@@ -1,0 +1,121 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const series = [
+  {
+    slug: '9ano',
+    titulo: '9º ano',
+    descricao: 'Álgebra, geometria e preparação para o Ensino Médio.',
+    total: 9,
+  },
+  {
+    slug: '1em',
+    titulo: '1º ano — Ensino Médio',
+    descricao: 'Conjuntos, números reais, funções e geometria plana.',
+    total: 10,
+  },
+  {
+    slug: '2em',
+    titulo: '2º ano — Ensino Médio',
+    descricao: 'Trigonometria, funções trigonométricas e sistemas lineares.',
+    total: 9,
+  },
+];
+---
+
+<Layout title="Materiais" description="Materiais didáticos de matemática para 9º ano e Ensino Médio.">
+  <main>
+    <header>
+      <h1>Materiais</h1>
+      <p class="subtitle">Apostilas e listas de exercícios organizadas por série.</p>
+    </header>
+
+    <div class="grid">
+      {series.map((s) => (
+        <a href={`/materiais/${s.slug}`} class="card">
+          <div class="card-top">
+            <span class="serie">{s.titulo}</span>
+            <span class="count">{s.total} materiais</span>
+          </div>
+          <p class="descricao">{s.descricao}</p>
+          <span class="cta">Ver materiais →</span>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { margin-bottom: 3rem; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; }
+
+  .grid { display: grid; gap: 1rem; }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .serie {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .count { font-size: 0.8rem; color: var(--muted); font-weight: 300; }
+
+  .descricao {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .cta {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+</style>

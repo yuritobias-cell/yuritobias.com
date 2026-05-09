@@ -1,183 +1,101 @@
 ---
-import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
 ---
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Yuri Tobias</title>
-    <meta name="description" content="Analista de dados educacionais e professor de matemática em Poços de Caldas." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  </head>
-  <body>
+<Layout title="Sobre">
+  <main>
+    <header>
+      <h1>Yuri Tobias</h1>
+      <p class="roles">
+        Analista de dados educacionais
+        <span class="sep">·</span>
+        Professor de matemática
+      </p>
+    </header>
 
-    <main>
-      <header>
-        <h1>Yuri Tobias</h1>
-        <p class="roles">
-          Analista de dados educacionais
-          <span class="sep">·</span>
-          Professor de matemática
-        </p>
-      </header>
+    <div class="divider"></div>
 
-      <div class="divider"></div>
+    <section class="bio">
+      <p>
+        Trabalho na Secretaria Municipal de Educação de Poços de Caldas
+        com análise de dados educacionais e no SESI como professor de
+        matemática para o 9º ano e o Ensino Médio.
+      </p>
+      <p>
+        Este site reúne projetos, materiais didáticos e reflexões sobre
+        os dois campos em que atuo — dados e ensino.
+      </p>
+    </section>
 
-      <section class="bio">
-        <p>
-          Trabalho na Secretaria Municipal de Educação de Poços de Caldas
-          com análise de dados educacionais e no SESI como professor de
-          matemática para o 9º ano e o Ensino Médio.
-        </p>
-        <p>
-          Este site reúne projetos, materiais didáticos e reflexões sobre
-          os dois campos em que atuo — dados e ensino.
-        </p>
-      </section>
+    <nav class="links">
+      <a href="mailto:yuritobias@gmail.com">E-mail</a>
+      <a href="https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="http://lattes.cnpq.br/2782196498099761" target="_blank" rel="noopener">Lattes</a>
+    </nav>
+  </main>
+</Layout>
 
-      <nav class="links">
-        <a href="mailto:yuritobias@gmail.com">
-          <span class="link-label">E-mail</span>
-        </a>
-        <a href="https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/" target="_blank" rel="noopener">
-          <span class="link-label">LinkedIn</span>
-        </a>
-        <a href="http://lattes.cnpq.br/2782196498099761" target="_blank" rel="noopener">
-          <span class="link-label">Lattes</span>
-        </a>
-      </nav>
-    </main>
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100dvh - 68px);
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    animation: fade-up 0.6s ease both;
+  }
 
-    <style>
-      *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-      :root {
-        --bg:        #F8F6F1;
-        --ink:       #1C1917;
-        --muted:     #78716C;
-        --accent:    #1B4F4F;
-        --rule:      #E2DDD6;
-        --font-display: 'Playfair Display', Georgia, serif;
-        --font-body:    'IBM Plex Sans', system-ui, sans-serif;
-      }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.6rem;
+  }
 
-      html {
-        background: var(--bg);
-        color: var(--ink);
-        font-family: var(--font-body);
-        font-size: 16px;
-        -webkit-font-smoothing: antialiased;
-      }
+  .roles { font-size: 0.95rem; font-weight: 300; color: var(--muted); }
+  .sep { margin: 0 0.5rem; opacity: 0.5; }
 
-      body {
-        min-height: 100dvh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem 1.5rem;
-      }
+  .divider {
+    width: 2.5rem;
+    height: 2px;
+    background: var(--accent);
+    margin: 2rem 0;
+  }
 
-      main {
-        width: 100%;
-        max-width: 580px;
-        animation: fade-up 0.6s ease both;
-      }
+  .bio { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 2.5rem; }
 
-      @keyframes fade-up {
-        from { opacity: 0; transform: translateY(16px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
+  .bio p { font-size: 1rem; line-height: 1.75; opacity: 0.85; }
 
-      h1 {
-        font-family: var(--font-display);
-        font-size: clamp(2.4rem, 6vw, 3.6rem);
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        line-height: 1.1;
-        color: var(--ink);
-        margin-bottom: 0.6rem;
-      }
+  .links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
 
-      .roles {
-        font-family: var(--font-body);
-        font-size: 0.95rem;
-        font-weight: 300;
-        color: var(--muted);
-        letter-spacing: 0.01em;
-      }
+  .links a {
+    text-decoration: none;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 2px;
+  }
 
-      .sep {
-        margin: 0 0.5rem;
-        opacity: 0.5;
-      }
+  .links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.25s ease;
+  }
 
-      .divider {
-        width: 2.5rem;
-        height: 2px;
-        background: var(--accent);
-        margin: 2rem 0;
-      }
-
-      .bio {
-        display: flex;
-        flex-direction: column;
-        gap: 0.9rem;
-        margin-bottom: 2.5rem;
-      }
-
-      .bio p {
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.75;
-        color: var(--ink);
-        opacity: 0.85;
-      }
-
-      .links {
-        display: flex;
-        gap: 1.75rem;
-        flex-wrap: wrap;
-      }
-
-      .links a {
-        text-decoration: none;
-        color: var(--accent);
-        font-size: 0.9rem;
-        font-weight: 500;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-        position: relative;
-        padding-bottom: 2px;
-      }
-
-      .links a::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0;
-        height: 1px;
-        background: var(--accent);
-        transition: width 0.25s ease;
-      }
-
-      .links a:hover::after {
-        width: 100%;
-      }
-
-      @media (max-width: 480px) {
-        .sep { display: none; }
-        .roles { display: flex; flex-direction: column; gap: 0.2rem; }
-      }
-    </style>
-
-  </body>
-</html>
+  .links a:hover::after { width: 100%; }
+</style>
