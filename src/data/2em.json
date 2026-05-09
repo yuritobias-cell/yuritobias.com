@@ -1,0 +1,11 @@
+[
+  { "n": "01", "titulo": "Apresentação", "descricao": "Introdução ao 2º ano e ao método de trabalho.", "arquivo": "01-intro.pdf" },
+  { "n": "02", "titulo": "Trigonometria I", "descricao": "Razões trigonométricas no triângulo retângulo.", "arquivo": "02-trigonometria-1.pdf" },
+  { "n": "03", "titulo": "Radianos", "descricao": "Medição de ângulos em radianos e conversões.", "arquivo": "03-radianos.pdf" },
+  { "n": "04", "titulo": "Lei dos Cossenos", "descricao": "Demonstração e aplicações da Lei dos Cossenos.", "arquivo": "04-lei-cossenos.pdf" },
+  { "n": "05", "titulo": "Lei dos Senos e Cossenos", "descricao": "Aplicações das leis trigonométricas em triângulos quaisquer.", "arquivo": "05-lei-senos-cossenos.pdf" },
+  { "n": "06", "titulo": "Circunferência Trigonométrica", "descricao": "O círculo unitário e os ângulos notáveis.", "arquivo": "06-circunferencia-trigonometrica.pdf" },
+  { "n": "07", "titulo": "Funções Trigonométricas — Apostila", "descricao": "Seno, cosseno e tangente como funções.", "arquivo": "07-funcoes-trigonometricas.pdf" },
+  { "n": "08", "titulo": "Sistemas — Apostila", "descricao": "Introdução aos sistemas de equações.", "arquivo": "08-sistemas-apostila.pdf" },
+  { "n": "09", "titulo": "Sistemas Lineares", "descricao": "Métodos de resolução de sistemas lineares.", "arquivo": "09-sistemas-lineares.pdf" }
+]

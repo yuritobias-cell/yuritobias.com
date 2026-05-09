@@ -1,0 +1,11 @@
+[
+  { "n": "01", "titulo": "Apresentação", "descricao": "Introdução ao ano letivo e ao método de trabalho.", "arquivo": "01-intro.pdf" },
+  { "n": "02", "titulo": "Equações", "descricao": "Equações do 1º grau e revisão de álgebra básica.", "arquivo": "02-equacoes.pdf" },
+  { "n": "03", "titulo": "Racionalização", "descricao": "Técnicas de racionalização de denominadores irracionais.", "arquivo": "03-racionalizacao.pdf" },
+  { "n": "04", "titulo": "Radiciação", "descricao": "Operações com raízes e propriedades dos radicais.", "arquivo": "04-radiciacao.pdf" },
+  { "n": "05", "titulo": "Notação Científica", "descricao": "Representação e operações com números em notação científica.", "arquivo": "05-notacao-cientifica.pdf" },
+  { "n": "06", "titulo": "Produtos Notáveis", "descricao": "Quadrado da soma, quadrado da diferença e produto da soma pela diferença.", "arquivo": "06-produtos-notaveis.pdf" },
+  { "n": "07", "titulo": "Equação do 2º Grau — Apostila I", "descricao": "Introdução às equações quadráticas e fórmula de Bhaskara.", "arquivo": "07-equacao-2grau-apostila.pdf" },
+  { "n": "08", "titulo": "Equação do 2º Grau — Apostila II", "descricao": "Exercícios complementares sobre equações do 2º grau.", "arquivo": "08-equacoes-2grau-apostila.pdf" },
+  { "n": "09", "titulo": "Teorema de Tales", "descricao": "Proporcionalidade entre segmentos e o Teorema de Tales.", "arquivo": "09-teorema-tales.pdf" }
+]

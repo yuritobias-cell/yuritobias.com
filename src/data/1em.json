@@ -1,0 +1,12 @@
+[
+  { "n": "01", "titulo": "Apresentação", "descricao": "Introdução ao Ensino Médio e ao método de trabalho.", "arquivo": "01-intro.pdf" },
+  { "n": "02", "titulo": "Conjuntos", "descricao": "Teoria dos conjuntos: representação e operações.", "arquivo": "02-conjuntos.pdf" },
+  { "n": "03", "titulo": "Conjuntos — Diagrama de Venn", "descricao": "Representação visual de conjuntos e suas operações.", "arquivo": "03-conjuntos-venn.pdf" },
+  { "n": "04", "titulo": "Fração Geratriz", "descricao": "Conversão de dízimas periódicas em frações.", "arquivo": "04-fracao-geratriz.pdf" },
+  { "n": "05", "titulo": "Operações com Reais", "descricao": "Operações no conjunto dos números reais.", "arquivo": "05-operacoes-reais.pdf" },
+  { "n": "06", "titulo": "Fechamento de Capítulo", "descricao": "Revisão e exercícios integrados da unidade.", "arquivo": "06-fechamento-capitulo.pdf" },
+  { "n": "07", "titulo": "Áreas — Apostila", "descricao": "Cálculo de áreas de figuras planas.", "arquivo": "07-areas-apostila.pdf" },
+  { "n": "08", "titulo": "Plano Cartesiano — Apostila", "descricao": "Coordenadas, distâncias e ponto médio.", "arquivo": "08-plano-cartesiano.pdf" },
+  { "n": "09", "titulo": "Produto Cartesiano", "descricao": "Conceito e aplicações do produto cartesiano.", "arquivo": "09-produto-cartesiano.pdf" },
+  { "n": "10", "titulo": "Classificação de Funções", "descricao": "Tipos de funções e suas características principais.", "arquivo": "10-classificacao-funcoes.pdf" }
+]

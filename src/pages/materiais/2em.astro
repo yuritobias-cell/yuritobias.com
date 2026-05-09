@@ -1,29 +1,18 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-
-const materiais = [
-  { n: '01', titulo: 'Apresentação', descricao: 'Introdução ao 2º ano e ao método de trabalho.', arquivo: '01-intro.pdf' },
-  { n: '02', titulo: 'Trigonometria I', descricao: 'Razões trigonométricas no triângulo retângulo.', arquivo: '02-trigonometria-1.pdf' },
-  { n: '03', titulo: 'Radianos', descricao: 'Medição de ângulos em radianos e conversões.', arquivo: '03-radianos.pdf' },
-  { n: '04', titulo: 'Lei dos Cossenos', descricao: 'Demonstração e aplicações da Lei dos Cossenos.', arquivo: '04-lei-cossenos.pdf' },
-  { n: '05', titulo: 'Lei dos Senos e Cossenos', descricao: 'Aplicações das leis trigonométricas em triângulos quaisquer.', arquivo: '05-lei-senos-cossenos.pdf' },
-  { n: '06', titulo: 'Circunferência Trigonométrica', descricao: 'O círculo unitário e os ângulos notáveis.', arquivo: '06-circunferencia-trigonometrica.pdf' },
-  { n: '07', titulo: 'Funções Trigonométricas — Apostila', descricao: 'Seno, cosseno e tangente como funções.', arquivo: '07-funcoes-trigonometricas.pdf' },
-  { n: '08', titulo: 'Sistemas — Apostila', descricao: 'Introdução aos sistemas de equações.', arquivo: '08-sistemas-apostila.pdf' },
-  { n: '09', titulo: 'Sistemas Lineares', descricao: 'Métodos de resolução de sistemas lineares.', arquivo: '09-sistemas-lineares.pdf' },
-];
+import materiais from '../../data/2em.json';
 ---
 
-<Layout title="2º ano — Ensino Médio" description="Materiais didáticos de matemática para o 2º ano do Ensino Médio.">
+<Layout title="9º ano" description="Materiais didáticos de matemática para o 9º ano.">
   <main>
     <nav class="breadcrumb">
       <a href="/materiais">Materiais</a>
       <span>›</span>
-      <span>2º ano — Ensino Médio</span>
+      <span>9º ano</span>
     </nav>
 
     <header>
-      <h1>2º ano — Ensino Médio</h1>
+      <h1>9º ano</h1>
       <p class="subtitle">{materiais.length} materiais disponíveis para download</p>
     </header>
 
@@ -47,80 +36,22 @@ const materiais = [
 </Layout>
 
 <style>
-  main {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 5rem;
-    animation: fade-up 0.5s ease both;
-  }
-
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 2rem;
-  }
-
+  main { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; animation: fade-up 0.5s ease both; }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
   .breadcrumb a { color: var(--accent); text-decoration: none; }
   .breadcrumb a:hover { text-decoration: underline; }
-
   header { margin-bottom: 2.5rem; }
-
-  h1 {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.4rem;
-  }
-
+  h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
   .subtitle { font-size: 0.9rem; color: var(--muted); font-weight: 300; }
-
   .lista { list-style: none; display: flex; flex-direction: column; }
-
-  .item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.25rem 0;
-    border-bottom: 1px solid var(--rule);
-  }
-
+  .item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 0; border-bottom: 1px solid var(--rule); }
   .item:first-child { border-top: 1px solid var(--rule); }
-
   .item-info { display: flex; align-items: flex-start; gap: 1rem; flex: 1; }
-
   .numero { font-size: 0.75rem; color: var(--muted); font-weight: 300; min-width: 1.5rem; padding-top: 0.15rem; }
-
   .titulo { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; }
-
   .descricao { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
-
-  .btn {
-    flex-shrink: 0;
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--accent);
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    border: 1px solid var(--accent);
-    padding: 0.4rem 0.9rem;
-    border-radius: 3px;
-    transition: background 0.2s ease, color 0.2s ease;
-  }
-
+  .btn { flex-shrink: 0; text-decoration: none; font-size: 0.8rem; font-weight: 500; color: var(--accent); letter-spacing: 0.03em; text-transform: uppercase; border: 1px solid var(--accent); padding: 0.4rem 0.9rem; border-radius: 3px; transition: background 0.2s ease, color 0.2s ease; }
   .btn:hover { background: var(--accent); color: white; }
-
-  @media (max-width: 520px) {
-    .item { flex-direction: column; align-items: flex-start; }
-  }
+  @media (max-width: 520px) { .item { flex-direction: column; align-items: flex-start; } }
 </style>
