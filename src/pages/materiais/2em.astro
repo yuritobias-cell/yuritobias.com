@@ -1,37 +1,64 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import materiais from '../../data/2em.json';
+import provas from '../../data/provas-2em.json';
 ---
 
-<Layout title="9º ano" description="Materiais didáticos de matemática para o 9º ano.">
+<Layout title="2º EM" description="Materiais didáticos de matemática para o 2º ano do Ensino Médio.">
   <main>
     <nav class="breadcrumb">
       <a href="/materiais">Materiais</a>
       <span>›</span>
-      <span>9º ano</span>
+      <span>2º EM</span>
     </nav>
 
     <header>
-      <h1>9º ano</h1>
-      <p class="subtitle">{materiais.length} materiais disponíveis para download</p>
+      <h1>2º EM</h1>
     </header>
 
-    <ul class="lista">
-      {materiais.map((m) => (
-        <li class="item">
-          <div class="item-info">
-            <span class="numero">{m.n}</span>
-            <div>
-              <p class="titulo">{m.titulo}</p>
-              <p class="descricao">{m.descricao}</p>
+    <!-- Seção: Materiais -->
+    <section class="secao">
+      <h2 class="secao-titulo">Para Casa</h2>
+      <p class="subtitle">{materiais.length} materiais disponíveis</p>
+      <ul class="lista">
+        {materiais.map((m) => (
+          <li class="item">
+            <div class="item-info">
+              <span class="numero">{m.n}</span>
+              <div>
+                <p class="titulo">{m.titulo}</p>
+                <p class="descricao">{m.descricao}</p>
+              </div>
             </div>
-          </div>
-          <a href={`/materiais/2em/${m.arquivo}`} download class="btn">
-            Baixar PDF
-          </a>
-        </li>
-      ))}
-    </ul>
+            <a href={`/materiais/2em/${m.arquivo}`} download class="btn">
+              Baixar PDF
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Seção: Provas -->
+    <section class="secao">
+      <h2 class="secao-titulo">Somativas</h2>
+      <p class="subtitle">{provas.length} provas disponíveis</p>
+      <ul class="lista">
+        {provas.map((p) => (
+          <li class="item">
+            <div class="item-info">
+              <span class="numero">{p.n}</span>
+              <div>
+                <p class="titulo">{p.titulo}</p>
+                <p class="descricao">{p.descricao}</p>
+              </div>
+            </div>
+            <a href={`/materiais/2em/${p.arquivo}`} download class="btn">
+              Baixar PDF
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   </main>
 </Layout>
 
@@ -53,5 +80,7 @@ import materiais from '../../data/2em.json';
   .descricao { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
   .btn { flex-shrink: 0; text-decoration: none; font-size: 0.8rem; font-weight: 500; color: var(--accent); letter-spacing: 0.03em; text-transform: uppercase; border: 1px solid var(--accent); padding: 0.4rem 0.9rem; border-radius: 3px; transition: background 0.2s ease, color 0.2s ease; }
   .btn:hover { background: var(--accent); color: white; }
+  .secao { margin-bottom: 3.5rem; }
+  .secao-titulo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
   @media (max-width: 520px) { .item { flex-direction: column; align-items: flex-start; } }
 </style>
