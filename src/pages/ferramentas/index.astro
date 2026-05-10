@@ -1,0 +1,34 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const ferramentas = [
+  {
+    slug: 'sorteador-grupos',
+    titulo: 'Sorteador de Grupos',
+    descricao: 'Distribua alunos em grupos aleatórios a partir de uma lista. Escolha o número de grupos ou o tamanho de cada um.',
+  },
+  {
+    slug: 'testador-senhas',
+    titulo: 'Testador de Senhas',
+    descricao: 'Simule quanto tempo levaria para quebrar uma senha por força bruta e entenda o que torna uma senha segura.',
+  },
+];
+---
+
+<Layout title="Ferramentas">
+  <main class="max-w-3xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-display mb-2">Ferramentas</h1>
+    <p class="text-stone-500 mb-12">Aplicações desenvolvidas para uso em sala de aula e no dia a dia.</p>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      {ferramentas.map(f => (
+        <a href={`/ferramentas/${f.slug}`} class="group block border border-stone-200 rounded-xl p-6 hover:border-[var(--color-accent)] transition-colors">
+          <h2 class="text-lg font-display mb-2 group-hover:text-[var(--color-accent)] transition-colors">
+            {f.titulo}
+          </h2>
+          <p class="text-sm text-stone-500 leading-relaxed">{f.descricao}</p>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>

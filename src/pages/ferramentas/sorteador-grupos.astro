@@ -1,0 +1,218 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Sorteador de Grupos">
+  <div class="tool-root">
+    <div class="container">
+      <header>
+        <a href="/ferramentas" class="back-link">← Ferramentas</a>
+        <h1>Sorteador de grupos</h1>
+        <p>Distribua alunos em grupos aleatórios de forma rápida e justa.</p>
+      </header>
+
+      <div class="card">
+        <div class="field" style="margin-bottom: 1.25rem;">
+          <span class="section-label">Lista de alunos (um por linha)</span>
+          <textarea id="names" placeholder="Ana Lima&#10;Bruno Souza&#10;Carla Mendes&#10;Daniel Costa&#10;..."></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <span class="section-label">Modo</span>
+            <select id="mode">
+              <option value="per_group">Alunos por grupo</option>
+              <option value="num_groups">Número de grupos</option>
+            </select>
+          </div>
+          <div class="field">
+            <span class="section-label" id="qty-label">Alunos por grupo</span>
+            <input type="number" id="qty" value="4" min="1" max="99">
+          </div>
+          <div class="field" style="margin-left: auto;">
+            <span class="section-label" style="visibility:hidden;">.</span>
+            <button class="btn-main" onclick="sortear()">Sortear grupos</button>
+          </div>
+        </div>
+        <div id="error-box" class="error"></div>
+      </div>
+
+      <section id="results-section">
+        <div class="info-bar">
+          <span class="stat" id="stat-text"></span>
+          <button class="btn-secondary" onclick="sortear()">Sortear novamente</button>
+        </div>
+        <hr class="divider">
+        <div class="groups-grid" id="groups-grid"></div>
+      </section>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .tool-root {
+    background: #f5f4f0;
+    min-height: calc(100vh - 65px);
+    padding: 2rem 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #1a1a18;
+  }
+  .tool-root .container { max-width: 760px; margin: 0 auto; }
+  .tool-root header { margin-bottom: 2rem; }
+  .back-link {
+    display: inline-block;
+    font-size: 13px;
+    color: #6b6b67;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: #1B4F4F; }
+  .tool-root header h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+  .tool-root header p { font-size: 14px; color: #6b6b67; }
+  .tool-root .card {
+    background: #fff;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-label { font-size: 13px; color: #6b6b67; margin-bottom: 6px; display: block; }
+  .tool-root textarea {
+    width: 100%; min-height: 130px; resize: vertical;
+    font-size: 14px; padding: 10px 12px;
+    border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px;
+    background: #fafaf8; color: #1a1a18; font-family: inherit; line-height: 1.6;
+  }
+  .tool-root textarea:focus { outline: none; border-color: rgba(0,0,0,0.35); }
+  .tool-root .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .tool-root .field { display: flex; flex-direction: column; gap: 6px; }
+  .tool-root select, .tool-root input[type=number] {
+    height: 36px; padding: 0 10px;
+    border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px;
+    background: #fafaf8; color: #1a1a18; font-size: 14px; font-family: inherit;
+  }
+  .tool-root select { min-width: 180px; }
+  .tool-root input[type=number] { width: 80px; }
+  .tool-root select:focus, .tool-root input[type=number]:focus { outline: none; border-color: rgba(0,0,0,0.35); }
+  .btn-main {
+    height: 36px; padding: 0 20px;
+    border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px;
+    background: #1a1a18; color: #fff; font-size: 14px;
+    font-family: inherit; cursor: pointer; font-weight: 500; transition: background 0.15s;
+  }
+  .btn-main:hover { background: #333; }
+  .btn-secondary {
+    height: 32px; padding: 0 14px;
+    border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px;
+    background: transparent; color: #6b6b67; font-size: 13px;
+    font-family: inherit; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-secondary:hover { background: #f5f4f0; color: #1a1a18; }
+  .error {
+    font-size: 13px; color: #a32d2d; padding: 8px 12px;
+    border: 0.5px solid #f09595; border-radius: 8px;
+    margin-top: 1rem; background: #fcebeb; display: none;
+  }
+  .info-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+  .stat { font-size: 13px; color: #6b6b67; }
+  .stat b { color: #1a1a18; font-weight: 500; }
+  .divider { border: none; border-top: 0.5px solid rgba(0,0,0,0.1); margin: 1.25rem 0; }
+  .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .group-card {
+    background: #fff; border: 0.5px solid rgba(0,0,0,0.1);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    animation: fadeUp 0.25s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 0.5px solid rgba(0,0,0,0.08); }
+  .group-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+  .group-title { font-size: 13px; font-weight: 500; }
+  .group-count { margin-left: auto; font-size: 12px; color: #6b6b67; }
+  .student-list { list-style: none; }
+  .student-item { font-size: 13px; color: #6b6b67; padding: 3px 0; line-height: 1.4; display: flex; align-items: baseline; gap: 6px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(0,0,0,0.2); flex-shrink: 0; margin-top: 5px; }
+  #results-section { display: none; }
+</style>
+
+<script>
+  const BADGE_COLORS = [
+    {bg:'#E6F1FB',color:'#0C447C'},{bg:'#E1F5EE',color:'#085041'},
+    {bg:'#FAECE7',color:'#712B13'},{bg:'#FBEAF0',color:'#72243E'},
+    {bg:'#FAEEDA',color:'#633806'},{bg:'#EAF3DE',color:'#27500A'},
+    {bg:'#EEEDFE',color:'#3C3489'},{bg:'#FCEBEB',color:'#791F1F'}
+  ];
+
+  document.getElementById('mode').addEventListener('change', function() {
+    document.getElementById('qty-label').textContent =
+      this.value === 'per_group' ? 'Alunos por grupo' : 'Número de grupos';
+  });
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  window.sortear = function() {
+    const raw = document.getElementById('names').value;
+    const qty = parseInt(document.getElementById('qty').value);
+    const mode = document.getElementById('mode').value;
+    const errBox = document.getElementById('error-box');
+    const grid = document.getElementById('groups-grid');
+    const section = document.getElementById('results-section');
+
+    errBox.style.display = 'none';
+    grid.innerHTML = '';
+    section.style.display = 'none';
+
+    const names = raw.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+
+    if (names.length < 2) { errBox.textContent = 'Adicione pelo menos 2 alunos na lista.'; errBox.style.display = 'block'; return; }
+    if (!qty || qty < 1) { errBox.textContent = 'Informe um valor válido (mínimo 1).'; errBox.style.display = 'block'; return; }
+
+    let numGroups;
+    if (mode === 'per_group') {
+      if (qty > names.length) { errBox.textContent = `Você tem apenas ${names.length} alunos. Diminua o tamanho do grupo.`; errBox.style.display = 'block'; return; }
+      numGroups = Math.ceil(names.length / qty);
+    } else {
+      if (qty > names.length) { errBox.textContent = `Não é possível criar ${qty} grupos com apenas ${names.length} alunos.`; errBox.style.display = 'block'; return; }
+      numGroups = qty;
+    }
+
+    const shuffled = shuffle(names);
+    const groups = Array.from({length: numGroups}, () => []);
+    shuffled.forEach((name, i) => groups[i % numGroups].push(name));
+
+    const sizes = [...new Set(groups.map(g => g.length))];
+    const sizeText = sizes.length === 1 ? `${sizes[0]} alunos` : `${sizes.join(' ou ')} alunos`;
+    document.getElementById('stat-text').innerHTML =
+      `<b>${names.length}</b> alunos em <b>${numGroups}</b> grupos · ${sizeText} cada`;
+
+    groups.forEach((group, idx) => {
+      const c = BADGE_COLORS[idx % BADGE_COLORS.length];
+      const card = document.createElement('div');
+      card.className = 'group-card';
+      card.style.animationDelay = (idx * 0.05) + 's';
+      card.innerHTML = `
+        <div class="group-header">
+          <div class="group-badge" style="background:${c.bg};color:${c.color};">${idx+1}</div>
+          <span class="group-title">Grupo ${idx+1}</span>
+          <span class="group-count">${group.length}</span>
+        </div>
+        <ul class="student-list">
+          ${group.map(n => `<li class="student-item"><span class="dot"></span>${n}</li>`).join('')}
+        </ul>
+      `;
+      grid.appendChild(card);
+    });
+
+    section.style.display = 'block';
+    section.scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
+</script>
