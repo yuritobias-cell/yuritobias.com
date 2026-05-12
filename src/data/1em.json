@@ -8,5 +8,7 @@
   { "n": "07", "titulo": "Áreas — Apostila", "descricao": "Cálculo de áreas de figuras planas.", "arquivo": "07-areas-apostila.pdf" },
   { "n": "08", "titulo": "Plano Cartesiano — Apostila", "descricao": "Coordenadas, distâncias e ponto médio.", "arquivo": "08-plano-cartesiano.pdf" },
   { "n": "09", "titulo": "Produto Cartesiano", "descricao": "Conceito e aplicações do produto cartesiano.", "arquivo": "09-produto-cartesiano.pdf" },
-  { "n": "10", "titulo": "Classificação de Funções", "descricao": "Tipos de funções e suas características principais.", "arquivo": "10-classificacao-funcoes.pdf" }
+  { "n": "10", "titulo": "Classificação de Funções", "descricao": "Tipos de funções e suas características principais.", "arquivo": "10-classificacao-funcoes.pdf" },
+  { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/cgdNahxSoho", "topicos": [] } },
+  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/KUhfQA1ltaI", "topicos": [] } }
 ]

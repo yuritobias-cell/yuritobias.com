@@ -25,14 +25,28 @@ import provas from '../../data/provas-9ano.json';
           <li class="item">
             <div class="item-info">
               <span class="numero">{m.n}</span>
-              <div>
+              <div class="item-texto">
                 <p class="titulo">{m.titulo}</p>
                 <p class="descricao">{m.descricao}</p>
+                {m.video && m.video.topicos.length > 0 && (
+                  <ul class="topicos">
+                    {m.video.topicos.map((t) => (
+                      <li>{t}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
-            <a href={`/materiais/9ano/${m.arquivo}`} download class="btn">
-              Baixar PDF
-            </a>
+            <div class="acoes">
+              <a href={`/materiais/9ano/${m.arquivo}`} download class="btn">
+                Baixar PDF
+              </a>
+              {m.video && (
+                <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
+                  ▶ Vídeo
+                </a>
+              )}
+            </div>
           </li>
         ))}
       </ul>
@@ -75,12 +89,19 @@ import provas from '../../data/provas-9ano.json';
   .item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 0; border-bottom: 1px solid var(--rule); }
   .item:first-child { border-top: 1px solid var(--rule); }
   .item-info { display: flex; align-items: flex-start; gap: 1rem; flex: 1; }
+  .item-texto { display: flex; flex-direction: column; gap: 0.2rem; }
   .numero { font-size: 0.75rem; color: var(--muted); font-weight: 300; min-width: 1.5rem; padding-top: 0.15rem; }
   .titulo { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; }
   .descricao { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .topicos { list-style: none; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; }
+  .topicos li { font-size: 0.8rem; color: var(--muted); padding-left: 0.75rem; position: relative; }
+  .topicos li::before { content: '–'; position: absolute; left: 0; }
+  .acoes { display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0; align-items: flex-end; }
   .btn { flex-shrink: 0; text-decoration: none; font-size: 0.8rem; font-weight: 500; color: var(--accent); letter-spacing: 0.03em; text-transform: uppercase; border: 1px solid var(--accent); padding: 0.4rem 0.9rem; border-radius: 3px; transition: background 0.2s ease, color 0.2s ease; }
   .btn:hover { background: var(--accent); color: white; }
+  .btn-video { color: var(--muted); border-color: var(--rule); }
+  .btn-video:hover { background: var(--ink); border-color: var(--ink); color: white; }
   .secao { margin-bottom: 3.5rem; }
   .secao-titulo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
-  @media (max-width: 520px) { .item { flex-direction: column; align-items: flex-start; } }
+  @media (max-width: 520px) { .item { flex-direction: column; align-items: flex-start; } .acoes { flex-direction: row; } }
 </style>

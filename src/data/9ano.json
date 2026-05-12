@@ -8,5 +8,7 @@
   { "n": "07", "titulo": "Equação do 2º Grau — Apostila I", "descricao": "Introdução às equações quadráticas e fórmula de Bhaskara.", "arquivo": "07-equacao-2grau-apostila.pdf" },
   { "n": "08", "titulo": "Equação do 2º Grau — Apostila II", "descricao": "Exercícios complementares sobre equações do 2º grau.", "arquivo": "08-equacoes-2grau-apostila.pdf" },
   { "n": "09", "titulo": "Teorema de Tales", "descricao": "Proporcionalidade entre segmentos e o Teorema de Tales.", "arquivo": "09-teorema-tales.pdf" },
-  { "n": "10", "titulo": "Porcentanges Sucessivas", "descricao": "Cálculo de porcentagens sucessivas em situações problema.", "arquivo": "10-porcentagens.pdf" }
+  { "n": "10", "titulo": "Porcentanges Sucessivas", "descricao": "Cálculo de porcentagens sucessivas em situações problema.", "arquivo": "10-porcentagens.pdf" },
+  { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/JmMjrmSV5oU", "topicos": [] } },
+  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/GgjZsjYITxA", "topicos": [] } }
 ]

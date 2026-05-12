@@ -8,5 +8,7 @@
   { "n": "07", "titulo": "Funções Trigonométricas — Apostila", "descricao": "Seno, cosseno e tangente como funções.", "arquivo": "07-funcoes-trigonometricas.pdf" },
   { "n": "08", "titulo": "Sistemas — Apostila", "descricao": "Introdução aos sistemas de equações.", "arquivo": "08-sistemas-apostila.pdf" },
   { "n": "09", "titulo": "Sistemas Lineares", "descricao": "Métodos de resolução de sistemas lineares.", "arquivo": "09-sistemas-lineares.pdf" },
-  { "n": "10", "titulo": "Somatório e Fatorial", "descricao": "Cálculo de Fatorias e Somatórios.", "arquivo": "10-fatorial-somatorio.pdf" }
+  { "n": "10", "titulo": "Somatório e Fatorial", "descricao": "Cálculo de Fatorias e Somatórios.", "arquivo": "10-fatorial-somatorio.pdf" },
+  { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/BXrTTuwsJpg", "topicos": [] } },
+  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/wgcpjmNXrmc", "topicos": [] } }
 ]
