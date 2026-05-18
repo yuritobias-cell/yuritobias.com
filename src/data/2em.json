@@ -10,5 +10,6 @@
   { "n": "09", "titulo": "Sistemas Lineares", "descricao": "Métodos de resolução de sistemas lineares.", "arquivo": "09-sistemas-lineares.pdf" },
   { "n": "10", "titulo": "Somatório e Fatorial", "descricao": "Cálculo de Fatorias e Somatórios.", "arquivo": "10-fatorial-somatorio.pdf" },
   { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/BXrTTuwsJpg", "topicos": [] } },
-  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/wgcpjmNXrmc", "topicos": [] } }
+  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/wgcpjmNXrmc", "topicos": [] } },
+  { "n": "11", "titulo": "Revisão para o Avalia SESI 2026", "descricao": "Lista de revisão para avaliação externa da rede.", "arquivo": "12-avaliasesi.pdf"}
 ]

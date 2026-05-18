@@ -10,5 +10,6 @@
   { "n": "09", "titulo": "Teorema de Tales", "descricao": "Proporcionalidade entre segmentos e o Teorema de Tales.", "arquivo": "09-teorema-tales.pdf" },
   { "n": "10", "titulo": "Porcentanges Sucessivas", "descricao": "Cálculo de porcentagens sucessivas em situações problema.", "arquivo": "10-porcentagens.pdf" },
   { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/JmMjrmSV5oU", "topicos": [] } },
-  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/GgjZsjYITxA", "topicos": [] } }
+  { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/GgjZsjYITxA", "topicos": [] } },
+  { "n": "11", "titulo": "Revisão para o Avalia SESI 2026", "descricao": "Lista de revisão para avaliação externa da rede.", "arquivo": "12-avaliasesi.pdf"}
 ]
