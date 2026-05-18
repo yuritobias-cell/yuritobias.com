@@ -1,0 +1,382 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Pluviometria dos Biomas Brasileiros">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" is:inline></script>
+
+  <div class="plv-page">
+
+    <div class="plv-header">
+      <div class="plv-badge">Climatologia</div>
+      <h1>Pluviometria dos Biomas Brasileiros</h1>
+      <p>Precipitação média histórica por bioma · Valores em milímetros (mm)</p>
+    </div>
+
+    <div class="plv-cards" id="cards"></div>
+
+    <div class="plv-panel">
+      <div class="plv-tabs">
+        <button class="plv-tab-btn active" onclick="switchTab('mensal')">Distribuição Mensal</button>
+        <button class="plv-tab-btn"        onclick="switchTab('anual')">Total Anual</button>
+      </div>
+
+      <div class="plv-inner">
+
+        <div id="view-mensal">
+          <div class="plv-toggle-row">
+            <span class="plv-toggle-label">Exibir:</span>
+            <button class="plv-tog-all on" id="btn-all" onclick="toggleAll()">Todos ✓</button>
+            <div id="bios-btns"></div>
+          </div>
+          <div class="plv-chart-wrap">
+            <canvas id="chartMensal"></canvas>
+          </div>
+          <p style="font-size:11px;color:#ccc;text-align:center;margin-top:10px;">
+            Clique nos botões acima para destacar biomas específicos
+          </p>
+        </div>
+
+        <div id="view-anual" style="display:none;">
+          <div class="plv-chart-wrap" style="height:300px;">
+            <canvas id="chartAnual"></canvas>
+          </div>
+          <div class="plv-desc-grid" id="desc-grid"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="plv-footer">Fontes: INMET · IBGE · ANA — Médias históricas representativas por bioma · Elaborado para uso didático</p>
+  </div>
+
+  <div class="plv-ct" id="tooltip" style="position:fixed;display:none;z-index:999;"></div>
+</Layout>
+
+<style is:global>
+  .plv-page {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: #1a1a2e;
+    padding: 28px 20px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .plv-header { text-align: center; margin-bottom: 28px; }
+  .plv-badge {
+    display: inline-block;
+    background: #e1f3ea; color: #1a7a50;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .07em; text-transform: uppercase;
+    padding: 4px 14px; border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .plv-header h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
+  .plv-header p  { font-size: 14px; color: #666; }
+
+  .plv-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .plv-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1.5px solid #f0f0f0;
+    border-left-width: 4px;
+    padding: 10px 14px;
+    transition: opacity .2s;
+  }
+  .plv-card .c-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #999; margin-bottom: 3px; }
+  .plv-card .c-val   { font-size: 19px; font-weight: 700; }
+  .plv-card .c-unit  { font-size: 12px; font-weight: 400; color: #bbb; }
+  .plv-card .bar-bg  { height: 4px; background: #efefef; border-radius: 2px; margin-top: 7px; }
+  .plv-card .bar-fill{ height: 4px; border-radius: 2px; }
+
+  .plv-panel {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e8e8e8;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .plv-tabs { display: flex; border-bottom: 1px solid #ececec; }
+  .plv-tab-btn {
+    padding: 13px 24px; border: none; background: none;
+    cursor: pointer; font-size: 13px; font-weight: 400; color: #999;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: color .15s;
+  }
+  .plv-tab-btn.active { color: #1a1a2e; font-weight: 600; border-bottom-color: #1a1a2e; }
+
+  .plv-inner { padding: 22px 26px 18px; }
+
+  .plv-toggle-row {
+    display: flex; flex-wrap: wrap; gap: 7px;
+    align-items: center; margin-bottom: 18px;
+  }
+  .plv-toggle-label { font-size: 12px; color: #bbb; margin-right: 2px; }
+  .plv-tog-all {
+    font-size: 11px; padding: 5px 12px; border-radius: 16px;
+    border: 1.5px solid #ccc; background: transparent;
+    color: #555; cursor: pointer; font-weight: 600;
+    transition: all .15s;
+  }
+  .plv-tog-all.on { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+  .plv-tog {
+    font-size: 12px; padding: 5px 12px; border-radius: 16px;
+    border: 1.5px solid; background: transparent;
+    cursor: pointer; font-weight: 600;
+    transition: all .15s;
+  }
+  .plv-tog.on  { color: #fff; }
+  .plv-tog.off { background: transparent !important; }
+
+  .plv-chart-wrap { position: relative; width: 100%; height: 340px; }
+
+  .plv-desc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 18px;
+  }
+  .plv-desc-card {
+    display: flex; align-items: flex-start; gap: 10px;
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .plv-desc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .plv-desc-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .plv-desc-text { font-size: 11px; color: #555; line-height: 1.45; }
+
+  .plv-footer { font-size: 11px; color: #ccc; text-align: center; }
+
+  .plv-ct {
+    background: #fff; border: 1px solid #e8e8e8;
+    border-radius: 10px; padding: 10px 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.09);
+    min-width: 180px; pointer-events: none;
+  }
+  .plv-ct-title { font-weight: 700; font-size: 13px; color: #333; margin-bottom: 8px; }
+  .plv-ct-row   { display: flex; justify-content: space-between; gap: 14px; font-size: 12px; margin-bottom: 3px; }
+  .plv-ct-name  { display: flex; align-items: center; gap: 5px; color: #555; }
+  .plv-ct-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .plv-ct-val   { font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .plv-cards { grid-template-columns: 1fr 1fr; }
+    .plv-desc-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+const BIOMAS = [
+  { name:'Amazônia',       color:'#1a8f60', bg:'#e6f7f0',
+    desc:'Maior bioma — chuvas abundantes o ano todo, com leve redução no inverno.',
+    data:[250,260,280,260,220,165,135,120,150,195,215,205] },
+  { name:'Mata Atlântica', color:'#1e6ebd', bg:'#e6f0fb',
+    desc:'Chuvas bem distribuídas com pico no verão, influenciadas pelo oceano.',
+    data:[185,165,155,105,80,65,60,65,95,130,160,225] },
+  { name:'Cerrado',        color:'#c8860e', bg:'#fdf3e3',
+    desc:'Forte sazonalidade: verão chuvoso (out–mar) e inverno muito seco (mai–set).',
+    data:[240,210,175,85,30,10,8,15,45,140,210,235] },
+  { name:'Pantanal',       color:'#6b4ec8', bg:'#f0ecfb',
+    desc:'Verão chuvoso; relevo plano acumula a água gerando as grandes cheias.',
+    data:[195,175,155,85,55,25,18,25,58,115,145,185] },
+  { name:'Pampa',          color:'#4a8c35', bg:'#edf6e8',
+    desc:'Único bioma sem estação seca definida — chuvas regulares o ano todo.',
+    data:[130,120,115,100,105,115,115,100,110,120,120,130] },
+  { name:'Caatinga',       color:'#c2530a', bg:'#faeee6',
+    desc:'Semiárido — chuvas escassas e irregulares, concentradas em jan–abr.',
+    data:[85,95,100,65,25,12,8,8,12,18,22,50] },
+];
+
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const totals   = BIOMAS.map(b => b.data.reduce((a,v)=>a+v,0));
+const maxTotal = Math.max(...totals);
+const visible  = BIOMAS.map(()=>true);
+
+// Cards
+const sortedIdx = [...BIOMAS.keys()].sort((a,b)=>totals[b]-totals[a]);
+const cardsEl = document.getElementById('cards');
+sortedIdx.forEach(i => {
+  const b = BIOMAS[i];
+  const pct = Math.round(totals[i]/maxTotal*100);
+  const div = document.createElement('div');
+  div.className = 'plv-card';
+  div.id = 'card-'+i;
+  div.style.borderLeftColor = b.color;
+  div.innerHTML = `
+    <div class="c-label">${b.name}</div>
+    <div class="c-val" style="color:${b.color}">${totals[i].toLocaleString('pt-BR')} <span class="c-unit">mm/ano</span></div>
+    <div class="bar-bg"><div class="bar-fill" id="bar-${i}" style="width:${pct}%;background:${b.color}"></div></div>`;
+  cardsEl.appendChild(div);
+});
+
+// Botões de toggle
+const btnsEl = document.getElementById('bios-btns');
+btnsEl.style.cssText = 'display:flex;flex-wrap:wrap;gap:7px;';
+BIOMAS.forEach((b,i) => {
+  const btn = document.createElement('button');
+  btn.className='plv-tog on';
+  btn.id='tog-'+i;
+  btn.textContent=b.name;
+  btn.style.borderColor=b.color;
+  btn.style.background=b.color;
+  btn.style.color='#fff';
+  btn.addEventListener('click',()=>toggleBio(i));
+  btnsEl.appendChild(btn);
+});
+
+function toggleBio(i) {
+  const anyOtherOn = visible.some((v,j)=>v&&j!==i);
+  if(visible[i] && !anyOtherOn) return;
+  visible[i]=!visible[i];
+  const btn  = document.getElementById('tog-'+i);
+  const card = document.getElementById('card-'+i);
+  if(visible[i]){
+    btn.classList.replace('off','on');
+    btn.style.background=BIOMAS[i].color; btn.style.color='#fff';
+    card.style.opacity='1';
+  } else {
+    btn.classList.replace('on','off');
+    btn.style.background='transparent'; btn.style.color=BIOMAS[i].color;
+    card.style.opacity='0.4';
+  }
+  const allBtn=document.getElementById('btn-all');
+  const allOn=visible.every(Boolean);
+  allBtn.textContent=allOn?'Todos ✓':'Todos';
+  allBtn.classList.toggle('on',allOn);
+  updateMensal();
+}
+
+function toggleAll(){
+  const allOn=visible.every(Boolean);
+  if(allOn){
+    BIOMAS.forEach((_,i)=>{ if(i>0){ visible[i]=false; refreshBtn(i); document.getElementById('card-'+i).style.opacity='0.4'; }});
+  } else {
+    BIOMAS.forEach((_,i)=>{ visible[i]=true; refreshBtn(i); document.getElementById('card-'+i).style.opacity='1'; });
+  }
+  const nowAll=visible.every(Boolean);
+  const allBtn=document.getElementById('btn-all');
+  allBtn.textContent=nowAll?'Todos ✓':'Todos';
+  allBtn.classList.toggle('on',nowAll);
+  updateMensal();
+}
+
+function refreshBtn(i){
+  const btn=document.getElementById('tog-'+i);
+  if(visible[i]){ btn.classList.replace('off','on'); btn.style.background=BIOMAS[i].color; btn.style.color='#fff'; }
+  else           { btn.classList.replace('on','off'); btn.style.background='transparent'; btn.style.color=BIOMAS[i].color; }
+}
+
+// Chart mensal
+const ctxM = document.getElementById('chartMensal').getContext('2d');
+const chartM = new Chart(ctxM,{
+  type:'line',
+  data:{
+    labels:MESES,
+    datasets:BIOMAS.map((b,i)=>({
+      label:b.name, data:b.data,
+      borderColor:b.color, backgroundColor:b.color+'22',
+      borderWidth:2.5, pointRadius:3.5, pointHoverRadius:6,
+      tension:0.35, fill:false,
+      borderDash:i===4?[6,3]:i===5?[2,2]:[],
+    }))
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{ mode:'index', intersect:false },
+    plugins:{
+      legend:{ display:false },
+      tooltip:{ enabled:false, external: externalTooltip }
+    },
+    scales:{
+      x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:12},color:'#999'} },
+      y:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:11},color:'#999',callback:v=>v+' mm'},
+          title:{display:true,text:'Precipitação (mm)',font:{size:11},color:'#aaa'} }
+    }
+  }
+});
+
+function updateMensal(){
+  BIOMAS.forEach((_,i)=>{ chartM.data.datasets[i].hidden=!visible[i]; });
+  chartM.update();
+}
+
+function externalTooltip(ctx){
+  const tip=document.getElementById('tooltip');
+  if(ctx.tooltip.opacity===0){ tip.style.display='none'; return; }
+  const items=[...ctx.tooltip.dataPoints].sort((a,b)=>b.parsed.y-a.parsed.y);
+  const label=ctx.tooltip.dataPoints[0]?.label||'';
+  tip.innerHTML=`<div class="plv-ct-title">${label}</div>`+
+    items.map(it=>`<div class="plv-ct-row">
+      <span class="plv-ct-name"><span class="plv-ct-dot" style="background:${it.dataset.borderColor}"></span>${it.dataset.label}</span>
+      <span class="plv-ct-val" style="color:${it.dataset.borderColor}">${it.parsed.y} mm</span>
+    </div>`).join('');
+  const {x,y}=ctx.tooltip;
+  const canvasRect=ctx.chart.canvas.getBoundingClientRect();
+  let left=canvasRect.left+x+14;
+  let top =canvasRect.top +y-10;
+  if(left+200>window.innerWidth) left=canvasRect.left+x-210;
+  tip.style.left=left+'px'; tip.style.top=top+'px'; tip.style.display='block';
+}
+document.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none',true);
+
+// Chart anual
+const annualSorted=[...BIOMAS.map((b,i)=>({...b,total:totals[i]}))].sort((a,z)=>a.total-z.total);
+const ctxA=document.getElementById('chartAnual').getContext('2d');
+new Chart(ctxA,{
+  type:'bar',
+  data:{
+    labels:annualSorted.map(b=>b.name),
+    datasets:[{
+      data:annualSorted.map(b=>b.total),
+      backgroundColor:annualSorted.map(b=>b.color+'cc'),
+      borderColor:annualSorted.map(b=>b.color),
+      borderWidth:1.5, borderRadius:5,
+    }]
+  },
+  options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        callbacks:{ label:ctx=>`  ${ctx.parsed.x.toLocaleString('pt-BR')} mm/ano` },
+        backgroundColor:'#fff', titleColor:'#333', bodyColor:'#555',
+        borderColor:'#e8e8e8', borderWidth:1, padding:10, cornerRadius:8,
+        titleFont:{weight:'700'}, bodyFont:{size:12},
+        displayColors:false,
+      }
+    },
+    scales:{
+      x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:11},color:'#999',callback:v=>v.toLocaleString('pt-BR')+' mm'} },
+      y:{ grid:{display:false}, ticks:{font:{size:13,weight:'600'},color:'#444'} }
+    }
+  }
+});
+
+// desc-grid
+const descEl=document.getElementById('desc-grid');
+annualSorted.slice().reverse().forEach(b=>{
+  descEl.innerHTML+=`<div class="plv-desc-card" style="background:${b.bg}">
+    <div class="plv-desc-dot" style="background:${b.color}"></div>
+    <div>
+      <div class="plv-desc-name" style="color:${b.color}">${b.name}</div>
+      <div class="plv-desc-text">${b.desc}</div>
+    </div>
+  </div>`;
+});
+
+// Tab switch
+let activeTab='mensal';
+function switchTab(tab){
+  if(tab===activeTab) return;
+  activeTab=tab;
+  document.getElementById('view-mensal').style.display = tab==='mensal'?'block':'none';
+  document.getElementById('view-anual') .style.display = tab==='anual' ?'block':'none';
+  document.querySelectorAll('.plv-tab-btn').forEach((b,i)=>
+    b.classList.toggle('active',(i===0&&tab==='mensal')||(i===1&&tab==='anual'))
+  );
+}
+</script>
