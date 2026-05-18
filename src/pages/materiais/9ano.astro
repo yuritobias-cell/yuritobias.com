@@ -2,6 +2,9 @@
 import Layout from '../../layouts/Layout.astro';
 import materiais from '../../data/9ano.json';
 import provas from '../../data/provas-9ano.json';
+
+const paracasa = materiais.filter((m) => !m.video);
+const revisoes = materiais.filter((m) => m.video);
 ---
 
 <Layout title="9º ano" description="Materiais didáticos de matemática para o 9º ano do Ensino Fundamental.">
@@ -19,9 +22,9 @@ import provas from '../../data/provas-9ano.json';
     <!-- Seção: Materiais -->
     <section class="secao">
       <h2 class="secao-titulo">Para Casa</h2>
-      <p class="subtitle">{materiais.length} materiais disponíveis</p>
+      <p class="subtitle">{paracasa.length} materiais disponíveis</p>
       <ul class="lista">
-        {materiais.map((m) => (
+        {paracasa.map((m) => (
           <li class="item">
             <div class="item-info">
               <span class="numero">{m.n}</span>
@@ -51,6 +54,43 @@ import provas from '../../data/provas-9ano.json';
         ))}
       </ul>
     </section>
+
+<!-- Seção: Revisão -->
+<section class="secao">
+  <h2 class="secao-titulo">Revisão</h2>
+  <p class="subtitle">{revisoes.length} listas disponíveis</p>
+  <ul class="lista">
+    {revisoes.map((m) => (
+      <li class="item">
+        <div class="item-info">
+          <span class="numero">{m.n}</span>
+          <div class="item-texto">
+            <p class="titulo">{m.titulo}</p>
+            <p class="descricao">{m.descricao}</p>
+            {m.video && m.video.topicos.length > 0 && (
+              <ul class="topicos">
+                {m.video.topicos.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+        <div class="acoes">
+          <a href={`/materiais/9ano/${m.arquivo}`} download class="btn">
+            Baixar PDF
+          </a>
+          <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
+            ▶ Vídeo
+          </a>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+
+
 
     <!-- Seção: Provas -->
     <section class="secao">
