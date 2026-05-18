@@ -1,0 +1,106 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const cursos = [
+  {
+    titulo: "FET — Free Timetabling",
+    descricao: "Aprenda a criar grades horárias escolares usando o software gratuito FET.",
+    aulas: 13,
+    slug: "fet"
+  }
+];
+---
+
+<Layout title="Cursos">
+  <main>
+    <div class="cabecalho">
+      <h1>Cursos</h1>
+      <p class="subtitulo">Cursos gravados em vídeo, disponíveis gratuitamente no YouTube.</p>
+    </div>
+
+    <div class="lista-cursos">
+      {cursos.map(curso => (
+        <a href={`/cursos/${curso.slug}`} class="card-curso">
+          <div class="card-info">
+            <h2>{curso.titulo}</h2>
+            <p>{curso.descricao}</p>
+          </div>
+          <span class="badge">{curso.aulas} aulas</span>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .cabecalho {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e0ddd6;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #1C1917;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitulo {
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #57534e;
+  }
+
+  .lista-cursos {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .card-curso {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background-color: #fff;
+    border: 1px solid #e0ddd6;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+
+  .card-curso:hover {
+    border-color: #1B4F4F;
+  }
+
+  .card-info h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #1C1917;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-info p {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem;
+    color: #57534e;
+  }
+
+  .badge {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1B4F4F;
+    border: 1px solid #1B4F4F;
+    padding: 0.25rem 0.6rem;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,155 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import curso from '../../data/curso-fet.json';
+
+const aulas = curso.aulas.filter(a => a.tipo === 'aula');
+const extras = curso.aulas.filter(a => a.tipo === 'extra');
+---
+
+<Layout title={curso.titulo}>
+  <main>
+    <div class="cabecalho">
+      <h1>{curso.titulo}</h1>
+      <p class="descricao">{curso.descricao}</p>
+      <a href={curso.playlist} target="_blank" rel="noopener noreferrer" class="btn-playlist">
+        ▶ Ver playlist completa no YouTube
+      </a>
+    </div>
+
+    <section>
+      <h2>Aulas</h2>
+      <ol class="lista-aulas">
+        {aulas.map(aula => (
+          <li class="item-aula">
+            <span class="numero">Aula {aula.n}</span>
+            <span class="titulo-aula">{aula.titulo}</span>
+            <a href={aula.url} target="_blank" rel="noopener noreferrer" class="btn-assistir">
+              ▶ Assistir
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section>
+      <h2>Aulas extras</h2>
+      <ol class="lista-aulas">
+        {extras.map(extra => (
+          <li class="item-aula">
+            <span class="numero">Extra {extra.n}</span>
+            <span class="titulo-aula">{extra.titulo}</span>
+            <a href={extra.url} target="_blank" rel="noopener noreferrer" class="btn-assistir">
+              ▶ Assistir
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .cabecalho {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e0ddd6;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #1C1917;
+    margin-bottom: 0.5rem;
+  }
+
+  .descricao {
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #57534e;
+    margin-bottom: 1.25rem;
+  }
+
+  .btn-playlist {
+    display: inline-block;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #1B4F4F;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .btn-playlist:hover {
+    background-color: #163d3d;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: #1C1917;
+    margin-bottom: 1rem;
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+  }
+
+  .lista-aulas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .item-aula {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: #fff;
+    border: 1px solid #e0ddd6;
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .numero {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1B4F4F;
+    white-space: nowrap;
+    min-width: 4.5rem;
+  }
+
+  .titulo-aula {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #1C1917;
+  }
+
+  .btn-assistir {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1B4F4F;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid #1B4F4F;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .btn-assistir:hover {
+    background-color: #1B4F4F;
+    color: #fff;
+  }
+</style>

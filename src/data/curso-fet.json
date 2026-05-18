@@ -1,0 +1,20 @@
+{
+  "titulo": "FET — Free Timetabling",
+  "descricao": "Aprenda a criar grades horárias escolares usando o software gratuito FET.",
+  "playlist": "https://www.youtube.com/playlist?list=PLj84aCw50YLBNcwaDszQlN_SvFSzV168O",
+  "aulas": [
+    { "n": 1, "tipo": "aula", "titulo": "Abrir o FET pela primeira vez e criar um arquivo", "url": "https://youtu.be/hgHGblYpxJM" },
+    { "n": 2, "tipo": "aula", "titulo": "Adicionar dias da semana e horário das aulas", "url": "https://youtu.be/4owOUoeUH40" },
+    { "n": 3, "tipo": "aula", "titulo": "Adicionar disciplinas e professores", "url": "https://youtu.be/loF9H7QL2Hk" },
+    { "n": 4, "tipo": "aula", "titulo": "Adicionar turmas e atividades", "url": "https://youtu.be/pKcrM-kuJi4" },
+    { "n": 5, "tipo": "aula", "titulo": "Gerar horários escolares e adicionar restrições de professores", "url": "https://youtu.be/BGp7J0PP_Y4" },
+    { "n": 6, "tipo": "aula", "titulo": "Refinando a grade horária", "url": "https://youtu.be/LVosJo-pyoc" },
+    { "n": 7, "tipo": "aula", "titulo": "Minimizar o número de janelas dos professores", "url": "https://youtu.be/o-3cCjWa3Ks" },
+    { "n": 8, "tipo": "aula", "titulo": "Impressão dos horários dos professores e das turmas", "url": "https://youtu.be/ICxW-z3fH2g" },
+    { "n": 1, "tipo": "extra", "titulo": "Separando turmas em grupos e subgrupos", "url": "https://youtu.be/kQCu6pEfeuQ" },
+    { "n": 2, "tipo": "extra", "titulo": "Aulas duplas obrigatórias", "url": "https://youtu.be/Qz6BMweWWeg" },
+    { "n": 3, "tipo": "extra", "titulo": "Uma mesma aula dada por dois ou mais professores", "url": "https://youtu.be/92dD8VizlI0" },
+    { "n": 4, "tipo": "extra", "titulo": "Dias da semana com quantidade de aulas diferentes", "url": "https://youtu.be/I4Klt0d3U6I" },
+    { "n": 5, "tipo": "extra", "titulo": "Uma mesma aula com várias turmas e único professor", "url": "https://youtu.be/Nm5NbjpqGLM" }
+  ]
+}
