@@ -31,12 +31,22 @@ const revisoes = materiais.filter((m) => m.video);
               <div class="item-texto">
                 <p class="titulo">{m.titulo}</p>
                 <p class="descricao">{m.descricao}</p>
+                {m.apostila && (
+                  <p class="apostila-ref">
+                    <span class="apostila-tag">Apostila</span>{m.apostila.ordem}
+                  </p>
+                )}
               </div>
             </div>
             <div class="acoes">
-              <a href={`/materiais/1em/${m.arquivo}`} download class="btn">
-                Baixar PDF
-              </a>
+              {m.arquivo && (
+                <a href={`/materiais/1em/${m.arquivo}`} download class="btn">
+                  Baixar PDF
+                </a>
+              )}
+              {m.apostila && m.apostila.data && (
+                <span class="badge-data">{m.apostila.data}</span>
+              )}
             </div>
           </li>
         ))}
@@ -118,6 +128,9 @@ const revisoes = materiais.filter((m) => m.video);
   .numero { font-size: 0.75rem; color: var(--muted); font-weight: 300; min-width: 1.5rem; padding-top: 0.15rem; }
   .titulo { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; }
   .descricao { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .apostila-ref { font-size: 0.85rem; color: var(--ink); line-height: 1.5; margin-top: 0.4rem; }
+  .apostila-tag { display: inline-block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0.05rem 0.4rem; margin-right: 0.5rem; }
+  .badge-data { font-size: 0.78rem; font-weight: 500; color: var(--muted); white-space: nowrap; letter-spacing: 0.02em; }
   .topicos { list-style: none; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; }
   .topicos li { font-size: 0.8rem; color: var(--muted); padding-left: 0.75rem; position: relative; }
   .topicos li::before { content: '–'; position: absolute; left: 0; }
