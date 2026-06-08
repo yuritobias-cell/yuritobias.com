@@ -1,0 +1,596 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Ângulos na Circunferência">
+
+  <!-- IBM Plex Mono carregado só nesta página (a equação é o elemento-assinatura).
+       Os demais (Playfair Display + IBM Plex Sans) já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <div class="ac-root">
+    <header class="masthead">
+      <p class="eyebrow">Geometria · Circunferência</p>
+      <h1>Ângulos na <em>circunferência</em></h1>
+      <p class="lede">Arraste os vértices e observe a fórmula se manter, ponto a ponto. Cada termo da equação está pintado com a cor do arco ou do ângulo que ele representa no desenho.</p>
+    </header>
+
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-mode="central"><span class="n">01</span>Central</button>
+      <button class="tab" role="tab" data-mode="inscrito"><span class="n">02</span>Inscrito</button>
+      <button class="tab" role="tab" data-mode="segmento"><span class="n">03</span>De segmento</button>
+      <button class="tab" role="tab" data-mode="interior"><span class="n">04</span>Excêntrico interior</button>
+      <button class="tab" role="tab" data-mode="exterior"><span class="n">05</span>Excêntrico exterior</button>
+    </div>
+
+    <div class="stage">
+      <div class="canvas-card">
+        <svg class="board" id="board" viewBox="0 0 520 520" aria-label="Área de desenho interativa"></svg>
+        <div class="hint" id="hint"></div>
+      </div>
+
+      <div class="panel">
+        <div class="card eq-card">
+          <div class="eq-label">Relação ao vivo</div>
+          <div class="eq" id="equation"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+
+        <div class="card">
+          <h2 id="theoremTitle"></h2>
+          <p id="theoremText"></p>
+        </div>
+
+        <div class="controls">
+          <label class="toggle on"><input type="checkbox" id="tArcs" checked> Arcos</label>
+          <label class="toggle on"><input type="checkbox" id="tMeasures" checked> Medidas</label>
+          <label class="toggle"><input type="checkbox" id="tGrid"> Grade</label>
+          <button class="reset" id="reset">Reiniciar pontos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Ângulos na Circunferência
+     Todo o CSS abaixo é escopado sob .ac-root para não vazar
+     para o resto do site. As variáveis ficam no próprio .ac-root.
+     ============================================================ */
+
+  .ac-root{
+    /* tokens (escopados nesta ferramenta) */
+    --bg:#F8F6F1;
+    --ink:#1C1917;
+    --muted:#78716C;
+    --accent:#1B4F4F;
+    --rule:#E2DDD6;
+    --paper:#FFFFFF;       /* superfície de desenho */
+    --paper-grid:#EFEBE3;
+    --arcA:#1B4F4F;        /* arco primário — teal */
+    --arcB:#936614;        /* segundo arco — ocre */
+    --angle:#A8442B;       /* ângulo (protagonista) — terracota */
+    --angle-fill:rgba(168,68,43,.18);
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+    --radius:14px;
+
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    color:var(--ink);
+    max-width:1180px;
+    margin:0 auto;
+    padding:30px 22px 56px;
+  }
+  .ac-root, .ac-root *{box-sizing:border-box}
+
+  .ac-root header.masthead{margin-bottom:22px}
+  .ac-root .eyebrow{
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px
+  }
+  .ac-root h1{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em
+  }
+  .ac-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .ac-root .lede{color:var(--muted);max-width:62ch;margin:12px 0 0;font-size:15px}
+
+  /* ----- tabs ----- */
+  .ac-root .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 18px}
+  .ac-root .tab{
+    appearance:none;border:1px solid var(--rule);background:transparent;
+    color:var(--muted);font-family:var(--font-body);font-weight:500;font-size:12.5px;
+    letter-spacing:.04em;text-transform:uppercase;
+    padding:9px 15px;border-radius:999px;cursor:pointer;transition:.18s;
+    display:flex;align-items:center;gap:8px
+  }
+  .ac-root .tab .n{font-family:var(--font-mono);font-size:11px;opacity:.65;letter-spacing:0}
+  .ac-root .tab:hover{color:var(--ink);border-color:var(--muted)}
+  .ac-root .tab[aria-selected="true"]{
+    background:var(--accent);border-color:var(--accent);color:#fff;
+    box-shadow:0 8px 22px -12px var(--accent)
+  }
+  .ac-root .tab[aria-selected="true"] .n{opacity:.8}
+
+  /* ----- layout ----- */
+  .ac-root .stage{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+  @media (max-width:880px){.ac-root .stage{grid-template-columns:1fr}}
+
+  .ac-root .canvas-card{
+    background:var(--paper);border:1px solid var(--rule);border-radius:var(--radius);
+    padding:10px;box-shadow:0 18px 44px -30px rgba(28,25,23,.45);position:relative
+  }
+  .ac-root svg.board{display:block;width:100%;height:auto;border-radius:8px;touch-action:none}
+
+  .ac-root .hint{
+    position:absolute;left:18px;right:18px;bottom:14px;
+    font-size:13px;color:#8A3A24;background:rgba(168,68,43,.10);
+    border:1px solid rgba(168,68,43,.38);border-radius:8px;padding:7px 11px;
+    font-family:var(--font-mono);display:none
+  }
+  .ac-root .hint.show{display:block}
+
+  .ac-root .panel{display:flex;flex-direction:column;gap:16px}
+  .ac-root .card{
+    background:var(--paper);border:1px solid var(--rule);
+    border-radius:var(--radius);padding:18px 18px 16px
+  }
+  .ac-root .card h2{font-family:var(--font-display);font-weight:600;font-size:21px;margin:0 0 5px;color:var(--ink)}
+  .ac-root .card p{margin:0;color:var(--muted);font-size:14px}
+
+  /* equação ao vivo — elemento-assinatura */
+  .ac-root .eq-card{border-left:3px solid var(--accent)}
+  .ac-root .eq-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .ac-root .eq{
+    font-family:var(--font-mono);font-size:clamp(15px,2.3vw,20px);
+    line-height:1.85;display:flex;flex-wrap:wrap;align-items:baseline;gap:7px
+  }
+  .ac-root .eq .tok{transition:color .15s}
+  .ac-root .eq .op{color:var(--muted)}
+  .ac-root .eq .ang{color:var(--angle);font-weight:600}
+  .ac-root .eq .arcA{color:var(--arcA);font-weight:600}
+  .ac-root .eq .arcB{color:var(--arcB);font-weight:600}
+  .ac-root .eq .res{color:var(--angle);font-weight:600;background:var(--angle-fill);
+    padding:1px 8px;border-radius:6px}
+  .ac-root .swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;
+    vertical-align:middle}
+
+  .ac-root .legend{display:flex;flex-direction:column;gap:7px;margin-top:14px;
+    font-size:12.5px;color:var(--muted);font-family:var(--font-mono)}
+  .ac-root .legend div{display:flex;align-items:center;gap:6px}
+
+  /* toggles */
+  .ac-root .controls{display:flex;flex-wrap:wrap;gap:8px}
+  .ac-root .toggle{
+    display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    border:1px solid var(--rule);border-radius:999px;padding:7px 13px;cursor:pointer;
+    user-select:none;transition:.16s;font-family:var(--font-body)
+  }
+  .ac-root .toggle:hover{color:var(--ink)}
+  .ac-root .toggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+  .ac-root .toggle.on{color:var(--ink);border-color:var(--muted);background:var(--paper)}
+
+  .ac-root .reset{
+    appearance:none;font-family:var(--font-body);font-size:13px;font-weight:500;
+    background:transparent;color:var(--muted);border:1px solid var(--rule);
+    border-radius:999px;padding:7px 14px;cursor:pointer;transition:.16s
+  }
+  .ac-root .reset:hover{color:var(--angle);border-color:var(--angle)}
+
+  /* estilo dos elementos SVG */
+  .ac-root .c-stroke{fill:none;stroke:var(--ink);stroke-width:2}
+  .ac-root .grid-line{stroke:var(--paper-grid);stroke-width:1}
+  .ac-root .chord{stroke:var(--ink);stroke-width:2;fill:none}
+  .ac-root .ray{stroke:var(--ink);stroke-width:2;fill:none}
+  .ac-root .tangent{stroke:var(--muted);stroke-width:2;stroke-dasharray:7 6;fill:none}
+  .ac-root .arcA{fill:none;stroke:var(--arcA);stroke-width:6;stroke-linecap:round}
+  .ac-root .arcB{fill:none;stroke:var(--arcB);stroke-width:6;stroke-linecap:round}
+  .ac-root .wedge{fill:var(--angle-fill);stroke:var(--angle);stroke-width:2}
+  .ac-root .lbl{font-family:var(--font-body);font-weight:600;font-size:15px;fill:var(--ink)}
+  .ac-root .arclbl{font-family:var(--font-mono);font-size:13px;font-weight:600}
+  .ac-root .anglbl{font-family:var(--font-mono);font-size:14px;font-weight:600;fill:var(--angle)}
+  .ac-root .handle{cursor:grab;stroke:#fff;stroke-width:2.5}
+  .ac-root .handle:active{cursor:grabbing}
+  .ac-root .handle.h-circle{fill:var(--arcA)}
+  .ac-root .handle.h-free{fill:var(--angle)}
+  .ac-root .center-dot{fill:var(--ink)}
+
+  @media (prefers-reduced-motion:reduce){.ac-root *{transition:none!important}}
+</style>
+
+<script is:inline>
+"use strict";
+const SVGNS="http://www.w3.org/2000/svg";
+const board=document.getElementById("board");
+const CX=260, CY=260, R=170;          // circle in viewBox coords
+const eqEl=document.getElementById("equation");
+const legendEl=document.getElementById("legend");
+const hintEl=document.getElementById("hint");
+const titleEl=document.getElementById("theoremTitle");
+const textEl=document.getElementById("theoremText");
+const acRoot=document.querySelector(".ac-root");   // [adaptado] lê as variáveis CSS deste contêiner
+
+const show={arcs:true,measures:true,grid:false};
+
+/* ---------- geometry helpers (validated) ---------- */
+const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+const norm=a=>((a%360)+360)%360;
+// math angle -> screen point (y flipped so increasing angle = counter-clockwise on screen)
+const toXY=a=>[CX+R*Math.cos(rad(a)), CY-R*Math.sin(rad(a))];
+// screen point -> math angle on circle
+const angleOf=(x,y)=>norm(deg(Math.atan2(-(y-CY), x-CX)));
+const arcCCW=(f,t)=>norm(t-f);
+const inCCW=(x,f,t)=>arcCCW(f,x)<arcCCW(f,t);
+// measure of arc from p to q that avoids every angle in excl[]
+function interceptedArc(p,q,excl){
+  const ccw=arcCCW(p,q);
+  const contains=excl.some(e=>inCCW(e,p,q));
+  return contains?360-ccw:ccw;
+}
+// {start, span} (ccw) of the arc from p to q avoiding excl  — for drawing
+function arcSeg(p,q,excl){
+  const ccw=arcCCW(p,q);
+  const contains=excl.some(e=>inCCW(e,p,q));
+  return contains?{start:q,span:360-ccw}:{start:p,span:ccw};
+}
+// geometric angle AVB in degrees (0..180)
+function angleAt(V,A,B){
+  const da=Math.atan2(A[1]-V[1],A[0]-V[0]);
+  const db=Math.atan2(B[1]-V[1],B[0]-V[0]);
+  let d=Math.abs(deg(da-db))%360; return Math.min(d,360-d);
+}
+// intersection of segment/line AB with line CD -> {p,sAB,sCD} or null
+function lineIntersect(A,B,C,D){
+  const bx=B[0]-A[0],by=B[1]-A[1],dx=D[0]-C[0],dy=D[1]-C[1];
+  const den=bx*dy-by*dx; if(Math.abs(den)<1e-9)return null;
+  const s=((C[0]-A[0])*dy-(C[1]-A[1])*dx)/den;
+  const u=((C[0]-A[0])*by-(C[1]-A[1])*bx)/den;
+  return {p:[A[0]+s*bx,A[1]+s*by],s,u};
+}
+// second intersection of line through external V and circle point Pa(math angle aPa)
+function secondIntersection(V,aPa){
+  const Pa=toXY(aPa);
+  const dx=Pa[0]-V[0],dy=Pa[1]-V[1];
+  const a=dx*dx+dy*dy;
+  const b=2*((V[0]-CX)*dx+(V[1]-CY)*dy);
+  const c=(V[0]-CX)**2+(V[1]-CY)**2-R*R;
+  const disc=b*b-4*a*c; if(disc<0)return null;
+  const sq=Math.sqrt(disc);
+  const t1=(-b-sq)/(2*a), t2=(-b+sq)/(2*a);
+  const P1=[V[0]+t1*dx,V[1]+t1*dy], P2=[V[0]+t2*dx,V[1]+t2*dy];
+  return [{p:P1,t:t1},{p:P2,t:t2}];
+}
+const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+const fmt=v=>v.toFixed(1).replace(".",",")+"°";
+
+/* ---------- svg drawing utils ---------- */
+function el(name,attrs){const e=document.createElementNS(SVGNS,name);
+  for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function clear(){while(board.firstChild)board.removeChild(board.firstChild);}
+// circumference arc path from {start,span} sampled along the circle
+function circArcPath(seg){
+  const step=seg.span/Math.max(2,Math.ceil(seg.span/2));
+  let d="";
+  for(let i=0;i<=Math.ceil(seg.span/step);i++){
+    const a=seg.start+Math.min(i*step,seg.span);
+    const[x,y]=toXY(a); d+=(i?" L":"M")+x.toFixed(2)+" "+y.toFixed(2);
+  }
+  return d;
+}
+// small angle wedge at vertex V between screen-points P1,P2 (minor angle)
+function wedgePath(V,P1,P2,rr){
+  let a1=Math.atan2(P1[1]-V[1],P1[0]-V[0]);
+  let a2=Math.atan2(P2[1]-V[1],P2[0]-V[0]);
+  let dd=a2-a1; while(dd>Math.PI)dd-=2*Math.PI; while(dd<-Math.PI)dd+=2*Math.PI;
+  const N=24; let d="M"+V[0]+" "+V[1];
+  for(let i=0;i<=N;i++){const a=a1+dd*i/N;
+    d+=" L"+(V[0]+rr*Math.cos(a)).toFixed(2)+" "+(V[1]+rr*Math.sin(a)).toFixed(2);}
+  return d+" Z";
+}
+function bisectorPoint(V,P1,P2,rr){
+  let a1=Math.atan2(P1[1]-V[1],P1[0]-V[0]);
+  let a2=Math.atan2(P2[1]-V[1],P2[0]-V[0]);
+  let dd=a2-a1; while(dd>Math.PI)dd-=2*Math.PI; while(dd<-Math.PI)dd+=2*Math.PI;
+  const a=a1+dd/2; return [V[0]+rr*Math.cos(a),V[1]+rr*Math.sin(a)];
+}
+
+function drawBase(){
+  if(show.grid){
+    for(let i=40;i<520;i+=40){
+      board.appendChild(el("line",{x1:i,y1:0,x2:i,y2:520,class:"grid-line"}));
+      board.appendChild(el("line",{x1:0,y1:i,x2:520,y2:i,class:"grid-line"}));
+    }
+  }
+  board.appendChild(el("circle",{cx:CX,cy:CY,r:R,class:"c-stroke"}));
+}
+function pointLabel(P,txt,dxn,dyn){
+  if(!show.measures&&false)return;
+  board.appendChild(el("text",{x:P[0]+dxn,y:P[1]+dyn,class:"lbl","text-anchor":"middle"})).textContent=txt;
+}
+function arcLabel(seg,color,txt){
+  if(!show.measures)return;
+  const[x,y]=toXY(seg.start+seg.span/2);
+  const t=el("text",{x:CX+(x-CX)*1.16,y:CY+(y-CY)*1.16,class:"arclbl",fill:color,
+    "text-anchor":"middle","dominant-baseline":"middle"}); t.textContent=txt;
+  board.appendChild(t);
+}
+
+/* ---------- state per mode ---------- */
+const defaults={
+  central:{A:60,B:160},
+  inscrito:{V:120,A:10,B:230},
+  segmento:{V:200,A:35},
+  interior:{A:70,B:250,C:150,D:340},
+  exterior:{V:[440,120],A:32,C:348}
+};
+let mode="central";
+let S=JSON.parse(JSON.stringify(defaults));
+
+/* ---------- handle dragging ---------- */
+let dragging=null;
+function svgPoint(evt){
+  const r=board.getBoundingClientRect();
+  const t=evt.touches?evt.touches[0]:evt;
+  const x=(t.clientX-r.left)/r.width*520;
+  const y=(t.clientY-r.top)/r.height*520;
+  return [x,y];
+}
+function addHandle(P,key,free){
+  const c=el("circle",{cx:P[0],cy:P[1],r:11,
+    class:"handle "+(free?"h-free":"h-circle")});
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault(); dragging={key,free}; c.setPointerCapture(e.pointerId);
+  });
+  board.appendChild(c);
+}
+function onMove(evt){
+  if(!dragging)return;
+  const[x,y]=svgPoint(evt);
+  const st=S[mode];
+  if(dragging.free){
+    st[dragging.key]=[Math.max(8,Math.min(512,x)),Math.max(8,Math.min(512,y))];
+  }else{
+    st[dragging.key]=angleOf(x,y);
+  }
+  render();
+}
+window.addEventListener("pointermove",onMove,{passive:false});
+window.addEventListener("pointerup",()=>dragging=null);
+
+/* ---------- equation rendering ---------- */
+function setEquation(parts){ // parts: array of {t,c}
+  eqEl.innerHTML="";
+  parts.forEach(p=>{
+    const s=document.createElement("span");
+    s.className="tok "+(p.c||"op"); s.textContent=p.t; eqEl.appendChild(s);
+  });
+}
+function setLegend(items){
+  legendEl.innerHTML="";
+  items.forEach(it=>{
+    const d=document.createElement("div");
+    d.innerHTML='<span class="swatch" style="background:'+it.c+'"></span>'+it.t;
+    legendEl.appendChild(d);
+  });
+}
+function setHint(msg){ if(msg){hintEl.textContent=msg;hintEl.classList.add("show");}
+  else hintEl.classList.remove("show"); }
+
+/* ---------- THEORY copy ---------- */
+const theory={
+  central:["Ângulo central","O vértice está no centro. O ângulo central tem a mesma medida do arco que ele enxerga: o ângulo é o próprio arco."],
+  inscrito:["Ângulo inscrito","O vértice está sobre a circunferência. O ângulo inscrito vale metade do arco que ele intercepta — por isso todo ângulo inscrito no mesmo arco tem a mesma medida."],
+  segmento:["Ângulo de segmento","Formado por uma corda e a tangente no ponto onde elas se tocam. Vale metade do arco contido entre a corda e a tangente — é o caso-limite do ângulo inscrito."],
+  interior:["Ângulo excêntrico interior","Vértice no encontro de duas cordas, dentro do círculo. O ângulo é a média dos dois arcos: metade da soma do arco que ele enxerga com o arco oposto pelo vértice."],
+  exterior:["Ângulo excêntrico exterior","Vértice fora do círculo, formado por duas secantes. O ângulo é metade da diferença entre o arco mais distante e o arco mais próximo."]
+};
+
+/* ---------- main render ---------- */
+function render(){
+  clear(); drawBase();
+  const st=S[mode];
+  titleEl.textContent=theory[mode][0];
+  textEl.textContent=theory[mode][1];
+  setHint("");
+
+  if(mode==="central") renderCentral(st);
+  else if(mode==="inscrito") renderInscrito(st);
+  else if(mode==="segmento") renderSegmento(st);
+  else if(mode==="interior") renderInterior(st);
+  else if(mode==="exterior") renderExterior(st);
+}
+
+function drawArc(seg,cls){ if(show.arcs) board.appendChild(el("path",{d:circArcPath(seg),class:cls})); }
+function drawWedge(V,P1,P2,r=30){
+  board.appendChild(el("path",{d:wedgePath(V,P1,P2,r),class:"wedge"}));
+}
+function angLabel(V,P1,P2,val,r=46){
+  if(!show.measures)return;
+  const b=bisectorPoint(V,P1,P2,r);
+  const t=el("text",{x:b[0],y:b[1],class:"anglbl","text-anchor":"middle","dominant-baseline":"middle"});
+  t.textContent=fmt(val); board.appendChild(t);
+}
+
+/* --- 01 central --- */
+function renderCentral(st){
+  const O=[CX,CY], A=toXY(st.A), B=toXY(st.B);
+  const arc=interceptedArc(st.A,st.B,[]);          // ccw A->B
+  const ang=Math.min(arc,360-arc);
+  const seg=arc<=360-arc?{start:st.A,span:arc}:{start:st.B,span:360-arc};
+  drawArc(seg,"arcA");
+  board.appendChild(el("line",{x1:O[0],y1:O[1],x2:A[0],y2:A[1],class:"ray"}));
+  board.appendChild(el("line",{x1:O[0],y1:O[1],x2:B[0],y2:B[1],class:"ray"}));
+  drawWedge(O,A,B,34); angLabel(O,A,B,ang,52);
+  arcLabel(seg,getCSS("--arcA"),fmt(ang));
+  board.appendChild(el("circle",{cx:O[0],cy:O[1],r:4,class:"center-dot"}));
+  pointLabel(A,"A",14,-12); pointLabel(B,"B",14,-12);
+  pointLabel(O,"O",-16,16);
+  addHandle(A,"A",false); addHandle(B,"B",false);
+  setEquation([{t:"α",c:"ang"},{t:"="},{t:"arco AB",c:"arcA"},{t:"="},{t:fmt(ang),c:"res"}]);
+  setLegend([{c:getCSS("--angle"),t:"α — ângulo central"},{c:getCSS("--arcA"),t:"arco AB"}]);
+}
+
+/* --- 02 inscrito --- */
+function renderInscrito(st){
+  const V=toXY(st.V),A=toXY(st.A),B=toXY(st.B);
+  const arc=interceptedArc(st.A,st.B,[st.V]);
+  const seg=arcSeg(st.A,st.B,[st.V]);
+  const ang=angleAt(V,A,B);
+  drawArc(seg,"arcA");
+  board.appendChild(el("line",{x1:V[0],y1:V[1],x2:A[0],y2:A[1],class:"ray"}));
+  board.appendChild(el("line",{x1:V[0],y1:V[1],x2:B[0],y2:B[1],class:"ray"}));
+  drawWedge(V,A,B,30); angLabel(V,A,B,ang);
+  arcLabel(seg,getCSS("--arcA"),fmt(arc));
+  pointLabel(V,"V",0,-16); pointLabel(A,"A",12,-10); pointLabel(B,"B",12,-10);
+  addHandle(A,"A",false); addHandle(B,"B",false); addHandle(V,"V",false);
+  setEquation([{t:"α",c:"ang"},{t:"="},{t:"½",c:"op"},{t:"·"},{t:"arco AB",c:"arcA"},
+    {t:"="},{t:"½ · "+fmt(arc),c:"op"},{t:"="},{t:fmt(ang),c:"res"}]);
+  setLegend([{c:getCSS("--angle"),t:"α — ângulo inscrito (vértice V)"},
+    {c:getCSS("--arcA"),t:"arco AB que V enxerga"}]);
+}
+
+/* --- 03 segmento (tangente-corda) --- */
+function renderSegmento(st){
+  const V=toXY(st.V),A=toXY(st.A);
+  // ccw arc V -> A (validated: tangent-chord angle on ccw side = half this arc)
+  const arc=arcCCW(st.V,st.A);
+  const seg={start:st.V,span:arc};
+  const ang=arc/2;
+  // tangent line at V (full line through V, direction perpendicular to OV)
+  const tdx=Math.cos(rad(st.V+90)), tdy=-Math.sin(rad(st.V+90)); // screen dir (y flip)
+  const T1=[V[0]-tdx*150,V[1]-tdy*150], T2=[V[0]+tdx*150,V[1]+tdy*150];
+  const Tccw=[V[0]+tdx*150,V[1]+tdy*150]; // the ccw tangent ray endpoint
+  drawArc(seg,"arcA");
+  board.appendChild(el("line",{x1:T1[0],y1:T1[1],x2:T2[0],y2:T2[1],class:"tangent"}));
+  board.appendChild(el("line",{x1:V[0],y1:V[1],x2:A[0],y2:A[1],class:"chord"}));
+  drawWedge(V,Tccw,A,30); angLabel(V,Tccw,A,ang);
+  arcLabel(seg,getCSS("--arcA"),fmt(arc));
+  pointLabel(V,"V",-4,-16); pointLabel(A,"A",12,-10);
+  pointLabel(Tccw,"t",10,4);
+  addHandle(V,"V",false); addHandle(A,"A",false);
+  setEquation([{t:"α",c:"ang"},{t:"="},{t:"½",c:"op"},{t:"·"},{t:"arco VA",c:"arcA"},
+    {t:"="},{t:"½ · "+fmt(arc),c:"op"},{t:"="},{t:fmt(ang),c:"res"}]);
+  setLegend([{c:getCSS("--angle"),t:"α — ângulo entre tangente t e corda VA"},
+    {c:getCSS("--arcA"),t:"arco VA interceptado"}]);
+}
+
+/* --- 04 excêntrico interior --- */
+function renderInterior(st){
+  const A=toXY(st.A),B=toXY(st.B),C=toXY(st.C),D=toXY(st.D);
+  const X=lineIntersect(A,B,C,D);
+  // draw chords fully
+  board.appendChild(el("line",{x1:A[0],y1:A[1],x2:B[0],y2:B[1],class:"chord"}));
+  board.appendChild(el("line",{x1:C[0],y1:C[1],x2:D[0],y2:D[1],class:"chord"}));
+  pointLabel(A,"A",12,-10);pointLabel(B,"B",12,-10);
+  pointLabel(C,"C",12,-10);pointLabel(D,"D",12,-10);
+  addHandle(A,"A",false);addHandle(B,"B",false);addHandle(C,"C",false);addHandle(D,"D",false);
+
+  const inside=X && X.s>0&&X.s<1&&X.u>0&&X.u<1;
+  if(!inside){
+    setHint("Arraste os pontos para que as cordas AB e CD se cruzem dentro do círculo.");
+    setEquation([{t:"α = ½ · (arco AC + arco BD)",c:"op"}]);
+    setLegend([{c:getCSS("--arcA"),t:"arco AC"},{c:getCSS("--arcB"),t:"arco BD"}]);
+    return;
+  }
+  const V=X.p;
+  const arcAC=interceptedArc(st.A,st.C,[st.B,st.D]);
+  const arcBD=interceptedArc(st.B,st.D,[st.A,st.C]);
+  const segAC=arcSeg(st.A,st.C,[st.B,st.D]);
+  const segBD=arcSeg(st.B,st.D,[st.A,st.C]);
+  const ang=angleAt(V,A,C);
+  drawArc(segAC,"arcA"); drawArc(segBD,"arcB");
+  drawWedge(V,A,C,26); angLabel(V,A,C,ang,40);
+  arcLabel(segAC,getCSS("--arcA"),fmt(arcAC));
+  arcLabel(segBD,getCSS("--arcB"),fmt(arcBD));
+  board.appendChild(el("circle",{cx:V[0],cy:V[1],r:4,class:"center-dot"}));
+  pointLabel(V,"V",-4,18);
+  setEquation([{t:"α",c:"ang"},{t:"="},{t:"½",c:"op"},{t:"· ("},
+    {t:"arco AC",c:"arcA"},{t:"+"},{t:"arco BD",c:"arcB"},{t:")"},
+    {t:"="},{t:"½ · ("+fmt(arcAC)+" + "+fmt(arcBD)+")",c:"op"},
+    {t:"="},{t:fmt(ang),c:"res"}]);
+  setLegend([{c:getCSS("--angle"),t:"α — ângulo em V"},
+    {c:getCSS("--arcA"),t:"arco AC (que o ângulo enxerga)"},
+    {c:getCSS("--arcB"),t:"arco BD (oposto pelo vértice)"}]);
+}
+
+/* --- 05 excêntrico exterior --- */
+function renderExterior(st){
+  const V=st.V;
+  const insideV=dist(V,[CX,CY])<R-2;
+  // each secant: line through V and the dragged circle point -> two intersections
+  const r1=secondIntersection(V,st.A), r2=secondIntersection(V,st.C);
+  // draggable near-handles always shown on circle
+  const Ah=toXY(st.A), Ch=toXY(st.C);
+  if(insideV||!r1||!r2){
+    board.appendChild(el("circle",{cx:V[0],cy:V[1],r:4,class:"center-dot"}));
+    addHandle(V,"V",true); addHandle(Ah,"A",false); addHandle(Ch,"C",false);
+    setHint("Arraste o vértice V para fora do círculo para formar duas secantes.");
+    setEquation([{t:"α = ½ · (arco distante − arco próximo)",c:"op"}]);
+    setLegend([{c:getCSS("--arcB"),t:"arco distante"},{c:getCSS("--arcA"),t:"arco próximo"}]);
+    return;
+  }
+  // sort each secant's two intersections by distance to V -> near / far
+  function nf(r){return dist(r[0].p,V)<dist(r[1].p,V)?{near:r[0].p,far:r[1].p}:{near:r[1].p,far:r[0].p};}
+  const s1=nf(r1), s2=nf(r2);
+  const an1=angleOf(...s1.near), af1=angleOf(...s1.far);
+  const an2=angleOf(...s2.near), af2=angleOf(...s2.far);
+  // draw secants from V through far points
+  board.appendChild(el("line",{x1:V[0],y1:V[1],x2:s1.far[0],y2:s1.far[1],class:"ray"}));
+  board.appendChild(el("line",{x1:V[0],y1:V[1],x2:s2.far[0],y2:s2.far[1],class:"ray"}));
+  const farArc=interceptedArc(af1,af2,[an1,an2]);
+  const nearArc=interceptedArc(an1,an2,[af1,af2]);
+  const segFar=arcSeg(af1,af2,[an1,an2]);
+  const segNear=arcSeg(an1,an2,[af1,af2]);
+  const ang=angleAt(V,s1.near,s2.near);
+  drawArc(segFar,"arcB"); drawArc(segNear,"arcA");
+  drawWedge(V,s1.near,s2.near,34); angLabel(V,s1.near,s2.near,ang,52);
+  arcLabel(segFar,getCSS("--arcB"),fmt(farArc));
+  arcLabel(segNear,getCSS("--arcA"),fmt(nearArc));
+  board.appendChild(el("circle",{cx:V[0],cy:V[1],r:4,class:"center-dot"}));
+  pointLabel(V,"V",-4,-14);
+  pointLabel(s1.near,"A",12,-8); pointLabel(s1.far,"B",12,-8);
+  pointLabel(s2.near,"C",12,-8); pointLabel(s2.far,"D",12,-8);
+  addHandle(V,"V",true); addHandle(Ah,"A",false); addHandle(Ch,"C",false);
+  setEquation([{t:"α",c:"ang"},{t:"="},{t:"½",c:"op"},{t:"· ("},
+    {t:"arco BD",c:"arcB"},{t:"−"},{t:"arco AC",c:"arcA"},{t:")"},
+    {t:"="},{t:"½ · ("+fmt(farArc)+" − "+fmt(nearArc)+")",c:"op"},
+    {t:"="},{t:fmt(ang),c:"res"}]);
+  setLegend([{c:getCSS("--angle"),t:"α — ângulo no vértice externo V"},
+    {c:getCSS("--arcB"),t:"arco BD (distante)"},
+    {c:getCSS("--arcA"),t:"arco AC (próximo)"}]);
+}
+
+/* ---------- css var reader ---------- */
+function getCSS(v){return getComputedStyle(acRoot).getPropertyValue(v).trim();}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    mode=btn.dataset.mode;
+    document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b===btn));
+    render();
+  });
+});
+function bindToggle(id,key){
+  const cb=document.getElementById(id);
+  cb.addEventListener("change",()=>{
+    show[key]=cb.checked; cb.closest(".toggle").classList.toggle("on",cb.checked); render();
+  });
+}
+bindToggle("tArcs","arcs"); bindToggle("tMeasures","measures"); bindToggle("tGrid","grid");
+document.getElementById("reset").addEventListener("click",()=>{
+  S[mode]=JSON.parse(JSON.stringify(defaults[mode])); render();
+});
+
+// init
+document.querySelector('.tab[data-mode="central"]').setAttribute("aria-selected","true");
+render();
+</script>
