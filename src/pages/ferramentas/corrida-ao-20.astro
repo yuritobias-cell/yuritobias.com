@@ -1,0 +1,693 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Corrida ao 20">
+
+  <!-- IBM Plex Mono carregado só nesta página (a trilha, o placar e as fórmulas usam mono).
+       Playfair Display + IBM Plex Sans já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <div class="c20-root">
+
+    <header class="masthead">
+      <p class="eyebrow">Ferramentas · Jogos matemáticos</p>
+      <h1>Corrida ao 20</h1>
+      <p class="lede">Uma adaptação do Jogo de Nim. Na sua vez, avance 1 ou 2 unidades sobre o
+      total anunciado — vence quem disser a meta. Jogue algumas partidas, anote quem venceu
+      e investigue: <em>existe um jeito de sempre ganhar?</em></p>
+    </header>
+
+    <!-- ======================= Configuração ======================= -->
+    <section class="config" aria-label="Configuração da partida">
+      <div class="field">
+        <label for="cfg-mode">Oponente</label>
+        <select id="cfg-mode">
+          <option value="cpu-smart">Computador estrategista</option>
+          <option value="cpu-random">Computador casual</option>
+          <option value="human">Outra pessoa (mesma tela)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cfg-first">Quem começa</label>
+        <select id="cfg-first">
+          <option value="1">Jogador 1 (você)</option>
+          <option value="2">Jogador 2 / Computador</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cfg-target">Meta</label>
+        <input id="cfg-target" type="number" min="10" max="40" step="1" value="20" />
+      </div>
+      <div class="field">
+        <label for="cfg-step">Avanço máximo</label>
+        <select id="cfg-step">
+          <option value="2">1 ou 2</option>
+          <option value="3">1, 2 ou 3</option>
+          <option value="4">1 a 4</option>
+        </select>
+      </div>
+      <button class="ghost" id="btn-new" type="button">Nova partida</button>
+    </section>
+
+    <!-- ======================= Palco ======================= -->
+    <section class="stage" aria-label="Partida em andamento">
+      <div class="totalbox" aria-hidden="true">
+        <div class="lbl">Total atual</div>
+        <div class="num" id="total-num">0</div>
+        <div class="of">meta <span id="total-goal">20</span></div>
+      </div>
+
+      <div class="turnline">
+        <p class="turn-msg" id="turn-msg" aria-live="polite"></p>
+        <div class="moves" id="moves"></div>
+        <p class="log" id="move-log" aria-label="Sequência de jogadas da partida"></p>
+      </div>
+    </section>
+
+    <div class="banner" id="banner" role="status">
+      <span class="txt" id="banner-txt"></span>
+      <button class="ghost" id="btn-rematch" type="button">Revanche (inverte quem começa)</button>
+    </div>
+
+    <!-- ======================= Trilha ======================= -->
+    <section class="track-section" aria-label="Trilha de números">
+      <h2>A trilha</h2>
+      <div class="legend">
+        <span class="chip"><span class="dot p1"></span> ditos pelo Jogador 1</span>
+        <span class="chip"><span class="dot p2"></span> ditos pelo Jogador 2</span>
+        <span class="chip" id="legend-win" hidden><span class="dot win"></span> casas vencedoras</span>
+      </div>
+      <div class="track" id="track"></div>
+    </section>
+
+    <!-- ======================= Painéis ======================= -->
+    <div class="panels">
+
+      <section class="panel" aria-label="Registro de partidas">
+        <h2>Registro de partidas</h2>
+        <p class="hint">Os dados para a investigação: quem começou importa? A meta muda algo?</p>
+        <div id="score-wrap"><p class="score-empty">Nenhuma partida concluída ainda.</p></div>
+      </section>
+
+      <section class="panel" aria-label="Modo análise">
+        <h2>Modo análise</h2>
+        <p class="hint">Abra só depois de investigar — aqui mora a estratégia.</p>
+        <details class="analysis" id="analysis">
+          <summary>Revelar as casas vencedoras</summary>
+          <div class="body">
+            <p id="an-intro"></p>
+            <div class="formula" id="an-formula"></div>
+            <p id="an-reasoning"></p>
+            <p id="an-general"></p>
+          </div>
+        </details>
+      </section>
+
+    </div>
+
+    <p class="visually-hidden" aria-live="assertive" id="sr-announce"></p>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Corrida ao 20
+     CSS escopado sob .c20-root para não vazar para o resto do site.
+     Variáveis no próprio .c20-root. JS inalterado.
+     ============================================================ */
+
+  .c20-root {
+    --bg:        #F8F6F1;
+    --ink:       #1C1917;
+    --accent:    #1B4F4F;   /* teal — Jogador 1 */
+    --muted:     #78716C;
+    --rule:      #E2DDD6;
+    --func-ochre:      #936614;  /* análise / casas vencedoras */
+    --func-terracotta: #A8442B;  /* Jogador 2 / computador */
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+    --accent-soft:      color-mix(in srgb, var(--accent) 12%, var(--bg));
+    --terracotta-soft:  color-mix(in srgb, var(--func-terracotta) 12%, var(--bg));
+    --ochre-soft:       color-mix(in srgb, var(--func-ochre) 14%, var(--bg));
+
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+  .c20-root, .c20-root * { box-sizing: border-box; }
+
+  /* ---------- Masthead ---------- */
+  .c20-root header.masthead {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .c20-root .masthead .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+  .c20-root .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .c20-root .masthead p.lede {
+    color: var(--muted);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  /* ---------- Configuração ---------- */
+  .c20-root .config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.75rem;
+    align-items: end;
+    padding: 1rem 0 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1.75rem;
+  }
+  .c20-root .field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .c20-root .field label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .c20-root .field select,
+  .c20-root .field input[type="number"] {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    min-width: 9.5rem;
+  }
+  .c20-root .field input[type="number"] { min-width: 5.5rem; }
+  .c20-root .field select:focus-visible,
+  .c20-root .field input:focus-visible,
+  .c20-root button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Palco do jogo ---------- */
+  .c20-root .stage {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 620px) { .c20-root .stage { grid-template-columns: 1fr; } }
+
+  .c20-root .totalbox {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1rem 1.4rem;
+    text-align: center;
+    min-width: 9rem;
+    background: color-mix(in srgb, var(--ink) 2%, var(--bg));
+  }
+  .c20-root .totalbox .lbl {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .c20-root .totalbox .num {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 3.2rem;
+    line-height: 1.1;
+  }
+  .c20-root .totalbox .of {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .c20-root .turnline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .c20-root .turn-msg {
+    font-size: 1.05rem;
+    min-height: 1.6em;
+  }
+  .c20-root .turn-msg strong { font-weight: 600; }
+  .c20-root .turn-msg .p1 { color: var(--accent); }
+  .c20-root .turn-msg .p2 { color: var(--func-terracotta); }
+
+  .c20-root .moves { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .c20-root button.move {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 1.3rem;
+    cursor: pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  .c20-root button.move:hover:not(:disabled) { transform: translateY(-1px); }
+  .c20-root button.move:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .c20-root button.ghost {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+  }
+  .c20-root button.ghost:hover { border-color: var(--muted); }
+
+  /* ---------- A trilha ---------- */
+  .c20-root .track-section h2,
+  .c20-root .panel h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin: 0 0 0.6rem;
+  }
+  .c20-root .track {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(2.6rem, 1fr));
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+  .c20-root .cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--muted);
+    background: var(--bg);
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .c20-root .cell.said-p1 { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .c20-root .cell.said-p2 { background: var(--func-terracotta); border-color: var(--func-terracotta); color: var(--bg); }
+  .c20-root .cell.goal { border-style: dashed; border-color: var(--muted); font-weight: 500; color: var(--ink); }
+  .c20-root .cell.goal.said-p1, .c20-root .cell.goal.said-p2 { border-style: solid; color: var(--bg); }
+  .c20-root .cell.current { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink) 35%, transparent); }
+  .c20-root .cell.win-cell::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--func-ochre);
+    border-radius: 11px;
+    pointer-events: none;
+  }
+  .c20-root .cell.win-cell { background: var(--ochre-soft); color: var(--ink); }
+  .c20-root .cell.said-p1.win-cell { background: var(--accent); color: var(--bg); }
+  .c20-root .cell.said-p2.win-cell { background: var(--func-terracotta); color: var(--bg); }
+
+  .c20-root .legend {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+  .c20-root .legend .chip { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .c20-root .legend .dot { width: 0.8rem; height: 0.8rem; border-radius: 4px; display: inline-block; }
+  .c20-root .legend .dot.p1 { background: var(--accent); }
+  .c20-root .legend .dot.p2 { background: var(--func-terracotta); }
+  .c20-root .legend .dot.win { background: var(--ochre-soft); border: 2px solid var(--func-ochre); }
+
+  /* ---------- Banner de vitória ---------- */
+  .c20-root .banner {
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    background: var(--accent-soft);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .c20-root .banner.show { display: flex; }
+  .c20-root .banner.p2win { border-left-color: var(--func-terracotta); background: var(--terracotta-soft); }
+  .c20-root .banner .txt { font-weight: 600; }
+
+  /* ---------- Painéis: histórico + análise ---------- */
+  .c20-root .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 720px) { .c20-root .panels { grid-template-columns: 1fr; } }
+
+  .c20-root .panel {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.1rem;
+  }
+  .c20-root .panel p.hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 0.75rem; }
+
+  .c20-root table.score {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .c20-root table.score th, .c20-root table.score td {
+    text-align: left;
+    padding: 0.35rem 0.5rem 0.35rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .c20-root table.score th {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .c20-root table.score td.mono { font-family: var(--font-mono); }
+  .c20-root table.score td .w1 { color: var(--accent); font-weight: 600; }
+  .c20-root table.score td .w2 { color: var(--func-terracotta); font-weight: 600; }
+  .c20-root .score-empty { color: var(--muted); font-size: 0.9rem; }
+
+  .c20-root details.analysis > summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--func-ochre);
+  }
+  .c20-root details.analysis > summary::-webkit-details-marker { display: none; }
+  .c20-root details.analysis > summary::before { content: "▸"; transition: transform 0.15s ease; }
+  .c20-root details.analysis[open] > summary::before { transform: rotate(90deg); }
+  .c20-root details.analysis .body { margin-top: 0.8rem; font-size: 0.95rem; }
+  .c20-root details.analysis .body p { margin: 0 0 0.7rem; }
+  .c20-root details.analysis .formula {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    background: var(--ochre-soft);
+    border: 1px solid color-mix(in srgb, var(--func-ochre) 35%, var(--bg));
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+  }
+
+  .c20-root .log {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.6rem;
+    line-height: 1.9;
+    word-spacing: 0.1em;
+  }
+  .c20-root .log .p1 { color: var(--accent); }
+  .c20-root .log .p2 { color: var(--func-terracotta); }
+
+  .c20-root .visually-hidden {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .c20-root * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<script is:inline>
+(function () {
+  "use strict";
+
+  /* ---------- estado ---------- */
+  const S = {
+    target: 20,        // meta
+    maxStep: 2,        // avanço máximo k
+    mode: "cpu-smart", // cpu-smart | cpu-random | human
+    firstPlayer: 1,    // 1 | 2
+    total: 0,
+    turn: 1,           // de quem é a vez (1 | 2)
+    over: false,
+    history: [],       // [{player, said}]
+    games: [],         // registro: {target, maxStep, mode, first, winner}
+    busy: false        // trava durante a "pausa para pensar" do computador
+  };
+
+  /* ---------- elementos ---------- */
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    mode: $("cfg-mode"), first: $("cfg-first"), target: $("cfg-target"), step: $("cfg-step"),
+    newBtn: $("btn-new"), totalNum: $("total-num"), totalGoal: $("total-goal"),
+    turnMsg: $("turn-msg"), moves: $("moves"), log: $("move-log"),
+    banner: $("banner"), bannerTxt: $("banner-txt"), rematch: $("btn-rematch"),
+    track: $("track"), legendWin: $("legend-win"),
+    scoreWrap: $("score-wrap"), analysis: $("analysis"),
+    anIntro: $("an-intro"), anFormula: $("an-formula"),
+    anReason: $("an-reasoning"), anGeneral: $("an-general"),
+    sr: $("sr-announce")
+  };
+
+  const isCpu = () => S.mode !== "human";
+  const p2Name = () => (isCpu() ? "Computador" : "Jogador 2");
+  const playerLabel = (p) => (p === 1 ? "Jogador 1" : p2Name());
+  const winResidue = () => S.target % (S.maxStep + 1);
+
+  /* ---------- lógica do computador ---------- */
+  function legalMoves(total) {
+    const out = [];
+    for (let s = 1; s <= S.maxStep && total + s <= S.target; s++) out.push(s);
+    return out;
+  }
+
+  function cpuChoose() {
+    const legal = legalMoves(S.total);
+    if (S.mode === "cpu-smart") {
+      const m = S.maxStep + 1;
+      for (const s of legal) {
+        if ((S.total + s) % m === winResidue()) return s; // alcança casa vencedora
+      }
+      // posição perdedora: joga qualquer coisa (aleatório legal)
+    }
+    return legal[Math.floor(Math.random() * legal.length)];
+  }
+
+  /* ---------- partida ---------- */
+  function readConfig() {
+    S.mode = els.mode.value;
+    S.firstPlayer = parseInt(els.first.value, 10);
+    S.maxStep = parseInt(els.step.value, 10);
+    let t = parseInt(els.target.value, 10);
+    if (Number.isNaN(t)) t = 20;
+    t = Math.min(40, Math.max(10, t));
+    els.target.value = t;
+    S.target = t;
+  }
+
+  function newGame(invertFirst) {
+    readConfig();
+    if (invertFirst) {
+      S.firstPlayer = S.firstPlayer === 1 ? 2 : 1;
+      els.first.value = String(S.firstPlayer);
+    }
+    S.total = 0;
+    S.turn = S.firstPlayer;
+    S.over = false;
+    S.history = [];
+    S.busy = false;
+    els.banner.className = "banner";
+    buildTrack();
+    render();
+    maybeCpuMove();
+  }
+
+  function applyMove(step) {
+    S.total += step;
+    S.history.push({ player: S.turn, said: S.total });
+    announce(playerLabel(S.turn) + " disse " + S.total + ".");
+    if (S.total === S.target) {
+      finishGame(S.turn);
+    } else {
+      S.turn = S.turn === 1 ? 2 : 1;
+    }
+    render();
+    maybeCpuMove();
+  }
+
+  function finishGame(winner) {
+    S.over = true;
+    S.games.push({
+      target: S.target, maxStep: S.maxStep,
+      mode: S.mode, first: S.firstPlayer, winner
+    });
+    const youWon = winner === 1;
+    els.bannerTxt.textContent = isCpu()
+      ? (youWon ? "Você venceu — disse " + S.target + " primeiro!" : "O computador venceu desta vez.")
+      : playerLabel(winner) + " venceu — disse " + S.target + " primeiro!";
+    els.banner.className = "banner show" + (winner === 2 ? " p2win" : "");
+    announce(els.bannerTxt.textContent);
+    renderScore();
+  }
+
+  function maybeCpuMove() {
+    if (S.over || !isCpu() || S.turn !== 2 || S.busy) return;
+    S.busy = true;
+    render(); // desabilita botões enquanto "pensa"
+    const reduced = typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => {
+      S.busy = false;
+      if (!S.over) applyMove(cpuChoose());
+    }, reduced ? 80 : 650);
+  }
+
+  /* ---------- renderização ---------- */
+  function buildTrack() {
+    els.track.innerHTML = "";
+    for (let n = 1; n <= S.target; n++) {
+      const c = document.createElement("div");
+      c.className = "cell" + (n === S.target ? " goal" : "");
+      c.dataset.n = n;
+      c.textContent = n;
+      els.track.appendChild(c);
+    }
+  }
+
+  function render() {
+    els.totalNum.textContent = S.total;
+    els.totalGoal.textContent = S.target;
+
+    // trilha
+    const saidBy = new Map(S.history.map(h => [h.said, h.player]));
+    const showWin = els.analysis.open;
+    const m = S.maxStep + 1, r = winResidue();
+    els.track.querySelectorAll(".cell").forEach(c => {
+      const n = parseInt(c.dataset.n, 10);
+      c.classList.toggle("said-p1", saidBy.get(n) === 1);
+      c.classList.toggle("said-p2", saidBy.get(n) === 2);
+      c.classList.toggle("current", n === S.total && S.total > 0);
+      c.classList.toggle("win-cell", showWin && n % m === r);
+    });
+    els.legendWin.hidden = !showWin;
+
+    // mensagem de vez + botões
+    if (S.over) {
+      els.turnMsg.innerHTML = "Partida encerrada.";
+    } else if (S.busy) {
+      els.turnMsg.innerHTML = "<strong class='p2'>" + p2Name() + "</strong> está pensando&hellip;";
+    } else {
+      const cls = S.turn === 1 ? "p1" : "p2";
+      els.turnMsg.innerHTML = "Vez de <strong class='" + cls + "'>" + playerLabel(S.turn) + "</strong>. Avance:";
+    }
+
+    els.moves.innerHTML = "";
+    const humanTurn = !S.over && !S.busy && (S.turn === 1 || !isCpu());
+    legalMoves(S.total).forEach(s => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "move";
+      if (S.turn === 2 && !isCpu()) b.style.background = "var(--func-terracotta)";
+      b.textContent = "+" + s + "  (diz " + (S.total + s) + ")";
+      b.disabled = !humanTurn;
+      b.addEventListener("click", () => { if (humanTurn) applyMove(s); });
+      els.moves.appendChild(b);
+    });
+
+    // log de jogadas
+    els.log.innerHTML = S.history.map(h =>
+      "<span class='" + (h.player === 1 ? "p1" : "p2") + "'>" + h.said + "</span>"
+    ).join(" → ");
+
+    renderAnalysis();
+  }
+
+  function renderScore() {
+    if (S.games.length === 0) {
+      els.scoreWrap.innerHTML = "<p class='score-empty'>Nenhuma partida concluída ainda.</p>";
+      return;
+    }
+    const rows = S.games.map((g, i) => {
+      const wCls = g.winner === 1 ? "w1" : "w2";
+      const wName = g.winner === 1 ? "Jogador 1" : (g.mode === "human" ? "Jogador 2" : "Computador");
+      const fName = g.first === 1 ? "J1" : (g.mode === "human" ? "J2" : "CPU");
+      return "<tr><td class='mono'>" + (i + 1) + "</td>" +
+             "<td class='mono'>" + g.target + " · 1–" + g.maxStep + "</td>" +
+             "<td>" + fName + "</td>" +
+             "<td><span class='" + wCls + "'>" + wName + "</span></td></tr>";
+    }).join("");
+    els.scoreWrap.innerHTML =
+      "<table class='score'><thead><tr>" +
+      "<th>#</th><th>Meta · passos</th><th>Começou</th><th>Venceu</th>" +
+      "</tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+
+  function renderAnalysis() {
+    const m = S.maxStep + 1, r = winResidue();
+    const cells = [];
+    for (let n = (r === 0 ? m : r); n <= S.target; n += m) cells.push(n);
+
+    els.anIntro.textContent =
+      "Com meta " + S.target + " e avanços de 1 a " + S.maxStep +
+      ", as casas vencedoras são: " + cells.join(", ") + ".";
+
+    els.anFormula.textContent =
+      "casa vencedora ⇔ resto " + r + " na divisão por " + m +
+      "   (pois " + S.target + " mod " + m + " = " + r + ")";
+
+    els.anReason.textContent =
+      "O raciocínio é regressivo: quem diz " + (S.target - m) + " garante o " + S.target +
+      ", porque o adversário avança no máximo " + S.maxStep +
+      " e qualquer resposta dele deixa a meta ao seu alcance — cada rodada completa soma exatamente " +
+      m + ". Repetindo o argumento, a cadeia de casas seguras desce de " + m + " em " + m + ".";
+
+    els.anGeneral.textContent = (r === 0)
+      ? "Aqui " + S.target + " é múltiplo de " + m + ": quem começa não alcança nenhuma casa vencedora na primeira jogada — com jogo perfeito, o segundo jogador vence sempre. Experimente trocar quem começa!"
+      : "Quem começa vence sempre: basta abrir dizendo " + r + " e, daí em diante, completar cada rodada para somar " + m + ". Mude a meta e o avanço máximo e verifique que a regra geral se mantém: meta N com passos de 1 a k ⇒ casas de resto N mod (k+1).";
+  }
+
+  function announce(msg) { els.sr.textContent = msg; }
+
+  /* ---------- eventos ---------- */
+  els.newBtn.addEventListener("click", () => newGame(false));
+  els.rematch.addEventListener("click", () => newGame(true));
+  [els.mode, els.first, els.step].forEach(el =>
+    el.addEventListener("change", () => newGame(false)));
+  els.target.addEventListener("change", () => newGame(false));
+  els.analysis.addEventListener("toggle", render);
+
+  /* ---------- início ---------- */
+  newGame(false);
+})();
+</script>
