@@ -35,6 +35,9 @@ const canonical = new URL(pathname, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL('/og.png', Astro.site)} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#1B4F4F" />
     <link rel="alternate" type="application/rss+xml" title="Blog · Yuri Tobias" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -52,6 +55,14 @@ const canonical = new URL(pathname, Astro.site);
           event: true,
         });
       });
+    </script>
+    <script is:inline>
+      // Service worker: ferramentas e páginas visitadas funcionam offline
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js');
+        });
+      }
     </script>
   </head>
   <body>

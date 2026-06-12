@@ -312,7 +312,6 @@ function drawBase(){
   board.appendChild(el("circle",{cx:CX,cy:CY,r:R,class:"c-stroke"}));
 }
 function pointLabel(P,txt,dxn,dyn){
-  if(!show.measures&&false)return;
   board.appendChild(el("text",{x:P[0]+dxn,y:P[1]+dyn,class:"lbl","text-anchor":"middle"})).textContent=txt;
 }
 function arcLabel(seg,color,txt){

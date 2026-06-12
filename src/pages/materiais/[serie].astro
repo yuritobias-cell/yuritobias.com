@@ -9,10 +9,26 @@ import provas1em from '../../data/provas-1em.json';
 import materiais2em from '../../data/2em.json';
 import provas2em from '../../data/provas-2em.json';
 
+export interface Material {
+  n: string;
+  titulo: string;
+  descricao: string;
+  arquivo?: string;
+  video?: { url: string; topicos: string[] };
+  apostila?: { ordem: string; data: string };
+}
+
+export interface Prova {
+  n: string;
+  titulo: string;
+  descricao: string;
+  arquivo: string;
+}
+
 export function getStaticPaths() {
   // Falha o build se algum JSON referenciar um PDF que não existe em public/materiais/<serie>/
   // (definida aqui dentro porque o Astro executa getStaticPaths em escopo isolado)
-  function validarArquivos(serie, ...listas) {
+  function validarArquivos(serie: string, ...listas: { arquivo?: string }[][]) {
     const dir = path.join(process.cwd(), 'public', 'materiais', serie);
     const emDisco = new Set(fs.readdirSync(dir));
     const faltando = listas.flat()
@@ -35,8 +51,8 @@ export function getStaticPaths() {
       props: {
         titulo: '9º ano',
         descricaoMeta: 'Materiais didáticos de matemática para o 9º ano do Ensino Fundamental.',
-        materiais: materiais9ano,
-        provas: provas9ano,
+        materiais: materiais9ano as Material[],
+        provas: provas9ano as Prova[],
       },
     },
     {
@@ -44,8 +60,8 @@ export function getStaticPaths() {
       props: {
         titulo: '1º EM',
         descricaoMeta: 'Materiais didáticos de matemática para o 1º ano do Ensino Médio.',
-        materiais: materiais1em,
-        provas: provas1em,
+        materiais: materiais1em as Material[],
+        provas: provas1em as Prova[],
       },
     },
     {
@@ -53,8 +69,8 @@ export function getStaticPaths() {
       props: {
         titulo: '2º EM',
         descricaoMeta: 'Materiais didáticos de matemática para o 2º ano do Ensino Médio.',
-        materiais: materiais2em,
-        provas: provas2em,
+        materiais: materiais2em as Material[],
+        provas: provas2em as Prova[],
       },
     },
   ];
@@ -64,9 +80,9 @@ const { serie } = Astro.params;
 const { titulo, descricaoMeta, materiais, provas } = Astro.props;
 
 const paracasa = materiais.filter((m) => !m.video);
-const revisoes = materiais.filter((m) => m.video);
+const revisoes = materiais.filter((m): m is Material & { video: NonNullable<Material['video']> } => Boolean(m.video));
 
-function formatarData(iso) {
+function formatarData(iso: string) {
   const partes = iso.split('-');
   if (partes.length !== 3) return iso;
   return `${partes[2]}/${partes[1]}`;

@@ -5,7 +5,7 @@ import curso from '../../data/curso-fet.json';
 const aulas = curso.aulas.filter(a => a.tipo === 'aula');
 const extras = curso.aulas.filter(a => a.tipo === 'extra');
 
-function thumbnail(url) {
+function thumbnail(url: string) {
   const id = url.split('youtu.be/')[1]?.split('?')[0];
   return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : '';
 }

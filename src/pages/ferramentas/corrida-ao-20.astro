@@ -90,6 +90,7 @@ import Layout from '../../layouts/Layout.astro';
         <h2>Registro de partidas</h2>
         <p class="hint">Os dados para a investigação: quem começou importa? A meta muda algo?</p>
         <div id="score-wrap"><p class="score-empty">Nenhuma partida concluída ainda.</p></div>
+        <button class="ghost btn-clear" id="btn-clear-reg" type="button" hidden>Limpar registro</button>
       </section>
 
       <section class="panel" aria-label="Modo análise">
@@ -402,6 +403,7 @@ import Layout from '../../layouts/Layout.astro';
   .c20-root table.score td .w1 { color: var(--accent); font-weight: 600; }
   .c20-root table.score td .w2 { color: var(--func-terracotta); font-weight: 600; }
   .c20-root .score-empty { color: var(--muted); font-size: 0.9rem; }
+  .c20-root .btn-clear { margin-top: 0.85rem; font-size: 0.8rem; padding: 0.4rem 0.8rem; }
 
   .c20-root details.analysis > summary {
     cursor: pointer;
@@ -474,7 +476,7 @@ import Layout from '../../layouts/Layout.astro';
     turnMsg: $("turn-msg"), moves: $("moves"), log: $("move-log"),
     banner: $("banner"), bannerTxt: $("banner-txt"), rematch: $("btn-rematch"),
     track: $("track"), legendWin: $("legend-win"),
-    scoreWrap: $("score-wrap"), analysis: $("analysis"),
+    scoreWrap: $("score-wrap"), clearReg: $("btn-clear-reg"), analysis: $("analysis"),
     anIntro: $("an-intro"), anFormula: $("an-formula"),
     anReason: $("an-reasoning"), anGeneral: $("an-general"),
     sr: $("sr-announce")
@@ -546,12 +548,27 @@ import Layout from '../../layouts/Layout.astro';
     maybeCpuMove();
   }
 
+  /* ---------- persistência do registro ---------- */
+  const REG_KEY = "corrida20:registro";
+  function salvarRegistro() {
+    try {
+      localStorage.setItem(REG_KEY, JSON.stringify(S.games.slice(-60)));
+    } catch (e) { /* armazenamento indisponível: o jogo segue sem persistir */ }
+  }
+  function restaurarRegistro() {
+    try {
+      const salvo = JSON.parse(localStorage.getItem(REG_KEY));
+      if (Array.isArray(salvo)) S.games = salvo;
+    } catch (e) { /* estado corrompido: começa do zero */ }
+  }
+
   function finishGame(winner) {
     S.over = true;
     S.games.push({
       target: S.target, maxStep: S.maxStep,
       mode: S.mode, first: S.firstPlayer, winner
     });
+    salvarRegistro();
     const youWon = winner === 1;
     els.bannerTxt.textContent = isCpu()
       ? (youWon ? "Você venceu — disse " + S.target + " primeiro!" : "O computador venceu desta vez.")
@@ -634,6 +651,7 @@ import Layout from '../../layouts/Layout.astro';
   }
 
   function renderScore() {
+    els.clearReg.hidden = S.games.length === 0;
     if (S.games.length === 0) {
       els.scoreWrap.innerHTML = "<p class='score-empty'>Nenhuma partida concluída ainda.</p>";
       return;
@@ -686,8 +704,15 @@ import Layout from '../../layouts/Layout.astro';
     el.addEventListener("change", () => newGame(false)));
   els.target.addEventListener("change", () => newGame(false));
   els.analysis.addEventListener("toggle", render);
+  els.clearReg.addEventListener("click", () => {
+    S.games = [];
+    try { localStorage.removeItem(REG_KEY); } catch (e) { /* sem armazenamento */ }
+    renderScore();
+  });
 
   /* ---------- início ---------- */
+  restaurarRegistro();
   newGame(false);
+  renderScore();
 })();
 </script>

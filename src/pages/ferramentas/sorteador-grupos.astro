@@ -39,7 +39,10 @@ import Layout from '../../layouts/Layout.astro';
       <section id="results-section">
         <div class="info-bar">
           <span class="stat" id="stat-text"></span>
-          <button class="btn-secondary" onclick="sortear()">Sortear novamente</button>
+          <div class="info-actions">
+            <button class="btn-secondary" id="btn-copy">Copiar grupos</button>
+            <button class="btn-secondary" onclick="sortear()">Sortear novamente</button>
+          </div>
         </div>
         <hr class="divider">
         <div class="groups-grid" id="groups-grid"></div>
@@ -114,6 +117,7 @@ import Layout from '../../layouts/Layout.astro';
     margin-top: 1rem; background: #fcebeb; display: none;
   }
   .info-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+  .info-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .stat { font-size: 13px; color: #6b6b67; }
   .stat b { color: #1a1a18; font-weight: 500; }
   .divider { border: none; border-top: 0.5px solid rgba(0,0,0,0.1); margin: 1.25rem 0; }
@@ -138,6 +142,7 @@ import Layout from '../../layouts/Layout.astro';
 </style>
 
 <script>
+  // @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
   const BADGE_COLORS = [
     {bg:'#E6F1FB',color:'#0C447C'},{bg:'#E1F5EE',color:'#085041'},
     {bg:'#FAECE7',color:'#712B13'},{bg:'#FBEAF0',color:'#72243E'},
@@ -145,10 +150,36 @@ import Layout from '../../layouts/Layout.astro';
     {bg:'#EEEDFE',color:'#3C3489'},{bg:'#FCEBEB',color:'#791F1F'}
   ];
 
-  document.getElementById('mode').addEventListener('change', function() {
+  // Persistência: a lista da turma e as opções sobrevivem ao recarregar a página
+  const STORE_KEY = 'sorteador:estado';
+  try {
+    const salvo = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (salvo) {
+      document.getElementById('names').value = salvo.nomes ?? '';
+      document.getElementById('mode').value = salvo.modo ?? 'per_group';
+      document.getElementById('qty').value = salvo.qtd ?? 4;
+    }
+  } catch { /* estado corrompido: ignora e segue com os padrões */ }
+
+  function persistir() {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      nomes: document.getElementById('names').value,
+      modo: document.getElementById('mode').value,
+      qtd: document.getElementById('qty').value,
+    }));
+  }
+  document.getElementById('names').addEventListener('input', persistir);
+  document.getElementById('qty').addEventListener('input', persistir);
+
+  function atualizarLabelModo() {
     document.getElementById('qty-label').textContent =
-      this.value === 'per_group' ? 'Alunos por grupo' : 'Número de grupos';
+      document.getElementById('mode').value === 'per_group' ? 'Alunos por grupo' : 'Número de grupos';
+  }
+  document.getElementById('mode').addEventListener('change', function() {
+    atualizarLabelModo();
+    persistir();
   });
+  atualizarLabelModo();
 
   function shuffle(arr) {
     const a = [...arr];
@@ -158,6 +189,23 @@ import Layout from '../../layouts/Layout.astro';
     }
     return a;
   }
+
+  // Copiar grupos como texto (para colar no WhatsApp da turma)
+  let ultimosGrupos = [];
+  document.getElementById('btn-copy').addEventListener('click', async function() {
+    if (ultimosGrupos.length === 0) return;
+    const texto = ultimosGrupos
+      .map((g, i) => `Grupo ${i + 1}: ${g.join(', ')}`)
+      .join('\n');
+    const btn = this;
+    try {
+      await navigator.clipboard.writeText(texto);
+      btn.textContent = 'Copiado ✓';
+    } catch {
+      btn.textContent = 'Não foi possível copiar';
+    }
+    setTimeout(() => { btn.textContent = 'Copiar grupos'; }, 1800);
+  });
 
   window.sortear = function() {
     const raw = document.getElementById('names').value;
@@ -188,6 +236,7 @@ import Layout from '../../layouts/Layout.astro';
     const shuffled = shuffle(names);
     const groups = Array.from({length: numGroups}, () => []);
     shuffled.forEach((name, i) => groups[i % numGroups].push(name));
+    ultimosGrupos = groups;
 
     const sizes = [...new Set(groups.map(g => g.length))];
     const sizeText = sizes.length === 1 ? `${sizes[0]} alunos` : `${sizes.join(' ou ')} alunos`;
