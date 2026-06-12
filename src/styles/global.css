@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@theme {
+  --color-bg:     #F8F6F1;
+  --color-ink:    #1C1917;
+  --color-muted:  #78716C;
+  --color-accent: #1B4F4F;
+  --color-rule:   #E2DDD6;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+}
+
+/* Aliases curtos usados nos estilos das páginas */
+:root {
+  --bg:     var(--color-bg);
+  --ink:    var(--color-ink);
+  --muted:  var(--color-muted);
+  --accent: var(--color-accent);
+  --rule:   var(--color-rule);
+}

@@ -13,6 +13,6 @@
   { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/KUhfQA1ltaI", "topicos": [] } },
   { "n": "11", "titulo": "Revisão para o Avalia SESI 2026", "descricao": "Lista de revisão para avaliação externa da rede.", "arquivo": "12-avaliasesi.pdf"},
   { "n": "R3", "titulo": "Lista de Revisão — 2ª Etapa I", "descricao": "Lista de revisão para a 2ª etapa de avaliação.", "arquivo": "003-revisao2etapa.pdf", "video": { "url": "", "topicos": [] } },
-  { "n": "12", "titulo": "Proporções", "descricao": "Resolver na apostila, com os cálculos. Correção em sala.", "apostila": { "ordem": "Atividades 38, 39, 40 e 41, págs. 214-215", "data": "08/06" } },
+  { "n": "12", "titulo": "Proporções", "descricao": "Resolver na apostila, com os cálculos. Correção em sala.", "apostila": { "ordem": "Atividades 38, 39, 40 e 41, págs. 214-215", "data": "2026-06-08" } },
   { "n": "13", "titulo": "Primeira Lista ENEM", "descricao": "Conjuntos, áreas e círcunferências.", "arquivo": "ListaENEM1-primeiroano.pdf" }
 ]

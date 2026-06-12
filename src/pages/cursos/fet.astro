@@ -4,6 +4,11 @@ import curso from '../../data/curso-fet.json';
 
 const aulas = curso.aulas.filter(a => a.tipo === 'aula');
 const extras = curso.aulas.filter(a => a.tipo === 'extra');
+
+function thumbnail(url) {
+  const id = url.split('youtu.be/')[1]?.split('?')[0];
+  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : '';
+}
 ---
 
 <Layout title={curso.titulo}>
@@ -21,6 +26,9 @@ const extras = curso.aulas.filter(a => a.tipo === 'extra');
       <ol class="lista-aulas">
         {aulas.map(aula => (
           <li class="item-aula">
+            <a href={aula.url} target="_blank" rel="noopener noreferrer" class="thumb" tabindex="-1">
+              <img src={thumbnail(aula.url)} alt="" width="120" height="68" loading="lazy" />
+            </a>
             <span class="numero">Aula {aula.n}</span>
             <span class="titulo-aula">{aula.titulo}</span>
             <a href={aula.url} target="_blank" rel="noopener noreferrer" class="btn-assistir">
@@ -36,6 +44,9 @@ const extras = curso.aulas.filter(a => a.tipo === 'extra');
       <ol class="lista-aulas">
         {extras.map(extra => (
           <li class="item-aula">
+            <a href={extra.url} target="_blank" rel="noopener noreferrer" class="thumb" tabindex="-1">
+              <img src={thumbnail(extra.url)} alt="" width="120" height="68" loading="lazy" />
+            </a>
             <span class="numero">Extra {extra.n}</span>
             <span class="titulo-aula">{extra.titulo}</span>
             <a href={extra.url} target="_blank" rel="noopener noreferrer" class="btn-assistir">
@@ -58,29 +69,27 @@ const extras = curso.aulas.filter(a => a.tipo === 'extra');
   .cabecalho {
     margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid #e0ddd6;
+    border-bottom: 1px solid var(--rule);
   }
 
   h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-display);
     font-size: 2rem;
-    color: #1C1917;
+    color: var(--ink);
     margin-bottom: 0.5rem;
   }
 
   .descricao {
-    font-family: 'IBM Plex Sans', sans-serif;
-    color: #57534e;
+    color: var(--muted);
     margin-bottom: 1.25rem;
   }
 
   .btn-playlist {
     display: inline-block;
-    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
     color: #fff;
-    background-color: #1B4F4F;
+    background-color: var(--accent);
     padding: 0.5rem 1rem;
     border-radius: 4px;
     text-decoration: none;
@@ -92,9 +101,9 @@ const extras = curso.aulas.filter(a => a.tipo === 'extra');
   }
 
   h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-display);
     font-size: 1.25rem;
-    color: #1C1917;
+    color: var(--ink);
     margin-bottom: 1rem;
   }
 
@@ -117,15 +126,30 @@ const extras = curso.aulas.filter(a => a.tipo === 'extra');
     gap: 1rem;
     padding: 0.75rem 1rem;
     background-color: #fff;
-    border: 1px solid #e0ddd6;
+    border: 1px solid var(--rule);
     border-radius: 6px;
-    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .thumb { flex-shrink: 0; line-height: 0; }
+
+  .thumb img {
+    width: 120px;
+    height: 68px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+  }
+
+  @media (max-width: 560px) {
+    .item-aula { flex-wrap: wrap; }
+    .thumb img { width: 96px; height: 54px; }
+    .titulo-aula { flex-basis: 100%; order: 3; }
   }
 
   .numero {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #1B4F4F;
+    color: var(--accent);
     white-space: nowrap;
     min-width: 4.5rem;
   }
@@ -133,23 +157,23 @@ const extras = curso.aulas.filter(a => a.tipo === 'extra');
   .titulo-aula {
     flex: 1;
     font-size: 0.95rem;
-    color: #1C1917;
+    color: var(--ink);
   }
 
   .btn-assistir {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #1B4F4F;
+    color: var(--accent);
     text-decoration: none;
     white-space: nowrap;
-    border: 1px solid #1B4F4F;
+    border: 1px solid var(--accent);
     padding: 0.3rem 0.75rem;
     border-radius: 4px;
     transition: background-color 0.2s, color 0.2s;
   }
 
   .btn-assistir:hover {
-    background-color: #1B4F4F;
+    background-color: var(--accent);
     color: #fff;
   }
 </style>

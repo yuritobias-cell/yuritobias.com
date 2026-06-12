@@ -1,25 +1,70 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import materiais from '../../data/9ano.json';
-import provas from '../../data/provas-9ano.json';
+import materiais9ano from '../../data/9ano.json';
+import provas9ano from '../../data/provas-9ano.json';
+import materiais1em from '../../data/1em.json';
+import provas1em from '../../data/provas-1em.json';
+import materiais2em from '../../data/2em.json';
+import provas2em from '../../data/provas-2em.json';
+
+export function getStaticPaths() {
+  return [
+    {
+      params: { serie: '9ano' },
+      props: {
+        titulo: '9º ano',
+        descricaoMeta: 'Materiais didáticos de matemática para o 9º ano do Ensino Fundamental.',
+        materiais: materiais9ano,
+        provas: provas9ano,
+      },
+    },
+    {
+      params: { serie: '1em' },
+      props: {
+        titulo: '1º EM',
+        descricaoMeta: 'Materiais didáticos de matemática para o 1º ano do Ensino Médio.',
+        materiais: materiais1em,
+        provas: provas1em,
+      },
+    },
+    {
+      params: { serie: '2em' },
+      props: {
+        titulo: '2º EM',
+        descricaoMeta: 'Materiais didáticos de matemática para o 2º ano do Ensino Médio.',
+        materiais: materiais2em,
+        provas: provas2em,
+      },
+    },
+  ];
+}
+
+const { serie } = Astro.params;
+const { titulo, descricaoMeta, materiais, provas } = Astro.props;
 
 const paracasa = materiais.filter((m) => !m.video);
 const revisoes = materiais.filter((m) => m.video);
+
+function formatarData(iso) {
+  const partes = iso.split('-');
+  if (partes.length !== 3) return iso;
+  return `${partes[2]}/${partes[1]}`;
+}
 ---
 
-<Layout title="9º ano" description="Materiais didáticos de matemática para o 9º ano do Ensino Fundamental.">
+<Layout title={titulo} description={descricaoMeta}>
   <main>
     <nav class="breadcrumb">
       <a href="/materiais">Materiais</a>
       <span>›</span>
-      <span>9º ano</span>
+      <span>{titulo}</span>
     </nav>
 
     <header>
-      <h1>9º ano</h1>
+      <h1>{titulo}</h1>
     </header>
 
-    <!-- Seção: Materiais -->
+    <!-- Seção: Para Casa -->
     <section class="secao">
       <h2 class="secao-titulo">Para Casa</h2>
       <p class="subtitle">{paracasa.length} materiais disponíveis</p>
@@ -36,6 +81,35 @@ const revisoes = materiais.filter((m) => m.video);
                     <span class="apostila-tag">Apostila</span>{m.apostila.ordem}
                   </p>
                 )}
+              </div>
+            </div>
+            <div class="acoes">
+              {m.arquivo && (
+                <a href={`/materiais/${serie}/${m.arquivo}`} download class="btn">
+                  Baixar PDF
+                </a>
+              )}
+              {m.apostila && m.apostila.data && (
+                <span class="badge-data" data-date={m.apostila.data}>{formatarData(m.apostila.data)}</span>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Seção: Revisão -->
+    <section class="secao">
+      <h2 class="secao-titulo">Revisão</h2>
+      <p class="subtitle">{revisoes.length} listas disponíveis</p>
+      <ul class="lista">
+        {revisoes.map((m) => (
+          <li class="item">
+            <div class="item-info">
+              <span class="numero">{m.n}</span>
+              <div class="item-texto">
+                <p class="titulo">{m.titulo}</p>
+                <p class="descricao">{m.descricao}</p>
                 {m.video && m.video.topicos.length > 0 && (
                   <ul class="topicos">
                     {m.video.topicos.map((t) => (
@@ -46,15 +120,10 @@ const revisoes = materiais.filter((m) => m.video);
               </div>
             </div>
             <div class="acoes">
-              {m.arquivo && (
-                <a href={`/materiais/9ano/${m.arquivo}`} download class="btn">
-                  Baixar PDF
-                </a>
-              )}
-              {m.apostila && m.apostila.data && (
-                <span class="badge-data">{m.apostila.data}</span>
-              )}
-              {m.video && (
+              <a href={`/materiais/${serie}/${m.arquivo}`} download class="btn">
+                Baixar PDF
+              </a>
+              {m.video.url && (
                 <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
                   ▶ Vídeo
                 </a>
@@ -64,43 +133,6 @@ const revisoes = materiais.filter((m) => m.video);
         ))}
       </ul>
     </section>
-
-<!-- Seção: Revisão -->
-<section class="secao">
-  <h2 class="secao-titulo">Revisão</h2>
-  <p class="subtitle">{revisoes.length} listas disponíveis</p>
-  <ul class="lista">
-    {revisoes.map((m) => (
-      <li class="item">
-        <div class="item-info">
-          <span class="numero">{m.n}</span>
-          <div class="item-texto">
-            <p class="titulo">{m.titulo}</p>
-            <p class="descricao">{m.descricao}</p>
-            {m.video && m.video.topicos.length > 0 && (
-              <ul class="topicos">
-                {m.video.topicos.map((t) => (
-                  <li>{t}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-        <div class="acoes">
-          <a href={`/materiais/9ano/${m.arquivo}`} download class="btn">
-            Baixar PDF
-          </a>
-          <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
-            ▶ Vídeo
-          </a>
-        </div>
-      </li>
-    ))}
-  </ul>
-</section>
-
-
-
 
     <!-- Seção: Provas -->
     <section class="secao">
@@ -116,7 +148,7 @@ const revisoes = materiais.filter((m) => m.video);
                 <p class="descricao">{p.descricao}</p>
               </div>
             </div>
-            <a href={`/materiais/9ano/${p.arquivo}`} download class="btn">
+            <a href={`/materiais/${serie}/${p.arquivo}`} download class="btn">
               Baixar PDF
             </a>
           </li>
@@ -125,6 +157,15 @@ const revisoes = materiais.filter((m) => m.video);
     </section>
   </main>
 </Layout>
+
+<script>
+  // Destaca tarefas com data de entrega hoje ou no futuro
+  const hoje = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD no fuso local
+  document.querySelectorAll<HTMLElement>('.badge-data[data-date]').forEach((el) => {
+    const data = el.dataset.date ?? '';
+    el.classList.add(data >= hoje ? 'futura' : 'vencida');
+  });
+</script>
 
 <style>
   main { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; animation: fade-up 0.5s ease both; }
@@ -146,6 +187,8 @@ const revisoes = materiais.filter((m) => m.video);
   .apostila-ref { font-size: 0.85rem; color: var(--ink); line-height: 1.5; margin-top: 0.4rem; }
   .apostila-tag { display: inline-block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0.05rem 0.4rem; margin-right: 0.5rem; }
   .badge-data { font-size: 0.78rem; font-weight: 500; color: var(--muted); white-space: nowrap; letter-spacing: 0.02em; }
+  .badge-data.futura { color: var(--accent); font-weight: 600; border: 1px solid var(--accent); border-radius: 3px; padding: 0.2rem 0.5rem; }
+  .badge-data.futura::before { content: 'para '; }
   .topicos { list-style: none; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; }
   .topicos li { font-size: 0.8rem; color: var(--muted); padding-left: 0.75rem; position: relative; }
   .topicos li::before { content: '–'; position: absolute; left: 0; }

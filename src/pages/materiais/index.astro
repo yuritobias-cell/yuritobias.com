@@ -1,24 +1,30 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import materiais9ano from '../../data/9ano.json';
+import provas9ano from '../../data/provas-9ano.json';
+import materiais1em from '../../data/1em.json';
+import provas1em from '../../data/provas-1em.json';
+import materiais2em from '../../data/2em.json';
+import provas2em from '../../data/provas-2em.json';
 
 const series = [
   {
     slug: '9ano',
     titulo: '9º ano',
     descricao: 'Álgebra, geometria e preparação para o Ensino Médio.',
-    total: 9,
+    total: materiais9ano.length + provas9ano.length,
   },
   {
     slug: '1em',
     titulo: '1º ano — Ensino Médio',
     descricao: 'Conjuntos, números reais, funções e geometria plana.',
-    total: 10,
+    total: materiais1em.length + provas1em.length,
   },
   {
     slug: '2em',
     titulo: '2º ano — Ensino Médio',
     descricao: 'Trigonometria, funções trigonométricas e sistemas lineares.',
-    total: 9,
+    total: materiais2em.length + provas2em.length,
   },
 ];
 ---

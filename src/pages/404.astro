@@ -1,0 +1,75 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Página não encontrada">
+  <main>
+    <p class="codigo">404</p>
+    <h1>Página não encontrada</h1>
+    <p class="texto">
+      O endereço que você procurou não existe ou foi movido.
+      Talvez o material tenha mudado de lugar.
+    </p>
+    <div class="links">
+      <a href="/">Início</a>
+      <a href="/materiais">Materiais</a>
+      <a href="/ferramentas">Ferramentas</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100dvh - 68px);
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .codigo {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .texto {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
+
+  .links a {
+    text-decoration: none;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .links a:hover { text-decoration: underline; }
+</style>

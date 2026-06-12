@@ -42,19 +42,18 @@ const cursos = [
   .cabecalho {
     margin-bottom: 2.5rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid #e0ddd6;
+    border-bottom: 1px solid var(--rule);
   }
 
   h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-display);
     font-size: 2rem;
-    color: #1C1917;
+    color: var(--ink);
     margin-bottom: 0.5rem;
   }
 
   .subtitulo {
-    font-family: 'IBM Plex Sans', sans-serif;
-    color: #57534e;
+    color: var(--muted);
   }
 
   .lista-cursos {
@@ -70,35 +69,33 @@ const cursos = [
     gap: 1rem;
     padding: 1.25rem 1.5rem;
     background-color: #fff;
-    border: 1px solid #e0ddd6;
+    border: 1px solid var(--rule);
     border-radius: 6px;
     text-decoration: none;
     transition: border-color 0.2s;
   }
 
   .card-curso:hover {
-    border-color: #1B4F4F;
+    border-color: var(--accent);
   }
 
   .card-info h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-display);
     font-size: 1.1rem;
-    color: #1C1917;
+    color: var(--ink);
     margin-bottom: 0.25rem;
   }
 
   .card-info p {
-    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 0.9rem;
-    color: #57534e;
+    color: var(--muted);
   }
 
   .badge {
-    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #1B4F4F;
-    border: 1px solid #1B4F4F;
+    color: var(--accent);
+    border: 1px solid var(--accent);
     padding: 0.25rem 0.6rem;
     border-radius: 99px;
     white-space: nowrap;
