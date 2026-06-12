@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = (await getCollection('blog')).filter(post => !post.data.draft);
   return posts.map(post => ({
     params: { slug: post.id },
     props: { post },
@@ -14,7 +14,7 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<Layout title={post.data.title}>
+<Layout title={post.data.title} description={post.data.description}>
   <main class="max-w-2xl mx-auto px-6 py-16">
 
     <a href="/blog" class="text-sm text-stone-400 hover:text-[var(--color-accent)] transition-colors mb-8 block">

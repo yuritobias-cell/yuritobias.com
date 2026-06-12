@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import Layout from '../../layouts/Layout.astro';
 import materiais9ano from '../../data/9ano.json';
 import provas9ano from '../../data/provas-9ano.json';
@@ -8,6 +10,25 @@ import materiais2em from '../../data/2em.json';
 import provas2em from '../../data/provas-2em.json';
 
 export function getStaticPaths() {
+  // Falha o build se algum JSON referenciar um PDF que não existe em public/materiais/<serie>/
+  // (definida aqui dentro porque o Astro executa getStaticPaths em escopo isolado)
+  function validarArquivos(serie, ...listas) {
+    const dir = path.join(process.cwd(), 'public', 'materiais', serie);
+    const emDisco = new Set(fs.readdirSync(dir));
+    const faltando = listas.flat()
+      .map((m) => m.arquivo)
+      .filter((a) => a && !emDisco.has(a));
+    if (faltando.length > 0) {
+      throw new Error(
+        `[materiais/${serie}] PDF referenciado no JSON mas ausente em public/materiais/${serie}/: ${faltando.join(', ')}`
+      );
+    }
+  }
+
+  validarArquivos('9ano', materiais9ano, provas9ano);
+  validarArquivos('1em', materiais1em, provas1em);
+  validarArquivos('2em', materiais2em, provas2em);
+
   return [
     {
       params: { serie: '9ano' },

@@ -1,11 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import cursoFet from '../../data/curso-fet.json';
 
 const cursos = [
   {
-    titulo: "FET — Free Timetabling",
-    descricao: "Aprenda a criar grades horárias escolares usando o software gratuito FET.",
-    aulas: 13,
+    titulo: cursoFet.titulo,
+    descricao: cursoFet.descricao,
+    aulas: cursoFet.aulas.length,
     slug: "fet"
   }
 ];

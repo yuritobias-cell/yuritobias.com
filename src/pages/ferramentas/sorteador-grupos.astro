@@ -205,10 +205,18 @@ import Layout from '../../layouts/Layout.astro';
           <span class="group-title">Grupo ${idx+1}</span>
           <span class="group-count">${group.length}</span>
         </div>
-        <ul class="student-list">
-          ${group.map(n => `<li class="student-item"><span class="dot"></span>${n}</li>`).join('')}
-        </ul>
+        <ul class="student-list"></ul>
       `;
+      const list = card.querySelector('.student-list');
+      group.forEach(n => {
+        const li = document.createElement('li');
+        li.className = 'student-item';
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        li.appendChild(dot);
+        li.appendChild(document.createTextNode(n));
+        list.appendChild(li);
+      });
       grid.appendChild(card);
     });
 

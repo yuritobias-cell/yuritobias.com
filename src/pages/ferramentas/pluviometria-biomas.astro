@@ -3,8 +3,6 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="Pluviometria dos Biomas Brasileiros">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" is:inline></script>
-
   <div class="plv-page">
 
     <div class="plv-header">
@@ -17,8 +15,8 @@ import Layout from '../../layouts/Layout.astro';
 
     <div class="plv-panel">
       <div class="plv-tabs">
-        <button class="plv-tab-btn active" onclick="switchTab('mensal')">Distribuição Mensal</button>
-        <button class="plv-tab-btn"        onclick="switchTab('anual')">Total Anual</button>
+        <button class="plv-tab-btn active" data-tab="mensal">Distribuição Mensal</button>
+        <button class="plv-tab-btn"        data-tab="anual">Total Anual</button>
       </div>
 
       <div class="plv-inner">
@@ -26,7 +24,7 @@ import Layout from '../../layouts/Layout.astro';
         <div id="view-mensal">
           <div class="plv-toggle-row">
             <span class="plv-toggle-label">Exibir:</span>
-            <button class="plv-tog-all on" id="btn-all" onclick="toggleAll()">Todos ✓</button>
+            <button class="plv-tog-all on" id="btn-all">Todos ✓</button>
             <div id="bios-btns"></div>
           </div>
           <div class="plv-chart-wrap">
@@ -169,7 +167,9 @@ import Layout from '../../layouts/Layout.astro';
   }
 </style>
 
-<script is:inline>
+<script>
+import Chart from 'chart.js/auto';
+
 const BIOMAS = [
   { name:'Amazônia',       color:'#1a8f60', bg:'#e6f7f0',
     desc:'Maior bioma — chuvas abundantes o ano todo, com leve redução no inverno.',
@@ -379,4 +379,8 @@ function switchTab(tab){
     b.classList.toggle('active',(i===0&&tab==='mensal')||(i===1&&tab==='anual'))
   );
 }
+document.querySelectorAll('.plv-tab-btn').forEach(b=>
+  b.addEventListener('click',()=>switchTab(b.dataset.tab))
+);
+document.getElementById('btn-all').addEventListener('click',toggleAll);
 </script>

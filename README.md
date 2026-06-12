@@ -1,43 +1,67 @@
-# Astro Starter Kit: Minimal
+# yuritobias.com
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Site pessoal de Yuri Tobias — professor de matemática (Escola SESI Poços de Caldas) e analista de dados educacionais (Secretaria Municipal de Educação de Poços de Caldas).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Reúne materiais didáticos por série, ferramentas interativas para sala de aula, cursos em vídeo e blog.
 
-## 🚀 Project Structure
+## Stack
 
-Inside of your Astro project, you'll see the following folders and files:
+- [Astro 6](https://astro.build) — site estático
+- [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
+- [Chart.js](https://www.chartjs.org) — gráficos (empacotado, sem CDN)
+- Deploy automático no GitHub Pages via Actions (push na `main`)
+- Analytics: GoatCounter (pageviews + eventos de download de PDF)
+
+## Comandos
+
+| Comando           | Ação                                       |
+| :---------------- | :----------------------------------------- |
+| `npm install`     | Instala as dependências                     |
+| `npm run dev`     | Servidor local em `localhost:4321`          |
+| `npm run build`   | Gera o site estático em `./dist/`           |
+| `npm run preview` | Pré-visualiza o build localmente            |
+
+## Estrutura
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+src/
+├── data/            # JSONs dos materiais por série + provas + curso FET
+├── content/blog/    # Posts do blog (Markdown com frontmatter)
+├── layouts/         # Layout base (nav, meta tags, OG, analytics)
+├── pages/
+│   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
+│   ├── ferramentas/              # ferramentas interativas (JS próprio por página)
+│   ├── cursos/                   # cursos em vídeo (dados em src/data)
+│   └── blog/                     # índice + [slug] (drafts não são publicados)
+└── styles/global.css             # @theme com cores e fontes do site
+public/materiais/<serie>/         # PDFs servidos para download
+scripts/og-image.py               # gerador da imagem Open Graph (public/og.png)
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Como adicionar um material
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+1. Coloque o PDF em `public/materiais/<serie>/`.
+2. Adicione a entrada no JSON da série em `src/data/<serie>.json`:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```json
+{ "n": "14", "titulo": "Título", "descricao": "Descrição curta.", "arquivo": "14-nome.pdf" }
+```
 
-## 🧞 Commands
+- Tarefa de apostila (sem PDF): use `"apostila": { "ordem": "Atividades X, pág. Y", "data": "2026-06-15" }` — **data em formato ISO** (`AAAA-MM-DD`); tarefas futuras ganham destaque automático.
+- Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
 
-All commands are run from the root of the project, from a terminal:
+As contagens nas páginas de índice são calculadas automaticamente a partir dos JSONs.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Como publicar um post
 
-## 👀 Want to learn more?
+Crie `src/content/blog/meu-post.md` com o frontmatter:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```yaml
+---
+title: "Título"
+description: "Descrição (usada no preview e no RSS)"
+date: 2026-06-11
+tags: ["tag"]
+draft: false   # true = não publica
+---
+```
