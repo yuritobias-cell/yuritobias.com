@@ -12,7 +12,7 @@
   { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/JmMjrmSV5oU", "topicos": [] } },
   { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/GgjZsjYITxA", "topicos": [] } },
   { "n": "11", "titulo": "Revisão para o Avalia SESI 2026", "descricao": "Lista de revisão para avaliação externa da rede.", "arquivo": "12-avaliasesi.pdf"},
-  { "n": "R3", "titulo": "Lista de Revisão — 2ª Etapa I", "descricao": "Lista de revisão para a 2ª etapa de avaliação.", "arquivo": "003-revisao2etapa.pdf", "video": { "url": "", "topicos": [] } },
+  { "n": "R3", "titulo": "Lista de Revisão — 2ª Etapa I", "descricao": "Lista de revisão para a 2ª etapa de avaliação.", "arquivo": "003-revisao2etapa.pdf", "video": { "url": "https://youtu.be/r-gKeoYu8Jc", "topicos": [] } },
   { "n": "12", "titulo": "Construção de Gráficos", "descricao": "Resolver no caderno.", "apostila": { "ordem": "Atividades 34, pág. 138", "data": "2026-06-08" } },
   { "n": "13", "titulo": "Revisão Teorema de Tales e Teorema da Bissetriz interna", "descricao": "Exercícios do Caderno de Atividades (apostila menor)", "apostila": { "ordem": "Atividades 21,23, 24 e 25 pág. 52, 53 e 54", "data": "2026-06-15" } }
 ]

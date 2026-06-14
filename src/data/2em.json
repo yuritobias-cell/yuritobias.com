@@ -12,7 +12,7 @@
   { "n": "R1", "titulo": "Lista de Revisão — 1ª Etapa I", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "001-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/BXrTTuwsJpg", "topicos": [] } },
   { "n": "R2", "titulo": "Lista de Revisão — 1ª Etapa II", "descricao": "Lista de revisão para a 1ª etapa de avaliação.", "arquivo": "002-Revisao1etapa.pdf", "video": { "url": "https://youtu.be/wgcpjmNXrmc", "topicos": [] } },
   { "n": "11", "titulo": "Revisão para o Avalia SESI 2026", "descricao": "Lista de revisão para avaliação externa da rede.", "arquivo": "12-avaliasesi.pdf"},
-  { "n": "R3", "titulo": "Lista de Revisão — 2ª Etapa I", "descricao": "Lista de revisão para a 2ª etapa de avaliação.", "arquivo": "003-revisao2etapa.pdf", "video": { "url": "", "topicos": [] } },
+  { "n": "R3", "titulo": "Lista de Revisão — 2ª Etapa I", "descricao": "Lista de revisão para a 2ª etapa de avaliação.", "arquivo": "003-revisao2etapa.pdf", "video": { "url": "https://youtu.be/P1vVPItpDyA", "topicos": [] } },
   { "n": "12", "titulo": "Arranjos e Combinações", "descricao": "Resolver no caderno, com os cálculos. Correção em sala.", "apostila": { "ordem": "Atividades 1 a 10, págs. 29", "data": "2026-06-08" } },
   { "n": "13", "titulo": "Primeira Lista ENEM", "descricao": "Análise combinatória e probabilidades.", "arquivo": "ListaENEM1-segundoano.pdf" }
 ]
