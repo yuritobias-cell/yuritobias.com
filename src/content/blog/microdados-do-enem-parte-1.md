@@ -183,3 +183,7 @@ for (const area of AREAS){
   container.appendChild(p);
 }
 </script>
+
+Com essa visualização já temos assunto para discutir. Mas não agora.
+
+Obrigado, até a próxima!
