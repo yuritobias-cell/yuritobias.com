@@ -184,6 +184,6 @@ for (const area of AREAS){
 }
 </script>
 
-Com essa visualização já temos assunto para discutir. Mas não agora.
+Com essa visualização, já temos assunto para discutir. Mas isso fica para outro momento.
 
-Obrigado, até a próxima!
+Obrigado e até a próxima!
