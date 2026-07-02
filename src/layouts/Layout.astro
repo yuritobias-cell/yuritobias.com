@@ -4,12 +4,25 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  /** Caminho da imagem Open Graph (1200x630); o padrão é a imagem do site. */
+  ogImage?: string;
+  /** Tipo Open Graph: "website" (padrão) ou "article" para posts. */
+  ogType?: 'website' | 'article';
 }
 
-const { title, description = "Analista de dados educacionais e professor de matemática em Poços de Caldas." } = Astro.props;
+const {
+  title,
+  description = "Analista de dados educacionais e professor de matemática em Poços de Caldas.",
+  ogImage = '/og.png',
+  ogType = 'website',
+} = Astro.props;
 const pathname = Astro.url.pathname;
 const tituloCompleto = title === 'Sobre' ? 'Yuri Tobias' : `${title} · Yuri Tobias`;
 const canonical = new URL(pathname, Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
+const ogImageAlt = ogImage === '/og.png'
+  ? 'Yuri Tobias — Professor de Matemática e Analista de Dados Educacionais'
+  : tituloCompleto;
 ---
 
 <!DOCTYPE html>
@@ -20,20 +33,20 @@ const canonical = new URL(pathname, Astro.site);
     <title>{tituloCompleto}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Yuri Tobias" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:title" content={tituloCompleto} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Yuri Tobias — Professor de Matemática e Analista de Dados Educacionais" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={tituloCompleto} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL('/og.png', Astro.site)} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -57,8 +70,9 @@ const canonical = new URL(pathname, Astro.site);
       });
     </script>
     <script is:inline>
-      // Service worker: ferramentas e páginas visitadas funcionam offline
-      if ('serviceWorker' in navigator) {
+      // Service worker: ferramentas e páginas visitadas funcionam offline.
+      // Fora do localhost para não servir módulos velhos durante o desenvolvimento.
+      if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
         window.addEventListener('load', function () {
           navigator.serviceWorker.register('/sw.js');
         });

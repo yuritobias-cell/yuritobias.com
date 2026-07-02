@@ -1,0 +1,56 @@
+---
+title: "Microdados do ENEM - Parte 1"
+description: "O que são os microdados do ENEM e por que resolvi explorá-los — introdução de uma série sobre análise de dados educacionais."
+date: 2026-07-01T12:00:00-03:00
+tags: ["análise de dados", "educação"]
+series: "Microdados do ENEM"
+part: 1
+draft: false
+---
+
+import GraficoDistribuicao from '../../components/GraficoDistribuicao.astro';
+import dados from '../../data/enem/desempenho-dependencia-2025.json';
+
+Comecei a receber, nas últimas semanas, uma série de propagandas nas redes sociais que anunciavam: "Já estão disponíveis os microdados do ENEM!". Essa chamada, patrocinada muito provavelmente, existe para suprir a necessidade das redes de ensino e dos futuros candidatos com indicadores que diferenciem o seu produto, no caso das empresas, ou os seus resultados, no caso dos alunos.
+
+Como no meu trabalho cotidiano já costumo lidar com os microdados governamentais de outras frentes, como os do Censo Escolar, do SAEB e até mesmo do DATASUS, me interessei pelo assunto. Aliás, uma dúvida: você sabe o que são esses tais microdados?
+
+Eles formam o conjunto mais detalhado de informação sobre determinado assunto — no caso do ENEM, os dados de cada candidato que realizou a prova. Imagine uma tabela gigantesca: para ser mais enfático, mais de 4,8 milhões — precisamente, 4.810.772 — linhas, em que cada uma corresponde aos dados de um único candidato.
+
+Temos as informações das alternativas escolhidas, as notas calculadas pela TRI, referências geográficas e dados da unidade educacional. A novidade da edição divulgada em 2026 são as adaptações das informações para se adequar à LGPD, reduzindo drasticamente a possibilidade de identificar o candidato por meio dos dados disponíveis.
+
+Minha curiosidade sobre o assunto aumentou quando percebi que os documentos fornecidos pelo INEP eram realmente pesados: um arquivo .csv com mais de 2 GB me chamou bastante a atenção. Intrigado, busquei informações sobre como manipular dados dessa magnitude com o meu computador. E, nessa busca, iniciei alguns processos analíticos, tratando a informação, adicionando filtros, criando visualizações e aprendendo um pouco mais sobre o assunto.
+
+Aproveitando meu período de férias escolares, a pesquisa, os resultados obtidos, minhas reflexões e dificuldades vão se tornar uma série de postagens aqui no blog, sendo esta apenas a introdução do assunto.
+
+Costumo dizer para alguns colegas que trabalham comigo na área de análise que, ao criar um relatório, um painel ou um simples texto informativo, devemos estar preparados para que eles não sejam usados, ainda que priorizemos a qualidade dos dados, a qualidade da apresentação e a segurança da informação. Ou seja, o objetivo principal deste projeto é satisfazer a minha curiosidade e, tal qual um arquivo, manter a salvo a forma como trabalho e penso hoje, para que, quem sabe, um eu do futuro possa voltar e sentir uma boa (ou má) nostalgia deste tempo.
+
+Antes de terminar, vou deixar aqui uma pequena amostra do tipo de informação de uma das frentes que iremos discutir nas próximas postagens.
+
+## Desempenho no ENEM 2025 por dependência administrativa
+
+<GraficoDistribuicao
+  dados={dados}
+  paleta={{ Estadual: "#8AA6A3", Municipal: "#5C8480", Federal: "#B4763A", Privada: "#1B4F4F" }}
+  ordemY={["Privada", "Federal", "Municipal", "Estadual"]}
+  paineis={["Linguagens", "Ciências Humanas", "Ciências da Natureza", "Matemática", "Redação"]}
+  linhaReferencia="Privada"
+  rotuloGrupo="Rede"
+>
+  <Fragment slot="subtitulo">
+    Concluintes com escola declarada — cerca de 40% dos presentes.
+    Linha fina: 10º–90º percentil. Barra grossa: intervalo interquartílico (25–75).
+    Ponto: mediana. Passe o cursor — ou toque — sobre uma linha para ver os valores.
+  </Fragment>
+  <Fragment slot="nota">
+    A linha tracejada em cada painel marca a <b>mediana da rede privada</b>: onde ela
+    cruza as demais redes mostra até que ponto de cada distribuição pública o "meio" da
+    privada alcança. As distribuições se sobrepõem — o gap entre redes é real, mas não
+    determinístico. <b>Fonte:</b> microdados do ENEM 2025 (INEP), processados localmente;
+    só agregados suprimidos são publicados.
+  </Fragment>
+</GraficoDistribuicao>
+
+Com essa visualização, já temos assunto para discutir. Mas isso fica para outro momento.
+
+Obrigado e até a próxima!

@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import ListaPosts from '../../../components/ListaPosts.astro';
+import { slugTag } from '../../../utils/tags';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).filter(post => !post.data.draft);
+  // slug -> nome original da tag (o primeiro uso define a grafia exibida)
+  const tags = new Map<string, string>();
+  for (const post of posts) {
+    for (const tag of post.data.tags ?? []) {
+      if (!tags.has(slugTag(tag))) tags.set(slugTag(tag), tag);
+    }
+  }
+  return [...tags].map(([slug, nome]) => ({ params: { tag: slug }, props: { nome } }));
+}
+
+const { nome } = Astro.props;
+const posts = (await getCollection('blog'))
+  .filter(post => !post.data.draft && (post.data.tags ?? []).some(t => slugTag(t) === Astro.params.tag))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout title={`Tag: ${nome}`} description={`Postagens do blog com a tag "${nome}".`}>
+  <main class="max-w-2xl mx-auto px-6 py-16">
+    <a href="/blog" class="text-sm text-stone-400 hover:text-[var(--color-accent)] transition-colors mb-8 block">
+      ← Blog
+    </a>
+
+    <h1 class="text-4xl font-display mb-2">
+      <span class="text-stone-400">Tag:</span> {nome}
+    </h1>
+    <p class="text-stone-500 mb-12">
+      {posts.length} {posts.length === 1 ? 'postagem' : 'postagens'} com esta tag.
+    </p>
+
+    <ListaPosts posts={posts} />
+  </main>
+</Layout>

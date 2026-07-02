@@ -1,0 +1,22 @@
+[
+  { "area": "Ciências da Natureza", "grupo": "Federal",   "n": 68618,   "media": 535.7, "p10": 440.1, "p25": 489.2, "p50": 538.5, "p75": 584.3, "p90": 623.4 },
+  { "area": "Ciências da Natureza", "grupo": "Estadual",  "n": 964885,  "media": 472.6, "p10": 384.5, "p25": 422.6, "p50": 472.7, "p75": 520.2, "p90": 558.9 },
+  { "area": "Ciências da Natureza", "grupo": "Municipal", "n": 6619,    "media": 500.2, "p10": 406.7, "p25": 454.4, "p50": 503.5, "p75": 547.7, "p90": 584.0 },
+  { "area": "Ciências da Natureza", "grupo": "Privada",   "n": 252481,  "media": 551.9, "p10": 443.0, "p25": 496.7, "p50": 554.1, "p75": 608.6, "p90": 654.5 },
+  { "area": "Ciências Humanas",     "grupo": "Federal",   "n": 70097,   "media": 547.9, "p10": 433.8, "p25": 497.0, "p50": 558.4, "p75": 605.4, "p90": 641.8 },
+  { "area": "Ciências Humanas",     "grupo": "Estadual",  "n": 1018248, "media": 483.7, "p10": 387.9, "p25": 427.7, "p50": 482.6, "p75": 539.4, "p90": 582.1 },
+  { "area": "Ciências Humanas",     "grupo": "Municipal", "n": 6952,    "media": 517.1, "p10": 411.3, "p25": 462.8, "p50": 525.2, "p75": 574.4, "p90": 610.8 },
+  { "area": "Ciências Humanas",     "grupo": "Privada",   "n": 257265,  "media": 566.2, "p10": 450.6, "p25": 518.2, "p50": 576.6, "p75": 622.9, "p90": 661.6 },
+  { "area": "Linguagens",           "grupo": "Federal",   "n": 70097,   "media": 564.0, "p10": 487.3, "p25": 529.3, "p50": 569.5, "p75": 605.6, "p90": 636.0 },
+  { "area": "Linguagens",           "grupo": "Estadual",  "n": 1018248, "media": 508.2, "p10": 411.1, "p25": 466.4, "p50": 516.2, "p75": 557.0, "p90": 589.6 },
+  { "area": "Linguagens",           "grupo": "Municipal", "n": 6952,    "media": 541.7, "p10": 461.3, "p25": 508.4, "p50": 550.0, "p75": 584.1, "p90": 612.6 },
+  { "area": "Linguagens",           "grupo": "Privada",   "n": 257265,  "media": 577.6, "p10": 500.6, "p25": 542.9, "p50": 583.5, "p75": 618.8, "p90": 648.6 },
+  { "area": "Matemática",           "grupo": "Federal",   "n": 68618,   "media": 586.9, "p10": 412.4, "p25": 489.4, "p50": 588.5, "p75": 680.4, "p90": 752.8 },
+  { "area": "Matemática",           "grupo": "Estadual",  "n": 964885,  "media": 480.6, "p10": 359.0, "p25": 397.4, "p50": 462.3, "p75": 548.6, "p90": 630.1 },
+  { "area": "Matemática",           "grupo": "Municipal", "n": 6619,    "media": 532.3, "p10": 384.6, "p25": 445.3, "p50": 528.1, "p75": 611.2, "p90": 681.9 },
+  { "area": "Matemática",           "grupo": "Privada",   "n": 252481,  "media": 620.3, "p10": 436.6, "p25": 525.9, "p50": 627.4, "p75": 715.4, "p90": 786.8 },
+  { "area": "Redação",              "grupo": "Federal",   "n": 70097,   "media": 675.8, "p10": 480.0, "p25": 600.0, "p50": 680.0, "p75": 800.0, "p90": 880.0 },
+  { "area": "Redação",              "grupo": "Estadual",  "n": 1018248, "media": 526.5, "p10": 260.0, "p25": 440.0, "p50": 560.0, "p75": 660.0, "p90": 780.0 },
+  { "area": "Redação",              "grupo": "Municipal", "n": 6952,    "media": 594.6, "p10": 400.0, "p25": 500.0, "p50": 600.0, "p75": 700.0, "p90": 820.0 },
+  { "area": "Redação",              "grupo": "Privada",   "n": 257265,  "media": 729.7, "p10": 540.0, "p25": 640.0, "p50": 760.0, "p75": 860.0, "p90": 920.0 }
+]

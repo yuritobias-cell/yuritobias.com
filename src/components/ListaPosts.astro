@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Tags from './Tags.astro';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length === 0 ? (
+  <p class="text-stone-400 italic">Nenhum post publicado ainda.</p>
+) : (
+  <ul class="space-y-10">
+    {posts.map(post => (
+      <li>
+        <a href={`/blog/${post.id}`} class="group block">
+          <time class="text-sm text-stone-400">
+            {post.data.date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' })}
+          </time>
+          <h2 class="text-xl font-display mt-1 group-hover:text-[var(--color-accent)] transition-colors">
+            {post.data.title}
+          </h2>
+          <p class="text-stone-500 mt-1 text-sm">{post.data.description}</p>
+        </a>
+        <div class="mt-3">
+          <Tags tags={post.data.tags} />
+        </div>
+      </li>
+    ))}
+  </ul>
+)}

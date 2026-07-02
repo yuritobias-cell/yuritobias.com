@@ -1,6 +1,9 @@
 ---
+import fs from 'node:fs';
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import Tags from '../../components/Tags.astro';
+import { minutosDeLeitura } from '../../utils/leitura';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter(post => !post.data.draft);
@@ -12,23 +15,75 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+const minutos = minutosDeLeitura(post.body ?? '');
+
+// Imagem OG do post, se gerada pelo scripts/og-image.py (senão, a do site).
+const temOgProprio = fs.existsSync(new URL(`../../../public/og/${post.id}.png`, import.meta.url));
+const ogImage = temOgProprio ? `/og/${post.id}.png` : undefined;
+
+const publicados = (await getCollection('blog')).filter(p => !p.data.draft);
+
+// Postagens da mesma série, ordenadas pela parte.
+const partesDaSerie = post.data.series
+  ? publicados
+      .filter(p => p.data.series === post.data.series)
+      .sort((a, b) => (a.data.part ?? 0) - (b.data.part ?? 0))
+  : [];
+
+// Vizinhos cronológicos (todas as postagens, da mais antiga para a mais nova).
+const cronologia = [...publicados].sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+const indiceCrono = cronologia.findIndex(p => p.id === post.id);
+const postAnterior = indiceCrono > 0 ? cronologia[indiceCrono - 1] : null;
+const postSeguinte = indiceCrono >= 0 && indiceCrono < cronologia.length - 1
+  ? cronologia[indiceCrono + 1]
+  : null;
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
+<Layout title={post.data.title} description={post.data.description} ogImage={ogImage} ogType="article">
   <main class="max-w-2xl mx-auto px-6 py-16">
 
     <a href="/blog" class="text-sm text-stone-400 hover:text-[var(--color-accent)] transition-colors mb-8 block">
       ← Blog
     </a>
 
-    <time class="text-sm text-stone-400">
-      {post.data.date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-    </time>
+    <p class="text-sm text-stone-400">
+      <time>
+        {post.data.date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' })}
+      </time>
+      <span aria-hidden="true"> · </span>{minutos} min de leitura
+    </p>
 
     <h1 class="text-4xl font-display mt-2 mb-4">{post.data.title}</h1>
-    <p class="text-stone-500 mb-10 text-base">{post.data.description}</p>
+    <p class="text-stone-500 mb-4 text-base">{post.data.description}</p>
+
+    <div class="mb-10">
+      <Tags tags={post.data.tags} />
+    </div>
 
     <hr class="border-stone-200 mb-10" />
+
+    {post.data.series && (
+      <aside aria-label="Série" class="mb-10 rounded-lg border border-stone-200 p-5">
+        <p class="text-sm text-stone-500 mb-2">
+          {partesDaSerie.length > 1
+            ? <>Parte {post.data.part} da série <strong class="text-[var(--color-ink)]">{post.data.series}</strong></>
+            : <>Esta postagem abre a série <strong class="text-[var(--color-ink)]">{post.data.series}</strong> — as próximas partes aparecerão aqui.</>}
+        </p>
+        {partesDaSerie.length > 1 && (
+          <ol class="text-sm space-y-1 list-none">
+            {partesDaSerie.map(p => (
+              <li>
+                <span class="text-stone-400">{p.data.part}.</span>{' '}
+                {p.id === post.id
+                  ? <span class="font-semibold">{p.data.title}</span>
+                  : <a href={`/blog/${p.id}`} class="text-[var(--color-accent)] underline hover:no-underline">{p.data.title}</a>}
+              </li>
+            ))}
+          </ol>
+        )}
+      </aside>
+    )}
 
     <article class="
       text-[var(--color-ink)]
@@ -44,6 +99,27 @@ const { Content } = await render(post);
     ">
       <Content />
     </article>
+
+    {(postAnterior || postSeguinte) && (
+      <nav aria-label="Outras postagens" class="mt-12 pt-6 border-t border-stone-200 flex justify-between gap-6 text-sm">
+        <div>
+          {postAnterior && (
+            <a href={`/blog/${postAnterior.id}`} class="group block">
+              <span class="block text-stone-400 mb-1">← Anterior</span>
+              <span class="text-[var(--color-accent)] group-hover:underline">{postAnterior.data.title}</span>
+            </a>
+          )}
+        </div>
+        <div class="text-right">
+          {postSeguinte && (
+            <a href={`/blog/${postSeguinte.id}`} class="group block">
+              <span class="block text-stone-400 mb-1">Próxima →</span>
+              <span class="text-[var(--color-accent)] group-hover:underline">{postSeguinte.data.title}</span>
+            </a>
+          )}
+        </div>
+      </nav>
+    )}
 
   </main>
 </Layout>

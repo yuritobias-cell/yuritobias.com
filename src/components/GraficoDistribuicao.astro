@@ -1,0 +1,268 @@
+---
+/**
+ * Gráfico de distribuições (percentis) em painéis, um por "área".
+ * Cada linha compara grupos (ex.: dependência administrativa) via
+ * p10–p90 (linha fina), p25–p75 (barra grossa) e mediana (ponto).
+ *
+ * Reutilizável em posts MDX: os dados vêm por props e o Observable Plot
+ * é empacotado no build (sem CDN).
+ */
+interface Registro {
+  area: string;
+  grupo: string;
+  n: number;
+  media: number;
+  p10: number;
+  p25: number;
+  p50: number;
+  p75: number;
+  p90: number;
+}
+
+interface Props {
+  /** Linhas do gráfico (uma por área × grupo). */
+  dados: Registro[];
+  /** Cor de cada grupo; a ordem define a legenda. */
+  paleta: Record<string, string>;
+  /** Ordem dos grupos no eixo y (de cima para baixo). */
+  ordemY: string[];
+  /** Áreas, na ordem em que os painéis aparecem. */
+  paineis: string[];
+  /** Grupo cuja mediana vira linha tracejada de referência (opcional). */
+  linhaReferencia?: string;
+  /** Rótulo da coluna de grupos na tabela de dados (ex.: "Rede"). */
+  rotuloGrupo?: string;
+}
+
+const { dados, paleta, ordemY, paineis, linhaReferencia, rotuloGrupo = 'Grupo' } = Astro.props;
+const config = { dados, paleta, ordemY, paineis, linhaReferencia };
+
+// Tabela de dados renderizada no servidor: alternativa acessível ao gráfico
+// (leitores de tela, navegação sem JS, consulta dos valores exatos no celular).
+const fmtInt = new Intl.NumberFormat('pt-BR');
+const fmtNota = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const tabelas = paineis.map((area) => ({
+  area,
+  linhas: ordemY
+    .map((grupo) => dados.find((d) => d.area === area && d.grupo === grupo))
+    .filter((d): d is Registro => d !== undefined),
+}));
+---
+
+<div class="grafico-distribuicao">
+  <div class="gd-sub"><slot name="subtitulo" /></div>
+  <div class="gd-legenda" aria-hidden="true"></div>
+  <div class="gd-grafico" aria-hidden="true"></div>
+  <details class="gd-dados">
+    <summary>Ver os dados em tabela</summary>
+    {tabelas.map(({ area, linhas }) => (
+      <div class="gd-tabela-rolagem">
+        <table>
+          <caption>{area}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{rotuloGrupo}</th>
+              <th scope="col">n</th>
+              <th scope="col">p10</th>
+              <th scope="col">p25</th>
+              <th scope="col">Mediana</th>
+              <th scope="col">p75</th>
+              <th scope="col">p90</th>
+              <th scope="col">Média</th>
+            </tr>
+          </thead>
+          <tbody>
+            {linhas.map((d) => (
+              <tr>
+                <th scope="row">{d.grupo}</th>
+                <td>{fmtInt.format(d.n)}</td>
+                <td>{fmtNota.format(d.p10)}</td>
+                <td>{fmtNota.format(d.p25)}</td>
+                <td>{fmtNota.format(d.p50)}</td>
+                <td>{fmtNota.format(d.p75)}</td>
+                <td>{fmtNota.format(d.p90)}</td>
+                <td>{fmtNota.format(d.media)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))}
+  </details>
+  <div class="gd-nota"><slot name="nota" /></div>
+  <script is:inline type="application/json" class="gd-config" set:html={JSON.stringify(config)} />
+</div>
+
+<style is:global>
+  .grafico-distribuicao .gd-sub{color:var(--muted); font-size:.92rem; margin:0 0 1.4rem; max-width:60ch}
+  /* O MDX envolve o conteúdo dos slots em <p>; zera a margem para manter o espaçamento original. */
+  .grafico-distribuicao .gd-sub p, .grafico-distribuicao .gd-nota p{margin:0; font-size:inherit; line-height:inherit}
+  .grafico-distribuicao .gd-legenda{display:flex; flex-wrap:wrap; gap:.9rem 1.3rem; margin:0 0 1.6rem}
+  .grafico-distribuicao .gd-legenda span{display:inline-flex; align-items:center; gap:.45rem; font-size:.85rem}
+  .grafico-distribuicao .gd-swatch{width:14px; height:14px; border-radius:3px; display:inline-block}
+  .grafico-distribuicao .gd-area-titulo{
+    font-family:var(--font-display); font-weight:700;
+    font-size:1.05rem; color:var(--accent); margin:1.5rem 0 .1rem;
+  }
+  .grafico-distribuicao .gd-painel svg{max-width:100%; height:auto; display:block}
+  .grafico-distribuicao .gd-dados{margin-top:1.8rem}
+  .grafico-distribuicao .gd-dados summary{
+    cursor:pointer; font-size:.88rem; font-weight:600; color:var(--accent);
+    width:fit-content;
+  }
+  .grafico-distribuicao .gd-dados summary:hover{text-decoration:underline}
+  .grafico-distribuicao .gd-tabela-rolagem{overflow-x:auto; margin-top:1.1rem}
+  .grafico-distribuicao .gd-dados table{
+    width:100%; border-collapse:collapse; font-size:.82rem;
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .grafico-distribuicao .gd-dados caption{
+    text-align:left; font-family:var(--font-display); font-weight:700;
+    color:var(--accent); font-size:.95rem; padding:0 0 .45rem;
+  }
+  .grafico-distribuicao .gd-dados th, .grafico-distribuicao .gd-dados td{
+    padding:.3rem .6rem; border-bottom:1px solid var(--rule); text-align:right;
+  }
+  .grafico-distribuicao .gd-dados th:first-child{text-align:left; padding-left:0}
+  .grafico-distribuicao .gd-dados thead th{color:var(--muted); font-weight:600}
+  .grafico-distribuicao .gd-dados tbody th{font-weight:500}
+  .grafico-distribuicao .gd-nota{
+    margin-top:2rem; padding-top:1rem; border-top:1px solid var(--rule);
+    font-size:.82rem; color:var(--muted); max-width:64ch;
+  }
+  .grafico-distribuicao .gd-nota b{color:var(--ink); font-weight:600}
+  /* Tooltip flutuante: position:fixed, nunca é recortado pelo painel. */
+  .gd-tooltip{
+    position:fixed; top:0; left:0; z-index:50; pointer-events:none;
+    background:#fff; border:1px solid var(--rule); border-radius:6px;
+    box-shadow:0 4px 14px rgba(27,79,79,.14); padding:.55rem .7rem;
+    font-size:.82rem; color:var(--ink); min-width:150px;
+    opacity:0; transition:opacity .08s ease;
+  }
+  .gd-tooltip.on{opacity:1}
+  .gd-tooltip .cab{font-weight:700; margin-bottom:.25rem; display:flex; align-items:center; gap:.4rem}
+  .gd-tooltip .cab i{width:11px; height:11px; border-radius:2px; display:inline-block}
+  .gd-tooltip .lin{display:flex; justify-content:space-between; gap:1.2rem; font-variant-numeric:tabular-nums}
+  .gd-tooltip .lin span:first-child{color:var(--muted)}
+</style>
+
+<script>
+  import * as Plot from "@observablehq/plot";
+
+  const FONTE = "'IBM Plex Sans', system-ui, sans-serif";
+  const fmt = new Intl.NumberFormat("pt-BR");
+
+  // Tooltip único compartilhado por todas as instâncias da página.
+  const tt = document.createElement("div");
+  tt.className = "gd-tooltip";
+  document.body.appendChild(tt);
+
+  function mostrarTooltip(d: any, cor: string) {
+    tt.innerHTML =
+      `<div class="cab"><i style="background:${cor}"></i>${d.grupo}</div>`
+      + `<div class="lin"><span>n</span><span>${fmt.format(d.n)}</span></div>`
+      + `<div class="lin"><span>p10 · p25</span><span>${d.p10} · ${d.p25}</span></div>`
+      + `<div class="lin"><span>mediana</span><span>${d.p50}</span></div>`
+      + `<div class="lin"><span>p75 · p90</span><span>${d.p75} · ${d.p90}</span></div>`;
+    tt.classList.add("on");
+  }
+  function esconderTooltip() { tt.classList.remove("on"); }
+
+  // Posiciona a caixa perto do cursor, virando quando encosta na borda da janela.
+  function posicionarTooltip(ev: PointerEvent) {
+    const cx = ev.clientX, cy = ev.clientY;
+    const larg = tt.offsetWidth, alt = tt.offsetHeight;
+    let x = cx + 14, y = cy + 14;
+    if (x + larg > window.innerWidth)  x = cx - larg - 14;   // vira para a esquerda
+    if (y + alt  > window.innerHeight) y = cy - alt  - 14;   // vira para cima
+    tt.style.left = Math.max(6, x) + "px";
+    tt.style.top  = Math.max(6, y) + "px";
+  }
+
+  function painel(cfg: any, area: string, largura: number) {
+    const linhas = cfg.dados.filter((d: any) => d.area === area);
+    const lo = Math.min(...linhas.map((d: any) => d.p10)) - 15;
+    const hi = Math.max(...linhas.map((d: any) => d.p90)) + 15;
+    const ref = cfg.linhaReferencia
+      ? linhas.find((d: any) => d.grupo === cfg.linhaReferencia)?.p50
+      : undefined;
+    const compacto = largura < 480;
+
+    const chart: any = Plot.plot({
+      width: largura, height: 150, marginLeft: compacto ? 70 : 88, marginTop: 6, marginBottom: 26,
+      style: { background: "transparent", fontFamily: FONTE, fontSize: compacto ? "11px" : "12px", color: "#2B2B28" },
+      x: { domain: [lo, hi], grid: true, label: null, ticks: compacto ? 4 : 6 },
+      y: { domain: cfg.ordemY, label: null, tickSize: 0 },
+      color: { domain: Object.keys(cfg.paleta), range: Object.values(cfg.paleta) },
+      marks: [
+        ref != null
+          ? Plot.ruleX([ref], { stroke: cfg.paleta[cfg.linhaReferencia], strokeDasharray: "3,3", strokeOpacity: 0.35 })
+          : null,
+        Plot.ruleY(linhas, { y: "grupo", x1: "p10", x2: "p90", stroke: "grupo", strokeWidth: 1.4 }),
+        Plot.ruleY(linhas, { y: "grupo", x1: "p25", x2: "p75", stroke: "grupo", strokeWidth: 7, strokeOpacity: 0.85 }),
+        Plot.dot(linhas, { y: "grupo", x: "p50", fill: "#F8F6F1", stroke: "grupo", strokeWidth: 2, r: 5 }),
+        // Marca de interação: seleciona a linha mais próxima em y (hover em qualquer x da faixa).
+        // Realça a mediana e alimenta chart.value, que dispara o evento "input".
+        Plot.dot(linhas, Plot.pointerY({ x: "p50", y: "grupo", r: 8, fill: "none",
+                                         stroke: "#2B2B28", strokeWidth: 1.5 })),
+      ].filter(Boolean),
+    });
+
+    // chart.value = datum apontado (ou null). "input" dispara quando muda.
+    chart.addEventListener("input", () => {
+      if (chart.value) mostrarTooltip(chart.value, cfg.paleta[chart.value.grupo]);
+      else esconderTooltip();
+    });
+    chart.addEventListener("pointermove", (ev: PointerEvent) => { if (chart.value) posicionarTooltip(ev); });
+    chart.addEventListener("pointerleave", esconderTooltip);
+    return chart;
+  }
+
+  for (const raiz of document.querySelectorAll(".grafico-distribuicao")) {
+    const cfgEl = raiz.querySelector(".gd-config");
+    if (!cfgEl?.textContent) continue;
+    const cfg = JSON.parse(cfgEl.textContent);
+
+    const legenda = raiz.querySelector(".gd-legenda");
+    for (const [grupo, cor] of Object.entries(cfg.paleta)) {
+      const s = document.createElement("span");
+      s.innerHTML = `<i class="gd-swatch" style="background:${cor}"></i>${grupo}`;
+      legenda?.appendChild(s);
+    }
+
+    const alvo = raiz.querySelector(".gd-grafico") as HTMLElement | null;
+    if (!alvo) continue;
+
+    // Gera os painéis na largura real do contêiner: em telas estreitas o SVG
+    // é recriado menor (fonte legível), em vez de escalado via CSS.
+    const larguraAlvo = () => Math.max(300, Math.min(720, alvo.clientWidth || 720));
+    let larguraRenderizada = 0;
+
+    const renderizar = () => {
+      larguraRenderizada = larguraAlvo();
+      alvo.replaceChildren();
+      for (const area of cfg.paineis) {
+        const h = document.createElement("div");
+        h.className = "gd-area-titulo";
+        h.textContent = area;
+        alvo.appendChild(h);
+        const p = document.createElement("div");
+        p.className = "gd-painel";
+        p.appendChild(painel(cfg, area, larguraRenderizada));
+        alvo.appendChild(p);
+      }
+    };
+    renderizar();
+
+    // Redesenha quando a largura diverge do que foi renderizado (rotação do
+    // celular, janela redimensionada, layout tardio). O observador também
+    // dispara na observação inicial, corrigindo medições feitas antes do layout.
+    let agendado: ReturnType<typeof setTimeout>;
+    const observador = new ResizeObserver(() => {
+      if (Math.abs(larguraAlvo() - larguraRenderizada) < 8) return;
+      clearTimeout(agendado);
+      agendado = setTimeout(renderizar, 150);
+    });
+    observador.observe(alvo);
+  }
+</script>
