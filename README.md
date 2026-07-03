@@ -6,9 +6,9 @@ Reúne materiais didáticos por série, ferramentas interativas para sala de aul
 
 ## Stack
 
-- [Astro 6](https://astro.build) — site estático
+- [Astro 6](https://astro.build) — site estático (+ MDX nos posts com componentes)
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
-- [Chart.js](https://www.chartjs.org) — gráficos (empacotado, sem CDN)
+- [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
 - Deploy automático no GitHub Pages via Actions (push na `main`)
 - Analytics: GoatCounter (pageviews + eventos de download de PDF)
 
@@ -25,17 +25,20 @@ Reúne materiais didáticos por série, ferramentas interativas para sala de aul
 
 ```text
 src/
-├── data/            # JSONs dos materiais por série + provas + curso FET
-├── content/blog/    # Posts do blog (Markdown com frontmatter)
+├── data/            # JSONs dos materiais por série + provas + curso FET + dados de posts (enem/)
+├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
+├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
+├── utils/           # Utilitários (slug de tags, tempo de leitura)
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics)
 ├── pages/
 │   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
 │   ├── ferramentas/              # ferramentas interativas (JS próprio por página)
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
-│   └── blog/                     # índice + [slug] (drafts não são publicados)
+│   └── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
 └── styles/global.css             # @theme com cores e fontes do site
 public/materiais/<serie>/         # PDFs servidos para download
-scripts/og-image.py               # gerador da imagem Open Graph (public/og.png)
+public/og/                        # imagens Open Graph por post (geradas por script)
+scripts/og-image.py               # gerador das imagens Open Graph (og.png + public/og/)
 ```
 
 ## Como adicionar um material
@@ -54,14 +57,22 @@ As contagens nas páginas de índice são calculadas automaticamente a partir do
 
 ## Como publicar um post
 
-Crie `src/content/blog/meu-post.md` com o frontmatter:
+Passo a passo completo em [docs/publicar-post.md](docs/publicar-post.md). Resumo:
+
+1. Crie `src/content/blog/meu-post.md` (ou `.mdx`, se usar componentes) com o frontmatter:
 
 ```yaml
 ---
 title: "Título"
-description: "Descrição (usada no preview e no RSS)"
+description: "Descrição (usada no índice, no preview e no RSS)"
 date: 2026-06-11
-tags: ["tag"]
-draft: false   # true = não publica
+tags: ["tag"]                 # etiquetas + páginas /blog/tag/<slug> automáticas
+series: "Nome da série"       # opcional — agrupa e navega entre as partes
+part: 1                       # opcional — ordem dentro da série
+draft: false                  # true = não publica
 ---
 ```
+
+2. Gere a imagem OG do post e commite: `/tmp/ogvenv/bin/python scripts/og-image.py`
+   (preparação do venv/fontes no manual).
+3. Confira com `npm run dev` e faça push na `main` — o deploy é automático.
