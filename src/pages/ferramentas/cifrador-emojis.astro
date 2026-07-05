@@ -48,8 +48,13 @@ import Layout from '../../layouts/Layout.astro';
               <button data-v="alta" aria-pressed="true">ABC</button>
               <button data-v="baixa" aria-pressed="false">abc</button>
             </div></div>
-          <div class="campo"><label class="mini">Símbolos</label>
-            <div class="semente"><input id="semente" type="number" min="1" value="1" aria-label="Semente"><button class="btn sec" id="trocar">trocar</button></div>
+          <div class="campo"><label class="mini">Figuras</label>
+            <div class="seg" id="figuras" role="group">
+              <button data-v="emoji" aria-pressed="true">emojis</button>
+              <button data-v="simbolo" aria-pressed="false">símbolos</button>
+            </div></div>
+          <div class="campo"><label class="mini">Variação</label>
+            <div class="semente"><input id="semente" type="number" min="1" value="1" aria-label="Variação"><button class="btn sec" id="trocar">trocar</button></div>
           </div>
         </div>
 
@@ -289,6 +294,21 @@ const POOL = [
  "🏰","⛺","🎡","🎠","🧸","🎨","✏️","📚","🔑","⏰","🪁","🌂","🕯","🥇","💎","🎳"
 ];
 
+/* Conjunto monocromático (preto e branco): estrelas, formas, naipes, peças de
+   xadrez, notas, dados e alguns pictogramas. O seletor de variação de texto
+   (U+FE0E) força a apresentação em glifo, impedindo o navegador de trocar por
+   versões coloridas de emoji. Símbolos distintos das letras usuais. */
+const SIMBOLOS_BASE = [
+ "★","☆","✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✶","✷","✸","✹","✺",
+ "✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊","❋",
+ "●","○","◆","◇","■","□","▲","△","▼","▽","◀","▶",
+ "♠","♣","♥","♦","♩","♪","♫","♬",
+ "♔","♕","♖","♗","♘","♙","♚","♛","♜","♝","♞","♟",
+ "⚀","⚁","⚂","⚃","⚄","⚅",
+ "☀","☁","☂","☃","☘","☯","☮","⚓","⌂","✈","✉","✂","✎"
+];
+const POOL_SIMBOLOS = SIMBOLOS_BASE.map(s=>s+"\uFE0E");
+
 /* ==========================================================================
    3) PRNG com semente (reprodutibilidade)
    ========================================================================== */
@@ -326,14 +346,16 @@ function extrair(frase, est, opts){
   }
   return tokens;
 }
+function poolAtivo(est){ return est.figuras==="simbolo" ? POOL_SIMBOLOS : POOL; }
 function construirChave(unicas, est){
   const usados=new Set(), chave=new Map(); let faltou=false;
-  const pool=embaralhar(POOL, est.semente); let pi=0;
+  const pool=embaralhar(poolAtivo(est), est.semente); let pi=0;
   const doPool=()=>{ while(pi<pool.length&&usados.has(pool[pi]))pi++;
     if(pi>=pool.length){faltou=true;return "❓";} const e=pool[pi++]; usados.add(e); return e; };
   for(const u of unicas){
     let emoji=null;
-    if(est.modo==="letra"&&est.chaveTipo==="fixa"){
+    // A chave fixa é mnemônica (figura pela inicial), então só faz sentido com emojis.
+    if(est.modo==="letra"&&est.chaveTipo==="fixa"&&est.figuras==="emoji"){
       const m=MNEMONICO[u.toLowerCase()];
       if(m&&!usados.has(m)){ emoji=m; usados.add(m); }
     }
@@ -346,7 +368,7 @@ function construirChave(unicas, est){
 /* ==========================================================================
    5) ESTADO + RENDER
    ========================================================================== */
-const est={ modo:"silaba", chaveTipo:"aleatoria", acentos:"manter", caixa:"alta", semente:1 };
+const est={ modo:"silaba", chaveTipo:"aleatoria", acentos:"manter", caixa:"alta", figuras:"emoji", semente:1 };
 const $=id=>document.getElementById(id);
 
 function gerar(){
@@ -372,7 +394,7 @@ function gerar(){
   else g.hidden=true;
 
   const av=$("aviso");
-  if(faltou){ av.hidden=false; av.textContent="A frase tem mais unidades distintas do que o pool comporta ("+POOL.length+" símbolos). Encurte a frase ou peça para eu ampliar o conjunto."; }
+  if(faltou){ av.hidden=false; av.textContent="A frase tem mais unidades distintas do que o conjunto comporta ("+poolAtivo(est).length+" figuras). Encurte a frase ou troque o conjunto."; }
   else av.hidden=true;
 
   $("resumo").textContent=tokens.length+" palavra(s) · "+unidades.length+" unidade(s) · "+unicas.length+" símbolo(s) na chave · "+
@@ -428,12 +450,15 @@ function ligarSeg(id,chaveEstado,aoMudar){
       est[chaveEstado]=b.dataset.v; if(aoMudar)aoMudar(); gerar(); });
   });
 }
-ligarSeg("modo","modo",()=>{
+// A chave "fixa" só existe no modo letra + emojis (é mnemônica pela inicial).
+function atualizarFixa(){
   const fixa=document.querySelector('#chaveTipo button[data-v="fixa"]');
-  if(est.modo==="letra") fixa.setAttribute("aria-disabled","false");
+  if(est.modo==="letra"&&est.figuras==="emoji") fixa.setAttribute("aria-disabled","false");
   else{ fixa.setAttribute("aria-disabled","true"); est.chaveTipo="aleatoria";
     document.querySelectorAll("#chaveTipo button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="aleatoria")); }
-});
+}
+ligarSeg("modo","modo",atualizarFixa);
+ligarSeg("figuras","figuras",atualizarFixa);
 ligarSeg("chaveTipo","chaveTipo"); ligarSeg("acentos","acentos"); ligarSeg("caixa","caixa");
 ["frase","titulo","instrucao","semente"].forEach(id=>$(id).addEventListener("input",gerar));
 ["optIdent","optLinhas","optGabarito"].forEach(id=>$(id).addEventListener("change",gerar));
