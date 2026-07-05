@@ -19,6 +19,7 @@ const PRECACHE = [
   '/ferramentas/pluviometria-biomas/',
   '/ferramentas/angulos-circunferencia/',
   '/ferramentas/corrida-ao-20/',
+  '/ferramentas/cifrador-emojis/',
 ];
 
 self.addEventListener('install', (e) => {
