@@ -2,236 +2,285 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="Testador de Senhas">
-  <div class="tr">
+<Layout
+  title="Testador de Senhas"
+  description="Simule um ataque de força bruta e veja quanto tempo levaria para quebrar uma senha — análise combinatória aplicada à segurança digital."
+>
 
-    <div class="tr-back-wrap">
-      <a href="/ferramentas" class="tr-back">← Ferramentas</a>
-    </div>
+  <!-- IBM Plex Mono + pesos 600/700 do Plex Sans carregados só nesta página.
+       Playfair Display + IBM Plex Sans (300–500) já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@600;700&display=swap" rel="stylesheet" />
 
-    <header class="tr-page-header">
-      <div class="tr-header-info">
-        <div class="tr-prof">Professor Yuri Tobias</div>
-        <div class="tr-disciplina">Matemática · Análise Combinatória</div>
-      </div>
-    </header>
-    <div class="tr-header-accent"></div>
+  <div class="tsr-root">
+    <div class="wrap">
 
-    <div class="tr-container">
-      <h1>Simulador de Força Bruta</h1>
-      <p class="tr-subtitle">Atividade prática · Segurança de senhas e análise combinatória</p>
+      <header class="masthead">
+        <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Análise combinatória</p>
+        <h1>Testador de senhas</h1>
+        <p class="lede">Um simulador de força bruta: escolha uma senha curta, veja quantas combinações existem e quanto tempo cada cenário de ataque levaria para esgotá-las — e por que cada caractere a mais muda tudo. Nenhuma senha sai da página.</p>
+      </header>
 
-      <div class="tr-sec tr-grid2">
-        <div>
-          <label>Senha (2 a 4 caracteres)</label>
-          <div style="display:flex; gap:6px;">
-            <input type="text" id="pwd-in" maxlength="4" placeholder="ex: 7392" oninput="refresh()" style="flex:1; font-family:var(--tr-mono); font-size:18px; letter-spacing:0.15em;" />
-            <button onclick="genPwd()" style="white-space:nowrap; font-size:13px; padding:0 12px;">↻ gerar</button>
+      <!-- ================= SENHA E CONJUNTO ================= -->
+      <section class="card">
+        <div class="grid2">
+          <div class="campo">
+            <label class="mini" for="pwd-in">Senha (2 a 4 caracteres)</label>
+            <div class="senha-row">
+              <input type="text" id="pwd-in" maxlength="4" placeholder="ex: 7392" spellcheck="false" autocomplete="off">
+              <button class="btn sec" id="gen-btn">↻ gerar</button>
+            </div>
+          </div>
+          <div class="campo">
+            <label class="mini" for="cs-sel">Conjunto de caracteres</label>
+            <select id="cs-sel">
+              <option value="digits">Apenas dígitos · 10 símbolos</option>
+              <option value="lower">Dígitos + letras minúsculas · 36 símbolos</option>
+              <option value="mixed">Dígitos + minúsculas + maiúsculas · 62 símbolos</option>
+            </select>
           </div>
         </div>
-        <div>
-          <label>Conjunto de caracteres</label>
-          <select id="cs-sel" onchange="refresh()">
-            <option value="digits">Apenas dígitos · 10 símbolos</option>
-            <option value="lower">Dígitos + letras minúsculas · 36 símbolos</option>
-            <option value="mixed">Dígitos + minúsculas + maiúsculas · 62 símbolos</option>
-          </select>
+
+        <div class="formula">
+          <span class="formula-eq">combinações possíveis = |conjunto|<sup>comprimento</sup></span>
+          <div class="formula-linha" id="math-line">Digite ou gere uma senha acima</div>
+          <div class="formula-nota" id="math-note"></div>
         </div>
-      </div>
+      </section>
 
-      <div class="tr-sec tr-formula-box">
-        <span style="font-size:12px; color:var(--tr-text2);">combinações possíveis = |conjunto|<sup style="font-size:10px;">comprimento</sup></span>
-        <div style="margin-top:4px; font-size:17px; font-weight:500;" id="math-line">Digite ou gere uma senha acima</div>
-        <div style="font-size:12px; color:var(--tr-text2); margin-top:3px;" id="math-note"></div>
-      </div>
-
-      <div class="tr-sec tr-proj-table">
-        <div style="background:var(--tr-bg2); padding:8px 12px; font-size:11px; color:var(--tr-text2); font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">Projeção · tempo para esgotar todas as combinações (pior caso)</div>
-        <div class="tr-proj-row" style="border-top:none; font-size:11px; color:var(--tr-text3); font-weight:600; background:var(--tr-bg2); padding:6px 12px;">
+      <!-- ================= PROJEÇÃO ================= -->
+      <section class="proj">
+        <div class="proj-titulo">Projeção · tempo para esgotar todas as combinações (pior caso)</div>
+        <div class="proj-row proj-head">
           <span>Cenário de ataque</span><span>Velocidade</span><span>Tempo estimado</span>
         </div>
-        <div class="tr-proj-row">
-          <span>Ataque online <span style="font-size:11px; color:var(--tr-text2)">(servidor limita após erros)</span></span>
-          <span class="tr-mono" style="font-size:12px;">10 /s</span>
-          <span id="pt-online" class="tr-mono" style="font-weight:500;">—</span>
+        <div class="proj-row">
+          <span>Ataque online <span class="obs">(servidor limita após erros)</span></span>
+          <span class="mono obs">10 /s</span>
+          <span id="pt-online" class="mono destaque">—</span>
         </div>
-        <div class="tr-proj-row">
-          <span>CPU moderna <span style="font-size:11px; color:var(--tr-text2)">(ataque offline)</span></span>
-          <span class="tr-mono" style="font-size:12px;">10⁶ /s</span>
-          <span id="pt-cpu" class="tr-mono" style="font-weight:500;">—</span>
+        <div class="proj-row">
+          <span>CPU moderna <span class="obs">(ataque offline)</span></span>
+          <span class="mono obs">10⁶ /s</span>
+          <span id="pt-cpu" class="mono destaque">—</span>
         </div>
-        <div class="tr-proj-row">
-          <span>GPU dedicada <span style="font-size:11px; color:var(--tr-text2)">(ex: RTX 4090)</span></span>
-          <span class="tr-mono" style="font-size:12px;">10¹⁰ /s</span>
-          <span id="pt-gpu" class="tr-mono" style="font-weight:500;">—</span>
+        <div class="proj-row">
+          <span>GPU dedicada <span class="obs">(ex: RTX 4090)</span></span>
+          <span class="mono obs">10¹⁰ /s</span>
+          <span id="pt-gpu" class="mono destaque">—</span>
         </div>
-      </div>
+      </section>
 
-      <div class="tr-sec tr-config-box">
-        <div style="display:flex; gap:24px; flex-wrap:wrap;">
-          <div style="flex:1; min-width:220px;">
-            <label id="speed-lbl" style="margin-bottom:6px;">Velocidade da simulação: <strong>50 tentativas/s</strong></label>
-            <input type="range" id="speed-sl" min="0" max="4" value="1" step="1" oninput="updateControls()" />
-            <div class="tr-speed-ticks"><span>5/s</span><span>50/s</span><span>500/s</span><span>5.000/s</span><span>50.000/s</span></div>
-            <div style="font-size:12px; color:var(--tr-text2); margin-top:6px; line-height:1.5;" id="speed-hint">Bom para ver cada tentativa individualmente</div>
+      <!-- ================= SIMULAÇÃO ================= -->
+      <section class="card">
+        <div class="config-grid">
+          <div class="campo campo-veloc">
+            <label class="mini" id="speed-lbl" for="speed-sl">Velocidade da simulação: <strong>50 tentativas/s</strong></label>
+            <input type="range" id="speed-sl" min="0" max="4" value="1" step="1">
+            <div class="ticks"><span>5/s</span><span>50/s</span><span>500/s</span><span>5.000/s</span><span>50.000/s</span></div>
+            <p class="nota" id="speed-hint">Bom para ver o processo em ação</p>
           </div>
-          <div style="display:flex; flex-direction:column; justify-content:flex-start; gap:6px; min-width:160px;">
-            <label style="margin-bottom:0;">Limite de tempo da simulação</label>
-            <div class="tr-inline-row" style="gap:6px;">
-              <button onclick="adjustCap(-30)" style="padding:4px 10px; font-size:16px; line-height:1;">−</button>
-              <input type="number" id="cap-input" min="10" max="600" value="30" step="10" oninput="updateControls()" />
-              <span style="font-size:13px; color:var(--tr-text2);">segundos</span>
-              <button onclick="adjustCap(30)" style="padding:4px 10px; font-size:16px; line-height:1;">+</button>
+          <div class="campo">
+            <label class="mini" for="cap-input">Limite de tempo da simulação</label>
+            <div class="cap-row">
+              <button class="btn sec mini-btn" data-cap-delta="-30" aria-label="Diminuir 30 segundos">−</button>
+              <input type="number" id="cap-input" min="10" max="600" value="30" step="10">
+              <span class="obs">segundos</span>
+              <button class="btn sec mini-btn" data-cap-delta="30" aria-label="Aumentar 30 segundos">+</button>
             </div>
-            <div class="tr-inline-row" style="gap:6px; margin-top:2px;">
-              <button onclick="setCap(30)"  style="font-size:11px; padding:3px 8px;">30s</button>
-              <button onclick="setCap(60)"  style="font-size:11px; padding:3px 8px;">1 min</button>
-              <button onclick="setCap(120)" style="font-size:11px; padding:3px 8px;">2 min</button>
-              <button onclick="setCap(300)" style="font-size:11px; padding:3px 8px;">5 min</button>
+            <div class="cap-row">
+              <button class="btn sec mini-btn" data-cap="30">30s</button>
+              <button class="btn sec mini-btn" data-cap="60">1 min</button>
+              <button class="btn sec mini-btn" data-cap="120">2 min</button>
+              <button class="btn sec mini-btn" data-cap="300">5 min</button>
             </div>
-            <div style="font-size:12px; color:var(--tr-text2); margin-top:2px;" id="cap-note">—</div>
+            <p class="nota" id="cap-note">—</p>
           </div>
         </div>
-      </div>
 
-      <div class="tr-sec tr-btn-row">
-        <button id="start-btn" onclick="startBF()" style="font-size:14px; padding:9px 22px; background:#003087; color:#fff; border-color:#003087;">▶ Iniciar</button>
-        <button id="stop-btn" onclick="stopBF()" disabled style="font-size:14px; padding:9px 18px;">◼ Parar</button>
-        <button onclick="resetBF()" style="font-size:14px; padding:9px 18px;">↺ Reiniciar</button>
-        <span class="tr-cap-warn" id="cap-warn">⚠ A senha estará além do limite — será exibida ao final do tempo</span>
-      </div>
-
-      <div id="prog-sec" class="tr-sec" style="display:none;">
-        <div style="font-size:11px; color:var(--tr-text2); letter-spacing:0.08em; margin-bottom:6px; text-transform:uppercase;">Tentativa Atual</div>
-        <div class="tr-cur-att" id="cur-att">----</div>
-        <div class="tr-prog-bar-wrap"><div class="tr-prog-bar-fill" id="prog-bar"></div></div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <span style="font-size:11px; color:var(--tr-text2);">Tempo restante</span>
-          <span style="font-size:12px; font-family:var(--tr-mono); color:var(--tr-text2);" id="timer-display">—</span>
+        <div class="acoes">
+          <button class="btn" id="start-btn">▶ Iniciar</button>
+          <button class="btn sec" id="stop-btn" disabled>◼ Parar</button>
+          <button class="btn sec" id="reset-btn">↺ Reiniciar</button>
+          <span class="cap-warn" id="cap-warn" hidden>⚠ A senha está além do limite — será exibida ao final do tempo</span>
         </div>
-        <div class="tr-timer-bar-wrap"><div class="tr-timer-bar-fill" id="timer-bar"></div></div>
-        <div style="margin-top:1rem;" class="tr-stat-grid">
-          <div class="tr-stat-card"><p class="tr-stat-lbl">Tentativas</p><p class="tr-stat-val" id="att-count">0</p></div>
-          <div class="tr-stat-card"><p class="tr-stat-lbl">Total possível</p><p class="tr-stat-val" id="att-total">—</p></div>
-          <div class="tr-stat-card"><p class="tr-stat-lbl">Velocidade real</p><p class="tr-stat-val" id="speed-real">0/s</p></div>
-          <div class="tr-stat-card"><p class="tr-stat-lbl">Progresso</p><p class="tr-stat-val" id="prog-pct">0%</p></div>
+        <div class="aviso" id="err-box" hidden></div>
+      </section>
+
+      <!-- ================= PROGRESSO ================= -->
+      <section class="card" id="prog-sec" hidden>
+        <div class="secao-titulo">Tentativa atual</div>
+        <div class="cur-att" id="cur-att">----</div>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="prog-bar"></div></div>
+        <div class="timer-head">
+          <span>Tempo restante</span>
+          <span class="mono" id="timer-display">—</span>
         </div>
-      </div>
+        <div class="timer-bar-wrap"><div class="timer-bar-fill" id="timer-bar"></div></div>
+        <div class="stat-grid">
+          <div class="stat-card"><p class="stat-lbl">Tentativas</p><p class="stat-val" id="att-count">0</p></div>
+          <div class="stat-card"><p class="stat-lbl">Total possível</p><p class="stat-val" id="att-total">—</p></div>
+          <div class="stat-card"><p class="stat-lbl">Velocidade real</p><p class="stat-val" id="speed-real">0/s</p></div>
+          <div class="stat-card"><p class="stat-lbl">Progresso</p><p class="stat-val" id="prog-pct">0%</p></div>
+        </div>
+      </section>
 
-      <div id="result-sec" class="tr-sec tr-result-box" style="display:none;">
-        <p style="font-size:15px; font-weight:500; margin:0 0 4px;" id="result-title">Senha encontrada!</p>
-        <p id="result-txt" style="font-size:13px; margin:0; font-family:var(--tr-mono); line-height:1.7; white-space:pre-line;"></p>
-      </div>
+      <!-- ================= RESULTADO ================= -->
+      <section class="result" id="result-sec" hidden>
+        <p class="result-title" id="result-title">Senha encontrada!</p>
+        <p class="result-txt" id="result-txt"></p>
+      </section>
 
-      <div id="hist-sec" class="tr-sec" style="display:none;">
-        <p style="font-size:11px; color:var(--tr-text2); font-weight:600; margin:0 0 8px; text-transform:uppercase; letter-spacing:0.06em;">Histórico de execuções</p>
-        <div class="tr-hist-table">
-          <div class="tr-hist-row tr-hist-head"><span>Senha</span><span>Conjunto</span><span>Tentativas</span><span>Tempo</span><span>Limite</span><span>Veloc.</span></div>
+      <!-- ================= HISTÓRICO ================= -->
+      <section id="hist-sec" hidden>
+        <div class="secao-titulo">Histórico de execuções</div>
+        <div class="hist">
+          <div class="hist-row hist-head"><span>Senha</span><span>Conjunto</span><span>Tentativas</span><span>Tempo</span><span>Limite</span><span>Veloc.</span></div>
           <div id="hist-body"></div>
         </div>
-      </div>
+      </section>
 
-      <div class="tr-page-footer">SESI Poços de Caldas · Professor Yuri Tobias · Matemática</div>
     </div>
   </div>
+
 </Layout>
 
 <style is:global>
-  .tr {
-    --tr-bg: #ffffff; --tr-bg2: #f5f5f4; --tr-bg3: #eeede9;
-    --tr-text: #1a1a18; --tr-text2: #6b6b67; --tr-text3: #9b9b96;
-    --tr-border: rgba(0,0,0,0.12); --tr-border2: rgba(0,0,0,0.22);
-    --tr-info: #185fa5; --tr-info-bg: #e6f1fb;
-    --tr-success: #0f6e56; --tr-success-bg: #e1f5ee;
-    --tr-warn: #854f0b; --tr-warn-bg: #faeeda;
-    --tr-danger: #a32d2d; --tr-danger-bg: #fcebeb;
-    --tr-blue: #003087; --tr-green: #6ab04c;
-    --tr-mono: 'Courier New', Courier, monospace;
-    font-family: system-ui, -apple-system, sans-serif;
-    color: var(--tr-text);
-    line-height: 1.6;
+  /* ============================================================
+     Ferramenta: Testador de senhas
+     CSS escopado sob .tsr-root para não vazar para o resto do site.
+     Variáveis no próprio .tsr-root, na paleta do site.
+     ============================================================ */
+
+  .tsr-root{
+    --papel:#F8F6F1; --tinta:#1B4F4F; --tinta-2:#2f6b6b;
+    --traco:#d8d2c4; --neutro:#6b6459;
+    --ocre:#936614;  --ocre-bg:#f7efdd;   /* alertas, tempo médio     */
+    --terra:#A8442B; --terra-bg:#f9e9e4;  /* erros, tempo curto       */
+    --verde:#0f6e56; --verde-bg:#e3f1ec;  /* sucesso, tempo geológico */
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    background:var(--papel); color:var(--tinta);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.5;
+    padding:2rem 1.2rem 4rem;
   }
-  @media (prefers-color-scheme: dark) {
-    .tr {
-      --tr-bg: #1c1c1a; --tr-bg2: #252523; --tr-bg3: #2e2e2b;
-      --tr-text: #f0efeb; --tr-text2: #a8a8a3; --tr-text3: #6b6b67;
-      --tr-border: rgba(255,255,255,0.1); --tr-border2: rgba(255,255,255,0.2);
-      --tr-info: #85b7eb; --tr-info-bg: #042c53;
-      --tr-success: #5dcaa5; --tr-success-bg: #04342c;
-      --tr-warn: #ef9f27; --tr-warn-bg: #412402;
-      --tr-danger: #f09595; --tr-danger-bg: #501313;
-    }
+  .tsr-root [hidden]{ display:none !important; }
+  .tsr-root .wrap{ max-width:760px; margin:0 auto; }
+
+  .tsr-root .masthead{ margin-bottom:1.4rem; }
+  .tsr-root .masthead .eyebrow{
+    font-family:var(--font-mono); font-size:0.75rem;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--neutro); margin:0 0 .6rem;
   }
-  .tr-back-wrap { max-width: 720px; margin: 0 auto; padding: 1rem 1rem 0; }
-  .tr-back { font-size: 13px; color: #6b6b67; text-decoration: none; transition: color 0.2s; }
-  .tr-back:hover { color: #1B4F4F; }
-  .tr-page-header { background: var(--tr-blue); padding: 1rem 2rem; display: flex; align-items: center; justify-content: flex-end; }
-  .tr-header-info { text-align: right; }
-  .tr-prof { color: #fff; font-size: 14px; font-weight: 500; }
-  .tr-disciplina { color: rgba(255,255,255,0.65); font-size: 12px; margin-top: 2px; }
-  .tr-header-accent { height: 4px; background: linear-gradient(90deg, var(--tr-blue) 0%, var(--tr-green) 100%); }
-  .tr-container { max-width: 720px; margin: 0 auto; padding: 2rem 1rem 3rem; background: var(--tr-bg); }
-  .tr-container h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; color: var(--tr-text); }
-  .tr-subtitle { font-size: 13px; color: var(--tr-text2); margin-bottom: 2rem; }
-  .tr-sec { margin-bottom: 1.5rem; }
-  .tr-container label { font-size: 13px; color: var(--tr-text2); display: block; margin-bottom: 5px; }
-  .tr-container input[type=text], .tr-container select {
-    width: 100%; padding: 8px 12px; border: 1px solid var(--tr-border2);
-    border-radius: 8px; background: var(--tr-bg); color: var(--tr-text);
-    font-size: 15px; outline: none;
-  }
-  .tr-container input[type=text]:focus, .tr-container select:focus {
-    border-color: var(--tr-info); box-shadow: 0 0 0 3px rgba(24,95,165,0.15);
-  }
-  .tr-container input[type=number] {
-    width: 72px; padding: 6px 10px; border: 1px solid var(--tr-border2);
-    border-radius: 8px; background: var(--tr-bg); color: var(--tr-text);
-    font-size: 14px; font-family: var(--tr-mono); outline: none; text-align: center;
-  }
-  .tr-container input[type=range] { width: 100%; cursor: pointer; accent-color: var(--tr-blue); }
-  .tr-container button {
-    padding: 8px 18px; border: 1px solid var(--tr-border2); border-radius: 8px;
-    background: var(--tr-bg); color: var(--tr-text); font-size: 14px;
-    cursor: pointer; transition: background 0.15s;
-  }
-  .tr-container button:hover { background: var(--tr-bg2); }
-  .tr-container button:active { transform: scale(0.98); }
-  .tr-container button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .tr-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .tr-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .tr-stat-card { background: var(--tr-bg2); border-radius: 8px; padding: 0.75rem 1rem; }
-  .tr-stat-lbl { font-size: 12px; color: var(--tr-text2); margin: 0 0 3px; }
-  .tr-stat-val { font-size: 16px; font-weight: 500; margin: 0; font-family: var(--tr-mono); }
-  .tr-formula-box { background: var(--tr-bg2); border-radius: 8px; padding: 0.75rem 1rem; font-family: var(--tr-mono); }
-  .tr-config-box { background: var(--tr-bg2); border-radius: 8px; padding: 0.75rem 1rem; }
-  .tr-proj-table { border: 1px solid var(--tr-border); border-radius: 12px; overflow: hidden; }
-  .tr-proj-row { display: grid; grid-template-columns: 1fr 110px 160px; gap: 12px; align-items: center; padding: 9px 12px; border-top: 1px solid var(--tr-border); font-size: 13px; }
-  .tr-speed-ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--tr-text3); margin-top: 4px; }
-  .tr-prog-bar-wrap { background: var(--tr-bg2); border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 1rem; }
-  .tr-prog-bar-fill { background: var(--tr-blue); height: 100%; width: 0%; transition: width 0.08s; }
-  .tr-timer-bar-wrap { background: var(--tr-bg2); border-radius: 4px; height: 4px; overflow: hidden; margin-top: 6px; }
-  .tr-timer-bar-fill { background: var(--tr-green); height: 100%; width: 0%; transition: width 0.5s linear; }
-  .tr-cur-att { font-family: var(--tr-mono); font-size: 38px; font-weight: 500; letter-spacing: 0.2em; line-height: 1.1; margin-bottom: 12px; color: var(--tr-text); }
-  .tr-result-box { padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid; }
-  .tr-result-box.found { background: var(--tr-success-bg); border-color: var(--tr-success); color: var(--tr-success); }
-  .tr-result-box.capped { background: var(--tr-warn-bg); border-color: var(--tr-warn); color: var(--tr-warn); }
-  .tr-hist-table { border: 1px solid var(--tr-border); border-radius: 12px; overflow: hidden; }
-  .tr-hist-row { display: grid; grid-template-columns: 70px 1fr 100px 60px 60px 80px; gap: 8px; align-items: center; padding: 8px 12px; font-size: 13px; color: var(--tr-text); }
-  .tr-hist-row + .tr-hist-row { border-top: 1px solid var(--tr-border); }
-  .tr-hist-head { font-size: 11px; color: var(--tr-text3); font-weight: 600; background: var(--tr-bg2); }
-  .tr-btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .tr-cap-warn { font-size: 12px; color: var(--tr-warn); display: none; }
-  .tr-mono { font-family: var(--tr-mono); }
-  .tr-page-footer { border-top: 1px solid var(--tr-border); margin-top: 2rem; padding-top: 1rem; font-size: 12px; color: var(--tr-text3); text-align: center; }
-  .tr-inline-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  @media (max-width: 560px) {
-    .tr-grid2 { grid-template-columns: 1fr; }
-    .tr-stat-grid { grid-template-columns: repeat(2, 1fr); }
-    .tr-proj-row { grid-template-columns: 1fr 80px; }
-    .tr-proj-row span:nth-child(2) { display: none; }
-    .tr-hist-row { grid-template-columns: 60px 1fr 90px 60px 60px; }
-    .tr-hist-row span:last-child { display: none; }
-    .tr-cur-att { font-size: 26px; }
+  .tsr-root .masthead .eyebrow a{ color:inherit; text-decoration:none; }
+  .tsr-root .masthead .eyebrow a:hover{ color:var(--tinta); }
+  .tsr-root .masthead h1{ font-family:'Playfair Display',Georgia,serif; font-weight:700;
+    font-size:clamp(1.6rem,4vw,2.2rem); margin:0 0 .2rem; }
+  .tsr-root .masthead .lede{ color:var(--neutro); margin:0; font-size:.95rem; max-width:62ch; }
+
+  /* ---------- cartões e campos ---------- */
+  .tsr-root .card{ background:#fff; border:1px solid var(--traco); border-radius:12px;
+    padding:1.1rem 1.2rem; margin-bottom:1rem; }
+  .tsr-root .campo{ display:flex; flex-direction:column; gap:.35rem; }
+  .tsr-root label.mini{ display:block; font-weight:600; font-size:.74rem; text-transform:uppercase;
+    letter-spacing:.06em; margin:0; color:var(--tinta-2); }
+  .tsr-root .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .tsr-root input[type=text], .tsr-root select{
+    width:100%; background:#fff; border:1px solid var(--traco); border-radius:9px;
+    padding:.55rem .8rem; font:inherit; color:var(--tinta); }
+  .tsr-root input:focus, .tsr-root select:focus{ outline:2px solid var(--tinta); outline-offset:1px; }
+  .tsr-root .senha-row{ display:flex; gap:.5rem; }
+  .tsr-root #pwd-in{ flex:1; font-family:var(--font-mono); font-size:1.1rem; letter-spacing:.15em; }
+  .tsr-root input[type=number]{ width:4.5rem; background:#fff; border:1px solid var(--traco);
+    border-radius:8px; padding:.4rem; font:inherit; font-family:var(--font-mono); text-align:center; }
+  .tsr-root input[type=range]{ width:100%; cursor:pointer; accent-color:var(--tinta); }
+
+  .tsr-root .btn{ background:var(--tinta); color:var(--papel); border:0; border-radius:8px;
+    padding:.5rem .85rem; font:inherit; font-weight:600; cursor:pointer; }
+  .tsr-root .btn:hover{ background:var(--tinta-2); }
+  .tsr-root .btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .tsr-root .btn.sec{ background:#fff; color:var(--tinta); border:1px solid var(--traco); }
+  .tsr-root .btn.sec:hover{ background:var(--papel); }
+  .tsr-root .btn.sec:disabled:hover{ background:#fff; }
+  .tsr-root .btn.mini-btn{ padding:.25rem .6rem; font-size:.78rem; font-weight:500; }
+
+  .tsr-root .mono{ font-family:var(--font-mono); }
+  .tsr-root .obs{ font-size:.78rem; color:var(--neutro); }
+  .tsr-root .nota{ font-size:.78rem; color:var(--neutro); margin:.2rem 0 0; line-height:1.5; }
+  .tsr-root .destaque{ font-weight:500; font-size:.85rem; }
+  .tsr-root .secao-titulo{ font-weight:700; font-size:.8rem; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--tinta-2); margin:0 0 .5rem; }
+
+  /* ---------- fórmula ---------- */
+  .tsr-root .formula{ margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--traco);
+    font-family:var(--font-mono); }
+  .tsr-root .formula-eq{ font-size:.75rem; color:var(--neutro); }
+  .tsr-root .formula-linha{ font-size:1.05rem; font-weight:500; margin-top:.25rem; }
+  .tsr-root .formula-nota{ font-size:.8rem; color:var(--neutro); margin-top:.15rem; }
+  .tsr-root .formula-nota.invalida{ color:var(--terra); }
+
+  /* ---------- tabela de projeção ---------- */
+  .tsr-root .proj{ background:#fff; border:1px solid var(--traco); border-radius:12px;
+    overflow:hidden; margin-bottom:1rem; }
+  .tsr-root .proj-titulo{ background:var(--papel); padding:.5rem .9rem; font-size:.72rem;
+    color:var(--tinta-2); font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  .tsr-root .proj-row{ display:grid; grid-template-columns:1fr 110px 170px; gap:.8rem;
+    align-items:center; padding:.55rem .9rem; border-top:1px solid var(--traco); font-size:.88rem; }
+  .tsr-root .proj-head{ font-size:.7rem; color:var(--neutro); font-weight:600;
+    background:var(--papel); text-transform:uppercase; letter-spacing:.05em; padding:.4rem .9rem; }
+
+  /* ---------- configuração da simulação ---------- */
+  .tsr-root .config-grid{ display:flex; gap:1.5rem 2rem; flex-wrap:wrap; }
+  .tsr-root .campo-veloc{ flex:1 1 260px; }
+  .tsr-root .ticks{ display:flex; justify-content:space-between; font-size:.7rem;
+    color:var(--neutro); margin-top:.2rem; }
+  .tsr-root .cap-row{ display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
+  .tsr-root .acoes{ display:flex; gap:.6rem; align-items:center; flex-wrap:wrap;
+    margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--traco); }
+  .tsr-root .cap-warn{ font-size:.8rem; color:var(--ocre); font-weight:500; }
+  .tsr-root .aviso{ margin-top:.7rem; color:var(--terra); font-weight:600; font-size:.9rem; }
+
+  /* ---------- progresso ---------- */
+  .tsr-root .cur-att{ font-family:var(--font-mono); font-size:2.4rem; font-weight:500;
+    letter-spacing:.2em; line-height:1.1; margin:.2rem 0 .8rem; }
+  .tsr-root .prog-bar-wrap{ background:var(--papel); border-radius:4px; height:6px;
+    overflow:hidden; margin-bottom:1rem; }
+  .tsr-root .prog-bar-fill{ background:var(--tinta); height:100%; width:0%; transition:width .08s; }
+  .tsr-root .timer-head{ display:flex; justify-content:space-between; align-items:center;
+    font-size:.75rem; color:var(--neutro); margin-bottom:.3rem; }
+  .tsr-root .timer-bar-wrap{ background:var(--papel); border-radius:4px; height:4px; overflow:hidden; }
+  .tsr-root .timer-bar-fill{ background:var(--verde); height:100%; width:0%; transition:width .5s linear; }
+  .tsr-root .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; margin-top:1rem; }
+  .tsr-root .stat-card{ background:var(--papel); border-radius:8px; padding:.6rem .8rem; }
+  .tsr-root .stat-lbl{ font-size:.72rem; color:var(--neutro); margin:0 0 .15rem; }
+  .tsr-root .stat-val{ font-size:1rem; font-weight:600; margin:0; font-family:var(--font-mono); }
+
+  /* ---------- resultado ---------- */
+  .tsr-root .result{ border-radius:12px; border:1.4px solid; padding:.9rem 1.1rem; margin-bottom:1rem; }
+  .tsr-root .result.found{ background:var(--verde-bg); border-color:var(--verde); color:var(--verde); }
+  .tsr-root .result.capped{ background:var(--ocre-bg); border-color:var(--ocre); color:var(--ocre); }
+  .tsr-root .result-title{ font-weight:600; margin:0 0 .2rem; }
+  .tsr-root .result-txt{ font-family:var(--font-mono); font-size:.82rem; margin:0;
+    line-height:1.7; white-space:pre-line; }
+
+  /* ---------- histórico ---------- */
+  .tsr-root .hist{ background:#fff; border:1px solid var(--traco); border-radius:12px; overflow:hidden; }
+  .tsr-root .hist-row{ display:grid; grid-template-columns:70px 1fr 100px 60px 60px 80px;
+    gap:.5rem; align-items:center; padding:.5rem .9rem; font-size:.82rem; }
+  .tsr-root .hist-row + .hist-row{ border-top:1px solid var(--traco); }
+  .tsr-root .hist-head{ font-size:.7rem; color:var(--neutro); font-weight:600;
+    background:var(--papel); text-transform:uppercase; letter-spacing:.05em; }
+  .tsr-root .hist-row.recente{ background:var(--papel); }
+
+  @media (max-width:560px){
+    .tsr-root .grid2{ grid-template-columns:1fr; }
+    .tsr-root .stat-grid{ grid-template-columns:repeat(2,1fr); }
+    .tsr-root .proj-row{ grid-template-columns:1fr 100px; }
+    .tsr-root .proj-row span:nth-child(2){ display:none; }
+    .tsr-root .hist-row{ grid-template-columns:60px 1fr 90px 60px 60px; }
+    .tsr-root .hist-row span:last-child{ display:none; }
+    .tsr-root .cur-att{ font-size:1.6rem; }
   }
 </style>
 
@@ -242,7 +291,9 @@ import Layout from '../../layouts/Layout.astro';
   const SPEEDS=[5,50,500,5000,50000];
   const SPEED_HINTS=["Ideal para acompanhar cada tentativa com calma","Bom para ver o processo em ação","Equilíbrio entre visibilidade e agilidade","Senhas longas ficam visíveis mais rápido","Para demonstrar escala em grandes conjuntos"];
   const SCENARIOS=[{id:"online",speed:10},{id:"cpu",speed:1e6},{id:"gpu",speed:1e10}];
-  let running=false,rafId=null,currentIdx=0,targetIdx=0,total=0,chars="",pwdLen=0,simSpeed=0,startTime=0,simCapMs=30000,history=[];
+  const $=id=>document.getElementById(id);
+  let running=false,rafId=null,currentIdx=0,targetIdx=0,total=0,chars="",pwdLen=0,simSpeed=0,startTime=0,simCapMs=30000;
+  const execucoes=[];
 
   function idx2str(idx,c,len){let r="",n=idx;for(let i=0;i<len;i++){r=c[n%c.length]+r;n=Math.floor(n/c.length);}return r;}
   function str2idx(s,c){let idx=0;for(let i=0;i<s.length;i++){const p=c.indexOf(s[i]);if(p<0)return -1;idx=idx*c.length+p;}return idx;}
@@ -262,83 +313,85 @@ import Layout from '../../layouts/Layout.astro';
     if(s>=60)return(Math.floor(s/60))+"min "+Math.floor(s%60)+"s";
     return Math.ceil(s)+"s";
   }
-  function timeColor(s){if(s<60)return"var(--tr-danger)";if(s<86400*365)return"var(--tr-warn)";return"var(--tr-success)";}
-  function getCap(){return Math.max(10,Math.min(600,parseInt(document.getElementById('cap-input').value)||30));}
-  window.adjustCap=function(delta){const el=document.getElementById('cap-input');el.value=Math.max(10,Math.min(600,(parseInt(el.value)||30)+delta));updateControls();}
-  window.setCap=function(v){document.getElementById('cap-input').value=v;updateControls();}
-  function updateProjection(tot){SCENARIOS.forEach(sc=>{const el=document.getElementById("pt-"+sc.id),t=tot/sc.speed;el.textContent=fmtTime(t);el.style.color=timeColor(t);});}
+  function timeColor(s){if(s<60)return"var(--terra)";if(s<86400*365)return"var(--ocre)";return"var(--verde)";}
+  function getCap(){return Math.max(10,Math.min(600,parseInt($('cap-input').value)||30));}
+  function adjustCap(delta){const el=$('cap-input');el.value=Math.max(10,Math.min(600,(parseInt(el.value)||30)+delta));updateControls();}
+  function setCap(v){$('cap-input').value=v;updateControls();}
+  function updateProjection(tot){SCENARIOS.forEach(sc=>{const el=$("pt-"+sc.id),t=tot/sc.speed;el.textContent=fmtTime(t);el.style.color=timeColor(t);});}
+  function erro(msg){const e=$('err-box');e.textContent=msg;e.hidden=false;}
 
-  window.updateControls=function(){
-    const v=parseInt(document.getElementById('speed-sl').value);
-    document.getElementById('speed-lbl').innerHTML='Velocidade da simulação: <strong>'+SPEEDS[v].toLocaleString('pt-BR')+' tentativas/s</strong>';
-    document.getElementById('speed-hint').textContent=SPEED_HINTS[v];
+  function updateControls(){
+    const v=parseInt($('speed-sl').value);
+    $('speed-lbl').innerHTML='Velocidade da simulação: <strong>'+SPEEDS[v].toLocaleString('pt-BR')+' tentativas/s</strong>';
+    $('speed-hint').textContent=SPEED_HINTS[v];
     const cap=getCap();simCapMs=cap*1000;
     const label=cap>=60?(Math.floor(cap/60)+"min"+(cap%60>0?" "+cap%60+"s":"")):(cap+"s");
-    document.getElementById('cap-note').textContent='Limite atual: '+label+' — máx. '+(SPEEDS[v]*cap).toLocaleString('pt-BR')+' tentativas visíveis';
+    $('cap-note').textContent='Limite atual: '+label+' — máx. '+(SPEEDS[v]*cap).toLocaleString('pt-BR')+' tentativas visíveis';
     refresh();
   }
 
-  window.refresh=function(){
-    const pwd=document.getElementById('pwd-in').value;
-    const cs=CS[document.getElementById('cs-sel').value];
-    const ml=document.getElementById('math-line'),mn=document.getElementById('math-note');
-    if(!pwd){ml.textContent="Digite ou gere uma senha acima";mn.textContent="";SCENARIOS.forEach(sc=>{const el=document.getElementById("pt-"+sc.id);el.textContent="—";el.style.color="";});document.getElementById('cap-warn').style.display='none';return;}
+  function refresh(){
+    $('err-box').hidden=true;
+    const pwd=$('pwd-in').value;
+    const cs=CS[$('cs-sel').value];
+    const ml=$('math-line'),mn=$('math-note');
+    if(!pwd){ml.textContent="Digite ou gere uma senha acima";mn.textContent="";SCENARIOS.forEach(sc=>{const el=$("pt-"+sc.id);el.textContent="—";el.style.color="";});$('cap-warn').hidden=true;return;}
     const tot=Math.pow(cs.length,pwd.length);
     ml.textContent=cs.length+"^"+pwd.length+" = "+tot.toLocaleString('pt-BR')+" combinações";
     const idx=str2idx(pwd,cs);
-    if(idx<0){mn.textContent="⚠ Caractere inválido para este conjunto";mn.style.color="var(--tr-danger)";}
-    else{mn.style.color="";mn.textContent='"'+pwd+'" é a tentativa nº '+(idx+1).toLocaleString('pt-BR')+' ('+((idx+1)/tot*100).toFixed(1)+'% do espaço)';}
+    if(idx<0){mn.textContent="⚠ Caractere inválido para este conjunto";mn.classList.add('invalida');}
+    else{mn.classList.remove('invalida');mn.textContent='"'+pwd+'" é a tentativa nº '+(idx+1).toLocaleString('pt-BR')+' ('+((idx+1)/tot*100).toFixed(1)+'% do espaço)';}
     updateProjection(tot);
-    const spd=SPEEDS[parseInt(document.getElementById('speed-sl').value)];
-    const cap=getCap();
-    document.getElementById('cap-warn').style.display=(idx+1)/spd>cap?'inline':'none';
+    const spd=SPEEDS[parseInt($('speed-sl').value)];
+    $('cap-warn').hidden=!((idx+1)/spd>getCap());
   }
 
-  window.genPwd=function(){
-    const cs=CS[document.getElementById('cs-sel').value],len=4,tot=Math.pow(cs.length,len);
-    document.getElementById('pwd-in').value=idx2str(Math.floor(tot*(0.55+Math.random()*0.40)),cs,len);
+  function genPwd(){
+    const cs=CS[$('cs-sel').value],len=4,tot=Math.pow(cs.length,len);
+    $('pwd-in').value=idx2str(Math.floor(tot*(0.55+Math.random()*0.40)),cs,len);
     refresh();
   }
 
-  window.startBF=function(){
-    const pwd=document.getElementById('pwd-in').value.trim();
-    if(pwd.length<2){alert("Digite ou gere uma senha com 2 a 4 caracteres.");return;}
-    const csId=document.getElementById('cs-sel').value;chars=CS[csId];
-    for(const c of pwd){if(!chars.includes(c)){alert('O caractere "'+c+'" não pertence ao conjunto selecionado.');return;}}
+  function startBF(){
+    const pwd=$('pwd-in').value.trim();
+    if(pwd.length<2){erro("Digite ou gere uma senha com 2 a 4 caracteres.");return;}
+    const csId=$('cs-sel').value;chars=CS[csId];
+    for(const c of pwd){if(!chars.includes(c)){erro('O caractere "'+c+'" não pertence ao conjunto selecionado.');return;}}
+    $('err-box').hidden=true;
     pwdLen=pwd.length;targetIdx=str2idx(pwd,chars);total=Math.pow(chars.length,pwdLen);
-    currentIdx=0;simSpeed=SPEEDS[parseInt(document.getElementById('speed-sl').value)];
+    currentIdx=0;simSpeed=SPEEDS[parseInt($('speed-sl').value)];
     simCapMs=getCap()*1000;startTime=performance.now();running=true;
-    document.getElementById('prog-sec').style.display='block';document.getElementById('result-sec').style.display='none';
-    document.getElementById('att-total').textContent=total.toLocaleString('pt-BR');
-    document.getElementById('start-btn').disabled=true;document.getElementById('stop-btn').disabled=false;
+    $('prog-sec').hidden=false;$('result-sec').hidden=true;
+    $('att-total').textContent=total.toLocaleString('pt-BR');
+    $('start-btn').disabled=true;$('stop-btn').disabled=false;
     function tick(){
       if(!running)return;
       const elapsed=performance.now()-startTime;
       const remaining=Math.max(0,(simCapMs-elapsed)/1000);
       const timerPct=Math.min(100,elapsed/simCapMs*100);
-      document.getElementById('timer-display').textContent=fmtSecs(remaining);
-      document.getElementById('timer-bar').style.width=timerPct+'%';
-      document.getElementById('timer-bar').style.background=remaining<10?'var(--tr-danger)':remaining<30?'var(--tr-warn)':'var(--tr-green)';
+      $('timer-display').textContent=fmtSecs(remaining);
+      $('timer-bar').style.width=timerPct+'%';
+      $('timer-bar').style.background=remaining<10?'var(--terra)':remaining<30?'var(--ocre)':'var(--verde)';
       const end=Math.min(Math.floor(simSpeed*elapsed/1000)+1,targetIdx+1);
       if(end>currentIdx){
         currentIdx=end;
         const cur=idx2str(end-1,chars,pwdLen),pct=end/total*100,realSpd=Math.round(end/(elapsed/1000));
-        document.getElementById('cur-att').textContent=cur;
-        document.getElementById('att-count').textContent=end.toLocaleString('pt-BR');
-        document.getElementById('speed-real').textContent=realSpd.toLocaleString('pt-BR')+'/s';
-        document.getElementById('prog-pct').textContent=pct.toFixed(2)+'%';
-        document.getElementById('prog-bar').style.width=Math.min(100,pct)+'%';
+        $('cur-att').textContent=cur;
+        $('att-count').textContent=end.toLocaleString('pt-BR');
+        $('speed-real').textContent=realSpd.toLocaleString('pt-BR')+'/s';
+        $('prog-pct').textContent=pct.toFixed(2)+'%';
+        $('prog-bar').style.width=Math.min(100,pct)+'%';
       }
       const capReached=elapsed>=simCapMs;
       if(currentIdx>=targetIdx+1||capReached){
         running=false;
-        document.getElementById('start-btn').disabled=false;document.getElementById('stop-btn').disabled=true;
-        document.getElementById('timer-display').textContent='0s';document.getElementById('timer-bar').style.width='100%';
+        $('start-btn').disabled=false;$('stop-btn').disabled=true;
+        $('timer-display').textContent='0s';$('timer-bar').style.width='100%';
         const elapsedSec=elapsed/1000,capApplied=capReached&&currentIdx<targetIdx+1;
-        if(capApplied){document.getElementById('cur-att').textContent=pwd;document.getElementById('prog-bar').style.width='100%';document.getElementById('prog-pct').textContent='100.00%';}
-        const rDiv=document.getElementById('result-sec');rDiv.className='tr-sec tr-result-box '+(capApplied?'capped':'found');rDiv.style.display='block';
-        document.getElementById('result-title').textContent=capApplied?"Tempo esgotado — senha localizada ao final":"Senha encontrada!";
-        document.getElementById('result-txt').textContent=
+        if(capApplied){$('cur-att').textContent=pwd;$('prog-bar').style.width='100%';$('prog-pct').textContent='100.00%';}
+        const rDiv=$('result-sec');rDiv.className='result '+(capApplied?'capped':'found');rDiv.hidden=false;
+        $('result-title').textContent=capApplied?"Tempo esgotado — senha localizada ao final":"Senha encontrada!";
+        $('result-txt').textContent=
           '"'+pwd+'" encontrada na tentativa '+(targetIdx+1).toLocaleString('pt-BR')+' de '+total.toLocaleString('pt-BR')+'\n'+
           ((targetIdx+1)/total*100).toFixed(4)+'% do espaço buscado · tempo de simulação: '+elapsedSec.toFixed(2)+'s';
         addHistory(pwd,csId,total,targetIdx+1,elapsedSec,getCap(),simSpeed);
@@ -347,31 +400,48 @@ import Layout from '../../layouts/Layout.astro';
     rafId=requestAnimationFrame(tick);
   }
 
-  window.stopBF=function(){running=false;cancelAnimationFrame(rafId);document.getElementById('start-btn').disabled=false;document.getElementById('stop-btn').disabled=true;}
-  window.resetBF=function(){
+  function stopBF(){running=false;cancelAnimationFrame(rafId);$('start-btn').disabled=false;$('stop-btn').disabled=true;}
+  function resetBF(){
     stopBF();
-    document.getElementById('prog-sec').style.display='none';document.getElementById('result-sec').style.display='none';
-    document.getElementById('cur-att').textContent='----';document.getElementById('att-count').textContent='0';
-    document.getElementById('speed-real').textContent='0/s';document.getElementById('prog-pct').textContent='0%';
-    document.getElementById('prog-bar').style.width='0%';document.getElementById('timer-bar').style.width='0%';
-    document.getElementById('timer-display').textContent='—';
+    $('prog-sec').hidden=true;$('result-sec').hidden=true;
+    $('cur-att').textContent='----';$('att-count').textContent='0';
+    $('speed-real').textContent='0/s';$('prog-pct').textContent='0%';
+    $('prog-bar').style.width='0%';$('timer-bar').style.width='0%';
+    $('timer-display').textContent='—';
   }
 
   function addHistory(pwd,csId,tot,found,elapsed,cap,spd){
-    history.unshift({pwd,csId,tot,found,elapsed,cap,spd});if(history.length>8)history.pop();
-    document.getElementById('hist-body').innerHTML=history.map((h,i)=>{
+    execucoes.unshift({pwd,csId,tot,found,elapsed,cap,spd});if(execucoes.length>8)execucoes.pop();
+    const body=$('hist-body');body.innerHTML='';
+    execucoes.forEach((h,i)=>{
       const capLabel=h.cap>=60?(Math.floor(h.cap/60)+"min"+(h.cap%60>0?" "+h.cap%60+"s":"")):(h.cap+"s");
-      return '<div class="tr-hist-row"'+(i===0?' style="background:var(--tr-bg2)"':'')+'>'+
-        '<span class="tr-mono" style="font-weight:500;">"'+h.pwd+'"</span>'+
-        '<span style="font-size:12px;color:var(--tr-text2);">'+CS_NAMES[h.csId]+'</span>'+
-        '<span class="tr-mono" style="font-size:12px;">'+h.found.toLocaleString('pt-BR')+'</span>'+
-        '<span class="tr-mono" style="font-size:12px;">'+h.elapsed.toFixed(1)+'s</span>'+
-        '<span class="tr-mono" style="font-size:12px;">'+capLabel+'</span>'+
-        '<span class="tr-mono" style="font-size:12px;">'+h.spd.toLocaleString('pt-BR')+'/s</span>'+
-      '</div>';
-    }).join('');
-    document.getElementById('hist-sec').style.display='block';
+      const row=document.createElement('div');
+      row.className='hist-row'+(i===0?' recente':'');
+      const celulas=[
+        {cls:'mono destaque',txt:'"'+h.pwd+'"'},
+        {cls:'obs',txt:CS_NAMES[h.csId]},
+        {cls:'mono obs',txt:h.found.toLocaleString('pt-BR')},
+        {cls:'mono obs',txt:h.elapsed.toFixed(1)+'s'},
+        {cls:'mono obs',txt:capLabel},
+        {cls:'mono obs',txt:h.spd.toLocaleString('pt-BR')+'/s'},
+      ];
+      for(const c of celulas){const s=document.createElement('span');s.className=c.cls;s.textContent=c.txt;row.appendChild(s);}
+      body.appendChild(row);
+    });
+    $('hist-sec').hidden=false;
   }
+
+  /* --- amarração dos controles --- */
+  $('pwd-in').addEventListener('input',refresh);
+  $('cs-sel').addEventListener('change',refresh);
+  $('gen-btn').addEventListener('click',genPwd);
+  $('speed-sl').addEventListener('input',updateControls);
+  $('cap-input').addEventListener('input',updateControls);
+  document.querySelectorAll('[data-cap-delta]').forEach(b=>b.addEventListener('click',()=>adjustCap(parseInt(b.dataset.capDelta))));
+  document.querySelectorAll('[data-cap]').forEach(b=>b.addEventListener('click',()=>setCap(parseInt(b.dataset.cap))));
+  $('start-btn').addEventListener('click',startBF);
+  $('stop-btn').addEventListener('click',stopBF);
+  $('reset-btn').addEventListener('click',resetBF);
 
   updateControls();
 </script>
