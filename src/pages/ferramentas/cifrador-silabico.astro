@@ -3,8 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Cifrador de Emojis"
-  description="Crie fichas imprimíveis de frases cifradas com emojis, por sílabas ou letras, para atividades de alfabetização."
+  title="Cifrador Silábico"
+  description="Crie fichas imprimíveis de palavras e frases cifradas por sílabas ou letras — com emojis ou símbolos — para atividades de alfabetização."
 >
 
   <!-- IBM Plex Mono + pesos 600/700 do Plex Sans carregados só nesta página.
@@ -18,14 +18,14 @@ import Layout from '../../layouts/Layout.astro';
 
       <header class="masthead">
         <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Alfabetização</p>
-        <h1>Cifrador de emojis</h1>
-        <p class="lede">Cifre a frase, ajuste a ficha e imprima (ou salve em PDF). O que sai no papel é só a <strong>ficha</strong> abaixo — os controles não são impressos. No modo sílaba, <code>|</code> força cortes manuais. Tudo roda no navegador.</p>
+        <h1>Cifrador silábico</h1>
+        <p class="lede">Cifre o texto, ajuste a ficha e imprima (ou salve em PDF). Cada linha digitada vira uma linha da ficha — dá para usar uma frase ou uma lista de palavras. O que sai no papel é só a <strong>ficha</strong> abaixo — os controles não são impressos. No modo sílaba, <code>|</code> força cortes manuais. Tudo roda no navegador.</p>
       </header>
 
       <!-- ================= CONTROLES ================= -->
       <div class="toolbar">
-        <label class="mini" for="frase">Frase</label>
-        <input id="frase" class="frase-in" type="text" value="O SAPO PULA NA LAGOA" spellcheck="false" autocomplete="off">
+        <label class="mini" for="frase">Texto (uma frase, ou uma palavra por linha)</label>
+        <textarea id="frase" class="frase-in" rows="3" spellcheck="false" autocomplete="off">O SAPO PULA NA LAGOA</textarea>
 
         <div class="linhaControles">
           <div class="campo"><label class="mini">Cifrar por</label>
@@ -73,7 +73,7 @@ import Layout from '../../layouts/Layout.astro';
 
         <div class="acoes">
           <button class="btn" id="imprimir">Imprimir / Salvar PDF</button>
-          <button class="btn sec" id="copiarCifra">Copiar frase cifrada</button>
+          <button class="btn sec" id="copiarCifra">Copiar texto cifrado</button>
           <button class="btn sec" id="copiarChave">Copiar chave</button>
         </div>
         <div class="aviso" id="aviso" hidden></div>
@@ -108,9 +108,9 @@ import Layout from '../../layouts/Layout.astro';
 
 <style is:global>
   /* ============================================================
-     Ferramenta: Cifrador de emojis
+     Ferramenta: Cifrador silábico
      CSS escopado sob .cif-root para não vazar para o resto do site.
-     Variáveis no próprio .cif-root. JS inalterado.
+     Variáveis no próprio .cif-root.
      ============================================================ */
 
   .cif-root{
@@ -140,10 +140,10 @@ import Layout from '../../layouts/Layout.astro';
   .cif-root .toolbar{ background:#fff; border:1px solid var(--traco); border-radius:12px; padding:1.1rem 1.2rem; }
   .cif-root label.mini{ display:block; font-weight:600; font-size:.74rem; text-transform:uppercase;
     letter-spacing:.06em; margin:0 0 .35rem; color:var(--tinta-2); }
-  .cif-root input[type=text]{ width:100%; background:#fff; border:1px solid var(--traco); border-radius:9px;
+  .cif-root input[type=text], .cif-root textarea{ width:100%; background:#fff; border:1px solid var(--traco); border-radius:9px;
     padding:.6rem .8rem; font:inherit; color:var(--tinta); }
-  .cif-root input[type=text]:focus, .cif-root input:focus{ outline:2px solid var(--tinta); outline-offset:1px; }
-  .cif-root .frase-in{ font-size:1.1rem; }
+  .cif-root input[type=text]:focus, .cif-root input:focus, .cif-root textarea:focus{ outline:2px solid var(--tinta); outline-offset:1px; }
+  .cif-root .frase-in{ font-size:1.1rem; resize:vertical; line-height:1.5; }
   .cif-root .linhaControles{ display:flex; flex-wrap:wrap; gap:1rem 1.4rem; align-items:flex-end; margin-top:1rem; }
   .cif-root .campo{ display:flex; flex-direction:column; gap:.35rem; }
   .cif-root .seg{ display:inline-flex; border:1px solid var(--traco); border-radius:8px; overflow:hidden; }
@@ -173,7 +173,8 @@ import Layout from '../../layouts/Layout.astro';
   .cif-root .ficha .ident span{ flex:1 1 auto; }
   .cif-root .ficha .identline{ display:inline-block; border-bottom:1px solid #999; min-width:8rem; }
 
-  .cif-root .puzzle{ display:flex; flex-wrap:wrap; gap:.5rem 0; }
+  .cif-root .puzzle{ display:flex; flex-direction:column; gap:.3rem; }
+  .cif-root .plinha{ display:flex; flex-wrap:wrap; }   /* uma linha do texto digitado */
   .cif-root .word{ display:inline-flex; gap:.35rem; margin:.35rem 1.1rem .35rem 0; padding:.2rem; }
   .cif-root .unit{ display:inline-flex; flex-direction:column; align-items:center; min-width:2.5em; }
   .cif-root .unit .emoji{ font-size:2.1rem; line-height:1.3; }
@@ -329,22 +330,28 @@ function ajustar(u,opts){
   if(opts.semAcento) s=s.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   return opts.maiusc? s.toUpperCase():s.toLowerCase();
 }
-function extrair(frase, est, opts){
-  const brutos=frase.split(/(\s+)/); const tokens=[];
-  for(const bruto of brutos){
-    if(/^\s+$/.test(bruto)) continue;
-    const limpo=bruto.replace(/[^A-Za-zÀ-ÿ|]/g,"");
-    if(!limpo) continue;
-    let pedacos;
-    if(est.modo==="silaba"){
-      pedacos = limpo.includes("|") ? limpo.split("|").filter(x=>x.length) : silabar(limpo.replace(/\|/g,""));
-    } else {
-      pedacos = limpo.replace(/\|/g,"").split("");
+/* Cada linha do texto vira uma linha da ficha; dentro dela, palavras separadas
+   por espaço. Devolve um array de linhas, cada uma com suas palavras. */
+function extrair(texto, est, opts){
+  const linhas=[];
+  for(const linha of texto.split(/\n/)){
+    const palavras=[];
+    for(const bruto of linha.split(/(\s+)/)){
+      if(/^\s+$/.test(bruto)) continue;
+      const limpo=bruto.replace(/[^A-Za-zÀ-ÿ|]/g,"");
+      if(!limpo) continue;
+      let pedacos;
+      if(est.modo==="silaba"){
+        pedacos = limpo.includes("|") ? limpo.split("|").filter(x=>x.length) : silabar(limpo.replace(/\|/g,""));
+      } else {
+        pedacos = limpo.replace(/\|/g,"").split("");
+      }
+      const unidades=pedacos.map(p=>ajustar(p,opts)).filter(x=>x.length);
+      if(unidades.length) palavras.push({unidades});
     }
-    const unidades=pedacos.map(p=>ajustar(p,opts)).filter(x=>x.length);
-    if(unidades.length) tokens.push({unidades});
+    if(palavras.length) linhas.push(palavras);
   }
-  return tokens;
+  return linhas;
 }
 function poolAtivo(est){ return est.figuras==="simbolo" ? POOL_SIMBOLOS : POOL; }
 function construirChave(unicas, est){
@@ -374,8 +381,8 @@ const $=id=>document.getElementById(id);
 function gerar(){
   est.semente=Math.max(1,parseInt($("semente").value||"1",10));
   const opts={ maiusc: est.caixa==="alta", semAcento: est.acentos==="normalizar" };
-  const tokens=extrair($("frase").value, est, opts);
-  const unidades=[]; tokens.forEach(t=>t.unidades.forEach(u=>unidades.push(u)));
+  const linhas=extrair($("frase").value, est, opts);
+  const unidades=[]; linhas.forEach(l=>l.forEach(t=>t.unidades.forEach(u=>unidades.push(u))));
   const unicas=[...new Set(unidades)].sort((a,b)=>a.localeCompare(b,"pt"));
   const {chave,faltou}=construirChave(unicas, est);
 
@@ -385,38 +392,43 @@ function gerar(){
   $("fIdent").hidden=!$("optIdent").checked;
 
   // puzzle do aluno
-  renderUnidades($("fPuzzle"), tokens, chave, {linhas:$("optLinhas").checked, resolver:false});
+  renderUnidades($("fPuzzle"), linhas, chave, {linhas:$("optLinhas").checked, resolver:false});
   // chave
   renderChave($("fChave"), unicas, chave);
   // gabarito
   const g=$("fGabarito");
-  if($("optGabarito").checked){ g.hidden=false; renderUnidades($("fGabPuzzle"), tokens, chave, {linhas:false, resolver:true}); }
+  if($("optGabarito").checked){ g.hidden=false; renderUnidades($("fGabPuzzle"), linhas, chave, {linhas:false, resolver:true}); }
   else g.hidden=true;
 
   const av=$("aviso");
-  if(faltou){ av.hidden=false; av.textContent="A frase tem mais unidades distintas do que o conjunto comporta ("+poolAtivo(est).length+" figuras). Encurte a frase ou troque o conjunto."; }
+  if(faltou){ av.hidden=false; av.textContent="O texto tem mais unidades distintas do que o conjunto comporta ("+poolAtivo(est).length+" figuras). Encurte o texto ou troque o conjunto."; }
   else av.hidden=true;
 
-  $("resumo").textContent=tokens.length+" palavra(s) · "+unidades.length+" unidade(s) · "+unicas.length+" símbolo(s) na chave · "+
+  const nPalavras=linhas.reduce((n,l)=>n+l.length,0);
+  $("resumo").textContent=linhas.length+" linha(s) · "+nPalavras+" palavra(s) · "+unidades.length+" unidade(s) · "+unicas.length+" símbolo(s) na chave · "+
     (est.modo==="letra"&&est.chaveTipo==="fixa"?"chave fixa":"chave aleatória (semente "+est.semente+")");
 
-  window._ult={tokens,chave,unicas};
+  window._ult={linhas,chave,unicas};
 }
 
-function renderUnidades(alvo, tokens, chave, {linhas, resolver}){
+function renderUnidades(alvo, linhasTexto, chave, {linhas, resolver}){
   alvo.innerHTML="";
-  if(!tokens.length){ alvo.innerHTML='<span style="color:#999">Digite uma frase.</span>'; return; }
-  for(const t of tokens){
-    const w=document.createElement("span"); w.className="word";
-    for(const u of t.unidades){
-      const un=document.createElement("span"); un.className="unit";
-      const em=document.createElement("span"); em.className="emoji"; em.textContent=chave.get(u)||"❓";
-      un.appendChild(em);
-      if(resolver){ const s=document.createElement("span"); s.className="sol"; s.textContent=u; un.appendChild(s); }
-      else if(linhas){ const l=document.createElement("span"); l.className="linha"; un.appendChild(l); }
-      w.appendChild(un);
+  if(!linhasTexto.length){ alvo.innerHTML='<span style="color:#999">Digite uma frase ou uma lista de palavras.</span>'; return; }
+  for(const palavras of linhasTexto){
+    const row=document.createElement("div"); row.className="plinha";
+    for(const t of palavras){
+      const w=document.createElement("span"); w.className="word";
+      for(const u of t.unidades){
+        const un=document.createElement("span"); un.className="unit";
+        const em=document.createElement("span"); em.className="emoji"; em.textContent=chave.get(u)||"❓";
+        un.appendChild(em);
+        if(resolver){ const s=document.createElement("span"); s.className="sol"; s.textContent=u; un.appendChild(s); }
+        else if(linhas){ const l=document.createElement("span"); l.className="linha"; un.appendChild(l); }
+        w.appendChild(un);
+      }
+      row.appendChild(w);
     }
-    alvo.appendChild(w);
+    alvo.appendChild(row);
   }
 }
 function renderChave(alvo, unicas, chave){
@@ -437,8 +449,8 @@ async function copiar(texto, botao){
     document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");}catch(_){} document.body.removeChild(ta); }
   const orig=botao.textContent; botao.textContent="copiado!"; setTimeout(()=>botao.textContent=orig,1200);
 }
-function textoCifra(){ const {tokens,chave}=window._ult||{tokens:[]};
-  return tokens.map(w=>w.unidades.map(u=>chave.get(u)||"❓").join("")).join("  "); }
+function textoCifra(){ const {linhas,chave}=window._ult||{linhas:[]};
+  return linhas.map(l=>l.map(w=>w.unidades.map(u=>chave.get(u)||"❓").join("")).join("  ")).join("\n"); }
 function textoChave(){ const {unicas,chave}=window._ult||{unicas:[]};
   return unicas.map(u=>chave.get(u)+" = "+u).join("\n"); }
 

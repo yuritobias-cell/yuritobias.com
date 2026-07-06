@@ -6,7 +6,7 @@
    - PDFs: rede primeiro com fallback no cache (PDF corrigido com o mesmo nome propaga).
    - Fontes do Google: cache primeiro (aceita respostas opacas).
    Para invalidar tudo, incremente VERSAO. */
-const VERSAO = 'v1';
+const VERSAO = 'v2';
 const CACHE_PAGINAS = 'paginas-' + VERSAO;
 const CACHE_ASSETS = 'assets-' + VERSAO;
 const CACHE_EXTRAS = 'extras-' + VERSAO;
@@ -19,7 +19,7 @@ const PRECACHE = [
   '/ferramentas/pluviometria-biomas/',
   '/ferramentas/angulos-circunferencia/',
   '/ferramentas/corrida-ao-20/',
-  '/ferramentas/cifrador-emojis/',
+  '/ferramentas/cifrador-silabico/',
 ];
 
 self.addEventListener('install', (e) => {
