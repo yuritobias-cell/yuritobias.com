@@ -4,9 +4,9 @@
      offline continua funcionando).
    - /_astro/ (assets com hash no nome): cache primeiro — são imutáveis.
    - PDFs: rede primeiro com fallback no cache (PDF corrigido com o mesmo nome propaga).
-   - Fontes do Google: cache primeiro (aceita respostas opacas).
+   - Demais recursos locais (fontes, imagens): cache primeiro.
    Para invalidar tudo, incremente VERSAO. */
-const VERSAO = 'v2';
+const VERSAO = 'v3';
 const CACHE_PAGINAS = 'paginas-' + VERSAO;
 const CACHE_ASSETS = 'assets-' + VERSAO;
 const CACHE_EXTRAS = 'extras-' + VERSAO;
@@ -40,9 +40,9 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-function cacheFirst(req, cacheName, aceitaOpaca) {
+function cacheFirst(req, cacheName) {
   return caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-    if (res.ok || (aceitaOpaca && res.type === 'opaque')) {
+    if (res.ok) {
       const copia = res.clone();
       caches.open(cacheName).then((c) => c.put(req, copia));
     }
@@ -76,7 +76,7 @@ self.addEventListener('fetch', (e) => {
   }
 
   if (url.origin === location.origin && url.pathname.startsWith('/_astro/')) {
-    e.respondWith(cacheFirst(req, CACHE_ASSETS, false));
+    e.respondWith(cacheFirst(req, CACHE_ASSETS));
     return;
   }
 
@@ -85,12 +85,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-    e.respondWith(cacheFirst(req, CACHE_EXTRAS, true));
-    return;
-  }
-
   if (url.origin === location.origin) {
-    e.respondWith(cacheFirst(req, CACHE_EXTRAS, false));
+    e.respondWith(cacheFirst(req, CACHE_EXTRAS));
   }
 });
