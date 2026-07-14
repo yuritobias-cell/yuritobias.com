@@ -23,6 +23,7 @@ const ogImageUrl = new URL(ogImage, Astro.site);
 const ogImageAlt = ogImage === '/og.png'
   ? 'Yuri Tobias — Professor de Matemática e Analista de Dados Educacionais'
   : tituloCompleto;
+const ano = new Date().getFullYear();
 ---
 
 <!DOCTYPE html>
@@ -52,9 +53,8 @@ const ogImageAlt = ogImage === '/og.png'
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#1B4F4F" />
     <link rel="alternate" type="application/rss+xml" title="Blog · Yuri Tobias" href="/rss.xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/playfair-display-latin.woff2" as="font" type="font/woff2" crossorigin />
     <script is:inline data-goatcounter="https://yuritobias.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
     <script is:inline>
       // Registra downloads de PDF como eventos no GoatCounter
@@ -91,6 +91,19 @@ const ogImageAlt = ogImage === '/og.png'
       </div>
     </nav>
     <slot />
+    <footer>
+      <p class="licenca">
+        Salvo indicação em contrário, os materiais didáticos e textos deste site estão sob a licença
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt-br" target="_blank" rel="license noopener">CC BY-NC-SA 4.0</a>
+        — use e adapte livremente em sala de aula, com atribuição e sem fins comerciais.
+      </p>
+      <p class="footer-links">
+        <span>© {ano} Yuri Tobias</span>
+        <a href="mailto:yuritobias@gmail.com">E-mail</a>
+        <a href="/rss.xml">RSS</a>
+        <a href="https://github.com/yuritobias-cell/yuritobias.com" target="_blank" rel="noopener">Código-fonte</a>
+      </p>
+    </footer>
   </body>
 </html>
 
@@ -105,7 +118,7 @@ const ogImageAlt = ogImage === '/og.png'
     -webkit-font-smoothing: antialiased;
   }
 
-  body { min-height: 100dvh; }
+  body { min-height: 100dvh; display: flex; flex-direction: column; }
 
   nav {
     display: flex;
@@ -151,5 +164,35 @@ const ogImageAlt = ogImage === '/og.png'
       justify-content: center;
     }
     .nav-links a { font-size: 0.8rem; }
+  }
+
+  footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem 2rem 2rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  footer a:hover { text-decoration: underline; }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    footer { padding: 1.25rem 1.25rem 1.75rem; }
   }
 </style>

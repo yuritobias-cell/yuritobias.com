@@ -9,6 +9,7 @@ Reúne materiais didáticos por série, ferramentas interativas para sala de aul
 - [Astro 6](https://astro.build) — site estático (+ MDX nos posts com componentes)
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
+- Fontes auto-hospedadas em `public/fonts/` (variáveis, subset latino; `@font-face` em `src/styles/global.css`) — sem requisições ao Google Fonts
 - Deploy automático no GitHub Pages via Actions (push na `main`)
 - Analytics: GoatCounter (pageviews + eventos de download de PDF)
 
@@ -54,6 +55,13 @@ scripts/og-image.py               # gerador das imagens Open Graph (og.png + pub
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
 
 As contagens nas páginas de índice são calculadas automaticamente a partir dos JSONs.
+
+## Licença do conteúdo
+
+Salvo indicação em contrário, os materiais didáticos (PDFs) e os textos do blog estão sob a licença
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt-br) —
+podem ser usados e adaptados em sala de aula, com atribuição e sem fins comerciais.
+A nota aparece no rodapé de todas as páginas (em `src/layouts/Layout.astro`).
 
 ## Como publicar um post
 
