@@ -1,26 +1,18 @@
 /* Service worker — páginas e ferramentas funcionam offline após a primeira visita.
+   TEMPLATE: os marcadores de versão e de precache abaixo são preenchidos no
+   build pela integração em astro.config.mjs, com a lista real de ferramentas.
    Estratégias:
    - Navegação (HTML): rede primeiro, cache como fallback (atualizações chegam rápido,
      offline continua funcionando).
    - /_astro/ (assets com hash no nome): cache primeiro — são imutáveis.
    - PDFs: rede primeiro com fallback no cache (PDF corrigido com o mesmo nome propaga).
-   - Demais recursos locais (fontes, imagens): cache primeiro.
-   Para invalidar tudo, incremente VERSAO. */
-const VERSAO = 'v3';
+   - Demais recursos locais (fontes, imagens): cache primeiro. */
+const VERSAO = '__VERSAO__';
 const CACHE_PAGINAS = 'paginas-' + VERSAO;
 const CACHE_ASSETS = 'assets-' + VERSAO;
 const CACHE_EXTRAS = 'extras-' + VERSAO;
 
-const PRECACHE = [
-  '/',
-  '/ferramentas/',
-  '/ferramentas/sorteador-grupos/',
-  '/ferramentas/testador-senhas/',
-  '/ferramentas/pluviometria-biomas/',
-  '/ferramentas/angulos-circunferencia/',
-  '/ferramentas/corrida-ao-20/',
-  '/ferramentas/cifrador-silabico/',
-];
+const PRECACHE = __PRECACHE__;
 
 self.addEventListener('install', (e) => {
   e.waitUntil(

@@ -10,6 +10,8 @@ Reúne materiais didáticos por série, ferramentas interativas para sala de aul
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
 - Fontes auto-hospedadas em `public/fonts/` (variáveis, subset latino; `@font-face` em `src/styles/global.css`) — sem requisições ao Google Fonts
+- Service worker (offline) gerado no build: template em `src/sw.js`, precache derivado
+  das páginas de `src/pages/ferramentas/` pela integração em `astro.config.mjs`
 - Deploy automático no GitHub Pages via Actions (push na `main`)
 - Analytics: GoatCounter (pageviews + eventos de download de PDF)
 
