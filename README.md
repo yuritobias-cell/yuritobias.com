@@ -26,26 +26,30 @@ Reúne materiais didáticos por série, ferramentas interativas para sala de aul
 
 ```text
 src/
-├── data/            # JSONs dos materiais por série + provas + curso FET + dados de posts (enem/)
+├── assets/og/       # fontes TTF usadas só na geração das imagens Open Graph
+├── data/
+│   ├── series.json               # manifesto das séries (ativas e arquivadas) — dirige /materiais
+│   ├── materiais/<ano>-<slug>.json   # materiais de cada série (+ <ano>-<slug>-provas.json)
+│   └── ...                       # curso FET + dados de posts (enem/)
 ├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
 ├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
-├── utils/           # Utilitários (slug de tags, tempo de leitura)
-├── layouts/         # Layout base (nav, meta tags, OG, analytics)
+├── utils/           # Utilitários (slug de tags, tempo de leitura, template das imagens OG)
+├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
 │   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
 │   ├── ferramentas/              # ferramentas interativas (JS próprio por página)
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
-│   └── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
+│   ├── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
+│   └── og.png.ts, og/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
 └── styles/global.css             # @theme com cores e fontes do site
 public/materiais/<serie>/         # PDFs servidos para download
-public/og/                        # imagens Open Graph por post (geradas por script)
-scripts/og-image.py               # gerador das imagens Open Graph (og.png + public/og/)
 ```
 
 ## Como adicionar um material
 
-1. Coloque o PDF em `public/materiais/<serie>/`.
-2. Adicione a entrada no JSON da série em `src/data/<serie>.json`:
+1. Coloque o PDF na pasta da série em `public/materiais/` (a pasta de cada série
+   está no campo `pastaPdf` de `src/data/series.json`).
+2. Adicione a entrada no JSON da série em `src/data/materiais/<ano>-<slug>.json`:
 
 ```json
 { "n": "14", "titulo": "Título", "descricao": "Descrição curta.", "arquivo": "14-nome.pdf" }
@@ -55,6 +59,25 @@ scripts/og-image.py               # gerador das imagens Open Graph (og.png + pub
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
 
 As contagens nas páginas de índice são calculadas automaticamente a partir dos JSONs.
+
+## Virada do ano letivo
+
+Tudo é dirigido por `src/data/series.json` — nenhuma página precisa ser editada.
+
+1. **Arquivar o ano encerrado**: mude `"arquivada": true` nas séries do ano. Elas saem
+   dos cartões principais e vão para a seção "Arquivo" de `/materiais`, em
+   `/materiais/arquivo/<ano>/<slug>`, com aviso de conteúdo encerrado. A URL antiga
+   (`/materiais/<slug>`) redireciona sozinha para o arquivo — a menos que uma série
+   nova reutilize o slug, caso em que ele passa a apontar para a série nova.
+2. **Criar as séries novas**: adicione uma entrada por série no manifesto (com o `ano`
+   novo e sem `pastaPdf` — a pasta padrão é `public/materiais/<ano>/<slug>/`) e crie:
+   - `src/data/materiais/<ano>-<slug>.json` com os materiais (pode começar `[]`);
+   - a pasta `public/materiais/<ano>/<slug>/` para os PDFs;
+   - `src/data/materiais/<ano>-<slug>-provas.json` é opcional (sem ele, a série começa sem provas).
+3. Confira com `npm run dev` e faça push. O build valida pastas e PDFs e falha cedo se algo faltar.
+
+As séries de 2026 usam `pastaPdf` sem o ano (`"9ano"` etc.) porque os PDFs foram
+publicados antes desta estrutura — as URLs dos arquivos não mudaram.
 
 ## Licença do conteúdo
 
@@ -81,6 +104,5 @@ draft: false                  # true = não publica
 ---
 ```
 
-2. Gere a imagem OG do post e commite: `/tmp/ogvenv/bin/python scripts/og-image.py`
-   (preparação do venv/fontes no manual).
-3. Confira com `npm run dev` e faça push na `main` — o deploy é automático.
+2. Confira com `npm run dev` e faça push na `main` — o deploy é automático.
+   A imagem Open Graph do post é gerada sozinha no build, a partir do título.

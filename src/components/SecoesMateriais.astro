@@ -1,0 +1,152 @@
+---
+/* Seções de uma série de materiais (Para Casa, Revisões de Prova, Somativas anteriores).
+   Usado pela página ativa (/materiais/<slug>) e pela do arquivo (/materiais/arquivo/<ano>/<slug>). */
+import type { Material, Serie } from '../utils/materiais';
+
+interface Props {
+  serie: Serie;
+}
+
+const { serie } = Astro.props;
+
+const paracasa = serie.materiais.filter((m) => !m.video);
+const revisoes = serie.materiais.filter((m): m is Material & { video: NonNullable<Material['video']> } => Boolean(m.video));
+const basePdf = `/materiais/${serie.pastaPdf}`;
+
+function formatarData(iso: string) {
+  const partes = iso.split('-');
+  if (partes.length !== 3) return iso;
+  return `${partes[2]}/${partes[1]}`;
+}
+
+const disponiveis = (n: number, singular: string, plural: string) =>
+  n === 1 ? `1 ${singular} disponível` : `${n} ${plural} disponíveis`;
+---
+
+<!-- Seção: Para Casa -->
+<section class="secao">
+  <h2 class="secao-titulo">Para Casa</h2>
+  <p class="subtitle">{disponiveis(paracasa.length, 'material', 'materiais')}</p>
+  <ul class="lista">
+    {paracasa.map((m) => (
+      <li class="item">
+        <div class="item-info">
+          <span class="numero">{m.n}</span>
+          <div class="item-texto">
+            <p class="titulo">{m.titulo}</p>
+            <p class="descricao">{m.descricao}</p>
+            {m.apostila && (
+              <p class="apostila-ref">
+                <span class="apostila-tag">Apostila</span>{m.apostila.ordem}
+              </p>
+            )}
+          </div>
+        </div>
+        <div class="acoes">
+          {m.arquivo && (
+            <a href={`${basePdf}/${m.arquivo}`} download class="btn">
+              Baixar PDF
+            </a>
+          )}
+          {m.apostila && m.apostila.data && (
+            <span class="badge-data" data-date={m.apostila.data}>{formatarData(m.apostila.data)}</span>
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<!-- Seção: Revisão -->
+<section class="secao">
+  <h2 class="secao-titulo">Revisões de Prova</h2>
+  <p class="subtitle">{disponiveis(revisoes.length, 'lista', 'listas')}</p>
+  <ul class="lista">
+    {revisoes.map((m) => (
+      <li class="item">
+        <div class="item-info">
+          <span class="numero">{m.n}</span>
+          <div class="item-texto">
+            <p class="titulo">{m.titulo}</p>
+            <p class="descricao">{m.descricao}</p>
+            {m.video && m.video.topicos.length > 0 && (
+              <ul class="topicos">
+                {m.video.topicos.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+        <div class="acoes">
+          <a href={`${basePdf}/${m.arquivo}`} download class="btn">
+            Baixar PDF
+          </a>
+          {m.video.url && (
+            <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
+              ▶ Vídeo
+            </a>
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<!-- Seção: Provas Anteriores-->
+<section class="secao">
+  <h2 class="secao-titulo">Somativas anteriores</h2>
+  <p class="subtitle">{disponiveis(serie.provas.length, 'prova', 'provas')}</p>
+  <ul class="lista">
+    {serie.provas.map((p) => (
+      <li class="item">
+        <div class="item-info">
+          <span class="numero">{p.n}</span>
+          <div>
+            <p class="titulo">{p.titulo}</p>
+            <p class="descricao">{p.descricao}</p>
+          </div>
+        </div>
+        <a href={`${basePdf}/${p.arquivo}`} download class="btn">
+          Baixar PDF
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<script>
+  // Destaca tarefas com data de entrega hoje ou no futuro
+  const hoje = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD no fuso local
+  document.querySelectorAll<HTMLElement>('.badge-data[data-date]').forEach((el) => {
+    const data = el.dataset.date ?? '';
+    el.classList.add(data >= hoje ? 'futura' : 'vencida');
+  });
+</script>
+
+<style>
+  .subtitle { font-size: 0.9rem; color: var(--muted); font-weight: 300; }
+  .lista { list-style: none; display: flex; flex-direction: column; }
+  .item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 0; border-bottom: 1px solid var(--rule); }
+  .item:first-child { border-top: 1px solid var(--rule); }
+  .item-info { display: flex; align-items: flex-start; gap: 1rem; flex: 1; }
+  .item-texto { display: flex; flex-direction: column; gap: 0.2rem; }
+  .numero { font-size: 0.75rem; color: var(--muted); font-weight: 300; min-width: 1.5rem; padding-top: 0.15rem; }
+  .titulo { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; }
+  .descricao { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .apostila-ref { font-size: 0.85rem; color: var(--ink); line-height: 1.5; margin-top: 0.4rem; }
+  .apostila-tag { display: inline-block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0.05rem 0.4rem; margin-right: 0.5rem; }
+  .badge-data { font-size: 0.78rem; font-weight: 500; color: var(--muted); white-space: nowrap; letter-spacing: 0.02em; }
+  .badge-data.futura { color: var(--accent); font-weight: 600; border: 1px solid var(--accent); border-radius: 3px; padding: 0.2rem 0.5rem; }
+  .badge-data.futura::before { content: 'para '; }
+  .topicos { list-style: none; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; }
+  .topicos li { font-size: 0.8rem; color: var(--muted); padding-left: 0.75rem; position: relative; }
+  .topicos li::before { content: '–'; position: absolute; left: 0; }
+  .acoes { display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0; align-items: flex-end; }
+  .btn { flex-shrink: 0; text-decoration: none; font-size: 0.8rem; font-weight: 500; color: var(--accent); letter-spacing: 0.03em; text-transform: uppercase; border: 1px solid var(--accent); padding: 0.4rem 0.9rem; border-radius: 3px; transition: background 0.2s ease, color 0.2s ease; }
+  .btn:hover { background: var(--accent); color: white; }
+  .btn-video { color: var(--muted); border-color: var(--rule); }
+  .btn-video:hover { background: var(--ink); border-color: var(--ink); color: white; }
+  .secao { margin-bottom: 3.5rem; }
+  .secao-titulo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+</style>

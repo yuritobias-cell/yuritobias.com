@@ -1,32 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import materiais9ano from '../../data/9ano.json';
-import provas9ano from '../../data/provas-9ano.json';
-import materiais1em from '../../data/1em.json';
-import provas1em from '../../data/provas-1em.json';
-import materiais2em from '../../data/2em.json';
-import provas2em from '../../data/provas-2em.json';
+import { seriesAtivas, seriesArquivadas } from '../../utils/materiais';
 
-const series = [
-  {
-    slug: '9ano',
-    titulo: '9º ano',
-    descricao: 'Álgebra, geometria e preparação para o Ensino Médio.',
-    total: materiais9ano.length + provas9ano.length,
-  },
-  {
-    slug: '1em',
-    titulo: '1º ano — Ensino Médio',
-    descricao: 'Conjuntos, números reais, funções e geometria plana.',
-    total: materiais1em.length + provas1em.length,
-  },
-  {
-    slug: '2em',
-    titulo: '2º ano — Ensino Médio',
-    descricao: 'Trigonometria, funções trigonométricas e sistemas lineares.',
-    total: materiais2em.length + provas2em.length,
-  },
-];
+// Séries arquivadas agrupadas por ano, do mais recente para o mais antigo.
+const anosArquivo = [...new Set(seriesArquivadas.map((s) => s.ano))].sort((a, b) => b - a);
+
+const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
 ---
 
 <Layout title="Materiais" description="Materiais didáticos de matemática para 9º ano e Ensino Médio.">
@@ -37,17 +16,37 @@ const series = [
     </header>
 
     <div class="grid">
-      {series.map((s) => (
+      {seriesAtivas.map((s) => (
         <a href={`/materiais/${s.slug}`} class="card">
           <div class="card-top">
-            <span class="serie">{s.titulo}</span>
-            <span class="count">{s.total} materiais</span>
+            <span class="serie">{s.tituloLongo}</span>
+            <span class="count">{contagem(s.materiais.length + s.provas.length)}</span>
           </div>
           <p class="descricao">{s.descricao}</p>
           <span class="cta">Ver materiais →</span>
         </a>
       ))}
     </div>
+
+    {anosArquivo.length > 0 && (
+      <section class="arquivo">
+        <h2>Arquivo</h2>
+        <p class="subtitle">Materiais de anos letivos encerrados.</p>
+        {anosArquivo.map((ano) => (
+          <div class="arquivo-ano">
+            <h3>{ano}</h3>
+            <ul>
+              {seriesArquivadas.filter((s) => s.ano === ano).map((s) => (
+                <li>
+                  <a href={`/materiais/arquivo/${s.ano}/${s.slug}`}>{s.tituloLongo}</a>
+                  <span class="count">{contagem(s.materiais.length + s.provas.length)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    )}
   </main>
 </Layout>
 
@@ -124,4 +123,46 @@ const series = [
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
+
+  .arquivo { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--rule); }
+
+  .arquivo h2 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .arquivo-ano { margin-top: 1.75rem; }
+
+  .arquivo-ano h3 {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .arquivo-ano ul { list-style: none; display: flex; flex-direction: column; }
+
+  .arquivo-ano li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .arquivo-ano li:first-child { border-top: 1px solid var(--rule); }
+
+  .arquivo-ano a {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .arquivo-ano a:hover { text-decoration: underline; }
 </style>
