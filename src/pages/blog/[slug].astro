@@ -20,6 +20,25 @@ const minutos = minutosDeLeitura(post.body ?? '');
 // Imagem OG do post, gerada no build por src/pages/og/[slug].png.ts.
 const ogImage = `/og/${post.id}.png`;
 
+const urlPost = new URL(Astro.url.pathname, Astro.site).toString();
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  inLanguage: 'pt-BR',
+  image: new URL(ogImage, Astro.site).toString(),
+  url: urlPost,
+  mainEntityOfPage: urlPost,
+  keywords: post.data.tags,
+  author: {
+    '@type': 'Person',
+    name: 'Yuri Tobias',
+    url: Astro.site?.toString(),
+  },
+};
+
 const publicados = (await getCollection('blog')).filter(p => !p.data.draft);
 
 // Postagens da mesma série, ordenadas pela parte.
@@ -38,7 +57,7 @@ const postSeguinte = indiceCrono >= 0 && indiceCrono < cronologia.length - 1
   : null;
 ---
 
-<Layout title={post.data.title} description={post.data.description} ogImage={ogImage} ogType="article">
+<Layout title={post.data.title} description={post.data.description} ogImage={ogImage} ogType="article" schema={schema}>
   <main class="max-w-2xl mx-auto px-6 py-16">
 
     <a href="/blog" class="text-sm text-stone-400 hover:text-[var(--color-accent)] transition-colors mb-8 block">

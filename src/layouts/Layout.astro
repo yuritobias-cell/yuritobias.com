@@ -8,6 +8,8 @@ interface Props {
   ogImage?: string;
   /** Tipo Open Graph: "website" (padrão) ou "article" para posts. */
   ogType?: 'website' | 'article';
+  /** Dados estruturados (JSON-LD, schema.org) da página — objeto ou lista de objetos. */
+  schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
@@ -15,6 +17,7 @@ const {
   description = "Analista de dados educacionais e professor de matemática em Poços de Caldas.",
   ogImage = '/og.png',
   ogType = 'website',
+  schema,
 } = Astro.props;
 const pathname = Astro.url.pathname;
 const tituloCompleto = title === 'Sobre' ? 'Yuri Tobias' : `${title} · Yuri Tobias`;
@@ -53,6 +56,7 @@ const ano = new Date().getFullYear();
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#1B4F4F" />
     <link rel="alternate" type="application/rss+xml" title="Blog · Yuri Tobias" href="/rss.xml" />
+    {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />}
     <link rel="preload" href="/fonts/ibm-plex-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/playfair-display-latin.woff2" as="font" type="font/woff2" crossorigin />
     <script is:inline data-goatcounter="https://yuritobias.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

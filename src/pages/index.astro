@@ -1,8 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Yuri Tobias',
+  url: Astro.site?.toString(),
+  jobTitle: ['Professor de Matemática', 'Analista de Dados Educacionais'],
+  worksFor: [
+    { '@type': 'Organization', name: 'Escola SESI Poços de Caldas' },
+    { '@type': 'Organization', name: 'Secretaria Municipal de Educação de Poços de Caldas' },
+  ],
+  sameAs: [
+    'https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/',
+    'https://lattes.cnpq.br/2782196498099761',
+  ],
+};
 ---
 
-<Layout title="Sobre">
+<Layout title="Sobre" schema={schema}>
   <main>
     <header>
       <h1>Yuri Tobias</h1>
