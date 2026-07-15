@@ -91,26 +91,16 @@ O componente cuida do resto: tooltip, responsividade no celular e a tabela de
 dados acessível ("Ver os dados em tabela"). O Observable Plot é empacotado no
 build — não há dependência de CDN.
 
-## 5. Gerar a imagem de compartilhamento (OG)
+## 5. Imagem de compartilhamento (OG) — automática
 
-Cada post ganha uma imagem própria para redes sociais, gerada por
-`scripts/og-image.py` a partir do título. Rode uma vez ao publicar:
+Cada post ganha uma imagem própria para redes sociais (1200×630, com o título),
+gerada **automaticamente durante o build** a partir do frontmatter — nada a fazer.
 
-```bash
-# Preparação (só na primeira vez, ou se /tmp tiver sido limpo):
-mkdir -p /tmp/ogfonts
-curl -sL -o /tmp/ogfonts/playfair.ttf "https://github.com/google/fonts/raw/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf"
-curl -sL -o /tmp/ogfonts/plex.ttf "https://github.com/google/fonts/raw/main/ofl/ibmplexsans/IBMPlexSans%5Bwdth%2Cwght%5D.ttf"
-python3 -m venv /tmp/ogvenv && /tmp/ogvenv/bin/pip install pillow
-
-# Gerar (sempre que publicar):
-/tmp/ogvenv/bin/python scripts/og-image.py
-```
-
-O script gera `public/og/<slug>.png` para todo post publicado (e refaz o
-`og.png` do site). **Commite os PNGs** — eles fazem parte do repositório.
-
-Se esquecer este passo, nada quebra: o post usa a imagem padrão do site.
+Como funciona, caso precise mexer: o endpoint `src/pages/og/[slug].png.ts` gera
+`/og/<slug>.png` para todo post publicado (e `src/pages/og.png.ts` gera o
+`/og.png` padrão do site), usando o template em `src/utils/og.ts` e as fontes
+TTF de `src/assets/og/`. Para conferir uma imagem localmente:
+`npm run build` e abra `dist/og/<slug>.png`.
 
 ## 6. Conferir localmente
 
@@ -128,7 +118,7 @@ Opcional, para pegar erros antes do CI: `npm run check && npm run build`.
 ## 7. Publicar
 
 ```bash
-git add src/content/blog/ src/data/ public/og/
+git add src/content/blog/ src/data/
 git commit -m "Nova postagem: <título>"
 git push
 ```
@@ -141,6 +131,5 @@ no GitHub Pages. RSS, sitemap e páginas de tag são regenerados sozinhos.
 - [ ] Arquivo em `src/content/blog/` com frontmatter completo
 - [ ] Tags com grafia idêntica às existentes (se for reutilizar)
 - [ ] `series`/`part` preenchidos, se for parte de série
-- [ ] Imagem OG gerada e commitada (`/tmp/ogvenv/bin/python scripts/og-image.py`)
 - [ ] Conferido no `npm run dev`
 - [ ] Commit + push na `main`

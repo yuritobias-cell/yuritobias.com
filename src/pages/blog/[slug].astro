@@ -1,5 +1,4 @@
 ---
-import fs from 'node:fs';
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Tags from '../../components/Tags.astro';
@@ -18,9 +17,8 @@ const { Content } = await render(post);
 
 const minutos = minutosDeLeitura(post.body ?? '');
 
-// Imagem OG do post, se gerada pelo scripts/og-image.py (senão, a do site).
-const temOgProprio = fs.existsSync(new URL(`../../../public/og/${post.id}.png`, import.meta.url));
-const ogImage = temOgProprio ? `/og/${post.id}.png` : undefined;
+// Imagem OG do post, gerada no build por src/pages/og/[slug].png.ts.
+const ogImage = `/og/${post.id}.png`;
 
 const publicados = (await getCollection('blog')).filter(p => !p.data.draft);
 
