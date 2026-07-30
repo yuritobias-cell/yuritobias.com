@@ -20,7 +20,7 @@ const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
         <a href={`/materiais/${s.slug}`} class="card">
           <div class="card-top">
             <span class="serie">{s.tituloLongo}</span>
-            <span class="count">{contagem(s.materiais.length + s.provas.length)}</span>
+            <span class="count">{contagem(s.materiais.length + s.provas.length + s.formativas.length)}</span>
           </div>
           <p class="descricao">{s.descricao}</p>
           <span class="cta">Ver materiais →</span>
@@ -39,7 +39,7 @@ const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
               {seriesArquivadas.filter((s) => s.ano === ano).map((s) => (
                 <li>
                   <a href={`/materiais/arquivo/${s.ano}/${s.slug}`}>{s.tituloLongo}</a>
-                  <span class="count">{contagem(s.materiais.length + s.provas.length)}</span>
+                  <span class="count">{contagem(s.materiais.length + s.provas.length + s.formativas.length)}</span>
                 </li>
               ))}
             </ul>

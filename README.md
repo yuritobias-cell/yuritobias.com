@@ -75,7 +75,8 @@ Tudo é dirigido por `src/data/series.json` — nenhuma página precisa ser edit
    novo e sem `pastaPdf` — a pasta padrão é `public/materiais/<ano>/<slug>/`) e crie:
    - `src/data/materiais/<ano>-<slug>.json` com os materiais (pode começar `[]`);
    - a pasta `public/materiais/<ano>/<slug>/` para os PDFs;
-   - `src/data/materiais/<ano>-<slug>-provas.json` é opcional (sem ele, a série começa sem provas).
+   - `src/data/materiais/<ano>-<slug>-provas.json` e `<ano>-<slug>-formativas.json` são
+     opcionais (sem eles, a série começa sem somativas/formativas anteriores).
 3. Confira com `npm run dev` e faça push. O build valida pastas e PDFs e falha cedo se algo faltar.
 
 As séries de 2026 usam `pastaPdf` sem o ano (`"9ano"` etc.) porque os PDFs foram

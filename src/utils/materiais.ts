@@ -1,6 +1,7 @@
 /* Séries de materiais didáticos, dirigidas pelo manifesto src/data/series.json.
    Cada série carrega seus dados de src/data/materiais/<ano>-<slug>.json
-   (+ <ano>-<slug>-provas.json, opcional) e serve PDFs de public/materiais/<pastaPdf>/.
+   (+ <ano>-<slug>-provas.json e <ano>-<slug>-formativas.json, opcionais)
+   e serve PDFs de public/materiais/<pastaPdf>/.
    Na virada do ano letivo, basta editar o manifesto — ver README, "Virada do ano letivo". */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -34,9 +35,10 @@ export interface Serie {
   pastaPdf: string;
   materiais: Material[];
   provas: Prova[];
+  formativas: Prova[];
 }
 
-type EntradaManifesto = Omit<Serie, 'materiais' | 'provas' | 'pastaPdf'> & { pastaPdf?: string };
+type EntradaManifesto = Omit<Serie, 'materiais' | 'provas' | 'formativas' | 'pastaPdf'> & { pastaPdf?: string };
 
 // Todos os JSONs de dados, indexados pelo nome do arquivo (sem caminho nem extensão).
 const dadosGlob = import.meta.glob<{ default: unknown }>('../data/materiais/*.json', { eager: true });
@@ -50,7 +52,7 @@ function validarPdfs(serie: Serie) {
     throw new Error(`[materiais/${serie.slug}] pasta de PDFs ausente: public/materiais/${serie.pastaPdf}/`);
   }
   const emDisco = new Set(fs.readdirSync(dir));
-  const faltando = [...serie.materiais, ...serie.provas]
+  const faltando = [...serie.materiais, ...serie.provas, ...serie.formativas]
     .map((m) => m.arquivo)
     .filter((a) => a && !emDisco.has(a));
   if (faltando.length > 0) {
@@ -71,6 +73,7 @@ function montar(entrada: EntradaManifesto): Serie {
     pastaPdf: entrada.pastaPdf ?? `${entrada.ano}/${entrada.slug}`,
     materiais,
     provas: (dados[`${base}-provas`] as Prova[] | undefined) ?? [],
+    formativas: (dados[`${base}-formativas`] as Prova[] | undefined) ?? [],
   };
   validarPdfs(serie);
   return serie;
