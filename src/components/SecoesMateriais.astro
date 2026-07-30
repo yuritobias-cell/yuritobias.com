@@ -9,8 +9,10 @@ interface Props {
 
 const { serie } = Astro.props;
 
-const paracasa = serie.materiais.filter((m) => !m.video);
-const revisoes = serie.materiais.filter((m): m is Material & { video: NonNullable<Material['video']> } => Boolean(m.video));
+// Listas de revisão têm numeração com prefixo "R" (R1, R2, …); o vídeo é opcional.
+const ehRevisao = (m: Material) => m.n.startsWith('R');
+const paracasa = serie.materiais.filter((m) => !ehRevisao(m));
+const revisoes = serie.materiais.filter(ehRevisao);
 const basePdf = `/materiais/${serie.pastaPdf}`;
 
 function formatarData(iso: string) {
@@ -82,7 +84,7 @@ const disponiveis = (n: number, singular: string, plural: string) =>
           <a href={`${basePdf}/${m.arquivo}`} download class="btn">
             Baixar PDF
           </a>
-          {m.video.url && (
+          {m.video?.url && (
             <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
               ▶ Vídeo
             </a>
