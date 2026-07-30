@@ -15,5 +15,6 @@
   { "n": "R3", "titulo": "Lista de Revisão — 2ª Etapa I", "descricao": "Lista de revisão para a 2ª etapa de avaliação.", "arquivo": "003-revisao2etapa.pdf", "video": { "url": "https://youtu.be/2AShL0z7G98", "topicos": [] } },
   { "n": "12", "titulo": "Proporções", "descricao": "Resolver na apostila, com os cálculos. Correção em sala.", "apostila": { "ordem": "Atividades 38, 39, 40 e 41, págs. 214-215", "data": "2026-06-08" } },
   { "n": "13", "titulo": "Primeira Lista ENEM", "descricao": "Conjuntos, áreas e círcunferências.", "arquivo": "ListaENEM1-primeiroano.pdf" },
-  { "n": "14", "titulo": "Ângulos na Circunferência", "descricao": "Propriedades e aplicações dos ângulos na circunferência.", "arquivo": "14-angcirc.pdf" }
+  { "n": "14", "titulo": "Ângulos na Circunferência", "descricao": "Propriedades e aplicações dos ângulos na circunferência.", "arquivo": "14-angcirc.pdf" },
+  { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: circunferência e círculo.", "arquivo": "004-revisao2etapa.pdf" }
 ]
