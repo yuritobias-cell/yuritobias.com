@@ -16,5 +16,6 @@
   { "n": "12", "titulo": "Arranjos e Combinações", "descricao": "Resolver no caderno, com os cálculos. Correção em sala.", "apostila": { "ordem": "Atividades 1 a 10, págs. 29", "data": "2026-06-08" } },
   { "n": "13", "titulo": "Primeira Lista ENEM", "descricao": "Análise combinatória e probabilidades.", "arquivo": "ListaENEM1-segundoano.pdf" },
   { "n": "14", "titulo": "Probabilidade", "descricao": "Exercícios de probabilidade.", "arquivo": "14-probabilidade.pdf" },
-  { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: probabilidade.", "arquivo": "004-revisao2etapa.pdf" }
+  { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: probabilidade.", "arquivo": "004-revisao2etapa.pdf" },
+  { "n": "15", "titulo": "Para Casa — Probabilidade", "descricao": "Probabilidade — iniciando o segundo semestre.", "arquivo": "15-para-casa-probabilidade.pdf" }
 ]
