@@ -1,0 +1,761 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Paradoxo de Monty Hall"
+  description="Simulador do problema das três portas: jogue rodada a rodada, registre os resultados e rode milhares de simulações comparando as estratégias de manter ou trocar de porta."
+>
+
+  <!-- IBM Plex Mono carregado só nesta página (placar, barras e fórmulas usam mono).
+       Playfair Display + IBM Plex Sans já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <div class="mh-root">
+
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Probabilidade</p>
+      <h1>Paradoxo de Monty Hall</h1>
+      <p class="lede">Atrás de uma porta há um carro; atrás das outras, cabras. Você escolhe uma
+      porta, o apresentador — que sabe onde está o carro — abre outra com uma cabra e pergunta:
+      <em>quer manter a sua porta ou trocar?</em> Jogue algumas rodadas, registre os resultados
+      e investigue: <em>trocar faz diferença?</em></p>
+    </header>
+
+    <!-- ======================= Configuração ======================= -->
+    <section class="config" aria-label="Configuração da rodada">
+      <div class="field">
+        <label for="cfg-doors">Número de portas</label>
+        <select id="cfg-doors">
+          <option value="3">3 portas (clássico)</option>
+          <option value="5">5 portas</option>
+          <option value="10">10 portas</option>
+          <option value="100">100 portas</option>
+        </select>
+      </div>
+      <button class="ghost" id="btn-new" type="button">Nova rodada</button>
+    </section>
+
+    <!-- ======================= Palco ======================= -->
+    <section class="stage" aria-label="Rodada em andamento">
+      <p class="stage-msg" id="stage-msg" aria-live="polite"></p>
+      <div class="doors" id="doors"></div>
+      <div class="decision" id="decision" hidden>
+        <button class="move keep" id="btn-keep" type="button"></button>
+        <button class="move switch" id="btn-switch" type="button"></button>
+      </div>
+    </section>
+
+    <div class="banner" id="banner" role="status">
+      <span class="txt" id="banner-txt"></span>
+      <button class="ghost" id="btn-again" type="button">Jogar de novo</button>
+    </div>
+
+    <!-- ======================= Painéis ======================= -->
+    <div class="panels">
+
+      <section class="panel" aria-label="Registro das suas rodadas">
+        <h2>Suas rodadas</h2>
+        <p class="hint">Os dados para a investigação: com qual estratégia você ganhou mais vezes?</p>
+        <div id="score-wrap"><p class="score-empty">Nenhuma rodada concluída ainda.</p></div>
+        <button class="ghost btn-clear" id="btn-clear-reg" type="button" hidden>Limpar registro</button>
+      </section>
+
+      <section class="panel" aria-label="Simulação automática">
+        <h2>Simulação automática</h2>
+        <p class="hint">Poucas rodadas enganam. Deixe o computador jogar milhares de vezes com cada
+        estratégia (com <span id="sim-doors-label">3</span> portas) e observe as frequências.</p>
+        <div class="sim-controls">
+          <div class="field">
+            <label for="cfg-sim">Rodadas por estratégia</label>
+            <select id="cfg-sim">
+              <option value="100">100</option>
+              <option value="1000" selected>1 000</option>
+              <option value="10000">10 000</option>
+              <option value="100000">100 000</option>
+            </select>
+          </div>
+          <button class="ghost" id="btn-sim" type="button">Simular e acumular</button>
+          <button class="ghost btn-clear" id="btn-sim-reset" type="button" hidden>Zerar</button>
+        </div>
+        <div class="simbars" id="simbars" hidden>
+          <div class="simbar">
+            <div class="simhead"><span class="name switch-c">Trocar</span><span class="mono" id="sim-sw-txt"></span></div>
+            <div class="bar"><div class="fill switch-c" id="sim-sw-fill"></div><div class="mark" id="mark-sw"></div></div>
+          </div>
+          <div class="simbar">
+            <div class="simhead"><span class="name keep-c">Manter</span><span class="mono" id="sim-kp-txt"></span></div>
+            <div class="bar"><div class="fill keep-c" id="sim-kp-fill"></div><div class="mark" id="mark-kp"></div></div>
+          </div>
+          <p class="marklegend">As linhas tracejadas marcam os valores teóricos: <span class="mono" id="mark-legend-txt"></span></p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ======================= Análise ======================= -->
+    <section class="panel panel-full" aria-label="Modo análise">
+      <h2>Modo análise</h2>
+      <p class="hint">Abra só depois de investigar — aqui mora a explicação.</p>
+      <details class="analysis" id="analysis">
+        <summary>Revelar por que trocar é melhor</summary>
+        <div class="body">
+          <p id="an-intro"></p>
+          <div class="formula" id="an-formula"></div>
+          <p>Com 3 portas dá para conferir caso a caso. Digamos que você sempre escolhe a porta 1
+          — por simetria, o argumento vale para qualquer escolha:</p>
+          <table class="cases">
+            <thead>
+              <tr><th>Onde está o carro</th><th>Se mantiver</th><th>Se trocar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Porta 1 <span class="mono">(1/3)</span></td><td class="win">ganha 🚗</td><td class="lose">cabra 🐐</td></tr>
+              <tr><td>Porta 2 <span class="mono">(1/3)</span></td><td class="lose">cabra 🐐</td><td class="win">ganha 🚗</td></tr>
+              <tr><td>Porta 3 <span class="mono">(1/3)</span></td><td class="lose">cabra 🐐</td><td class="win">ganha 🚗</td></tr>
+            </tbody>
+          </table>
+          <p>A chave está no apresentador: ele <strong>sabe</strong> onde o carro está e nunca o
+          revela. Abrir portas com cabras não muda a chance da sua porta original — ela continua
+          valendo a probabilidade da primeira escolha. Todo o resto da probabilidade se concentra
+          na porta que ele deixou fechada.</p>
+          <p id="an-general"></p>
+        </div>
+      </details>
+    </section>
+
+    <p class="visually-hidden" aria-live="assertive" id="sr-announce"></p>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Paradoxo de Monty Hall
+     CSS escopado sob .mh-root para não vazar para o resto do site.
+     Variáveis no próprio .mh-root.
+     ============================================================ */
+
+  .mh-root {
+    --bg:        #F8F6F1;
+    --ink:       #1C1917;
+    --accent:    #1B4F4F;   /* teal — estratégia trocar */
+    --muted:     #78716C;
+    --rule:      #E2DDD6;
+    --func-ochre:      #936614;  /* carro / prêmio / análise */
+    --func-terracotta: #A8442B;  /* estratégia manter */
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+    --accent-soft:      color-mix(in srgb, var(--accent) 12%, var(--bg));
+    --terracotta-soft:  color-mix(in srgb, var(--func-terracotta) 12%, var(--bg));
+    --ochre-soft:       color-mix(in srgb, var(--func-ochre) 14%, var(--bg));
+
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+  .mh-root, .mh-root * { box-sizing: border-box; }
+
+  /* ---------- Masthead ---------- */
+  .mh-root header.masthead {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .mh-root .masthead .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+  .mh-root .masthead .eyebrow a { color: inherit; text-decoration: none; }
+  .mh-root .masthead .eyebrow a:hover { color: var(--accent); }
+  .mh-root .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .mh-root .masthead p.lede {
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  /* ---------- Configuração ---------- */
+  .mh-root .config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.75rem;
+    align-items: end;
+    padding: 1rem 0 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1.75rem;
+  }
+  .mh-root .field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .mh-root .field label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .mh-root .field select {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    min-width: 9.5rem;
+  }
+  .mh-root .field select:focus-visible,
+  .mh-root button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Palco ---------- */
+  .mh-root .stage { margin-bottom: 1.5rem; }
+  .mh-root .stage-msg {
+    font-size: 1.05rem;
+    min-height: 1.6em;
+    margin: 0 0 1rem;
+  }
+  .mh-root .stage-msg strong { font-weight: 600; }
+
+  .mh-root .doors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.1rem;
+  }
+  .mh-root button.door {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    aspect-ratio: 3 / 4;
+    border: 1px solid var(--rule);
+    border-radius: 10px 10px 6px 6px;
+    background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+    font-family: var(--font-mono);
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.12s ease;
+  }
+  .mh-root button.door:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--muted); }
+  .mh-root button.door:disabled { cursor: default; }
+  /* maçaneta */
+  .mh-root button.door::after {
+    content: "";
+    position: absolute;
+    right: 12%;
+    top: 50%;
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--muted);
+    opacity: 0.6;
+  }
+  .mh-root button.door.open::after { display: none; }
+
+  .mh-root .doors.size-l button.door { width: 7.5rem; }
+  .mh-root .doors.size-m button.door { width: 4.4rem; border-radius: 8px 8px 5px 5px; }
+  .mh-root .doors.size-s button.door { width: 2.5rem; gap: 0; border-radius: 6px 6px 4px 4px; }
+
+  .mh-root .door .num { font-size: 1rem; }
+  .mh-root .doors.size-m .door .num { font-size: 0.85rem; }
+  .mh-root .doors.size-s .door .num { font-size: 0.68rem; }
+  .mh-root .door .prize { font-size: 2.4rem; line-height: 1.1; }
+  .mh-root .doors.size-m .door .prize { font-size: 1.5rem; }
+  .mh-root .doors.size-s .door .prize { font-size: 0.95rem; }
+  .mh-root .doors.size-s .door.open .num { display: none; }
+  .mh-root .door .prize { display: none; }
+  .mh-root .door.open .prize { display: block; }
+
+  .mh-root .door.chosen {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .mh-root .door.open {
+    background: color-mix(in srgb, var(--muted) 10%, var(--bg));
+    border-style: dashed;
+    color: var(--muted);
+  }
+  .mh-root .door.open.car {
+    background: var(--ochre-soft);
+    border-style: solid;
+    border-color: var(--func-ochre);
+    color: var(--ink);
+  }
+  .mh-root .door.final-win {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--func-ochre) 55%, transparent);
+  }
+  .mh-root .door.final-lose {
+    border-color: var(--func-terracotta);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--func-terracotta) 40%, transparent);
+  }
+
+  .mh-root .decision { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+  .mh-root button.move {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 1.3rem;
+    cursor: pointer;
+    transition: transform 0.08s ease;
+  }
+  .mh-root button.move:hover { transform: translateY(-1px); }
+  .mh-root button.move.keep { background: var(--func-terracotta); }
+  .mh-root button.move.switch { background: var(--accent); }
+
+  .mh-root button.ghost {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+  }
+  .mh-root button.ghost:hover { border-color: var(--muted); }
+
+  /* ---------- Banner de resultado ---------- */
+  .mh-root .banner {
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--func-ochre);
+    border-radius: 8px;
+    background: var(--ochre-soft);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .mh-root .banner.show { display: flex; }
+  .mh-root .banner.lose { border-left-color: var(--func-terracotta); background: var(--terracotta-soft); }
+  .mh-root .banner .txt { font-weight: 600; }
+
+  /* ---------- Painéis ---------- */
+  .mh-root .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 720px) { .mh-root .panels { grid-template-columns: 1fr; } }
+
+  .mh-root .panel {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.1rem;
+  }
+  .mh-root .panel-full { margin-top: 1.75rem; }
+  .mh-root .panel h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin: 0 0 0.6rem;
+  }
+  .mh-root .panel p.hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 0.75rem; }
+  .mh-root .mono { font-family: var(--font-mono); }
+
+  .mh-root table.score,
+  .mh-root table.cases {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .mh-root table.score th, .mh-root table.score td,
+  .mh-root table.cases th, .mh-root table.cases td {
+    text-align: left;
+    padding: 0.35rem 0.5rem 0.35rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mh-root table.score th,
+  .mh-root table.cases th {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .mh-root table.score td.mono { font-family: var(--font-mono); }
+  .mh-root .keep-c   { color: var(--func-terracotta); font-weight: 600; }
+  .mh-root .switch-c { color: var(--accent); font-weight: 600; }
+  .mh-root table.cases td.win  { color: var(--func-ochre); font-weight: 600; }
+  .mh-root table.cases td.lose { color: var(--muted); }
+  .mh-root .score-empty { color: var(--muted); font-size: 0.9rem; }
+  .mh-root .btn-clear { margin-top: 0.85rem; font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+
+  /* ---------- Simulação ---------- */
+  .mh-root .sim-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+  .mh-root .sim-controls .btn-clear { margin-top: 0; }
+  .mh-root .simbar { margin-bottom: 0.8rem; }
+  .mh-root .simhead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+  .mh-root .simhead .mono { font-size: 0.8rem; color: var(--muted); }
+  .mh-root .bar {
+    position: relative;
+    height: 1.1rem;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--ink) 2%, var(--bg));
+    overflow: hidden;
+  }
+  .mh-root .bar .fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .mh-root .bar .fill.switch-c { background: var(--accent); }
+  .mh-root .bar .fill.keep-c   { background: var(--func-terracotta); }
+  .mh-root .bar .mark {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-left: 2px dashed var(--func-ochre);
+  }
+  .mh-root .marklegend {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0.2rem 0 0;
+  }
+
+  /* ---------- Análise ---------- */
+  .mh-root details.analysis > summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--func-ochre);
+  }
+  .mh-root details.analysis > summary::-webkit-details-marker { display: none; }
+  .mh-root details.analysis > summary::before { content: "▸"; transition: transform 0.15s ease; }
+  .mh-root details.analysis[open] > summary::before { transform: rotate(90deg); }
+  .mh-root details.analysis .body { margin-top: 0.8rem; font-size: 0.95rem; max-width: 68ch; }
+  .mh-root details.analysis .body p { margin: 0 0 0.7rem; }
+  .mh-root details.analysis .body table.cases { margin: 0.4rem 0 0.9rem; max-width: 34rem; }
+  .mh-root details.analysis .formula {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    background: var(--ochre-soft);
+    border: 1px solid color-mix(in srgb, var(--func-ochre) 35%, var(--bg));
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+  }
+
+  .mh-root .visually-hidden {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mh-root * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<script is:inline>
+(function () {
+  "use strict";
+
+  /* ---------- estado ---------- */
+  const S = {
+    n: 3,             // número de portas
+    fase: "pick",     // pick | decide | done
+    carro: 0,         // porta do carro (0-based)
+    escolha: null,    // porta escolhida pelo jogador
+    alternativa: null,// porta que o apresentador deixa fechada
+    registro: {},     // { "3": { manteve:{v,j}, trocou:{v,j} }, ... }
+    sim: null         // { n, manteve:{v,j}, trocou:{v,j} } — não persiste
+  };
+
+  /* ---------- elementos ---------- */
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    doorsSel: $("cfg-doors"), newBtn: $("btn-new"),
+    msg: $("stage-msg"), doors: $("doors"),
+    decision: $("decision"), keep: $("btn-keep"), swi: $("btn-switch"),
+    banner: $("banner"), bannerTxt: $("banner-txt"), again: $("btn-again"),
+    scoreWrap: $("score-wrap"), clearReg: $("btn-clear-reg"),
+    simSel: $("cfg-sim"), simBtn: $("btn-sim"), simReset: $("btn-sim-reset"),
+    simBars: $("simbars"), simDoorsLabel: $("sim-doors-label"),
+    swTxt: $("sim-sw-txt"), swFill: $("sim-sw-fill"), markSw: $("mark-sw"),
+    kpTxt: $("sim-kp-txt"), kpFill: $("sim-kp-fill"), markKp: $("mark-kp"),
+    markLegend: $("mark-legend-txt"),
+    analysis: $("analysis"), anIntro: $("an-intro"),
+    anFormula: $("an-formula"), anGeneral: $("an-general"),
+    sr: $("sr-announce")
+  };
+
+  const fmtInt = (x) => x.toLocaleString("pt-BR");
+  const fmtPct = (x) => (100 * x).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
+  const sorteio = (n) => Math.floor(Math.random() * n);
+
+  /* ---------- rodada ---------- */
+  function novaRodada() {
+    S.n = parseInt(els.doorsSel.value, 10);
+    S.fase = "pick";
+    S.carro = sorteio(S.n);
+    S.escolha = null;
+    S.alternativa = null;
+    els.banner.className = "banner";
+    els.decision.hidden = true;
+    els.msg.innerHTML = "Atrás de uma porta há um carro 🚗; atrás das outras, cabras 🐐. <strong>Escolha uma porta.</strong>";
+    buildDoors();
+    renderAnalise();
+    renderSim();
+  }
+
+  function escolher(i) {
+    if (S.fase !== "pick") return;
+    S.escolha = i;
+    // O apresentador abre todas as outras portas com cabra, deixando uma fechada:
+    // a do carro — ou, se o jogador já acertou, uma outra qualquer.
+    if (S.escolha === S.carro) {
+      let alt = sorteio(S.n - 1);
+      if (alt >= S.escolha) alt++;
+      S.alternativa = alt;
+    } else {
+      S.alternativa = S.carro;
+    }
+    S.fase = "decide";
+    const abertas = S.n - 2;
+    els.msg.innerHTML = "O apresentador abriu <strong>" +
+      (abertas === 1 ? "1 porta" : fmtInt(abertas) + " portas") +
+      "</strong> com cabra. Ficam a porta <strong>" + (S.escolha + 1) +
+      "</strong> (sua escolha) e a porta <strong>" + (S.alternativa + 1) +
+      "</strong>. E agora?";
+    els.keep.textContent = "Manter a porta " + (S.escolha + 1);
+    els.swi.textContent = "Trocar para a porta " + (S.alternativa + 1);
+    els.decision.hidden = false;
+    renderDoors();
+    announce(els.msg.textContent);
+  }
+
+  function decidir(estrategia) {
+    if (S.fase !== "decide") return;
+    const final_ = estrategia === "trocou" ? S.alternativa : S.escolha;
+    const ganhou = final_ === S.carro;
+    S.fase = "done";
+    S.finalEscolha = final_;
+    els.decision.hidden = true;
+    els.msg.innerHTML = "Portas abertas. O carro estava na porta <strong>" + (S.carro + 1) + "</strong>.";
+    registrar(estrategia, ganhou);
+    const acao = estrategia === "trocou" ? "trocou de porta" : "manteve a porta";
+    els.bannerTxt.textContent = ganhou
+      ? "Você " + acao + " e ganhou o carro! 🚗"
+      : "Você " + acao + " e levou uma cabra. 🐐";
+    els.banner.className = "banner show" + (ganhou ? "" : " lose");
+    announce(els.bannerTxt.textContent);
+    renderDoors();
+  }
+
+  /* ---------- portas ---------- */
+  function buildDoors() {
+    els.doors.className = "doors " + (S.n <= 3 ? "size-l" : S.n <= 10 ? "size-m" : "size-s");
+    els.doors.innerHTML = "";
+    for (let i = 0; i < S.n; i++) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "door";
+      b.dataset.i = i;
+      b.innerHTML = "<span class='num'>" + (i + 1) + "</span><span class='prize' aria-hidden='true'></span>";
+      els.doors.appendChild(b);
+    }
+    renderDoors();
+  }
+
+  function renderDoors() {
+    els.doors.querySelectorAll(".door").forEach((b) => {
+      const i = parseInt(b.dataset.i, 10);
+      const aberta =
+        (S.fase === "decide" && i !== S.escolha && i !== S.alternativa) ||
+        S.fase === "done";
+      const carro = i === S.carro;
+      b.classList.toggle("open", aberta);
+      b.classList.toggle("car", aberta && carro);
+      b.classList.toggle("chosen", S.fase !== "done" && i === S.escolha);
+      b.classList.toggle("final-win", S.fase === "done" && i === S.finalEscolha && carro);
+      b.classList.toggle("final-lose", S.fase === "done" && i === S.finalEscolha && !carro);
+      b.querySelector(".prize").textContent = aberta ? (carro ? "🚗" : "🐐") : "";
+      b.disabled =
+        S.fase === "done" ||
+        (S.fase === "decide" && i !== S.escolha && i !== S.alternativa);
+      const estado = aberta ? (carro ? "aberta, carro" : "aberta, cabra") : "fechada";
+      b.setAttribute("aria-label", "Porta " + (i + 1) + ", " + estado);
+    });
+  }
+
+  /* ---------- registro (persistido) ---------- */
+  const REG_KEY = "montyhall:registro";
+  function salvarRegistro() {
+    try { localStorage.setItem(REG_KEY, JSON.stringify(S.registro)); }
+    catch (e) { /* armazenamento indisponível: o jogo segue sem persistir */ }
+  }
+  function restaurarRegistro() {
+    try {
+      const salvo = JSON.parse(localStorage.getItem(REG_KEY));
+      if (salvo && typeof salvo === "object") S.registro = salvo;
+    } catch (e) { /* estado corrompido: começa do zero */ }
+  }
+
+  function registrar(estrategia, ganhou) {
+    const chave = String(S.n);
+    if (!S.registro[chave]) S.registro[chave] = { manteve: { v: 0, j: 0 }, trocou: { v: 0, j: 0 } };
+    const r = S.registro[chave][estrategia];
+    r.j += 1;
+    if (ganhou) r.v += 1;
+    salvarRegistro();
+    renderScore();
+  }
+
+  function renderScore() {
+    const chaves = Object.keys(S.registro).sort((a, b) => a - b);
+    const temDados = chaves.some((k) =>
+      S.registro[k].manteve.j > 0 || S.registro[k].trocou.j > 0);
+    els.clearReg.hidden = !temDados;
+    if (!temDados) {
+      els.scoreWrap.innerHTML = "<p class='score-empty'>Nenhuma rodada concluída ainda.</p>";
+      return;
+    }
+    const linhas = [];
+    chaves.forEach((k) => {
+      [["trocou", "Trocou", "switch-c"], ["manteve", "Manteve", "keep-c"]].forEach(([id, nome, cls]) => {
+        const r = S.registro[k][id];
+        if (r.j === 0) return;
+        linhas.push(
+          "<tr><td class='mono'>" + k + "</td>" +
+          "<td><span class='" + cls + "'>" + nome + "</span></td>" +
+          "<td class='mono'>" + fmtInt(r.v) + " / " + fmtInt(r.j) + "</td>" +
+          "<td class='mono'>" + fmtPct(r.v / r.j) + "</td></tr>"
+        );
+      });
+    });
+    els.scoreWrap.innerHTML =
+      "<table class='score'><thead><tr>" +
+      "<th>Portas</th><th>Estratégia</th><th>Vitórias</th><th>Freq.</th>" +
+      "</tr></thead><tbody>" + linhas.join("") + "</tbody></table>";
+  }
+
+  /* ---------- simulação automática ---------- */
+  function simular() {
+    const q = parseInt(els.simSel.value, 10);
+    if (!S.sim || S.sim.n !== S.n) {
+      S.sim = { n: S.n, manteve: { v: 0, j: 0 }, trocou: { v: 0, j: 0 } };
+    }
+    // Manter ganha quando a 1ª escolha acerta o carro; trocar, quando erra.
+    for (let i = 0; i < q; i++) {
+      const acertou = sorteio(S.n) === 0;
+      S.sim.manteve.j++; if (acertou) S.sim.manteve.v++;
+      S.sim.trocou.j++;  if (!acertou) S.sim.trocou.v++;
+    }
+    renderSim();
+    announce("Simulação: trocar venceu " + fmtPct(S.sim.trocou.v / S.sim.trocou.j) +
+      " e manter " + fmtPct(S.sim.manteve.v / S.sim.manteve.j) +
+      " em " + fmtInt(S.sim.trocou.j) + " rodadas por estratégia.");
+  }
+
+  function renderSim() {
+    els.simDoorsLabel.textContent = S.n;
+    const ativo = S.sim && S.sim.n === S.n && S.sim.trocou.j > 0;
+    els.simBars.hidden = !ativo;
+    els.simReset.hidden = !ativo;
+    const pKeep = 1 / S.n, pSwitch = (S.n - 1) / S.n;
+    els.markSw.style.left = (100 * pSwitch) + "%";
+    els.markKp.style.left = (100 * pKeep) + "%";
+    els.markLegend.textContent =
+      "manter = 1/" + S.n + " ≈ " + fmtPct(pKeep) +
+      " · trocar = " + (S.n - 1) + "/" + S.n + " ≈ " + fmtPct(pSwitch);
+    if (!ativo) return;
+    const fsw = S.sim.trocou.v / S.sim.trocou.j;
+    const fkp = S.sim.manteve.v / S.sim.manteve.j;
+    els.swFill.style.width = (100 * fsw) + "%";
+    els.kpFill.style.width = (100 * fkp) + "%";
+    els.swTxt.textContent = fmtInt(S.sim.trocou.v) + " / " + fmtInt(S.sim.trocou.j) + " = " + fmtPct(fsw);
+    els.kpTxt.textContent = fmtInt(S.sim.manteve.v) + " / " + fmtInt(S.sim.manteve.j) + " = " + fmtPct(fkp);
+  }
+
+  /* ---------- análise ---------- */
+  function renderAnalise() {
+    const n = S.n;
+    els.anIntro.textContent =
+      "Com " + n + " portas, sua primeira escolha acerta o carro com probabilidade 1/" + n +
+      " — e é só isso que a estratégia de manter aproveita. Trocar ganha exatamente quando a " +
+      "primeira escolha erra, o que acontece em " + (n - 1) + " de cada " + n + " rodadas.";
+    els.anFormula.textContent =
+      "P(ganhar mantendo) = 1/" + n + " ≈ " + fmtPct(1 / n) +
+      " · P(ganhar trocando) = " + (n - 1) + "/" + n + " ≈ " + fmtPct((n - 1) / n);
+    els.anGeneral.textContent =
+      "Se a intuição resistir, experimente as 100 portas: você escolhe uma, o apresentador abre " +
+      "98 com cabras e sobra uma única porta fechada além da sua. Ainda parece indiferente trocar? " +
+      "Compare com as frequências da simulação — quanto mais rodadas, mais perto dos valores teóricos.";
+  }
+
+  function announce(msg) { els.sr.textContent = msg; }
+
+  /* ---------- eventos ---------- */
+  els.doors.addEventListener("click", (e) => {
+    const b = e.target.closest("button.door");
+    if (!b) return;
+    const i = parseInt(b.dataset.i, 10);
+    if (S.fase === "pick") escolher(i);
+    else if (S.fase === "decide") decidir(i === S.escolha ? "manteve" : "trocou");
+  });
+  els.keep.addEventListener("click", () => decidir("manteve"));
+  els.swi.addEventListener("click", () => decidir("trocou"));
+  els.newBtn.addEventListener("click", novaRodada);
+  els.again.addEventListener("click", novaRodada);
+  els.doorsSel.addEventListener("change", novaRodada);
+  els.simBtn.addEventListener("click", simular);
+  els.simReset.addEventListener("click", () => { S.sim = null; renderSim(); });
+  els.clearReg.addEventListener("click", () => {
+    S.registro = {};
+    try { localStorage.removeItem(REG_KEY); } catch (e) { /* sem armazenamento */ }
+    renderScore();
+  });
+
+  /* ---------- início ---------- */
+  restaurarRegistro();
+  novaRodada();
+  renderScore();
+})();
+</script>
