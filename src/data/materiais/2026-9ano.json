@@ -16,7 +16,7 @@
   { "n": "12", "titulo": "Construção de Gráficos", "descricao": "Resolver no caderno.", "apostila": { "ordem": "Atividades 34, pág. 138", "data": "2026-06-08" } },
   { "n": "13", "titulo": "Revisão Teorema de Tales e Teorema da Bissetriz interna", "descricao": "Exercícios do Caderno de Atividades (apostila menor)", "apostila": { "ordem": "Atividades 21,23, 24 e 25 pág. 52, 53 e 54", "data": "2026-06-15" } },
   { "n": "14", "titulo": "Funções Quadráticas", "descricao": "Construção de gráficos de funções quadráticas.", "arquivo": "14-funcoesquadradas.pdf" },
-  { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: funções afim e quadrática.", "arquivo": "004-revisao2etapa.pdf" },
+  { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: funções afim e quadrática.", "arquivo": "004-revisao2etapa.pdf", "video": { "url": "https://youtu.be/uXuJEFg3r_U", "topicos": [] } },
   { "n": "15", "titulo": "Para Casa — Funções", "descricao": "Raízes e pontos de máximo e mínimo das funções afim e quadrática — iniciando o segundo semestre.", "arquivo": "15-para-casa-funcoes.pdf" },
   { "n": "16", "titulo": "Material Extra — Malhas Diversas para Desenho", "descricao": "Material extra para imprimir: malhas quadriculada, pontilhada e isométrica para desenhos e construções geométricas.", "arquivo": "16-malhas-variadas.pdf" }
 ]
