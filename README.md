@@ -2,7 +2,7 @@
 
 Site pessoal de Yuri Tobias — professor de matemática (Escola SESI Poços de Caldas) e analista de dados educacionais (Secretaria Municipal de Educação de Poços de Caldas).
 
-Reúne materiais didáticos por série, ferramentas interativas para sala de aula, cursos em vídeo e blog.
+Reúne materiais didáticos por série, ferramentas interativas para sala de aula, análises de dados educacionais, cursos em vídeo e blog.
 
 ## Stack
 
@@ -32,6 +32,7 @@ src/
 ├── data/
 │   ├── series.json               # manifesto das séries (ativas e arquivadas) — dirige /materiais
 │   ├── materiais/<ano>-<slug>.json   # materiais de cada série (+ <ano>-<slug>-provas.json)
+│   ├── analises.json             # manifesto das análises — dirige /analises
 │   └── ...                       # curso FET + dados de posts (enem/)
 ├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
 ├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
@@ -40,11 +41,13 @@ src/
 ├── pages/
 │   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
 │   ├── ferramentas/              # ferramentas interativas (JS próprio por página)
+│   ├── analises/                 # índice + capa [slug] de cada análise
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
 │   ├── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
-│   └── og.png.ts, og/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
+│   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
 └── styles/global.css             # @theme com cores e fontes do site
 public/materiais/<serie>/         # PDFs servidos para download
+public/analises/paineis/          # painéis HTML autocontidos das análises
 ```
 
 ## Como adicionar um material
@@ -81,6 +84,40 @@ Tudo é dirigido por `src/data/series.json` — nenhuma página precisa ser edit
 
 As séries de 2026 usam `pastaPdf` sem o ano (`"9ano"` etc.) porque os PDFs foram
 publicados antes desta estrutura — as URLs dos arquivos não mudaram.
+
+## Como publicar uma análise
+
+Uma análise é um **painel HTML autocontido** (dados, estilos e scripts no próprio arquivo,
+sem CDN) apresentado no site por uma capa em `/analises/<slug>` — com contexto, fonte dos
+dados e o botão que abre o painel em tela cheia.
+
+1. Coloque o arquivo em `public/analises/paineis/<slug>.html`.
+2. Adicione a entrada em `src/data/analises.json` (as análises aparecem da mais recente
+   para a mais antiga):
+
+```json
+{
+  "slug": "ideb-2025",
+  "titulo": "IDEB 2025 — Poços de Caldas",
+  "descricao": "Resumo curto — vai para o índice e para as meta tags.",
+  "data": "2026-08-07",
+  "arquivo": "ideb-2025.html",
+  "fonte": "INEP — planilhas de divulgação do IDEB 2025",
+  "tags": ["IDEB"],
+  "secoes": ["Visão geral — principais indicadores"],
+  "rascunho": false
+}
+```
+
+- `data` em formato ISO (`AAAA-MM-DD`); `tags` e `secoes` são opcionais.
+- `"rascunho": true` mantém a análise fora do índice e sem capa publicada.
+- O build valida a data e a existência do painel, e falha cedo se algo faltar.
+- A imagem Open Graph da capa é gerada sozinha no build, a partir do título.
+
+Os painéis trazem `noindex` para que a busca leve à capa (que tem a navegação do site)
+e não ao painel sem contexto. Se uma análise já tiver sido divulgada em outra URL,
+deixe no caminho antigo um arquivo curto com `meta refresh` para o novo — foi o que
+`public/analises/dashboard-ideb-2025-8268fddf8eb566e6.html` faz.
 
 ## Licença do conteúdo
 

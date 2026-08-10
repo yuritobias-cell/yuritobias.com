@@ -99,15 +99,21 @@ function quebraLinhas(txt: string, maxChars: number): string[] {
   return linhas;
 }
 
-/** Imagem de um post do blog: kicker + título + assinatura. */
-export function imagemPost(titulo: string): Promise<Uint8Array<ArrayBuffer>> {
+/** Imagem de uma página com título próprio: kicker + título + assinatura. */
+function imagemComTitulo(titulo: string, kicker: string): Promise<Uint8Array<ArrayBuffer>> {
   const mx = 105;
   const corpo = corpoDoTitulo(titulo);
   return renderizar(base([
     moldura(),
-    texto({ left: mx, top: 92, fontFamily: 'IBM Plex Sans', fontWeight: 500, fontSize: 24, color: ACCENT, letterSpacing: 3 }, 'BLOG · YURITOBIAS.COM'),
+    texto({ left: mx, top: 92, fontFamily: 'IBM Plex Sans', fontWeight: 500, fontSize: 24, color: ACCENT, letterSpacing: 3 }, kicker),
     el({ left: mx + 4, top: 168, width: 48, height: 4, background: ACCENT }),
     texto({ left: mx, top: 200, width: W - 2 * mx, fontFamily: 'Playfair Display', fontWeight: 700, fontSize: corpo, lineHeight: 1.24, color: INK }, titulo),
     texto({ left: mx, top: H - 118, fontFamily: 'IBM Plex Sans', fontWeight: 400, fontSize: 26, color: MUTED }, 'Yuri Tobias — Professor de Matemática e Analista de Dados Educacionais'),
   ]));
 }
+
+/** Imagem de um post do blog. */
+export const imagemPost = (titulo: string) => imagemComTitulo(titulo, 'BLOG · YURITOBIAS.COM');
+
+/** Imagem de uma análise. */
+export const imagemAnalise = (titulo: string) => imagemComTitulo(titulo, 'ANÁLISES · YURITOBIAS.COM');

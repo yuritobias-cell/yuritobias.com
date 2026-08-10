@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "ideb-2025",
+    "titulo": "IDEB 2025 — Poços de Caldas",
+    "descricao": "Painel interativo com os resultados do IDEB 2025 nas escolas de Poços de Caldas: indicadores da edição, séries históricas desde 2005, ranking por etapa e ficha de cada escola.",
+    "data": "2026-08-07",
+    "arquivo": "ideb-2025.html",
+    "fonte": "INEP — planilhas de divulgação do IDEB 2025 (divulgadas em 05/08/2026)",
+    "tags": ["IDEB", "Poços de Caldas", "Rede municipal"],
+    "secoes": [
+      "Visão geral — principais indicadores da edição 2025",
+      "Evolução histórica — séries de 2005 a 2025, posição relativa e decomposição em aprendizado e fluxo",
+      "Ranking de escolas — maiores e menores IDEB por etapa",
+      "Fichas por escola — ficha completa de cada unidade"
+    ],
+    "rascunho": false
+  }
+]

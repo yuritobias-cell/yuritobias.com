@@ -1,0 +1,194 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { analisesPublicadas, dataPorExtenso, urlPainel } from '../../utils/analises';
+
+export function getStaticPaths() {
+  return analisesPublicadas.map((analise) => ({
+    params: { slug: analise.slug },
+    props: { analise },
+  }));
+}
+
+const { analise } = Astro.props;
+
+const painel = urlPainel(analise);
+// Imagem OG da análise, gerada no build por src/pages/og/analises/[slug].png.ts.
+const ogImage = `/og/analises/${analise.slug}.png`;
+
+const url = new URL(Astro.url.pathname, Astro.site).toString();
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: analise.titulo,
+  description: analise.descricao,
+  datePublished: `${analise.data}T00:00:00-03:00`,
+  inLanguage: 'pt-BR',
+  image: new URL(ogImage, Astro.site).toString(),
+  url,
+  mainEntityOfPage: url,
+  keywords: analise.tags,
+  isBasedOn: analise.fonte,
+  author: {
+    '@type': 'Person',
+    name: 'Yuri Tobias',
+    url: Astro.site?.toString(),
+  },
+};
+---
+
+<Layout title={analise.titulo} description={analise.descricao} ogImage={ogImage} ogType="article" schema={schema}>
+  <main>
+    <a href="/analises" class="voltar">← Análises</a>
+
+    <header>
+      <time datetime={analise.data}>{dataPorExtenso(analise)}</time>
+      <h1>{analise.titulo}</h1>
+      <p class="descricao">{analise.descricao}</p>
+      {analise.tags.length > 0 && (
+        <ul class="tags">
+          {analise.tags.map((t) => <li>{t}</li>)}
+        </ul>
+      )}
+    </header>
+
+    <a href={painel} class="abrir">
+      Abrir o painel
+      <span aria-hidden="true">→</span>
+    </a>
+    <p class="nota">
+      O painel abre em tela cheia, com navegação própria. Funciona no computador e no celular,
+      sem instalar nada — os dados já vêm dentro da página.
+    </p>
+
+    {analise.secoes.length > 0 && (
+      <section class="secoes">
+        <h2>O que há no painel</h2>
+        <ul>
+          {analise.secoes.map((s) => <li>{s}</li>)}
+        </ul>
+      </section>
+    )}
+
+    <section class="fonte">
+      <h2>Fonte dos dados</h2>
+      <p>{analise.fonte}</p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .voltar {
+    display: block;
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .voltar:hover { color: var(--accent); }
+
+  header { margin-bottom: 2.5rem; }
+
+  time { font-size: 0.8rem; color: var(--muted); font-weight: 300; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0.4rem 0 0.75rem;
+  }
+
+  .descricao { font-size: 1rem; line-height: 1.7; color: var(--muted); }
+
+  .tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1rem;
+  }
+
+  .tags li {
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    padding: 0.15rem 0.55rem;
+    letter-spacing: 0.02em;
+  }
+
+  .abrir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .abrir:hover { opacity: 0.85; }
+
+  .nota {
+    margin-top: 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--rule); }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.9rem;
+  }
+
+  .secoes ul { list-style: none; display: flex; flex-direction: column; }
+
+  .secoes li {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--muted);
+    padding: 0.65rem 0 0.65rem 1.1rem;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .secoes li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.15rem;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .secoes li:first-child { border-top: 1px solid var(--rule); }
+
+  .fonte p { font-size: 0.9rem; line-height: 1.7; color: var(--muted); }
+</style>

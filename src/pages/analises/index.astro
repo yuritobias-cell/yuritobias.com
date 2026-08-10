@@ -1,0 +1,139 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { analisesPublicadas, dataPorExtenso } from '../../utils/analises';
+---
+
+<Layout
+  title="Análises"
+  description="Análises de dados educacionais em painéis interativos — indicadores, séries históricas e resultados por escola."
+>
+  <main>
+    <header>
+      <h1>Análises</h1>
+      <p class="subtitle">
+        Painéis interativos com dados educacionais — indicadores, séries históricas e resultados por escola.
+      </p>
+    </header>
+
+    {analisesPublicadas.length === 0 ? (
+      <p class="vazio">Nenhuma análise publicada por enquanto.</p>
+    ) : (
+      <div class="grid">
+        {analisesPublicadas.map((a) => (
+          <a href={`/analises/${a.slug}`} class="card">
+            <div class="card-top">
+              <span class="titulo">{a.titulo}</span>
+              <time datetime={a.data}>{dataPorExtenso(a)}</time>
+            </div>
+            <p class="descricao">{a.descricao}</p>
+            {a.tags.length > 0 && (
+              <ul class="tags">
+                {a.tags.map((t) => <li>{t}</li>)}
+              </ul>
+            )}
+            <span class="cta">Ver análise →</span>
+          </a>
+        ))}
+      </div>
+    )}
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { margin-bottom: 3rem; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; }
+
+  .vazio { font-size: 0.95rem; color: var(--muted); font-weight: 300; }
+
+  .grid { display: grid; gap: 1rem; }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .titulo {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  time { font-size: 0.8rem; color: var(--muted); font-weight: 300; white-space: nowrap; }
+
+  .descricao {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .tags li {
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    padding: 0.15rem 0.55rem;
+    letter-spacing: 0.02em;
+  }
+
+  .cta {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 520px) {
+    .card-top { flex-direction: column; gap: 0.25rem; }
+  }
+</style>
