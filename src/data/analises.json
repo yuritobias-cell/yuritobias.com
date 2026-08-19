@@ -1,12 +1,41 @@
 [
   {
+    "slug": "simave-2025",
+    "titulo": "SIMAVE 2025 — Poços de Caldas",
+    "descricao": "Painel interativo com a linha histórica do SIMAVE nas escolas de Poços de Caldas, de 2015 a 2025: proficiência e padrões de desempenho da alfabetização ao ensino médio, comparação com Minas Gerais, ficha de cada unidade e o percurso das escolas entre as etapas.",
+    "data": "2026-08-19",
+    "arquivo": "simave-2025.html",
+    "fonte": "SEE-MG — planilhas de resultados do SIMAVE por escola (alfabetização e demais etapas), edições de 2015 a 2025",
+    "tags": [
+      "SIMAVE",
+      "PROEB",
+      "PROALFA",
+      "Poços de Caldas",
+      "Rede municipal"
+    ],
+    "secoes": [
+      "Visão geral — onde Poços está na edição mais recente de cada etapa",
+      "Evolução histórica — séries de 2015 a 2025 e posição entre os municípios de Minas",
+      "Padrões de desempenho — composição de Baixo a Avançado e sua evolução",
+      "Ranking e equidade — distância entre a melhor e a pior escola da rede",
+      "Ficha por unidade — retrato completo de cada uma das 34 escolas",
+      "Participação — quem ficou sem resultado divulgado e por quê",
+      "Percurso entre etapas — a escola que alfabetiza bem é a que chega forte ao 5º ano?"
+    ],
+    "rascunho": false
+  },
+  {
     "slug": "ideb-2025",
     "titulo": "IDEB 2025 — Poços de Caldas",
     "descricao": "Painel interativo com os resultados do IDEB 2025 nas escolas de Poços de Caldas: indicadores da edição, séries históricas desde 2005, ranking por etapa e ficha de cada escola.",
     "data": "2026-08-07",
     "arquivo": "ideb-2025.html",
     "fonte": "INEP — planilhas de divulgação do IDEB 2025 (divulgadas em 05/08/2026)",
-    "tags": ["IDEB", "Poços de Caldas", "Rede municipal"],
+    "tags": [
+      "IDEB",
+      "Poços de Caldas",
+      "Rede municipal"
+    ],
     "secoes": [
       "Visão geral — principais indicadores da edição 2025",
       "Evolução histórica — séries de 2005 a 2025, posição relativa e decomposição em aprendizado e fluxo",
