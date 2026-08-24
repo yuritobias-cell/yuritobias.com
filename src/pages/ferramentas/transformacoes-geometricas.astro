@@ -1,0 +1,889 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Transformações Geométricas"
+  description="Simulador de transformações no plano cartesiano: translade uma figura por um vetor dado e gire 90° em torno da origem pela regra (x, y) ⟼ (−y, x). Arraste os vértices e acompanhe as coordenadas da imagem."
+>
+
+  <!-- IBM Plex Mono carregado só nesta página (coordenadas, regra e tabela usam mono).
+       Playfair Display + IBM Plex Sans já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <div class="tg-root">
+
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Geometria analítica</p>
+      <h1>Transformações <em>geométricas</em></h1>
+      <p class="lede">Arraste os vértices da figura e veja para onde cada ponto vai. Na
+      <em>translação</em>, todo ponto anda o mesmo vetor; na <em>rotação</em>, cada ponto percorre
+      um arco de 90° em torno da origem — e as coordenadas se trocam pela regra
+      <span class="rule-inline">(x, y) ⟼ (−y, x)</span>.</p>
+    </header>
+
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-mode="translacao"><span class="n">01</span>Translação</button>
+      <button class="tab" role="tab" data-mode="rotacao"><span class="n">02</span>Rotação de 90°</button>
+    </div>
+
+    <div class="stage">
+
+      <div class="canvas-card">
+        <svg class="board" id="board" viewBox="0 0 640 640" aria-label="Plano cartesiano interativo com a figura e sua imagem"></svg>
+        <p class="caption" id="caption"></p>
+      </div>
+
+      <div class="panel">
+
+        <!-- ---------- regra ao vivo ---------- -->
+        <div class="card rule-card">
+          <div class="card-label">Regra da transformação</div>
+          <div class="rule" id="rule"></div>
+          <p class="note" id="note"></p>
+        </div>
+
+        <!-- ---------- controles da translação ---------- -->
+        <div class="card" id="ctrl-translacao">
+          <h2>Vetor da translação</h2>
+          <p class="hint">Escolha o deslocamento — ou arraste a ponta da seta verde no plano.</p>
+          <div class="vec-fields">
+            <span class="vec-open">v = (</span>
+            <label class="sr-only" for="vec-a">Componente horizontal do vetor</label>
+            <input type="number" id="vec-a" step="1" inputmode="numeric" value="6" />
+            <span class="vec-sep">,</span>
+            <label class="sr-only" for="vec-b">Componente vertical do vetor</label>
+            <input type="number" id="vec-b" step="1" inputmode="numeric" value="-3" />
+            <span class="vec-open">)</span>
+          </div>
+          <div class="btn-row">
+            <button class="ghost" id="btn-anim-t" type="button">Animar o deslocamento</button>
+            <button class="ghost" id="btn-inv-t" type="button">Inverter o vetor</button>
+          </div>
+        </div>
+
+        <!-- ---------- controles da rotação ---------- -->
+        <div class="card" id="ctrl-rotacao" hidden>
+          <h2>Giro em torno da origem</h2>
+          <p class="hint">Cada clique aplica a regra <b>(x, y) ⟼ (−y, x)</b> mais uma vez, no sentido anti-horário.</p>
+          <div class="turns" id="turns" aria-live="polite"></div>
+          <div class="btn-row">
+            <button class="primary" id="btn-rot" type="button">Girar 90°</button>
+            <button class="ghost" id="btn-unrot" type="button">Voltar 90°</button>
+          </div>
+        </div>
+
+        <!-- ---------- tabela de vértices ---------- -->
+        <div class="card">
+          <h2>Vértices</h2>
+          <p class="hint">As coordenadas podem ser editadas direto na tabela.</p>
+          <table class="vtx">
+            <thead>
+              <tr><th></th><th>Objeto</th><th></th><th id="th-img">Imagem</th></tr>
+            </thead>
+            <tbody id="vtx-body"></tbody>
+          </table>
+          <div class="btn-row">
+            <button class="ghost" id="btn-add" type="button">+ vértice</button>
+            <button class="ghost" id="btn-del" type="button">− vértice</button>
+            <button class="ghost" id="btn-fix" type="button">Fixar imagem como objeto</button>
+          </div>
+        </div>
+
+        <!-- ---------- figura + opções ---------- -->
+        <div class="card">
+          <h2>Figura</h2>
+          <div class="presets" id="presets">
+            <button class="chip" data-preset="triangulo" type="button">Triângulo</button>
+            <button class="chip" data-preset="quadrado" type="button">Quadrado</button>
+            <button class="chip" data-preset="ele" type="button">Letra L</button>
+            <button class="chip" data-preset="seta" type="button">Seta</button>
+          </div>
+          <div class="controls">
+            <label class="toggle on"><input type="checkbox" id="tGrid" checked> Grade</label>
+            <label class="toggle on"><input type="checkbox" id="tCoords" checked> Coordenadas</label>
+            <label class="toggle on"><input type="checkbox" id="tTrace" checked> Trajetos</label>
+            <button class="reset" id="reset" type="button">Reiniciar</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ---------- teoria ---------- -->
+    <section class="theory">
+      <h2 id="theoryTitle"></h2>
+      <div id="theoryText"></div>
+    </section>
+
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Transformações Geométricas
+     Todo o CSS abaixo é escopado sob .tg-root para não vazar
+     para o resto do site. As variáveis ficam no próprio .tg-root.
+     ============================================================ */
+
+  .tg-root{
+    /* tokens (escopados nesta ferramenta) */
+    --bg:#F8F6F1;
+    --ink:#1C1917;
+    --muted:#78716C;
+    --accent:#1B4F4F;
+    --rule-c:#E2DDD6;
+    --paper:#FFFFFF;
+    --grid:#EDE8E0;
+    --grid-strong:#DED7CC;
+    --axis:#A8A29A;
+    --obj:#57534E;                    /* objeto — grafite */
+    --obj-fill:rgba(87,83,78,.09);
+    --img:#A8442B;                    /* imagem — terracota (protagonista) */
+    --img-fill:rgba(168,68,43,.15);
+    --vec:#1B4F4F;                    /* vetor / arcos — teal */
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+    --radius:14px;
+
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    color:var(--ink);
+    max-width:1180px;
+    margin:0 auto;
+    padding:30px 22px 56px;
+  }
+  .tg-root, .tg-root *{box-sizing:border-box}
+
+  .tg-root .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0
+  }
+
+  /* ----- cabeçalho ----- */
+  .tg-root header.masthead{margin-bottom:22px}
+  .tg-root .eyebrow{
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px
+  }
+  .tg-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .tg-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .tg-root h1{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em
+  }
+  .tg-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .tg-root .lede{color:var(--muted);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .tg-root .lede em{font-style:normal;color:var(--ink)}
+  .tg-root .rule-inline{font-family:var(--font-mono);color:var(--img);white-space:nowrap}
+
+  /* ----- abas ----- */
+  .tg-root .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 18px}
+  .tg-root .tab{
+    appearance:none;border:1px solid var(--rule-c);background:transparent;
+    color:var(--muted);font-family:var(--font-body);font-weight:500;font-size:12.5px;
+    letter-spacing:.04em;text-transform:uppercase;
+    padding:9px 15px;border-radius:999px;cursor:pointer;transition:.18s;
+    display:flex;align-items:center;gap:8px
+  }
+  .tg-root .tab .n{font-family:var(--font-mono);font-size:11px;opacity:.65;letter-spacing:0}
+  .tg-root .tab:hover{color:var(--ink);border-color:var(--muted)}
+  .tg-root .tab[aria-selected="true"]{
+    background:var(--accent);border-color:var(--accent);color:#fff;
+    box-shadow:0 8px 22px -12px var(--accent)
+  }
+  .tg-root .tab[aria-selected="true"] .n{opacity:.8}
+
+  /* ----- layout ----- */
+  .tg-root .stage{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:start}
+  @media (max-width:900px){.tg-root .stage{grid-template-columns:1fr}}
+
+  .tg-root .canvas-card{
+    background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);
+    padding:10px 10px 4px;box-shadow:0 18px 44px -30px rgba(28,25,23,.45);
+    position:sticky;top:16px
+  }
+  @media (max-width:900px){.tg-root .canvas-card{position:static}}
+  .tg-root svg.board{display:block;width:100%;height:auto;border-radius:8px;touch-action:none}
+  .tg-root .caption{
+    font-family:var(--font-mono);font-size:11.5px;color:var(--muted);
+    margin:6px 4px 8px;line-height:1.5
+  }
+
+  .tg-root .panel{display:flex;flex-direction:column;gap:16px}
+  .tg-root .card{
+    background:var(--paper);border:1px solid var(--rule-c);
+    border-radius:var(--radius);padding:18px
+  }
+  .tg-root .card[hidden]{display:none}
+  .tg-root .card h2{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0 0 4px}
+  .tg-root .card .hint{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+
+  /* regra ao vivo — elemento-assinatura */
+  .tg-root .rule-card{border-left:3px solid var(--img)}
+  .tg-root .card-label{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:12px
+  }
+  .tg-root .rule{
+    font-family:var(--font-mono);font-size:clamp(16px,2.4vw,21px);
+    line-height:1.7;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px
+  }
+  .tg-root .rule .op{color:var(--muted)}
+  .tg-root .rule .src{color:var(--obj);font-weight:600}
+  .tg-root .rule .dst{color:var(--img);font-weight:600;background:var(--img-fill);
+    padding:1px 8px;border-radius:6px}
+  .tg-root .rule .par{color:var(--vec);font-weight:600}
+  .tg-root .note{
+    margin:14px 0 0;font-family:var(--font-mono);font-size:12px;color:var(--muted);
+    line-height:1.65;border-top:1px solid var(--rule-c);padding-top:11px
+  }
+
+  /* vetor */
+  .tg-root .vec-fields{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);
+    font-size:19px;color:var(--vec);font-weight:600}
+  .tg-root .vec-fields input{
+    width:76px;font-family:var(--font-mono);font-size:17px;font-weight:600;color:var(--ink);
+    border:1px solid var(--rule-c);border-radius:8px;padding:7px 8px;text-align:center;
+    background:var(--bg)
+  }
+  .tg-root .vec-fields input:focus{outline:2px solid var(--vec);outline-offset:1px;border-color:transparent}
+  .tg-root .vec-sep{color:var(--muted)}
+
+  /* giros */
+  .tg-root .turns{display:flex;gap:7px;margin-bottom:14px}
+  .tg-root .turns span{
+    flex:1;text-align:center;font-family:var(--font-mono);font-size:12px;
+    border:1px solid var(--rule-c);border-radius:8px;padding:8px 4px;color:var(--muted);
+    transition:.18s
+  }
+  .tg-root .turns span.on{
+    background:var(--img-fill);border-color:var(--img);color:var(--img);font-weight:600
+  }
+
+  /* botões */
+  .tg-root .btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tg-root .ghost, .tg-root .primary, .tg-root .reset, .tg-root .chip{
+    appearance:none;font-family:var(--font-body);font-size:13px;font-weight:500;
+    border-radius:999px;padding:8px 15px;cursor:pointer;transition:.16s
+  }
+  .tg-root .ghost, .tg-root .reset, .tg-root .chip{
+    background:transparent;color:var(--muted);border:1px solid var(--rule-c)
+  }
+  .tg-root .ghost:hover, .tg-root .chip:hover{color:var(--ink);border-color:var(--muted)}
+  .tg-root .reset:hover{color:var(--img);border-color:var(--img)}
+  .tg-root .ghost:disabled{opacity:.45;cursor:not-allowed}
+  .tg-root .primary{
+    background:var(--img);border:1px solid var(--img);color:#fff;
+    box-shadow:0 8px 20px -12px var(--img)
+  }
+  .tg-root .primary:hover{filter:brightness(1.06)}
+  .tg-root .chip[aria-pressed="true"]{
+    background:var(--accent);border-color:var(--accent);color:#fff
+  }
+  .tg-root .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+
+  /* tabela */
+  .tg-root table.vtx{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:13px}
+  .tg-root table.vtx th{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;text-align:left;padding:0 6px 8px;border-bottom:1px solid var(--rule-c)
+  }
+  .tg-root table.vtx td{padding:5px 6px;border-bottom:1px solid var(--rule-c);vertical-align:middle}
+  .tg-root table.vtx tbody th{
+    padding:5px 6px;border-bottom:1px solid var(--rule-c);font-size:13px;letter-spacing:0;
+    text-transform:none;color:var(--obj);font-weight:600;width:1%
+  }
+  .tg-root table.vtx td.in{display:flex;align-items:center;gap:3px;padding:5px 6px}
+  .tg-root table.vtx input{
+    width:56px;font-family:var(--font-mono);font-size:13px;color:var(--ink);
+    border:1px solid var(--rule-c);border-radius:6px;padding:4px 5px;text-align:center;background:var(--bg)
+  }
+  .tg-root table.vtx input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  .tg-root table.vtx td.seta{color:var(--muted);text-align:center;width:1%}
+  .tg-root table.vtx td.img{color:var(--img);font-weight:600;white-space:nowrap}
+
+  /* toggles */
+  .tg-root .controls{display:flex;flex-wrap:wrap;gap:8px}
+  .tg-root .toggle{
+    display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    border:1px solid var(--rule-c);border-radius:999px;padding:7px 13px;cursor:pointer;
+    user-select:none;transition:.16s
+  }
+  .tg-root .toggle:hover{color:var(--ink)}
+  .tg-root .toggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+  .tg-root .toggle.on{color:var(--ink);border-color:var(--muted)}
+
+  /* teoria */
+  .tg-root .theory{
+    margin-top:26px;border-top:1px solid var(--rule-c);padding-top:24px;max-width:74ch
+  }
+  .tg-root .theory h2{font-family:var(--font-display);font-weight:600;font-size:24px;margin:0 0 10px}
+  .tg-root .theory p{color:var(--muted);font-size:15px;margin:0 0 12px}
+  .tg-root .theory b{color:var(--ink);font-weight:600}
+  .tg-root .theory code{font-family:var(--font-mono);font-size:.92em;color:var(--img)}
+  .tg-root .theory ul{margin:0 0 12px;padding-left:20px;color:var(--muted);font-size:15px}
+  .tg-root .theory li{margin-bottom:6px}
+
+  /* elementos do SVG */
+  .tg-root .g-line{stroke:var(--grid);stroke-width:1}
+  .tg-root .g-line.strong{stroke:var(--grid-strong)}
+  .tg-root .axis{stroke:var(--axis);stroke-width:1.6}
+  .tg-root .tick{stroke:var(--axis);stroke-width:1.2}
+  .tg-root .ticklbl{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+  .tg-root .axislbl{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--axis)}
+  .tg-root .poly-obj{fill:var(--obj-fill);stroke:var(--obj);stroke-width:2;
+    stroke-linejoin:round;stroke-dasharray:6 5}
+  .tg-root .poly-img{fill:var(--img-fill);stroke:var(--img);stroke-width:2.4;stroke-linejoin:round}
+  .tg-root .trace{stroke:var(--vec);stroke-width:1.4;stroke-dasharray:4 5;fill:none;opacity:.75}
+  .tg-root .vecline{stroke:var(--vec);stroke-width:3;stroke-linecap:round}
+  .tg-root .vechead{fill:var(--vec)}
+  .tg-root .veclbl{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--vec)}
+  .tg-root .pt-obj{fill:var(--obj)}
+  .tg-root .pt-img{fill:var(--img)}
+  .tg-root .lbl-obj{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--obj)}
+  .tg-root .lbl-img{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--img)}
+  .tg-root .coord{font-family:var(--font-mono);font-size:10.5px}
+  .tg-root .handle{cursor:grab;fill:transparent;stroke:transparent;stroke-width:0}
+  .tg-root .handle:hover{fill:rgba(87,83,78,.12)}
+  .tg-root .handle:active{cursor:grabbing}
+  .tg-root .handle.vec:hover{fill:rgba(27,79,79,.14)}
+
+  @media (prefers-reduced-motion:reduce){.tg-root *{transition:none!important}}
+</style>
+
+<script is:inline>
+"use strict";
+(function () {
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const board = document.getElementById("board");
+  const SIZE = 640, CX = 320, CY = 320, PAD = 26;
+
+  const ruleEl    = document.getElementById("rule");
+  const noteEl    = document.getElementById("note");
+  const capEl     = document.getElementById("caption");
+  const turnsEl   = document.getElementById("turns");
+  const tbodyEl   = document.getElementById("vtx-body");
+  const thImgEl   = document.getElementById("th-img");
+  const titleEl   = document.getElementById("theoryTitle");
+  const textEl    = document.getElementById("theoryText");
+  const inA       = document.getElementById("vec-a");
+  const inB       = document.getElementById("vec-b");
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- figuras iniciais ---------- */
+  const PRESETS = {
+    triangulo: [[1,1],[5,1],[2,4]],
+    quadrado:  [[1,1],[4,1],[4,4],[1,4]],
+    ele:       [[1,1],[4,1],[4,2],[2,2],[2,5],[1,5]],
+    seta:      [[1,2],[4,2],[4,1],[6,3],[4,5],[4,4],[1,4]]
+  };
+  const PRESET_PADRAO = "triangulo";
+
+  /* ---------- estado ---------- */
+  let mode = "translacao";
+  let preset = PRESET_PADRAO;
+  let obj = PRESETS[PRESET_PADRAO].map(([x, y]) => ({ x, y }));
+  let vec = { a: 6, b: -3 };
+  let k = 0;                       // quantos giros de 90° já foram aplicados (0..3)
+  let anim = null;                 // {kind:"t"|"r", p, fromDeg, toDeg}
+  const show = { grid: true, coords: true, trace: true };
+
+  /* ---------- números e coordenadas ---------- */
+  const LIM = 30;                                        // limite das coordenadas
+  const clampC = v => Math.max(-LIM, Math.min(LIM, v));
+  const round2 = v => Math.round(v * 100) / 100;
+  const fmt = v => {
+    const n = round2(v) === 0 ? 0 : round2(v);           // evita "-0"
+    return String(n).replace(".", ",").replace("-", "\u2212");   // menos tipográfico
+  };
+  const par = p => "(" + fmt(p.x) + ", " + fmt(p.y) + ")";
+  const rotulo = i => {
+    // A, B, C ... Z, A1, B1, ... (figuras têm poucos vértices, mas não trava)
+    const letra = String.fromCharCode(65 + (i % 26));
+    return i < 26 ? letra : letra + Math.floor(i / 26);
+  };
+
+  /* ---------- transformações ---------- */
+  const transladar = p => ({ x: p.x + vec.a, y: p.y + vec.b });
+  const girar90 = p => ({ x: -p.y, y: p.x });            // a regra (x, y) ⟼ (−y, x)
+  function girarK(p, n) {
+    let q = p;
+    for (let i = 0; i < ((n % 4) + 4) % 4; i++) q = girar90(q);
+    return q;
+  }
+  // rotação por um ângulo qualquer (só para animar o giro)
+  function girarAng(p, th) {
+    const c = Math.cos(th), s = Math.sin(th);
+    return { x: p.x * c - p.y * s, y: p.x * s + p.y * c };
+  }
+
+  const imagem = () => mode === "translacao" ? obj.map(transladar) : obj.map(p => girarK(p, k));
+
+  // pontos desenhados como imagem (durante a animação, a posição intermediária)
+  function imagemDesenho() {
+    if (anim && anim.kind === "t")
+      return obj.map(p => ({ x: p.x + vec.a * anim.p, y: p.y + vec.b * anim.p }));
+    if (anim && anim.kind === "r") {
+      const th = (anim.fromDeg + (anim.toDeg - anim.fromDeg) * anim.p) * Math.PI / 180;
+      return obj.map(p => girarAng(p, th));
+    }
+    return imagem();
+  }
+
+  /* ---------- escala do plano (auto-ajuste) ----------
+     A vista envolve o objeto, a imagem, o vetor e a origem — que fica sempre à
+     mostra, porque é o centro da rotação. Como as coordenadas são inteiras, a
+     caixa só muda em saltos: o desenho não treme durante o arraste. */
+  let U = 32, OX = CX, OY = CY, passo = 1;
+  let xMin = -9, xMax = 9, yMin = -9, yMax = 9;
+  function ajustarVista() {
+    const pts = obj.concat(imagem());
+    if (mode === "translacao") pts.push({ x: vec.a, y: vec.b });
+    pts.push({ x: 0, y: 0 });
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    pts.forEach(p => {
+      x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x);
+      y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y);
+    });
+    const FOLGA = 1.6;
+    x0 -= FOLGA; x1 += FOLGA; y0 -= FOLGA; y1 += FOLGA;
+    const larg = Math.max(5, x1 - x0), alt = Math.max(5, y1 - y0);
+    U = Math.min(46, (SIZE - 2 * PAD) / larg, (SIZE - 2 * PAD) / alt);
+    OX = CX - (x0 + x1) / 2 * U;
+    OY = CY + (y0 + y1) / 2 * U;
+    xMin = Math.ceil((0 - OX) / U); xMax = Math.floor((SIZE - OX) / U);
+    yMin = Math.ceil((OY - SIZE) / U); yMax = Math.floor(OY / U);
+    const vao = Math.max(xMax - xMin, yMax - yMin);
+    passo = vao <= 26 ? 1 : vao <= 55 ? 2 : vao <= 130 ? 5 : 10;
+  }
+  const PX = x => OX + x * U;
+  const PY = y => OY - y * U;
+  const inv = (px, py) => ({ x: (px - OX) / U, y: (OY - py) / U });
+
+  /* ---------- utilidades SVG ---------- */
+  function el(name, attrs, txt) {
+    const e = document.createElementNS(SVGNS, name);
+    for (const key in attrs) e.setAttribute(key, attrs[key]);
+    if (txt !== undefined) e.textContent = txt;
+    board.appendChild(e);
+    return e;
+  }
+  function limpar() { while (board.firstChild) board.removeChild(board.firstChild); }
+  const dPoly = pts => pts.map((p, i) => (i ? "L" : "M") + PX(p.x).toFixed(1) + " " + PY(p.y).toFixed(1)).join(" ") + " Z";
+
+  function seta(p1, p2, cls, clsHead, tam) {
+    const x1 = PX(p1.x), y1 = PY(p1.y), x2 = PX(p2.x), y2 = PY(p2.y);
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    const h = tam || 10;
+    if (Math.hypot(x2 - x1, y2 - y1) < 3) return;
+    const bx = x2 - h * Math.cos(ang), by = y2 - h * Math.sin(ang);
+    el("line", { x1: x1, y1: y1, x2: bx, y2: by, class: cls });
+    el("path", {
+      class: clsHead,
+      d: "M" + x2 + " " + y2 +
+         " L" + (bx - h * .42 * Math.sin(-ang)) + " " + (by - h * .42 * Math.cos(-ang)) +
+         " L" + (bx + h * .42 * Math.sin(-ang)) + " " + (by + h * .42 * Math.cos(-ang)) + " Z"
+    });
+  }
+
+  // arco de |graus| em torno da origem, do ponto p até a sua imagem
+  function arcoOrigem(p, graus) {
+    const r = Math.hypot(p.x, p.y);
+    if (r < .2 || graus === 0) return;
+    const th0 = Math.atan2(p.y, p.x), dth = graus * Math.PI / 180;
+    const N = Math.max(8, Math.round(Math.abs(graus) / 4));
+    let d = "";
+    for (let i = 0; i <= N; i++) {
+      const th = th0 + dth * i / N;
+      d += (i ? " L" : "M") + PX(r * Math.cos(th)).toFixed(1) + " " + PY(r * Math.sin(th)).toFixed(1);
+    }
+    el("path", { d: d, class: "trace" });
+  }
+
+  /* ---------- desenho ---------- */
+  function desenharPlano() {
+    const primeiro = v => Math.ceil(v / passo) * passo;
+    if (show.grid) {
+      for (let i = primeiro(xMin); i <= xMax; i += passo)
+        if (i !== 0) el("line", { x1: PX(i), y1: 0, x2: PX(i), y2: SIZE, class: "g-line" });
+      for (let j = primeiro(yMin); j <= yMax; j += passo)
+        if (j !== 0) el("line", { x1: 0, y1: PY(j), x2: SIZE, y2: PY(j), class: "g-line" });
+    }
+    // eixos
+    el("line", { x1: 0, y1: PY(0), x2: SIZE, y2: PY(0), class: "axis" });
+    el("line", { x1: PX(0), y1: 0, x2: PX(0), y2: SIZE, class: "axis" });
+    el("text", { x: SIZE - 6, y: PY(0) + 18, class: "axislbl", "text-anchor": "end" }, "x");
+    el("text", { x: PX(0) + 8, y: 14, class: "axislbl" }, "y");
+    // marcas e números (rareiam quando o plano fica apertado)
+    const salto = U >= 20 ? passo : passo * 2;
+    for (let i = Math.ceil(xMin / salto) * salto; i <= xMax; i += salto) {
+      if (i === 0) continue;
+      el("line", { x1: PX(i), y1: PY(0) - 3, x2: PX(i), y2: PY(0) + 3, class: "tick" });
+      el("text", { x: PX(i), y: PY(0) + 16, class: "ticklbl", "text-anchor": "middle" }, fmt(i));
+    }
+    for (let j = Math.ceil(yMin / salto) * salto; j <= yMax; j += salto) {
+      if (j === 0) continue;
+      el("line", { x1: PX(0) - 3, y1: PY(j), x2: PX(0) + 3, y2: PY(j), class: "tick" });
+      el("text", { x: PX(0) - 7, y: PY(j) + 4, class: "ticklbl", "text-anchor": "end" }, fmt(j));
+    }
+    el("text", { x: PX(0) - 7, y: PY(0) + 16, class: "ticklbl", "text-anchor": "end" }, "O");
+  }
+
+  function desenharFiguras() {
+    const img = imagemDesenho();
+    const congelado = !!anim;   // durante a animação, sem rótulos de coordenada
+
+    // trajetos: setas (translação) ou arcos (rotação)
+    if (show.trace && !congelado) {
+      if (mode === "translacao") {
+        if (vec.a || vec.b) obj.forEach((p, i) => seta(p, img[i], "trace", "vechead", 9));
+      } else if (k) {
+        obj.forEach(p => arcoOrigem(p, 90 * k));
+      }
+    }
+
+    // objeto e imagem
+    el("path", { d: dPoly(obj), class: "poly-obj" });
+    el("path", { d: dPoly(img), class: "poly-img" });
+
+    // vetor da translação, da origem até (a, b)
+    if (mode === "translacao" && (vec.a || vec.b)) {
+      seta({ x: 0, y: 0 }, { x: vec.a, y: vec.b }, "vecline", "vechead", 13);
+      el("text", {
+        x: PX(vec.a / 2) + 12, y: PY(vec.b / 2) - 8, class: "veclbl"
+      }, "v = (" + fmt(vec.a) + ", " + fmt(vec.b) + ")");
+    }
+
+    // vértices da imagem
+    img.forEach((p, i) => {
+      el("circle", { cx: PX(p.x), cy: PY(p.y), r: 4.5, class: "pt-img" });
+      if (!congelado) {
+        el("text", { x: PX(p.x) + 9, y: PY(p.y) - 8, class: "lbl-img" }, rotulo(i) + "′");
+        if (show.coords)
+          el("text", { x: PX(p.x) + 9, y: PY(p.y) + 6, class: "lbl-img coord" }, par(p));
+      }
+    });
+
+    // vértices do objeto (por cima, com as alças de arraste)
+    obj.forEach((p, i) => {
+      el("circle", { cx: PX(p.x), cy: PY(p.y), r: 4.5, class: "pt-obj" });
+      el("text", { x: PX(p.x) + 9, y: PY(p.y) - 8, class: "lbl-obj" }, rotulo(i));
+      if (show.coords)
+        el("text", { x: PX(p.x) + 9, y: PY(p.y) + 6, class: "lbl-obj coord" }, par(p));
+      const h = el("circle", { cx: PX(p.x), cy: PY(p.y), r: 15, class: "handle" });
+      h.addEventListener("pointerdown", ev => iniciarArraste(ev, h, { tipo: "vertice", i: i }));
+    });
+
+    // alça da ponta do vetor
+    if (mode === "translacao") {
+      const h = el("circle", { cx: PX(vec.a), cy: PY(vec.b), r: 15, class: "handle vec" });
+      h.addEventListener("pointerdown", ev => iniciarArraste(ev, h, { tipo: "vetor" }));
+    }
+  }
+
+  /* ---------- arraste ---------- */
+  let arrastando = null;
+  function pontoSVG(ev) {
+    const r = board.getBoundingClientRect();
+    return inv((ev.clientX - r.left) / r.width * SIZE, (ev.clientY - r.top) / r.height * SIZE);
+  }
+  function iniciarArraste(ev, alvo, info) {
+    ev.preventDefault();
+    arrastando = info;
+    alvo.setPointerCapture(ev.pointerId);
+  }
+  window.addEventListener("pointermove", ev => {
+    if (!arrastando) return;
+    const p = pontoSVG(ev);
+    const x = clampC(Math.round(p.x)), y = clampC(Math.round(p.y));   // encaixa na grade
+    if (arrastando.tipo === "vertice") {
+      const v = obj[arrastando.i];
+      if (v.x === x && v.y === y) return;
+      v.x = x; v.y = y;
+    } else {
+      if (vec.a === x && vec.b === y) return;
+      vec.a = x; vec.b = y;
+      inA.value = x; inB.value = y;
+    }
+    render();
+  });
+  window.addEventListener("pointerup", () => { arrastando = null; });
+  window.addEventListener("pointercancel", () => { arrastando = null; });
+
+  /* ---------- painéis de texto ---------- */
+  function tok(t, c) { return '<span class="' + (c || "op") + '">' + t + "</span>"; }
+  const sinal = v => (v < 0 ? " − " : " + ") + fmt(Math.abs(v));
+
+  const REGRA_GIRO = ["(x, y)", "(−y, x)", "(−x, −y)", "(y, −x)"];
+  const NOME_GIRO  = ["0°", "90° no sentido anti-horário", "180° (meia-volta)", "270° no sentido anti-horário"];
+
+  function atualizarRegra() {
+    if (mode === "translacao") {
+      ruleEl.innerHTML =
+        tok("(x, y)", "src") + tok("⟼") +
+        tok("(x" + sinal(vec.a) + ", y" + sinal(vec.b) + ")", "dst");
+      const c = Math.hypot(vec.a, vec.b);
+      noteEl.innerHTML = (vec.a || vec.b)
+        ? "Cada seta é uma cópia do vetor: mesmo comprimento e mesma direção.<br>|v| = √(" +
+          fmt(Math.abs(vec.a)) + "² + " + fmt(Math.abs(vec.b)) + "²) = " + fmt(c) + " unidades."
+        : "Com o vetor nulo nada se move — a imagem coincide com o objeto.";
+    } else {
+      ruleEl.innerHTML =
+        tok("(x, y)", "src") + tok("⟼") + tok("(−y, x)", "dst") +
+        (k > 1 ? tok("aplicada " + k + "×", "par") : "");
+      if (k === 0) {
+        noteEl.innerHTML = "Nenhum giro aplicado ainda — clique em <b>Girar 90°</b>.";
+      } else {
+        const p = obj[0], q = girarK(p, k);
+        noteEl.innerHTML =
+          "Giro acumulado: " + NOME_GIRO[k] + " — " + tok("(x, y)", "src") + " ⟼ " +
+          tok(REGRA_GIRO[k], "dst") + ".<br>" +
+          "A distância à origem não muda: O" + rotulo(0) + " = O" + rotulo(0) + "′ = " +
+          fmt(Math.hypot(q.x, q.y)) + ".";
+      }
+    }
+  }
+
+  function atualizarGiros() {
+    turnsEl.innerHTML = "";
+    for (let i = 0; i <= 3; i++) {
+      const s = document.createElement("span");
+      s.textContent = (i * 90) + "°";
+      if (i === k) s.className = "on";
+      turnsEl.appendChild(s);
+    }
+  }
+
+  const TEORIA = {
+    translacao: ["Translação por um vetor", `
+      <p>Transladar é <b>arrastar a figura inteira</b> segundo um vetor
+      <code>v = (a, b)</code>: cada ponto anda <b>a</b> unidades na horizontal e <b>b</b> na
+      vertical. Em coordenadas, <code>(x, y) ⟼ (x + a, y + b)</code>.</p>
+      <ul>
+        <li>Os segmentos que ligam cada ponto à sua imagem são <b>paralelos entre si</b> e têm
+        todos o mesmo comprimento — são cópias do vetor. Experimente conferir isso nas setas.</li>
+        <li>Comprimentos, ângulos, área e <b>orientação</b> se mantêm: a figura não gira nem
+        espelha. Por isso a translação é uma <b>isometria</b>.</li>
+        <li>Transladar por <code>v</code> e depois por <code>−v</code> devolve a figura ao lugar:
+        uma desfaz a outra.</li>
+      </ul>`],
+    rotacao: ["Rotação de 90° em torno da origem", `
+      <p>Girar 90° no sentido anti-horário em torno da origem leva cada ponto
+      <code>(x, y)</code> em <code>(−y, x)</code>: as coordenadas <b>trocam de lugar</b> e a
+      primeira <b>troca de sinal</b>.</p>
+      <ul>
+        <li>Cada ponto percorre um arco de 90° sobre a circunferência de centro na origem que
+        passa por ele — a <b>distância à origem não muda</b>, e é por isso que a figura não
+        deforma.</li>
+        <li>Um ponto do 1º quadrante vai para o 2º, o do 2º vai para o 3º, e assim por diante:
+        a cada giro a figura avança um quadrante.</li>
+        <li>Aplicando a regra <b>quatro vezes</b> a figura volta ao lugar
+        (4 × 90° = 360°): <code>(x, y) ⟼ (−y, x) ⟼ (−x, −y) ⟼ (y, −x) ⟼ (x, y)</code>.</li>
+        <li>Três giros anti-horários equivalem a um giro de 90° no sentido horário.</li>
+      </ul>`]
+  };
+
+  /* ---------- tabela ---------- */
+  function montarTabela() {
+    tbodyEl.innerHTML = "";
+    obj.forEach((p, i) => {
+      const tr = document.createElement("tr");
+
+      const th = document.createElement("th");
+      th.scope = "row"; th.textContent = rotulo(i);
+      tr.appendChild(th);
+
+      const td = document.createElement("td");
+      td.className = "in";
+      ["x", "y"].forEach((c, j) => {
+        if (j) { const v = document.createElement("span"); v.textContent = ","; td.appendChild(v); }
+        const inp = document.createElement("input");
+        inp.type = "number"; inp.step = "1"; inp.value = p[c];
+        inp.setAttribute("aria-label", "Coordenada " + c + " do vértice " + rotulo(i));
+        inp.addEventListener("input", () => {
+          const v = parseFloat(inp.value);
+          if (Number.isNaN(v)) return;
+          obj[i][c] = clampC(v);
+          render();
+        });
+        td.appendChild(inp);
+      });
+      tr.appendChild(td);
+
+      const ts = document.createElement("td");
+      ts.className = "seta"; ts.textContent = "⟼";
+      tr.appendChild(ts);
+
+      const ti = document.createElement("td");
+      ti.className = "img";
+      tr.appendChild(ti);
+
+      tbodyEl.appendChild(tr);
+    });
+    sincronizarTabela();
+  }
+
+  function sincronizarTabela() {
+    const img = imagem();
+    const linhas = tbodyEl.querySelectorAll("tr");
+    linhas.forEach((tr, i) => {
+      const ins = tr.querySelectorAll("input");
+      ["x", "y"].forEach((c, j) => {
+        if (ins[j] !== document.activeElement) ins[j].value = round2(obj[i][c]);
+      });
+      tr.querySelector("td.img").textContent = par(img[i]);
+    });
+    thImgEl.textContent = mode === "translacao"
+      ? "Imagem (x + a, y + b)"
+      : "Imagem " + REGRA_GIRO[k];
+    document.getElementById("btn-del").disabled = obj.length <= 3;
+    document.getElementById("btn-add").disabled = obj.length >= 12;
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    ajustarVista();
+    limpar();
+    desenharPlano();
+    desenharFiguras();
+    atualizarRegra();
+    if (mode === "rotacao") atualizarGiros();
+    sincronizarTabela();
+  }
+
+  function trocarModo(novo) {
+    mode = novo;
+    document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === novo)));
+    document.getElementById("ctrl-translacao").hidden = novo !== "translacao";
+    document.getElementById("ctrl-rotacao").hidden = novo !== "rotacao";
+    titleEl.textContent = TEORIA[novo][0];
+    textEl.innerHTML = TEORIA[novo][1];
+    capEl.textContent = novo === "translacao"
+      ? "Arraste os vértices do objeto (tracejado) ou a ponta do vetor. A imagem é a figura cheia."
+      : "Arraste os vértices do objeto (tracejado). Cada giro leva a imagem um quadrante adiante.";
+    anim = null;
+    render();
+  }
+
+  /* ---------- animações ---------- */
+  const suave = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  function encerrar(estado) {
+    if (anim !== estado) return;
+    anim = null;
+    if (estado.aoFim) estado.aoFim();
+    render();
+  }
+  function animar(estado, dur, aoFim) {
+    if (reduceMotion || document.hidden) { anim = null; if (aoFim) aoFim(); render(); return; }
+    estado.p = 0; estado.aoFim = aoFim; anim = estado;
+    const t0 = performance.now();
+    (function quadro(now) {
+      if (anim !== estado) return;                       // já encerrada
+      const t = Math.min(1, (now - t0) / dur);
+      estado.p = suave(t);
+      render();
+      if (t < 1) requestAnimationFrame(quadro); else encerrar(estado);
+    })(t0);
+  }
+  // em aba escondida o requestAnimationFrame pausa: encerra na hora para não travar os botões
+  document.addEventListener("visibilitychange", () => { if (document.hidden && anim) encerrar(anim); });
+
+  /* ---------- ligações ---------- */
+  document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => trocarModo(b.dataset.mode)));
+
+  function lerVetor() {
+    const a = parseFloat(inA.value), b = parseFloat(inB.value);
+    if (!Number.isNaN(a)) vec.a = clampC(a);
+    if (!Number.isNaN(b)) vec.b = clampC(b);
+    render();
+  }
+  inA.addEventListener("input", lerVetor);
+  inB.addEventListener("input", lerVetor);
+
+  document.getElementById("btn-inv-t").addEventListener("click", () => {
+    vec.a = -vec.a; vec.b = -vec.b;
+    inA.value = vec.a; inB.value = vec.b;
+    render();
+  });
+  document.getElementById("btn-anim-t").addEventListener("click", () => {
+    if (!vec.a && !vec.b) return;
+    animar({ kind: "t" }, 900);
+  });
+
+  document.getElementById("btn-rot").addEventListener("click", () => {
+    if (anim) return;
+    const de = k * 90;
+    animar({ kind: "r", fromDeg: de, toDeg: de + 90 }, 620, () => { k = (k + 1) % 4; });
+  });
+  document.getElementById("btn-unrot").addEventListener("click", () => {
+    if (anim) return;
+    const de = k * 90;
+    animar({ kind: "r", fromDeg: de, toDeg: de - 90 }, 620, () => { k = (k + 3) % 4; });
+  });
+
+  document.getElementById("btn-add").addEventListener("click", () => {
+    // insere um vértice no meio da aresta mais longa
+    let melhor = 0, maior = -1;
+    for (let i = 0; i < obj.length; i++) {
+      const a = obj[i], b = obj[(i + 1) % obj.length];
+      const d = Math.hypot(b.x - a.x, b.y - a.y);
+      if (d > maior) { maior = d; melhor = i; }
+    }
+    const a = obj[melhor], b = obj[(melhor + 1) % obj.length];
+    obj.splice(melhor + 1, 0, { x: round2((a.x + b.x) / 2), y: round2((a.y + b.y) / 2) });
+    montarTabela(); render();
+  });
+  document.getElementById("btn-del").addEventListener("click", () => {
+    if (obj.length <= 3) return;
+    obj.pop(); montarTabela(); render();
+  });
+  document.getElementById("btn-fix").addEventListener("click", () => {
+    obj = imagem();
+    if (mode === "rotacao") k = 0;
+    anim = null;
+    montarTabela(); render();
+  });
+
+  document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+    preset = c.dataset.preset;
+    carregarPreset();
+  }));
+  function carregarPreset() {
+    obj = PRESETS[preset].map(([x, y]) => ({ x: x, y: y }));
+    document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.preset === preset)));
+    k = 0; anim = null;
+    montarTabela(); render();
+  }
+
+  function ligarToggle(id, chave) {
+    const cb = document.getElementById(id);
+    cb.addEventListener("change", () => {
+      show[chave] = cb.checked;
+      cb.closest(".toggle").classList.toggle("on", cb.checked);
+      render();
+    });
+  }
+  ligarToggle("tGrid", "grid");
+  ligarToggle("tCoords", "coords");
+  ligarToggle("tTrace", "trace");
+
+  document.getElementById("reset").addEventListener("click", () => {
+    preset = PRESET_PADRAO;
+    vec = { a: 6, b: -3 };
+    inA.value = vec.a; inB.value = vec.b;
+    carregarPreset();
+  });
+
+  /* ---------- início ---------- */
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.preset === preset)));
+  montarTabela();
+  trocarModo("translacao");
+})();
+</script>
