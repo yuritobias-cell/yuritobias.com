@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 
 <Layout
   title="Transformações Geométricas"
-  description="Simulador de transformações no plano cartesiano: translade uma figura por um vetor dado e gire 90° em torno da origem pela regra (x, y) ⟼ (−y, x). Arraste os vértices e acompanhe as coordenadas da imagem."
+  description="Simulador de transformações no plano cartesiano: translação por um vetor, rotação de 90° em torno da origem pela regra (x, y) ⟼ (−y, x), simetria axial (reflexão num eixo) e simetria central. Arraste os vértices e acompanhe as coordenadas da imagem."
 >
 
   <!-- IBM Plex Mono carregado só nesta página (coordenadas, regra e tabela usam mono).
@@ -18,15 +18,18 @@ import Layout from '../../layouts/Layout.astro';
     <header class="masthead">
       <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Geometria analítica</p>
       <h1>Transformações <em>geométricas</em></h1>
-      <p class="lede">Arraste os vértices da figura e veja para onde cada ponto vai. Na
-      <em>translação</em>, todo ponto anda o mesmo vetor; na <em>rotação</em>, cada ponto percorre
-      um arco de 90° em torno da origem — e as coordenadas se trocam pela regra
-      <span class="rule-inline">(x, y) ⟼ (−y, x)</span>.</p>
+      <p class="lede">Arraste os vértices da figura e veja para onde cada ponto vai: transladar
+      por um <em>vetor</em>, girar 90° em torno da <em>origem</em>, refletir num <em>eixo</em>
+      (simetria axial) ou num <em>ponto</em> (simetria central). Cada transformação vira uma regra
+      que age nas coordenadas — como <span class="rule-inline">(x, y) ⟼ (−y, x)</span> no giro de
+      90°. As quatro são <em>isometrias</em>: não mudam tamanho nem forma.</p>
     </header>
 
     <div class="tabs" role="tablist" id="tabs">
       <button class="tab" role="tab" data-mode="translacao"><span class="n">01</span>Translação</button>
       <button class="tab" role="tab" data-mode="rotacao"><span class="n">02</span>Rotação de 90°</button>
+      <button class="tab" role="tab" data-mode="axial"><span class="n">03</span>Simetria axial</button>
+      <button class="tab" role="tab" data-mode="central"><span class="n">04</span>Simetria central</button>
     </div>
 
     <div class="stage">
@@ -72,6 +75,47 @@ import Layout from '../../layouts/Layout.astro';
           <div class="btn-row">
             <button class="primary" id="btn-rot" type="button">Girar 90°</button>
             <button class="ghost" id="btn-unrot" type="button">Voltar 90°</button>
+          </div>
+        </div>
+
+        <!-- ---------- controles da simetria axial ---------- -->
+        <div class="card" id="ctrl-axial" hidden>
+          <h2>Eixo de reflexão</h2>
+          <p class="hint">Escolha a reta que faz o papel de espelho — ou arraste a alça dela no plano.</p>
+          <div class="presets" id="eixos">
+            <button class="chip" data-eixo="ox" type="button">eixo x</button>
+            <button class="chip" data-eixo="oy" type="button">eixo y</button>
+            <button class="chip" data-eixo="yx" type="button">y = x</button>
+            <button class="chip" data-eixo="ymx" type="button">y = −x</button>
+            <button class="chip" data-eixo="xk" type="button">x = k</button>
+            <button class="chip" data-eixo="yk" type="button">y = k</button>
+          </div>
+          <div class="vec-fields" id="campo-k" hidden>
+            <span class="vec-open">k =</span>
+            <label class="sr-only" for="in-k">Valor de k na equação do eixo</label>
+            <input type="number" id="in-k" step="1" inputmode="numeric" value="3" />
+          </div>
+          <div class="btn-row">
+            <button class="ghost" id="btn-anim-r" type="button">Animar a reflexão</button>
+          </div>
+        </div>
+
+        <!-- ---------- controles da simetria central ---------- -->
+        <div class="card" id="ctrl-central" hidden>
+          <h2>Centro de simetria</h2>
+          <p class="hint">O ponto C é o espelho — arraste-o no plano ou digite as coordenadas.</p>
+          <div class="vec-fields">
+            <span class="vec-open">C = (</span>
+            <label class="sr-only" for="c-a">Abscissa do centro de simetria</label>
+            <input type="number" id="c-a" step="1" inputmode="numeric" value="0" />
+            <span class="vec-sep">,</span>
+            <label class="sr-only" for="c-b">Ordenada do centro de simetria</label>
+            <input type="number" id="c-b" step="1" inputmode="numeric" value="0" />
+            <span class="vec-open">)</span>
+          </div>
+          <div class="btn-row">
+            <button class="ghost" id="btn-anim-c" type="button">Animar (giro de 180°)</button>
+            <button class="ghost" id="btn-c-origem" type="button">Levar C à origem</button>
           </div>
         </div>
 
@@ -238,7 +282,8 @@ import Layout from '../../layouts/Layout.astro';
   .tg-root .rule .src{color:var(--obj);font-weight:600}
   .tg-root .rule .dst{color:var(--img);font-weight:600;background:var(--img-fill);
     padding:1px 8px;border-radius:6px}
-  .tg-root .rule .par{color:var(--vec);font-weight:600}
+  .tg-root .rule .par{color:var(--vec);font-weight:500;font-size:13px;
+    background:rgba(27,79,79,.08);padding:2px 8px;border-radius:6px}
   .tg-root .note{
     margin:14px 0 0;font-family:var(--font-mono);font-size:12px;color:var(--muted);
     line-height:1.65;border-top:1px solid var(--rule-c);padding-top:11px
@@ -254,6 +299,7 @@ import Layout from '../../layouts/Layout.astro';
   }
   .tg-root .vec-fields input:focus{outline:2px solid var(--vec);outline-offset:1px;border-color:transparent}
   .tg-root .vec-sep{color:var(--muted)}
+  .tg-root .vec-fields[hidden]{display:none}
 
   /* giros */
   .tg-root .turns{display:flex;gap:7px;margin-bottom:14px}
@@ -344,6 +390,9 @@ import Layout from '../../layouts/Layout.astro';
   .tg-root .vecline{stroke:var(--vec);stroke-width:3;stroke-linecap:round}
   .tg-root .vechead{fill:var(--vec)}
   .tg-root .veclbl{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--vec)}
+  .tg-root .eixo{stroke:var(--vec);stroke-width:2;stroke-dasharray:11 7;stroke-linecap:round}
+  .tg-root .eixolbl{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--vec)}
+  .tg-root .pt-ref{fill:var(--vec)}
   .tg-root .pt-obj{fill:var(--obj)}
   .tg-root .pt-img{fill:var(--img)}
   .tg-root .lbl-obj{font-family:var(--font-mono);font-size:13px;font-weight:600;fill:var(--obj)}
@@ -374,6 +423,9 @@ import Layout from '../../layouts/Layout.astro';
   const textEl    = document.getElementById("theoryText");
   const inA       = document.getElementById("vec-a");
   const inB       = document.getElementById("vec-b");
+  const inK       = document.getElementById("in-k");
+  const inCa      = document.getElementById("c-a");
+  const inCb      = document.getElementById("c-b");
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -392,6 +444,9 @@ import Layout from '../../layouts/Layout.astro';
   let obj = PRESETS[PRESET_PADRAO].map(([x, y]) => ({ x, y }));
   let vec = { a: 6, b: -3 };
   let k = 0;                       // quantos giros de 90° já foram aplicados (0..3)
+  let eixo = "ox";                 // eixo de reflexão da simetria axial
+  let kEixo = 3;                   // o k de "x = k" / "y = k"
+  let centro = { x: 0, y: 0 };     // centro da simetria central
   let anim = null;                 // {kind:"t"|"r", p, fromDeg, toDeg}
   const show = { grid: true, coords: true, trace: true };
 
@@ -424,17 +479,72 @@ import Layout from '../../layouts/Layout.astro';
     return { x: p.x * c - p.y * s, y: p.x * s + p.y * c };
   }
 
-  const imagem = () => mode === "translacao" ? obj.map(transladar) : obj.map(p => girarK(p, k));
+  // giro em torno de um centro qualquer (usado na animação da simetria central)
+  function girarAngC(p, th, C) {
+    const q = girarAng({ x: p.x - C.x, y: p.y - C.y }, th);
+    return { x: q.x + C.x, y: q.y + C.y };
+  }
+
+  /* Eixos de reflexão. Cada um traz a regra exata em coordenadas (nada de
+     arredondamento vindo de seno e cosseno), um ponto Q por onde a reta passa
+     e a direção u — esses dois só para desenhar a reta e animar o tombo. */
+  const R2 = Math.SQRT1_2;
+  const EIXOS = {
+    ox:  { nome: "eixo x", regra: "(x, −y)",     f: p => ({ x: p.x, y: -p.y }),
+           Q: () => ({ x: 0, y: 0 }),     u: { x: 1, y: 0 } },
+    oy:  { nome: "eixo y", regra: "(−x, y)",     f: p => ({ x: -p.x, y: p.y }),
+           Q: () => ({ x: 0, y: 0 }),     u: { x: 0, y: 1 } },
+    yx:  { nome: "y = x",  regra: "(y, x)",      f: p => ({ x: p.y, y: p.x }),
+           Q: () => ({ x: 0, y: 0 }),     u: { x: R2, y: R2 } },
+    ymx: { nome: "y = −x", regra: "(−y, −x)",    f: p => ({ x: -p.y, y: -p.x }),
+           Q: () => ({ x: 0, y: 0 }),     u: { x: R2, y: -R2 } },
+    xk:  { nome: "x = k",  regra: "(2k − x, y)", f: p => ({ x: 2 * kEixo - p.x, y: p.y }),
+           Q: () => ({ x: kEixo, y: 0 }), u: { x: 0, y: 1 } },
+    yk:  { nome: "y = k",  regra: "(x, 2k − y)", f: p => ({ x: p.x, y: 2 * kEixo - p.y }),
+           Q: () => ({ x: 0, y: kEixo }), u: { x: 1, y: 0 } }
+  };
+  const eixoAtual = () => EIXOS[eixo];
+  const normalDe = e => ({ x: -e.u.y, y: e.u.x });        // normal unitária à reta
+  const nomeEixo = () => eixo === "xk" ? "x = " + fmt(kEixo)
+                       : eixo === "yk" ? "y = " + fmt(kEixo)
+                       : eixoAtual().nome;
+  // "no eixo x" / "na reta y = x" — para as frases da regra e das notas
+  const ondeEixo = () => (eixo === "ox" || eixo === "oy" ? "no " : "na reta ") + nomeEixo();
+  const refletir = p => eixoAtual().f(p);
+  // distância (com sinal) de um ponto ao eixo, medida na direção da normal
+  function alturaNoEixo(p) {
+    const e = eixoAtual(), n = normalDe(e), Q = e.Q();
+    return (p.x - Q.x) * n.x + (p.y - Q.y) * n.y;
+  }
+  // simetria central: C é o ponto médio de PP′
+  const simCentral = p => ({ x: 2 * centro.x - p.x, y: 2 * centro.y - p.y });
+
+  function imagem() {
+    if (mode === "translacao") return obj.map(transladar);
+    if (mode === "rotacao")    return obj.map(p => girarK(p, k));
+    if (mode === "axial")      return obj.map(refletir);
+    return obj.map(simCentral);
+  }
 
   // pontos desenhados como imagem (durante a animação, a posição intermediária)
   function imagemDesenho() {
-    if (anim && anim.kind === "t")
+    if (!anim) return imagem();
+    if (anim.kind === "t")
       return obj.map(p => ({ x: p.x + vec.a * anim.p, y: p.y + vec.b * anim.p }));
-    if (anim && anim.kind === "r") {
+    if (anim.kind === "r") {
       const th = (anim.fromDeg + (anim.toDeg - anim.fromDeg) * anim.p) * Math.PI / 180;
       return obj.map(p => girarAng(p, th));
     }
-    return imagem();
+    if (anim.kind === "x") {
+      // a figura tomba sobre o eixo e levanta do outro lado, como num espelho
+      const n = normalDe(eixoAtual()), c = Math.cos(Math.PI * anim.p);
+      return obj.map(p => {
+        const d = alturaNoEixo(p) * (c - 1);
+        return { x: p.x + d * n.x, y: p.y + d * n.y };
+      });
+    }
+    // simetria central: meia-volta em torno de C
+    return obj.map(p => girarAngC(p, Math.PI * anim.p, centro));
   }
 
   /* ---------- escala do plano (auto-ajuste) ----------
@@ -443,9 +553,12 @@ import Layout from '../../layouts/Layout.astro';
      caixa só muda em saltos: o desenho não treme durante o arraste. */
   let U = 32, OX = CX, OY = CY, passo = 1;
   let xMin = -9, xMax = 9, yMin = -9, yMax = 9;
+  let wx0 = -10, wx1 = 10, wy0 = -10, wy1 = 10;          // caixa visível em coordenadas
   function ajustarVista() {
     const pts = obj.concat(imagem());
     if (mode === "translacao") pts.push({ x: vec.a, y: vec.b });
+    if (mode === "axial") pts.push(eixoAtual().Q());
+    if (mode === "central") pts.push(centro);
     pts.push({ x: 0, y: 0 });
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     pts.forEach(p => {
@@ -458,6 +571,8 @@ import Layout from '../../layouts/Layout.astro';
     U = Math.min(46, (SIZE - 2 * PAD) / larg, (SIZE - 2 * PAD) / alt);
     OX = CX - (x0 + x1) / 2 * U;
     OY = CY + (y0 + y1) / 2 * U;
+    wx0 = (0 - OX) / U; wx1 = (SIZE - OX) / U;
+    wy0 = (OY - SIZE) / U; wy1 = OY / U;
     xMin = Math.ceil((0 - OX) / U); xMax = Math.floor((SIZE - OX) / U);
     yMin = Math.ceil((OY - SIZE) / U); yMax = Math.floor(OY / U);
     const vao = Math.max(xMax - xMin, yMax - yMin);
@@ -491,6 +606,21 @@ import Layout from '../../layouts/Layout.astro';
          " L" + (bx - h * .42 * Math.sin(-ang)) + " " + (by - h * .42 * Math.cos(-ang)) +
          " L" + (bx + h * .42 * Math.sin(-ang)) + " " + (by + h * .42 * Math.cos(-ang)) + " Z"
     });
+  }
+
+  // parte da reta Q + t·u que cabe na área visível (null se ela não aparece)
+  function recortarReta(Q, u) {
+    let t0 = -Infinity, t1 = Infinity;
+    const faixas = [[u.x, wx0 - Q.x, wx1 - Q.x], [u.y, wy0 - Q.y, wy1 - Q.y]];
+    for (let i = 0; i < 2; i++) {
+      const d = faixas[i][0];
+      if (Math.abs(d) < 1e-9) { if (faixas[i][1] > 0 || faixas[i][2] < 0) return null; continue; }
+      let ta = faixas[i][1] / d, tb = faixas[i][2] / d;
+      if (ta > tb) { const tmp = ta; ta = tb; tb = tmp; }
+      t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
+    }
+    if (t0 > t1) return null;
+    return [{ x: Q.x + t0 * u.x, y: Q.y + t0 * u.y }, { x: Q.x + t1 * u.x, y: Q.y + t1 * u.y }];
   }
 
   // arco de |graus| em torno da origem, do ponto p até a sua imagem
@@ -536,16 +666,40 @@ import Layout from '../../layouts/Layout.astro';
     el("text", { x: PX(0) - 7, y: PY(0) + 16, class: "ticklbl", "text-anchor": "end" }, "O");
   }
 
+  function desenharEixo() {
+    const e = eixoAtual(), seg = recortarReta(e.Q(), e.u);
+    if (!seg) return;
+    el("line", { x1: PX(seg[0].x), y1: PY(seg[0].y), x2: PX(seg[1].x), y2: PY(seg[1].y), class: "eixo" });
+    // rótulo perto de uma das pontas, afastado da reta na direção da normal
+    const t = .9, n = normalDe(e);
+    const r = { x: seg[0].x + (seg[1].x - seg[0].x) * t, y: seg[0].y + (seg[1].y - seg[0].y) * t };
+    el("text", {
+      x: PX(r.x) + n.x * 18, y: PY(r.y) - n.y * 18 + 4,
+      class: "eixolbl", "text-anchor": "middle"
+    }, nomeEixo());
+  }
+
   function desenharFiguras() {
     const img = imagemDesenho();
     const congelado = !!anim;   // durante a animação, sem rótulos de coordenada
 
-    // trajetos: setas (translação) ou arcos (rotação)
+    // o espelho fica por baixo da figura
+    if (mode === "axial") desenharEixo();
+
+    // trajetos: setas (translação), arcos (rotação) ou os segmentos PP′ (reflexões)
     if (show.trace && !congelado) {
       if (mode === "translacao") {
         if (vec.a || vec.b) obj.forEach((p, i) => seta(p, img[i], "trace", "vechead", 9));
-      } else if (k) {
-        obj.forEach(p => arcoOrigem(p, 90 * k));
+      } else if (mode === "rotacao") {
+        if (k) obj.forEach(p => arcoOrigem(p, 90 * k));
+      } else {
+        obj.forEach((p, i) => {
+          const q = img[i];
+          if (Math.abs(p.x - q.x) < 1e-9 && Math.abs(p.y - q.y) < 1e-9) return;   // ponto fixo
+          el("line", { x1: PX(p.x), y1: PY(p.y), x2: PX(q.x), y2: PY(q.y), class: "trace" });
+          if (mode === "axial")   // o eixo corta PP′ ao meio: marca o ponto médio
+            el("circle", { cx: PX((p.x + q.x) / 2), cy: PY((p.y + q.y) / 2), r: 2.6, class: "pt-ref" });
+        });
       }
     }
 
@@ -586,6 +740,24 @@ import Layout from '../../layouts/Layout.astro';
       const h = el("circle", { cx: PX(vec.a), cy: PY(vec.b), r: 15, class: "handle vec" });
       h.addEventListener("pointerdown", ev => iniciarArraste(ev, h, { tipo: "vetor" }));
     }
+
+    // alça da reta x = k / y = k
+    if (mode === "axial" && (eixo === "xk" || eixo === "yk")) {
+      const Q = eixoAtual().Q();
+      el("circle", { cx: PX(Q.x), cy: PY(Q.y), r: 5, class: "pt-ref" });
+      const h = el("circle", { cx: PX(Q.x), cy: PY(Q.y), r: 15, class: "handle vec" });
+      h.addEventListener("pointerdown", ev => iniciarArraste(ev, h, { tipo: "eixo" }));
+    }
+
+    // centro da simetria central
+    if (mode === "central") {
+      el("circle", { cx: PX(centro.x), cy: PY(centro.y), r: 5, class: "pt-ref" });
+      el("text", { x: PX(centro.x) + 10, y: PY(centro.y) - 9, class: "eixolbl" }, "C");
+      if (show.coords)
+        el("text", { x: PX(centro.x) + 10, y: PY(centro.y) + 6, class: "eixolbl coord" }, par(centro));
+      const h = el("circle", { cx: PX(centro.x), cy: PY(centro.y), r: 15, class: "handle vec" });
+      h.addEventListener("pointerdown", ev => iniciarArraste(ev, h, { tipo: "centro" }));
+    }
   }
 
   /* ---------- arraste ---------- */
@@ -607,6 +779,14 @@ import Layout from '../../layouts/Layout.astro';
       const v = obj[arrastando.i];
       if (v.x === x && v.y === y) return;
       v.x = x; v.y = y;
+    } else if (arrastando.tipo === "eixo") {
+      const novo = eixo === "xk" ? x : y;
+      if (kEixo === novo) return;
+      kEixo = novo; inK.value = novo;
+    } else if (arrastando.tipo === "centro") {
+      if (centro.x === x && centro.y === y) return;
+      centro.x = x; centro.y = y;
+      inCa.value = x; inCb.value = y;
     } else {
       if (vec.a === x && vec.b === y) return;
       vec.a = x; vec.b = y;
@@ -624,6 +804,13 @@ import Layout from '../../layouts/Layout.astro';
   const REGRA_GIRO = ["(x, y)", "(−y, x)", "(−x, −y)", "(y, −x)"];
   const NOME_GIRO  = ["0°", "90° no sentido anti-horário", "180° (meia-volta)", "270° no sentido anti-horário"];
 
+  // índice do vértice que está mais longe do espelho — a nota fica com um número útil
+  function maisLonge(medida) {
+    let melhor = 0, maior = -1;
+    obj.forEach((p, i) => { const d = medida(p); if (d > maior) { maior = d; melhor = i; } });
+    return melhor;
+  }
+
   function atualizarRegra() {
     if (mode === "translacao") {
       ruleEl.innerHTML =
@@ -634,7 +821,7 @@ import Layout from '../../layouts/Layout.astro';
         ? "Cada seta é uma cópia do vetor: mesmo comprimento e mesma direção.<br>|v| = √(" +
           fmt(Math.abs(vec.a)) + "² + " + fmt(Math.abs(vec.b)) + "²) = " + fmt(c) + " unidades."
         : "Com o vetor nulo nada se move — a imagem coincide com o objeto.";
-    } else {
+    } else if (mode === "rotacao") {
       ruleEl.innerHTML =
         tok("(x, y)", "src") + tok("⟼") + tok("(−y, x)", "dst") +
         (k > 1 ? tok("aplicada " + k + "×", "par") : "");
@@ -648,6 +835,34 @@ import Layout from '../../layouts/Layout.astro';
           "A distância à origem não muda: O" + rotulo(0) + " = O" + rotulo(0) + "′ = " +
           fmt(Math.hypot(q.x, q.y)) + ".";
       }
+    } else if (mode === "axial") {
+      const e = eixoAtual();
+      const dst = eixo === "xk" ? "(" + fmt(2 * kEixo) + " − x, y)"
+                : eixo === "yk" ? "(x, " + fmt(2 * kEixo) + " − y)"
+                : e.regra;
+      ruleEl.innerHTML =
+        tok("(x, y)", "src") + tok("⟼") + tok(dst, "dst") + tok("reflexão " + ondeEixo(), "par");
+      const i = maisLonge(p => Math.abs(alturaNoEixo(p)));
+      const d = Math.abs(alturaNoEixo(obj[i]));
+      noteEl.innerHTML =
+        "O espelho é a <b>mediatriz</b> de cada segmento PP′: corta ao meio e forma ângulo reto.<br>" +
+        "dist(" + rotulo(i) + ", eixo) = dist(" + rotulo(i) + "′, eixo) = " + fmt(d) + "." +
+        ((eixo === "xk" || eixo === "yk")
+          ? "<br>Com k = " + fmt(kEixo) + ", a regra " + e.regra + " fica " + dst + "."
+          : "");
+    } else {
+      const naOrigem = centro.x === 0 && centro.y === 0;
+      const dst = naOrigem
+        ? "(−x, −y)"
+        : "(" + fmt(2 * centro.x) + " − x, " + fmt(2 * centro.y) + " − y)";
+      ruleEl.innerHTML =
+        tok("(x, y)", "src") + tok("⟼") + tok(dst, "dst") + tok("centro " + par(centro), "par");
+      const i = maisLonge(p => Math.hypot(p.x - centro.x, p.y - centro.y));
+      const d = Math.hypot(obj[i].x - centro.x, obj[i].y - centro.y);
+      noteEl.innerHTML =
+        "C é o <b>ponto médio</b> de cada segmento PP′ — o mesmo que girar 180° em torno de C.<br>" +
+        "C" + rotulo(i) + " = C" + rotulo(i) + "′ = " + fmt(d) + "." +
+        (naOrigem ? "" : "<br>Regra geral: (x, y) ⟼ (2a − x, 2b − y), com C = (a, b).");
     }
   }
 
@@ -660,6 +875,14 @@ import Layout from '../../layouts/Layout.astro';
       turnsEl.appendChild(s);
     }
   }
+
+  const MODOS = ["translacao", "rotacao", "axial", "central"];
+  const LEGENDAS = {
+    translacao: "Arraste os vértices do objeto (tracejado) ou a ponta do vetor. A imagem é a figura cheia.",
+    rotacao:    "Arraste os vértices do objeto (tracejado). Cada giro leva a imagem um quadrante adiante.",
+    axial:      "A reta tracejada em verde é o espelho: cada ponto e a sua imagem ficam à mesma distância dela.",
+    central:    "Arraste os vértices do objeto (tracejado) ou o ponto C. Todo segmento PP′ passa por C."
+  };
 
   const TEORIA = {
     translacao: ["Translação por um vetor", `
@@ -687,6 +910,37 @@ import Layout from '../../layouts/Layout.astro';
         <li>Aplicando a regra <b>quatro vezes</b> a figura volta ao lugar
         (4 × 90° = 360°): <code>(x, y) ⟼ (−y, x) ⟼ (−x, −y) ⟼ (y, −x) ⟼ (x, y)</code>.</li>
         <li>Três giros anti-horários equivalem a um giro de 90° no sentido horário.</li>
+      </ul>`],
+    axial: ["Simetria axial — reflexão num eixo", `
+      <p>Refletir é <b>espelhar</b>: cada ponto P vai para o ponto P′ do outro lado da reta e à
+      mesma distância dela. Dito de outro modo, o eixo é a <b>mediatriz</b> do segmento PP′ —
+      passa pelo meio dele e forma ângulo reto.</p>
+      <ul>
+        <li>Nos eixos e nas bissetrizes a regra fica curta: <code>eixo x: (x, y) ⟼ (x, −y)</code>,
+        <code>eixo y: (x, y) ⟼ (−x, y)</code>, <code>y = x: (x, y) ⟼ (y, x)</code> e
+        <code>y = −x: (x, y) ⟼ (−y, −x)</code>.</li>
+        <li>Numa reta vertical <code>x = k</code> vale <code>(x, y) ⟼ (2k − x, y)</code>; numa
+        horizontal <code>y = k</code>, <code>(x, y) ⟼ (x, 2k − y)</code>. Os eixos coordenados
+        são os casos com <code>k = 0</code>.</li>
+        <li>Os pontos <b>sobre o eixo não saem do lugar</b> — arraste um vértice até a reta
+        para ver.</li>
+        <li>É a única das quatro transformações desta ferramenta que <b>inverte a
+        orientação</b>: percorrendo A, B, C, o sentido (horário ou anti-horário) se troca. Por
+        isso a figura sai espelhada, e não apenas mudada de lugar.</li>
+        <li>Refletir duas vezes no mesmo eixo devolve a figura ao lugar.</li>
+      </ul>`],
+    central: ["Simetria central — reflexão num ponto", `
+      <p>Na simetria central de centro C, cada ponto P vai para o ponto P′ tal que
+      <b>C é o ponto médio</b> de PP′. Com o centro na origem a regra é
+      <code>(x, y) ⟼ (−x, −y)</code>; com centro <code>C = (a, b)</code>, ela vira
+      <code>(x, y) ⟼ (2a − x, 2b − y)</code>.</p>
+      <ul>
+        <li>É exatamente uma <b>rotação de 180°</b> em torno de C — compare com a aba da rotação
+        aplicada duas vezes, com C na origem.</li>
+        <li>Ao contrário da simetria axial, ela <b>preserva a orientação</b>: a figura não fica
+        espelhada, fica de cabeça para baixo.</li>
+        <li>Todo segmento PP′ passa por C, e o <b>único ponto fixo é o próprio C</b>.</li>
+        <li>Aplicar duas vezes devolve a figura ao lugar.</li>
       </ul>`]
   };
 
@@ -740,9 +994,12 @@ import Layout from '../../layouts/Layout.astro';
       });
       tr.querySelector("td.img").textContent = par(img[i]);
     });
-    thImgEl.textContent = mode === "translacao"
-      ? "Imagem (x + a, y + b)"
-      : "Imagem " + REGRA_GIRO[k];
+    thImgEl.textContent = "Imagem " + (
+      mode === "translacao" ? "(x + a, y + b)" :
+      mode === "rotacao"    ? REGRA_GIRO[k] :
+      mode === "axial"      ? (eixo === "xk" ? "(2k − x, y)" :
+                               eixo === "yk" ? "(x, 2k − y)" : eixoAtual().regra) :
+      (centro.x || centro.y) ? "(2a − x, 2b − y)" : "(−x, −y)");
     document.getElementById("btn-del").disabled = obj.length <= 3;
     document.getElementById("btn-add").disabled = obj.length >= 12;
   }
@@ -761,13 +1018,10 @@ import Layout from '../../layouts/Layout.astro';
   function trocarModo(novo) {
     mode = novo;
     document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === novo)));
-    document.getElementById("ctrl-translacao").hidden = novo !== "translacao";
-    document.getElementById("ctrl-rotacao").hidden = novo !== "rotacao";
+    MODOS.forEach(m => { document.getElementById("ctrl-" + m).hidden = m !== novo; });
     titleEl.textContent = TEORIA[novo][0];
     textEl.innerHTML = TEORIA[novo][1];
-    capEl.textContent = novo === "translacao"
-      ? "Arraste os vértices do objeto (tracejado) ou a ponta do vetor. A imagem é a figura cheia."
-      : "Arraste os vértices do objeto (tracejado). Cada giro leva a imagem um quadrante adiante.";
+    capEl.textContent = LEGENDAS[novo];
     anim = null;
     render();
   }
@@ -828,6 +1082,41 @@ import Layout from '../../layouts/Layout.astro';
     animar({ kind: "r", fromDeg: de, toDeg: de - 90 }, 620, () => { k = (k + 3) % 4; });
   });
 
+  // eixo da simetria axial
+  function marcarEixo() {
+    document.querySelectorAll("#eixos .chip").forEach(c =>
+      c.setAttribute("aria-pressed", String(c.dataset.eixo === eixo)));
+    document.getElementById("campo-k").hidden = eixo !== "xk" && eixo !== "yk";
+  }
+  document.querySelectorAll("#eixos .chip").forEach(c => c.addEventListener("click", () => {
+    eixo = c.dataset.eixo; anim = null;
+    marcarEixo(); render();
+  }));
+  inK.addEventListener("input", () => {
+    const v = parseFloat(inK.value);
+    if (Number.isNaN(v)) return;
+    kEixo = clampC(v); render();
+  });
+  document.getElementById("btn-anim-r").addEventListener("click", () => {
+    if (!anim) animar({ kind: "x" }, 900);
+  });
+
+  // centro da simetria central
+  function lerCentro() {
+    const a = parseFloat(inCa.value), b = parseFloat(inCb.value);
+    if (!Number.isNaN(a)) centro.x = clampC(a);
+    if (!Number.isNaN(b)) centro.y = clampC(b);
+    render();
+  }
+  inCa.addEventListener("input", lerCentro);
+  inCb.addEventListener("input", lerCentro);
+  document.getElementById("btn-anim-c").addEventListener("click", () => {
+    if (!anim) animar({ kind: "c" }, 900);
+  });
+  document.getElementById("btn-c-origem").addEventListener("click", () => {
+    centro.x = 0; centro.y = 0; inCa.value = 0; inCb.value = 0; render();
+  });
+
   document.getElementById("btn-add").addEventListener("click", () => {
     // insere um vértice no meio da aresta mais longa
     let melhor = 0, maior = -1;
@@ -851,13 +1140,17 @@ import Layout from '../../layouts/Layout.astro';
     montarTabela(); render();
   });
 
-  document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+  document.querySelectorAll("#presets .chip").forEach(c => c.addEventListener("click", () => {
     preset = c.dataset.preset;
     carregarPreset();
   }));
+  function marcarPresets() {
+    document.querySelectorAll("#presets .chip").forEach(c =>
+      c.setAttribute("aria-pressed", String(c.dataset.preset === preset)));
+  }
   function carregarPreset() {
     obj = PRESETS[preset].map(([x, y]) => ({ x: x, y: y }));
-    document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.preset === preset)));
+    marcarPresets();
     k = 0; anim = null;
     montarTabela(); render();
   }
@@ -878,11 +1171,15 @@ import Layout from '../../layouts/Layout.astro';
     preset = PRESET_PADRAO;
     vec = { a: 6, b: -3 };
     inA.value = vec.a; inB.value = vec.b;
+    eixo = "ox"; kEixo = 3; inK.value = kEixo;
+    centro = { x: 0, y: 0 }; inCa.value = 0; inCb.value = 0;
+    marcarEixo();
     carregarPreset();
   });
 
   /* ---------- início ---------- */
-  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.preset === preset)));
+  marcarPresets();
+  marcarEixo();
   montarTabela();
   trocarModo("translacao");
 })();
