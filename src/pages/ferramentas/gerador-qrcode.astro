@@ -77,8 +77,12 @@ import Layout from '../../layouts/Layout.astro';
               <span class="dz-nome" id="logo-nome"></span>
             </div>
           </div>
-          <div class="btn-row" id="logo-acoes" hidden>
-            <button class="reset" id="btn-remover-logo" type="button">Remover imagem</button>
+          <div class="btn-row">
+            <button class="chip com-icone" id="btn-logo-site" type="button">
+              <img src="/favicon.svg" alt="" width="16" height="16" />
+              Usar a logo do site
+            </button>
+            <button class="reset" id="btn-remover-logo" type="button" hidden>Remover imagem</button>
           </div>
 
           <div id="logo-controles" hidden>
@@ -469,6 +473,8 @@ import Layout from '../../layouts/Layout.astro';
   }
   .qr-root .chip:disabled{opacity:.4;cursor:not-allowed}
   .qr-root .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .qr-root .chip.com-icone{display:inline-flex;align-items:center;gap:8px;padding-left:9px}
+  .qr-root .chip.com-icone img{width:16px;height:16px;border-radius:3.5px;display:block}
 
   .qr-root .toggle{
     display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
@@ -542,7 +548,7 @@ const elDzVazio   = $('dz-vazio');
 const elDzCheio   = $('dz-cheio');
 const elLogoThumb = $('logo-thumb');
 const elLogoNome  = $('logo-nome');
-const elLogoAcoes = $('logo-acoes');
+const elBtnRemover= $('btn-remover-logo');
 const elLogoCtrl  = $('logo-controles');
 const elLogoTam   = $('logo-tam');
 const elLogoTamV  = $('logo-tam-val');
@@ -836,7 +842,7 @@ function atualizarContraste() {
 }
 
 /* ---------- imagem central ---------- */
-function carregarLogo(arquivo) {
+function carregarLogo(arquivo, opcoes = {}) {
   if (!arquivo) return;
   if (!arquivo.type.startsWith('image/')) {
     alertaLogo('Escolha um arquivo de imagem (PNG, JPG, WebP ou SVG).');
@@ -862,16 +868,24 @@ function carregarLogo(arquivo) {
       const cv = document.createElement('canvas');
       cv.width = w;
       cv.height = h;
-      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      const ctx = cv.getContext('2d');
+      if (opcoes.arredondar && ctx.roundRect) {
+        // Mesmo raio do favicon.svg (6 de 32): é a silhueta da marca. Sem ele,
+        // um bloco quadrado no meio do código parece defeito, não logo.
+        ctx.beginPath();
+        ctx.roundRect(0, 0, w, h, Math.min(w, h) * 0.1875);
+        ctx.clip();
+      }
+      ctx.drawImage(img, 0, 0, w, h);
 
       estado.logo = cv.toDataURL('image/png');
       estado.logoAspecto = w / h;
 
       elLogoThumb.src = estado.logo;
-      elLogoNome.textContent = arquivo.name;
+      elLogoNome.textContent = opcoes.nome || arquivo.name;
       elDzVazio.hidden = true;
       elDzCheio.hidden = false;
-      elLogoAcoes.hidden = false;
+      elBtnRemover.hidden = false;
       elLogoCtrl.hidden = false;
       travarNivel(true);
       render();
@@ -879,6 +893,23 @@ function carregarLogo(arquivo) {
     img.src = leitor.result;
   };
   leitor.readAsDataURL(arquivo);
+}
+
+// Atalho para o uso próprio: a marca do site, sem passar pelo seletor de arquivo.
+async function usarLogoDoSite() {
+  try {
+    const resp = await fetch('/icon-512.png');
+    if (!resp.ok) throw new Error(String(resp.status));
+    const blob = await resp.blob();
+    // Zera o seletor para que reescolher o mesmo arquivo depois ainda dispare o change.
+    elLogoInput.value = '';
+    carregarLogo(
+      new File([blob], 'logo-yuritobias.png', { type: blob.type || 'image/png' }),
+      { arredondar: true, nome: 'Logo do site' }
+    );
+  } catch {
+    alertaLogo('Não foi possível carregar a logo do site. Sem conexão, envie o arquivo pelo seletor.');
+  }
 }
 
 function alertaLogo(msg) {
@@ -893,7 +924,7 @@ function removerLogo() {
   elLogoThumb.removeAttribute('src');
   elDzVazio.hidden = false;
   elDzCheio.hidden = true;
-  elLogoAcoes.hidden = true;
+  elBtnRemover.hidden = true;
   elLogoCtrl.hidden = true;
   travarNivel(false);
   render();
@@ -1011,7 +1042,8 @@ elDropzone.addEventListener('drop', (e) => {
   if (arquivo) carregarLogo(arquivo);
 });
 
-$('btn-remover-logo').addEventListener('click', removerLogo);
+$('btn-logo-site').addEventListener('click', usarLogoDoSite);
+elBtnRemover.addEventListener('click', removerLogo);
 
 elLogoTam.addEventListener('input', () => {
   estado.logoTamanho = Number(elLogoTam.value) / 100;
