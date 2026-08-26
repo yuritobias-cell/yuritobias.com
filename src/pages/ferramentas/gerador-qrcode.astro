@@ -1,0 +1,1072 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Gerador de QR Code"
+  description="Gere QR codes personalizados a partir de um link ou texto: cores, formato dos módulos, margem e uma imagem no centro. Baixe em PNG ou SVG. Tudo acontece no seu navegador — nenhuma imagem é enviada para lugar nenhum."
+>
+
+  <!-- IBM Plex Mono carregado só nesta página (rótulos técnicos e medidas usam mono).
+       Playfair Display + IBM Plex Sans já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <div class="qr-root">
+
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Utilidades</p>
+      <h1>Gerador de <em>QR Code</em></h1>
+      <p class="lede">Cole um <em>link</em> (ou qualquer texto), ajuste as cores e o formato, e
+      coloque a sua <em>imagem no centro</em> — o código continua legível porque todo QR carrega
+      uma <em>correção de erros</em> embutida. Baixe em PNG para a tela ou em SVG para impressão.
+      Tudo é gerado no seu navegador: a imagem que você escolher <em>não sai do seu computador</em>.</p>
+    </header>
+
+    <div class="stage">
+
+      <!-- ---------- pré-visualização + downloads ---------- -->
+      <div class="canvas-card">
+        <div class="preview" id="preview" aria-live="polite"></div>
+        <p class="erro" id="erro" hidden></p>
+        <p class="caption" id="caption"></p>
+
+        <div class="export">
+          <button class="primary" id="dl-png" type="button">Baixar PNG</button>
+          <label class="sr-only" for="png-tam">Tamanho do PNG em pixels</label>
+          <select id="png-tam">
+            <option value="512">512 px</option>
+            <option value="1024" selected>1024 px</option>
+            <option value="2048">2048 px</option>
+          </select>
+          <button class="ghost" id="dl-svg" type="button">Baixar SVG</button>
+        </div>
+        <p class="export-nota">O SVG é vetorial — amplie à vontade para cartaz, adesivo ou camiseta.</p>
+      </div>
+
+      <!-- ---------- controles ---------- -->
+      <div class="panel">
+
+        <div class="card">
+          <h2>Conteúdo</h2>
+          <p class="hint">O que o celular vai abrir ao ler o código.</p>
+          <label class="sr-only" for="conteudo">Link ou texto do QR code</label>
+          <textarea id="conteudo" rows="3" spellcheck="false"
+            placeholder="https://exemplo.com.br"></textarea>
+          <p class="dica" id="dica-url" hidden>
+            Isso parece um endereço sem <code>https://</code> — sem o prefixo, muitos leitores
+            tratam como texto puro e não abrem nada.
+            <button class="link-btn" id="btn-https" type="button">Adicionar https://</button>
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>Imagem no centro</h2>
+          <p class="hint">PNG, JPG, WebP ou SVG. Fica só no seu navegador.</p>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button"
+            aria-label="Escolher imagem para o centro do código">
+            <input type="file" id="logo-input" accept="image/*" class="sr-only" />
+            <div class="dz-vazio" id="dz-vazio">
+              <span class="dz-icone" aria-hidden="true">+</span>
+              <span class="dz-txt">Clique ou arraste uma imagem</span>
+            </div>
+            <div class="dz-cheio" id="dz-cheio" hidden>
+              <img id="logo-thumb" alt="" />
+              <span class="dz-nome" id="logo-nome"></span>
+            </div>
+          </div>
+          <div class="btn-row" id="logo-acoes" hidden>
+            <button class="reset" id="btn-remover-logo" type="button">Remover imagem</button>
+          </div>
+
+          <div id="logo-controles" hidden>
+            <div class="slider">
+              <label for="logo-tam">Tamanho <b id="logo-tam-val">20%</b></label>
+              <input type="range" id="logo-tam" min="10" max="30" step="1" value="20" />
+            </div>
+            <label class="toggle on" id="lbl-respiro">
+              <input type="checkbox" id="respiro" checked />
+              Respiro claro atrás da imagem
+            </label>
+
+            <div class="medidor">
+              <div class="medidor-bar"><span id="medidor-fill"></span></div>
+              <p class="medidor-txt" id="medidor-txt"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Cores</h2>
+          <p class="hint">Os leitores esperam <em>escuro sobre claro</em>. Contraste alto é o que faz o código funcionar de longe.</p>
+
+          <div class="presets" id="presets">
+            <button class="swatch" type="button" data-frente="#1C1917" data-fundo="#FFFFFF" title="Grafite sobre branco"><i style="background:#1C1917"></i>Grafite</button>
+            <button class="swatch" type="button" data-frente="#1B4F4F" data-fundo="#F8F6F1" title="Teal sobre papel"><i style="background:#1B4F4F"></i>Teal</button>
+            <button class="swatch" type="button" data-frente="#A8442B" data-fundo="#F8F6F1" title="Terracota sobre papel"><i style="background:#A8442B"></i>Terracota</button>
+            <button class="swatch" type="button" data-frente="#243B6B" data-fundo="#FFFFFF" title="Azul sobre branco"><i style="background:#243B6B"></i>Azul</button>
+          </div>
+
+          <div class="cores">
+            <label class="cor">
+              <span>Módulos</span>
+              <input type="color" id="cor-frente" value="#1C1917" />
+            </label>
+            <label class="cor">
+              <span>Fundo</span>
+              <input type="color" id="cor-fundo" value="#FFFFFF" />
+            </label>
+          </div>
+
+          <label class="toggle" id="lbl-transparente">
+            <input type="checkbox" id="transparente" />
+            Fundo transparente
+          </label>
+
+          <p class="alerta" id="aviso-contraste" hidden></p>
+        </div>
+
+        <div class="card">
+          <h2>Formato</h2>
+          <p class="hint">Detalhes visuais que não mudam o conteúdo do código.</p>
+
+          <div class="campo">
+            <div class="card-label">Módulos</div>
+            <div class="chips" id="grupo-modulos" role="group" aria-label="Formato dos módulos">
+              <button class="chip" type="button" data-val="quadrado" aria-pressed="true">Quadrado</button>
+              <button class="chip" type="button" data-val="arredondado" aria-pressed="false">Arredondado</button>
+              <button class="chip" type="button" data-val="ponto" aria-pressed="false">Ponto</button>
+            </div>
+          </div>
+
+          <div class="campo">
+            <div class="card-label">Cantos de referência</div>
+            <div class="chips" id="grupo-olhos" role="group" aria-label="Formato dos cantos de referência">
+              <button class="chip" type="button" data-val="quadrado" aria-pressed="true">Quadrado</button>
+              <button class="chip" type="button" data-val="arredondado" aria-pressed="false">Arredondado</button>
+              <button class="chip" type="button" data-val="circular" aria-pressed="false">Circular</button>
+            </div>
+          </div>
+
+          <div class="campo">
+            <div class="card-label">Correção de erros</div>
+            <div class="chips" id="grupo-nivel" role="group" aria-label="Nível de correção de erros">
+              <button class="chip" type="button" data-val="L" aria-pressed="false">L · 7%</button>
+              <button class="chip" type="button" data-val="M" aria-pressed="true">M · 15%</button>
+              <button class="chip" type="button" data-val="Q" aria-pressed="false">Q · 25%</button>
+              <button class="chip" type="button" data-val="H" aria-pressed="false">H · 30%</button>
+            </div>
+            <p class="dica" id="nivel-nota" hidden>Com imagem no centro o nível fica travado em <b>H</b> — é a maior reserva de correção disponível.</p>
+          </div>
+
+          <div class="campo">
+            <div class="slider">
+              <label for="margem">Margem <b id="margem-val">4 módulos</b></label>
+              <input type="range" id="margem" min="0" max="8" step="1" value="4" />
+            </div>
+            <p class="dica">A norma pede 4 módulos de margem clara em volta. Abaixo disso, o leitor pode não encontrar o código.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <section class="theory">
+      <h2>Como um QR code aguenta uma imagem no meio</h2>
+
+      <p>Um QR code é uma malha de quadradinhos — os <b>módulos</b>. Os três blocos grandes nos
+      cantos são os <b>padrões de referência</b>: é por eles que a câmera descobre onde o código
+      está, para que lado ele aponta e qual o tamanho de cada módulo. O resto é conteúdo,
+      embaralhado por uma máscara para não formar manchas que confundam a leitura.</p>
+
+      <p>A parte interessante é que nem tudo ali é dado. Uma fatia do código é <b>redundância</b>,
+      calculada por um algoritmo de correção de erros chamado <b>Reed–Solomon</b> — o mesmo que
+      protege CDs e transmissões de sondas espaciais. Ele permite reconstruir trechos perdidos sem
+      precisar deles: o código carrega, junto, a informação necessária para se remendar. São
+      quatro níveis:</p>
+
+      <ul>
+        <li><b>L</b> — recupera cerca de 7% dos módulos danificados</li>
+        <li><b>M</b> — cerca de 15% (o padrão para uso comum)</li>
+        <li><b>Q</b> — cerca de 25%</li>
+        <li><b>H</b> — cerca de 30%</li>
+      </ul>
+
+      <p>É essa reserva que a imagem no centro consome. Uma logo ocupando 20% do lado do código
+      cobre cerca de 4% dos módulos <span class="nowrap">(0,20 × 0,20)</span>; a 30% do lado, cobre
+      9%. No nível H, com 30% de tolerância, sobra folga confortável — e é por isso que esta
+      ferramenta trava o nível em H assim que você adiciona uma imagem.</p>
+
+      <p>Só que folga gasta é folga que deixa de existir. A correção não foi inventada para
+      acomodar logos: ela existe para o código sobreviver a papel dobrado, tinta borrada, reflexo,
+      arranhão e impressão ruim. Quanto maior a imagem, menos margem sobra para o mundo real. Por
+      isso o limite aqui é 30% do lado, e por isso vale a regra prática: <b>teste com o celular
+      antes de mandar imprimir</b> — de longe, de perto, e de preferência em mais de um aparelho.</p>
+
+      <p>Dois outros detalhes decidem se o código funciona. O primeiro é a <b>margem clara</b> em
+      volta: sem esse silêncio de 4 módulos, a câmera não consegue separar o código do que está
+      atrás. O segundo é o <b>contraste</b> — os módulos precisam ser nitidamente mais escuros que
+      o fundo. Invertido (claro sobre escuro) alguns leitores até resolvem, mas muitos desistem.</p>
+
+      <p class="nota-final">Nada do que você digita ou envia aqui vai para um servidor: o código é
+      montado inteiramente no navegador, e a página funciona offline depois da primeira visita.
+      <span class="marca">QR Code é marca registrada da DENSO WAVE.</span></p>
+    </section>
+
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Gerador de QR Code
+     Todo o CSS abaixo é escopado sob .qr-root para não vazar
+     para o resto do site. As variáveis ficam no próprio .qr-root.
+     ============================================================ */
+
+  .qr-root{
+    /* tokens (escopados nesta ferramenta) */
+    --bg:#F8F6F1;
+    --ink:#1C1917;
+    --muted:#78716C;
+    --accent:#1B4F4F;
+    --rule-c:#E2DDD6;
+    --paper:#FFFFFF;
+    --destaque:#A8442B;               /* terracota — ações e alertas */
+    --ok:#1B6E4F;
+    --atencao:#B3701A;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+    --radius:14px;
+
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    color:var(--ink);
+    max-width:1180px;
+    margin:0 auto;
+    padding:30px 22px 56px;
+  }
+  .qr-root, .qr-root *{box-sizing:border-box}
+
+  .qr-root .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0
+  }
+  .qr-root .nowrap{white-space:nowrap}
+
+  /* ----- cabeçalho ----- */
+  .qr-root header.masthead{margin-bottom:22px}
+  .qr-root .eyebrow{
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px
+  }
+  .qr-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .qr-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .qr-root h1{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em
+  }
+  .qr-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .qr-root .lede{color:var(--muted);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .qr-root .lede em{font-style:normal;color:var(--ink)}
+
+  /* ----- layout ----- */
+  .qr-root .stage{display:grid;grid-template-columns:1fr .95fr;gap:22px;align-items:start;margin-top:26px}
+  @media (max-width:900px){.qr-root .stage{grid-template-columns:1fr}}
+
+  .qr-root .canvas-card{
+    background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);
+    padding:18px;box-shadow:0 18px 44px -30px rgba(28,25,23,.45);
+    position:sticky;top:16px
+  }
+  @media (max-width:900px){.qr-root .canvas-card{position:static}}
+
+  .qr-root .preview{
+    border-radius:10px;overflow:hidden;line-height:0;
+    display:flex;align-items:center;justify-content:center;min-height:180px
+  }
+  /* xadrez discreto quando o fundo é transparente */
+  .qr-root .preview.xadrez{
+    background-color:#fff;
+    background-image:
+      linear-gradient(45deg,#EFEAE2 25%,transparent 25%,transparent 75%,#EFEAE2 75%),
+      linear-gradient(45deg,#EFEAE2 25%,transparent 25%,transparent 75%,#EFEAE2 75%);
+    background-size:16px 16px;background-position:0 0,8px 8px
+  }
+  .qr-root .preview svg{display:block;width:100%;height:auto;max-width:420px}
+  .qr-root .preview.vazio{
+    border:1px dashed var(--rule-c);color:var(--muted);font-size:13.5px;
+    line-height:1.5;text-align:center;padding:40px 20px;font-family:var(--font-mono)
+  }
+
+  .qr-root .erro{
+    margin:12px 0 0;font-size:13px;color:var(--destaque);background:rgba(168,68,43,.08);
+    border-radius:8px;padding:10px 12px;line-height:1.5
+  }
+  .qr-root .erro[hidden]{display:none}
+
+  .qr-root .caption{
+    font-family:var(--font-mono);font-size:11.5px;color:var(--muted);
+    margin:12px 2px 0;line-height:1.6
+  }
+
+  .qr-root .export{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+  .qr-root .export select{
+    font-family:var(--font-mono);font-size:12.5px;color:var(--ink);background:var(--bg);
+    border:1px solid var(--rule-c);border-radius:999px;padding:8px 12px;cursor:pointer
+  }
+  .qr-root .export select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .qr-root .export-nota{
+    margin:10px 2px 0;font-size:12px;color:var(--muted);line-height:1.5
+  }
+
+  .qr-root .panel{display:flex;flex-direction:column;gap:16px}
+  .qr-root .card{
+    background:var(--paper);border:1px solid var(--rule-c);
+    border-radius:var(--radius);padding:18px
+  }
+  .qr-root .card h2{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0 0 4px}
+  .qr-root .card .hint{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+  .qr-root .card .hint em{font-style:normal;color:var(--ink)}
+  .qr-root .card-label{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:9px
+  }
+  .qr-root .campo{margin-bottom:16px}
+  .qr-root .campo:last-child{margin-bottom:0}
+
+  /* ----- conteúdo ----- */
+  .qr-root textarea{
+    width:100%;font-family:var(--font-mono);font-size:13.5px;line-height:1.6;color:var(--ink);
+    border:1px solid var(--rule-c);border-radius:10px;padding:11px 12px;background:var(--bg);
+    resize:vertical;min-height:76px
+  }
+  .qr-root textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+
+  .qr-root .dica{
+    margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6
+  }
+  .qr-root .dica[hidden]{display:none}
+  .qr-root .dica code{font-family:var(--font-mono);font-size:.94em;color:var(--destaque)}
+  .qr-root .dica b{color:var(--ink);font-weight:600}
+  .qr-root .link-btn{
+    appearance:none;background:none;border:0;padding:0;cursor:pointer;
+    font-family:var(--font-body);font-size:12.5px;font-weight:500;color:var(--accent);
+    text-decoration:underline;text-underline-offset:2px
+  }
+  .qr-root .link-btn:hover{color:var(--destaque)}
+
+  /* ----- upload ----- */
+  .qr-root .dropzone{
+    border:1px dashed var(--rule-c);border-radius:12px;background:var(--bg);
+    padding:16px;cursor:pointer;transition:.16s;text-align:center
+  }
+  .qr-root .dropzone:hover,
+  .qr-root .dropzone:focus-visible{border-color:var(--accent);background:rgba(27,79,79,.04);outline:none}
+  .qr-root .dropzone.arrastando{border-color:var(--accent);background:rgba(27,79,79,.08)}
+  .qr-root .dz-vazio{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .qr-root .dz-icone{
+    font-family:var(--font-mono);font-size:20px;color:var(--accent);line-height:1;
+    width:34px;height:34px;border:1px solid var(--rule-c);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;background:var(--paper)
+  }
+  .qr-root .dz-txt{font-size:13px;color:var(--muted)}
+  .qr-root .dz-cheio{display:flex;align-items:center;gap:12px;text-align:left}
+  .qr-root .dz-cheio[hidden]{display:none}
+  .qr-root .dz-cheio img{
+    width:46px;height:46px;object-fit:contain;border-radius:8px;
+    background:var(--paper);border:1px solid var(--rule-c);padding:4px;flex:none
+  }
+  .qr-root .dz-nome{
+    font-family:var(--font-mono);font-size:12px;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+  }
+
+  /* ----- sliders ----- */
+  .qr-root .slider{margin-bottom:12px}
+  .qr-root .slider label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13px;color:var(--muted);margin-bottom:7px
+  }
+  .qr-root .slider label b{
+    font-family:var(--font-mono);font-size:12.5px;color:var(--ink);font-weight:600
+  }
+  .qr-root input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer}
+
+  /* ----- medidor de segurança ----- */
+  .qr-root .medidor{margin-top:14px;border-top:1px solid var(--rule-c);padding-top:12px}
+  .qr-root .medidor-bar{
+    height:6px;border-radius:999px;background:var(--rule-c);overflow:hidden
+  }
+  .qr-root .medidor-bar span{
+    display:block;height:100%;border-radius:999px;background:var(--ok);
+    transition:width .18s ease,background .18s ease
+  }
+  .qr-root .medidor-bar span.atencao{background:var(--atencao)}
+  .qr-root .medidor-bar span.risco{background:var(--destaque)}
+  .qr-root .medidor-txt{
+    margin:9px 0 0;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);line-height:1.6
+  }
+  .qr-root .medidor-txt b{color:var(--ink);font-weight:600}
+
+  /* ----- cores ----- */
+  .qr-root .presets{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .qr-root .swatch{
+    appearance:none;display:flex;align-items:center;gap:7px;cursor:pointer;
+    font-family:var(--font-body);font-size:12.5px;color:var(--muted);
+    border:1px solid var(--rule-c);border-radius:999px;padding:6px 13px 6px 7px;
+    background:transparent;transition:.16s
+  }
+  .qr-root .swatch:hover{color:var(--ink);border-color:var(--muted)}
+  .qr-root .swatch i{
+    width:15px;height:15px;border-radius:50%;display:block;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)
+  }
+  .qr-root .cores{display:flex;gap:10px;flex-wrap:wrap}
+  .qr-root .cor{
+    flex:1;min-width:130px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    border:1px solid var(--rule-c);border-radius:10px;padding:8px 8px 8px 13px;cursor:pointer
+  }
+  .qr-root .cor span{font-size:13px;color:var(--muted)}
+  .qr-root .cor input[type="color"]{
+    appearance:none;width:38px;height:30px;padding:0;border:1px solid var(--rule-c);
+    border-radius:7px;background:none;cursor:pointer
+  }
+  .qr-root .cor input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+  .qr-root .cor input[type="color"]::-webkit-color-swatch{border:0;border-radius:5px}
+  .qr-root .cor input[type="color"]::-moz-color-swatch{border:0;border-radius:5px}
+
+  .qr-root .alerta{
+    margin:12px 0 0;font-size:12.5px;line-height:1.6;color:var(--atencao);
+    background:rgba(179,112,26,.09);border-radius:8px;padding:10px 12px
+  }
+  .qr-root .alerta[hidden]{display:none}
+
+  /* ----- botões, chips e toggles ----- */
+  .qr-root .btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .qr-root .btn-row[hidden]{display:none}
+  .qr-root .ghost, .qr-root .primary, .qr-root .reset, .qr-root .chip{
+    appearance:none;font-family:var(--font-body);font-size:13px;font-weight:500;
+    border-radius:999px;padding:9px 16px;cursor:pointer;transition:.16s
+  }
+  .qr-root .ghost, .qr-root .reset, .qr-root .chip{
+    background:transparent;color:var(--muted);border:1px solid var(--rule-c)
+  }
+  .qr-root .ghost:hover, .qr-root .chip:hover:not(:disabled){color:var(--ink);border-color:var(--muted)}
+  .qr-root .reset:hover{color:var(--destaque);border-color:var(--destaque)}
+  .qr-root .primary{
+    background:var(--destaque);border:1px solid var(--destaque);color:#fff;
+    box-shadow:0 8px 20px -12px var(--destaque)
+  }
+  .qr-root .primary:hover:not(:disabled){filter:brightness(1.06)}
+  .qr-root .primary:disabled, .qr-root .ghost:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+  .qr-root .chip[aria-pressed="true"]{
+    background:var(--accent);border-color:var(--accent);color:#fff
+  }
+  .qr-root .chip:disabled{opacity:.4;cursor:not-allowed}
+  .qr-root .chips{display:flex;flex-wrap:wrap;gap:7px}
+
+  .qr-root .toggle{
+    display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    border:1px solid var(--rule-c);border-radius:999px;padding:7px 14px;cursor:pointer;
+    user-select:none;transition:.16s;margin-top:4px
+  }
+  .qr-root .toggle:hover{color:var(--ink)}
+  .qr-root .toggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+  .qr-root .toggle.on{color:var(--ink);border-color:var(--muted)}
+
+  /* ----- teoria ----- */
+  .qr-root .theory{
+    margin-top:34px;border-top:1px solid var(--rule-c);padding-top:24px;max-width:74ch
+  }
+  .qr-root .theory h2{font-family:var(--font-display);font-weight:600;font-size:24px;margin:0 0 12px}
+  .qr-root .theory p{color:var(--muted);font-size:15px;margin:0 0 12px;line-height:1.7}
+  .qr-root .theory b{color:var(--ink);font-weight:600}
+  .qr-root .theory ul{margin:0 0 12px;padding-left:20px;color:var(--muted);font-size:15px}
+  .qr-root .theory li{margin-bottom:6px}
+  .qr-root .theory .nota-final{
+    font-size:13px;border-top:1px solid var(--rule-c);padding-top:14px;margin-top:18px
+  }
+  .qr-root .theory .marca{display:block;margin-top:5px;font-size:12px;opacity:.75}
+
+  @media (prefers-reduced-motion:reduce){.qr-root *{transition:none!important}}
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+import qrcode from 'qrcode-generator';
+
+// A biblioteca converte texto em bytes truncando cada caractere em 8 bits
+// (latin-1), o que quebraria acentos e emoji. No modo byte, o que os leitores
+// esperam é UTF-8 — então trocamos o conversor antes de qualquer codificação.
+qrcode.stringToBytes = (s) => Array.from(new TextEncoder().encode(s));
+
+/* ---------- estado ---------- */
+const PADRAO = 'https://yuritobias.com/ferramentas';
+
+const estado = {
+  texto: PADRAO,
+  nivel: 'M',            // escolha do usuário; com logo, o efetivo vira 'H'
+  margem: 4,
+  modulos: 'quadrado',
+  olhos: 'quadrado',
+  frente: '#1C1917',
+  fundo: '#FFFFFF',
+  transparente: false,
+  logo: null,            // data URL (PNG) da imagem já redimensionada
+  logoAspecto: 1,        // largura / altura
+  logoTamanho: 0.20,     // fração do lado do código
+  respiro: true,
+};
+
+// Reserva de correção de cada nível, em fração dos módulos (aproximada — a
+// norma define a reserva por codeword, não por módulo).
+const RESERVA = { L: 0.07, M: 0.15, Q: 0.25, H: 0.30 };
+
+/* ---------- elementos ---------- */
+const $ = (id) => document.getElementById(id);
+
+const elPreview   = $('preview');
+const elErro      = $('erro');
+const elCaption   = $('caption');
+const elConteudo  = $('conteudo');
+const elDicaUrl   = $('dica-url');
+const elBtnHttps  = $('btn-https');
+const elDropzone  = $('dropzone');
+const elLogoInput = $('logo-input');
+const elDzVazio   = $('dz-vazio');
+const elDzCheio   = $('dz-cheio');
+const elLogoThumb = $('logo-thumb');
+const elLogoNome  = $('logo-nome');
+const elLogoAcoes = $('logo-acoes');
+const elLogoCtrl  = $('logo-controles');
+const elLogoTam   = $('logo-tam');
+const elLogoTamV  = $('logo-tam-val');
+const elRespiro   = $('respiro');
+const elLblResp   = $('lbl-respiro');
+const elMedFill   = $('medidor-fill');
+const elMedTxt    = $('medidor-txt');
+const elCorFrente = $('cor-frente');
+const elCorFundo  = $('cor-fundo');
+const elTransp    = $('transparente');
+const elLblTransp = $('lbl-transparente');
+const elAvisoCor  = $('aviso-contraste');
+const elNivelNota = $('nivel-nota');
+const elMargem    = $('margem');
+const elMargemV   = $('margem-val');
+const elDlPng     = $('dl-png');
+const elDlSvg     = $('dl-svg');
+const elPngTam    = $('png-tam');
+
+/* ---------- utilidades ---------- */
+const f = (v) => Math.round(v * 1000) / 1000;
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]
+));
+
+function luminancia(hex) {
+  const c = hex.replace('#', '');
+  const canais = [0, 2, 4]
+    .map((i) => parseInt(c.slice(i, i + 2), 16) / 255)
+    .map((x) => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)));
+  return 0.2126 * canais[0] + 0.7152 * canais[1] + 0.0722 * canais[2];
+}
+
+function contraste(a, b) {
+  const la = luminancia(a);
+  const lb = luminancia(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+function nomeArquivo(ext) {
+  let base = 'qrcode';
+  try {
+    base = 'qrcode-' + new URL(estado.texto).hostname.replace(/^www\./, '');
+  } catch { /* não é URL: fica o nome genérico */ }
+  return base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.' + ext;
+}
+
+/* ---------- geometria da imagem central ---------- */
+// Caixa da imagem e do respiro, em módulos, já posicionadas na malha.
+function caixaLogo(n) {
+  const lado = estado.logoTamanho * n;
+  const a = estado.logoAspecto || 1;
+  const largura = a >= 1 ? lado : lado * a;
+  const altura  = a >= 1 ? lado / a : lado;
+  const folga   = estado.respiro ? Math.max(0.6, lado * 0.09) : 0;
+  const centro  = estado.margem + n / 2;
+  return {
+    imgX: centro - largura / 2,
+    imgY: centro - altura / 2,
+    imgL: largura,
+    imgA: altura,
+    padX: centro - largura / 2 - folga,
+    padY: centro - altura / 2 - folga,
+    padL: largura + 2 * folga,
+    padA: altura + 2 * folga,
+  };
+}
+
+// Quantos módulos ficam sob a imagem (contando pelo centro de cada módulo).
+function modulosCobertos(n, cx) {
+  let cobertos = 0;
+  for (let r = 0; r < n; r++) {
+    const y = estado.margem + r + 0.5;
+    if (y < cx.padY || y > cx.padY + cx.padA) continue;
+    for (let c = 0; c < n; c++) {
+      const x = estado.margem + c + 0.5;
+      if (x >= cx.padX && x <= cx.padX + cx.padL) cobertos++;
+    }
+  }
+  return cobertos;
+}
+
+/* ---------- montagem do SVG ---------- */
+// Devolve o SVG como string: é ela que vai para a tela, para o arquivo .svg
+// e para o rasterizador do PNG — assim os três resultados são idênticos.
+function montarSvg(qr, opcoes = {}) {
+  const n = qr.getModuleCount();
+  const m = estado.margem;
+  const total = n + 2 * m;
+  const ehOlho = (r, c) =>
+    (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7);
+
+  const partes = [];
+
+  if (!estado.transparente) {
+    partes.push(`<rect width="${total}" height="${total}" fill="${estado.fundo}"/>`);
+  }
+
+  /* módulos de dados */
+  if (estado.modulos === 'quadrado') {
+    // Um único path: quadrados vizinhos se fundem sem costura entre eles.
+    let d = '';
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        if (!qr.isDark(r, c) || ehOlho(r, c)) continue;
+        d += `M${m + c} ${m + r}h1v1h-1z`;
+      }
+    }
+    if (d) partes.push(`<path d="${d}" fill="${estado.frente}"/>`);
+  } else {
+    const formas = [];
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        if (!qr.isDark(r, c) || ehOlho(r, c)) continue;
+        formas.push(estado.modulos === 'ponto'
+          ? `<circle cx="${m + c + 0.5}" cy="${m + r + 0.5}" r="0.45"/>`
+          : `<rect x="${m + c}" y="${m + r}" width="1" height="1" rx="0.3"/>`);
+      }
+    }
+    if (formas.length) partes.push(`<g fill="${estado.frente}">${formas.join('')}</g>`);
+  }
+
+  /* cantos de referência */
+  const olhos = [[0, 0], [0, n - 7], [n - 7, 0]];
+  for (const [r, c] of olhos) {
+    const x = m + c;
+    const y = m + r;
+    if (estado.olhos === 'circular') {
+      partes.push(
+        `<circle cx="${x + 3.5}" cy="${y + 3.5}" r="3" fill="none" stroke="${estado.frente}" stroke-width="1"/>` +
+        `<circle cx="${x + 3.5}" cy="${y + 3.5}" r="1.5" fill="${estado.frente}"/>`
+      );
+    } else {
+      const rExt = estado.olhos === 'arredondado' ? 1.8 : 0;
+      const rInt = estado.olhos === 'arredondado' ? 0.75 : 0;
+      partes.push(
+        `<rect x="${x + 0.5}" y="${y + 0.5}" width="6" height="6" rx="${rExt}" fill="none" stroke="${estado.frente}" stroke-width="1"/>` +
+        `<rect x="${x + 2}" y="${y + 2}" width="3" height="3" rx="${rInt}" fill="${estado.frente}"/>`
+      );
+    }
+  }
+
+  /* imagem no centro */
+  if (estado.logo) {
+    const cx = caixaLogo(n);
+    if (estado.respiro) {
+      // Sobre fundo transparente o respiro precisa de uma cor própria, senão
+      // os módulos apareceriam atrás de uma imagem com transparência.
+      const corPad = estado.transparente ? '#FFFFFF' : estado.fundo;
+      partes.push(
+        `<rect x="${f(cx.padX)}" y="${f(cx.padY)}" width="${f(cx.padL)}" height="${f(cx.padA)}" ` +
+        `rx="${f(Math.min(cx.padL, cx.padA) * 0.16)}" fill="${corPad}"/>`
+      );
+    }
+    partes.push(
+      `<image href="${estado.logo}" xlink:href="${estado.logo}" ` +
+      `x="${f(cx.imgX)}" y="${f(cx.imgY)}" width="${f(cx.imgL)}" height="${f(cx.imgA)}" ` +
+      `preserveAspectRatio="xMidYMid meet"/>`
+    );
+  }
+
+  const dim = opcoes.px ? ` width="${opcoes.px}" height="${opcoes.px}"` : '';
+  const titulo = `<title>QR code: ${esc(estado.texto.slice(0, 120))}</title>`;
+  // Só quadrados: crispEdges alinha as bordas ao pixel e evita a franja cinza
+  // entre módulos vizinhos. Com curvas ele desliga o antisserrilhado e o
+  // resultado fica escadeado — nesse caso vale a renderização normal.
+  const nitidez = (estado.modulos === 'quadrado' && estado.olhos === 'quadrado')
+    ? ' shape-rendering="crispEdges"'
+    : '';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ` +
+    `viewBox="0 0 ${total} ${total}"${dim}${nitidez} role="img">` +
+    titulo + partes.join('') + `</svg>`;
+}
+
+/* ---------- render ---------- */
+let qrAtual = null;
+
+function render() {
+  const texto = estado.texto.trim();
+
+  // dica do https:// — endereço sem esquema é lido como texto puro
+  const pareceDominio = /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(\/|$)/i.test(texto) && !/\s/.test(texto);
+  elDicaUrl.hidden = !pareceDominio;
+
+  if (!texto) {
+    qrAtual = null;
+    elPreview.className = 'preview vazio';
+    elPreview.textContent = 'Cole um link ou escreva um texto para ver o código.';
+    elCaption.textContent = '';
+    elErro.hidden = true;
+    elDlPng.disabled = true;
+    elDlSvg.disabled = true;
+    atualizarMedidor(null);
+    return;
+  }
+
+  const nivel = estado.logo ? 'H' : estado.nivel;
+  let qr;
+  try {
+    qr = qrcode(0, nivel);
+    qr.addData(texto, 'Byte');
+    qr.make();
+  } catch {
+    qrAtual = null;
+    elPreview.className = 'preview vazio';
+    elPreview.textContent = 'Conteúdo longo demais.';
+    elCaption.textContent = '';
+    elErro.hidden = false;
+    elErro.textContent =
+      'Esse texto não cabe num QR code (o limite é cerca de 1.200 caracteres no nível H, ' +
+      'e menos ainda com acentos). Use um link curto no lugar do texto inteiro.';
+    elDlPng.disabled = true;
+    elDlSvg.disabled = true;
+    atualizarMedidor(null);
+    return;
+  }
+
+  qrAtual = qr;
+  elErro.hidden = true;
+  elPreview.className = 'preview' + (estado.transparente ? ' xadrez' : '');
+  elPreview.innerHTML = montarSvg(qr);
+  // O texto do usuário fica fora do markup gerado; entra aqui, já como dado.
+  const svg = elPreview.querySelector('svg');
+  if (svg) svg.setAttribute('aria-label', 'QR code de: ' + texto);
+
+  const n = qr.getModuleCount();
+  const versao = (n - 17) / 4;
+  const bytes = new TextEncoder().encode(texto).length;
+  elCaption.textContent =
+    `Versão ${versao} · ${n} × ${n} módulos · correção ${nivel} · ${bytes} bytes`;
+
+  elDlPng.disabled = false;
+  elDlSvg.disabled = false;
+  atualizarMedidor(qr);
+  atualizarContraste();
+}
+
+function atualizarMedidor(qr) {
+  if (!qr || !estado.logo) {
+    elMedTxt.textContent = '';
+    elMedFill.style.width = '0%';
+    return;
+  }
+  const n = qr.getModuleCount();
+  const cobertos = modulosCobertos(n, caixaLogo(n));
+  const fracao = cobertos / (n * n);
+  const reserva = RESERVA.H;
+  const usado = fracao / reserva;
+
+  elMedFill.style.width = Math.min(100, usado * 100).toFixed(1) + '%';
+  elMedFill.className = usado > 0.75 ? 'risco' : usado > 0.5 ? 'atencao' : '';
+
+  const pct = (fracao * 100).toFixed(1).replace('.', ',');
+  const situacao = usado > 0.75
+    ? 'Sobra pouca folga para dobra, sujeira ou impressão ruim — teste com o celular antes de usar.'
+    : usado > 0.5
+      ? 'Ainda dentro do limite, mas com menos reserva para imperfeições na impressão.'
+      : 'Folga confortável para desgaste, reflexo e impressão.';
+  elMedTxt.innerHTML =
+    `A imagem cobre <b>${pct}%</b> dos módulos, de uma reserva de cerca de 30% no nível H. ${situacao}`;
+}
+
+function atualizarContraste() {
+  const razao = contraste(estado.frente, estado.fundo);
+  const invertido = luminancia(estado.frente) > luminancia(estado.fundo);
+
+  if (estado.transparente) {
+    elAvisoCor.hidden = false;
+    elAvisoCor.textContent =
+      'Com fundo transparente, o código depende da superfície onde for aplicado — ' +
+      'sobre cor escura ou foto, a leitura falha. Use só sobre fundo claro e liso.';
+    return;
+  }
+  if (invertido) {
+    elAvisoCor.hidden = false;
+    elAvisoCor.textContent =
+      'Código invertido (módulos claros sobre fundo escuro). Alguns leitores resolvem, ' +
+      'muitos não. O esperado é escuro sobre claro.';
+    return;
+  }
+  if (razao < 4) {
+    elAvisoCor.hidden = false;
+    elAvisoCor.textContent =
+      `Contraste baixo (${razao.toFixed(1).replace('.', ',')}:1). Escureça os módulos ou clareie ` +
+      'o fundo — abaixo de 4:1 a leitura começa a falhar com pouca luz.';
+    return;
+  }
+  elAvisoCor.hidden = true;
+}
+
+/* ---------- imagem central ---------- */
+function carregarLogo(arquivo) {
+  if (!arquivo) return;
+  if (!arquivo.type.startsWith('image/')) {
+    alertaLogo('Escolha um arquivo de imagem (PNG, JPG, WebP ou SVG).');
+    return;
+  }
+
+  const leitor = new FileReader();
+  leitor.onerror = () => alertaLogo('Não foi possível ler esse arquivo.');
+  leitor.onload = () => {
+    const img = new Image();
+    img.onerror = () => alertaLogo('Não foi possível abrir essa imagem.');
+    img.onload = () => {
+      // Tudo é redesenhado como PNG de no máximo 512px: uniformiza os formatos
+      // (inclusive SVG), mantém os arquivos exportados leves e garante que o
+      // PNG final possa ser gerado — um SVG aninhado nem sempre rasteriza.
+      const MAX = 512;
+      const lo = img.naturalWidth || img.width || MAX;
+      const la = img.naturalHeight || img.height || MAX;
+      const escala = Math.min(1, MAX / Math.max(lo, la));
+      const w = Math.max(1, Math.round(lo * escala));
+      const h = Math.max(1, Math.round(la * escala));
+
+      const cv = document.createElement('canvas');
+      cv.width = w;
+      cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      estado.logo = cv.toDataURL('image/png');
+      estado.logoAspecto = w / h;
+
+      elLogoThumb.src = estado.logo;
+      elLogoNome.textContent = arquivo.name;
+      elDzVazio.hidden = true;
+      elDzCheio.hidden = false;
+      elLogoAcoes.hidden = false;
+      elLogoCtrl.hidden = false;
+      travarNivel(true);
+      render();
+    };
+    img.src = leitor.result;
+  };
+  leitor.readAsDataURL(arquivo);
+}
+
+function alertaLogo(msg) {
+  elErro.hidden = false;
+  elErro.textContent = msg;
+}
+
+function removerLogo() {
+  estado.logo = null;
+  estado.logoAspecto = 1;
+  elLogoInput.value = '';
+  elLogoThumb.removeAttribute('src');
+  elDzVazio.hidden = false;
+  elDzCheio.hidden = true;
+  elLogoAcoes.hidden = true;
+  elLogoCtrl.hidden = true;
+  travarNivel(false);
+  render();
+}
+
+// Com imagem no centro o nível vai para H e os outros ficam indisponíveis.
+function travarNivel(travado) {
+  elNivelNota.hidden = !travado;
+  document.querySelectorAll('#grupo-nivel .chip').forEach((b) => {
+    b.disabled = travado;
+    b.setAttribute('aria-pressed', String(
+      travado ? b.dataset.val === 'H' : b.dataset.val === estado.nivel
+    ));
+  });
+}
+
+/* ---------- downloads ---------- */
+function baixar(blob, nome, formato) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  // Âncora solta de propósito: o clique não sobe até o rastreador de PDFs do
+  // Layout, que registraria o UUID do blob. O evento certo é contado abaixo.
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+  if (window.goatcounter && window.goatcounter.count) {
+    window.goatcounter.count({
+      path: 'qrcode-download-' + formato,
+      title: 'Gerador de QR Code: download ' + formato.toUpperCase(),
+      event: true,
+    });
+  }
+}
+
+function baixarSvg() {
+  if (!qrAtual) return;
+  // O viewBox já garante a escala livre; a dimensão explícita só evita que o
+  // arquivo abra no tamanho padrão de 150px em editores como Inkscape.
+  const svg = montarSvg(qrAtual, { px: 1024 });
+  baixar(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), nomeArquivo('svg'), 'svg');
+}
+
+function baixarPng() {
+  if (!qrAtual) return;
+  const px = parseInt(elPngTam.value, 10);
+  const svg = montarSvg(qrAtual, { px });
+
+  const img = new Image();
+  img.onerror = () => alertaLogo('Não foi possível gerar o PNG. Tente baixar o SVG.');
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = px;
+    cv.height = px;
+    cv.getContext('2d').drawImage(img, 0, 0, px, px);
+    cv.toBlob((blob) => {
+      if (blob) baixar(blob, nomeArquivo('png'), 'png');
+    }, 'image/png');
+  };
+  // Data URI (e não blob:) para o canvas não ficar marcado como contaminado.
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ---------- ligações ---------- */
+function grupoChips(idGrupo, aoEscolher) {
+  const grupo = $(idGrupo);
+  grupo.addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip');
+    if (!btn || btn.disabled) return;
+    grupo.querySelectorAll('.chip').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
+    aoEscolher(btn.dataset.val);
+    render();
+  });
+}
+
+elConteudo.value = PADRAO;
+elConteudo.addEventListener('input', () => {
+  estado.texto = elConteudo.value;
+  render();
+});
+
+elBtnHttps.addEventListener('click', () => {
+  elConteudo.value = 'https://' + elConteudo.value.trim();
+  estado.texto = elConteudo.value;
+  elConteudo.focus();
+  render();
+});
+
+elDropzone.addEventListener('click', () => elLogoInput.click());
+elDropzone.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    elLogoInput.click();
+  }
+});
+elLogoInput.addEventListener('change', (e) => carregarLogo(e.target.files[0]));
+
+['dragenter', 'dragover'].forEach((ev) =>
+  elDropzone.addEventListener(ev, (e) => {
+    e.preventDefault();
+    elDropzone.classList.add('arrastando');
+  })
+);
+['dragleave', 'drop'].forEach((ev) =>
+  elDropzone.addEventListener(ev, (e) => {
+    e.preventDefault();
+    elDropzone.classList.remove('arrastando');
+  })
+);
+elDropzone.addEventListener('drop', (e) => {
+  const arquivo = e.dataTransfer && e.dataTransfer.files[0];
+  if (arquivo) carregarLogo(arquivo);
+});
+
+$('btn-remover-logo').addEventListener('click', removerLogo);
+
+elLogoTam.addEventListener('input', () => {
+  estado.logoTamanho = Number(elLogoTam.value) / 100;
+  elLogoTamV.textContent = elLogoTam.value + '%';
+  render();
+});
+
+elRespiro.addEventListener('change', () => {
+  estado.respiro = elRespiro.checked;
+  elLblResp.classList.toggle('on', elRespiro.checked);
+  render();
+});
+
+elCorFrente.addEventListener('input', () => {
+  estado.frente = elCorFrente.value.toUpperCase();
+  render();
+});
+elCorFundo.addEventListener('input', () => {
+  estado.fundo = elCorFundo.value.toUpperCase();
+  render();
+});
+
+$('presets').addEventListener('click', (e) => {
+  const btn = e.target.closest('.swatch');
+  if (!btn) return;
+  estado.frente = btn.dataset.frente;
+  estado.fundo = btn.dataset.fundo;
+  elCorFrente.value = estado.frente;
+  elCorFundo.value = estado.fundo;
+  if (estado.transparente) {
+    estado.transparente = false;
+    elTransp.checked = false;
+    elLblTransp.classList.remove('on');
+  }
+  render();
+});
+
+elTransp.addEventListener('change', () => {
+  estado.transparente = elTransp.checked;
+  elLblTransp.classList.toggle('on', elTransp.checked);
+  render();
+});
+
+elMargem.addEventListener('input', () => {
+  estado.margem = Number(elMargem.value);
+  elMargemV.textContent = estado.margem === 1 ? '1 módulo' : estado.margem + ' módulos';
+  render();
+});
+
+grupoChips('grupo-modulos', (v) => { estado.modulos = v; });
+grupoChips('grupo-olhos',   (v) => { estado.olhos = v; });
+grupoChips('grupo-nivel',   (v) => { estado.nivel = v; });
+
+elDlPng.addEventListener('click', baixarPng);
+elDlSvg.addEventListener('click', baixarSvg);
+
+render();
+</script>
