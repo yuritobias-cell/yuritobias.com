@@ -19,5 +19,6 @@
   { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: circunferência e círculo.", "arquivo": "004-revisao2etapa.pdf", "video": { "url": "https://youtu.be/8A0DQSNAwKA", "topicos": [] } },
   { "n": "15", "titulo": "Para Casa — Equações", "descricao": "Equações do 1º grau e sistemas lineares — iniciando o segundo semestre.", "arquivo": "15-para-casa-equacoes.pdf" },
   { "n": "16", "titulo": "Para Casa — Discriminante e Função do 1º Grau", "descricao": "Condições sobre as raízes usando o discriminante com parâmetro e função polinomial do 1º grau.", "arquivo": "16-para-casa-discriminante-funcao1grau.pdf" },
-  { "n": "17", "titulo": "Para Casa — Funções e Inequações", "descricao": "Gráfico e zero da função afim, domínio de funções e inequações do 1º grau em situações-problema. Correção em 28/08.", "arquivo": "17-para-casa-funcoes-inequacoes.pdf" }
+  { "n": "17", "titulo": "Para Casa — Funções e Inequações", "descricao": "Gráfico e zero da função afim, domínio de funções e inequações do 1º grau em situações-problema. Correção em 28/08.", "arquivo": "17-para-casa-funcoes-inequacoes.pdf" },
+  { "n": "18", "titulo": "Para Casa — Função Quadrática", "descricao": "Discriminante e raízes, vértice e imagem, estudo de sinais e problemas de máximo e mínimo. Correção em 04/09.", "arquivo": "18-para-casa-funcao-quadratica.pdf" }
 ]

@@ -16,5 +16,11 @@
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 1",
     "descricao": "Análise combinatória: princípio fundamental da contagem, permutações, arranjos e combinações.",
     "arquivo": "3-av2etapa.pdf"
+  },
+  {
+    "n": "4",
+    "titulo": "Prova Somativa — 2ª Etapa — Bloco 2",
+    "descricao": "Probabilidade: espaço amostral, união de eventos, probabilidade condicional, independência e eventos sucessivos.",
+    "arquivo": "4-av2etapa.pdf"
   }
 ]

@@ -19,5 +19,6 @@
   { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: funções afim e quadrática.", "arquivo": "004-revisao2etapa.pdf", "video": { "url": "https://youtu.be/uXuJEFg3r_U", "topicos": [] } },
   { "n": "15", "titulo": "Para Casa — Funções", "descricao": "Raízes e pontos de máximo e mínimo das funções afim e quadrática — iniciando o segundo semestre.", "arquivo": "15-para-casa-funcoes.pdf" },
   { "n": "16", "titulo": "Material Extra — Malhas Diversas para Desenho", "descricao": "Material extra para imprimir: malhas quadriculada, pontilhada e isométrica para desenhos e construções geométricas.", "arquivo": "16-malhas-variadas.pdf" },
-  { "n": "17", "titulo": "Para Casa — Teorema de Pitágoras", "descricao": "Cálculo de medidas em triângulos retângulos, recíproca do teorema e problemas de aplicação. Correção em 28/08.", "arquivo": "17-para-casa-pitagoras.pdf" }
+  { "n": "17", "titulo": "Para Casa — Teorema de Pitágoras", "descricao": "Cálculo de medidas em triângulos retângulos, recíproca do teorema e problemas de aplicação. Correção em 28/08.", "arquivo": "17-para-casa-pitagoras.pdf" },
+  { "n": "18", "titulo": "Para Casa — Relações Métricas no Triângulo Retângulo", "descricao": "Hipotenusa, altura relativa e projeções dos catetos, com problemas de aplicação. Correção em 04/09.", "arquivo": "18-para-casa-relacoes-metricas.pdf" }
 ]

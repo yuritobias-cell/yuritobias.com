@@ -18,5 +18,6 @@
   { "n": "14", "titulo": "Probabilidade", "descricao": "Exercícios de probabilidade.", "arquivo": "14-probabilidade.pdf" },
   { "n": "R4", "titulo": "Lista de Revisão — 2ª Etapa II", "descricao": "Lista de revisão para a 2ª etapa: probabilidade.", "arquivo": "004-revisao2etapa.pdf", "video": { "url": "https://youtu.be/H0AKADkUhXQ", "topicos": [] } },
   { "n": "15", "titulo": "Para Casa — Probabilidade", "descricao": "Probabilidade — iniciando o segundo semestre.", "arquivo": "15-para-casa-probabilidade.pdf" },
-  { "n": "16", "titulo": "Para Casa — Transformações Geométricas", "descricao": "Vetores no plano cartesiano, translações e rotações em torno da origem.", "arquivo": "16-para-casa-transformacoes-geometricas.pdf" }
+  { "n": "16", "titulo": "Para Casa — Transformações Geométricas", "descricao": "Vetores no plano cartesiano, translações e rotações em torno da origem.", "arquivo": "16-para-casa-transformacoes-geometricas.pdf" },
+  { "n": "17", "titulo": "Para Casa — Sistemas, Semelhança e Porcentagem", "descricao": "Questões de múltipla escolha no estilo ENEM: sistemas lineares, semelhança de triângulos e variação percentual. Resolver no caderno. Correção em 04/09.", "arquivo": "17-para-casa-sistemas-semelhanca-porcentagem.pdf" }
 ]
