@@ -1,0 +1,786 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Malhas para Imprimir"
+  description="Gere folhas A4 de malha quadriculada, pontilhada ou isométrica: escolha o passo em centímetros, a espessura do traço, o cabeçalho da escola e o espaço para o nome do aluno — e imprima ou salve em PDF."
+>
+
+  <!-- IBM Plex Mono carregado só nesta página (rótulos técnicos e medidas usam mono).
+       Playfair Display + IBM Plex Sans já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <div class="mal-root">
+
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · Geometria</p>
+      <h1>Malhas para <em>imprimir</em></h1>
+      <p class="lede">Folhas A4 de malha <em>quadriculada</em>, <em>pontilhada</em> ou
+      <em>isométrica</em>, do jeito que a aula pede. Escolha o <em>passo</em> em centímetros,
+      decida se a folha leva o nome da escola e o espaço para o aluno se identificar — ou tire
+      tudo e fique só com a malha limpa. O que sai no papel é apenas a <em>folha</em>: os
+      controles não são impressos. Tudo é gerado no seu navegador.</p>
+    </header>
+
+    <div class="stage">
+
+      <!-- ---------- pré-visualização + impressão ---------- -->
+      <div class="canvas-card">
+        <div class="palco" id="palco" aria-live="polite">
+          <div class="pilha" id="pilha"></div>
+        </div>
+        <p class="caption" id="caption"></p>
+
+        <div class="export">
+          <button class="primary" id="btn-imprimir" type="button">Imprimir / Salvar PDF</button>
+          <button class="ghost" id="btn-restaurar" type="button">Restaurar padrões</button>
+        </div>
+        <p class="export-nota">Na caixa de impressão, escolha papel <b>A4</b> e escala
+        <b>100%</b> — se a impressora “ajustar à página”, o passo sai menor do que o pedido.</p>
+      </div>
+
+      <!-- ---------- controles ---------- -->
+      <div class="panel">
+
+        <div class="card">
+          <h2>Tipo de malha</h2>
+          <p class="hint">A malha ocupa toda a área livre da folha, sempre num número inteiro de casas.</p>
+          <div class="chips" id="tipo" role="group" aria-label="Tipo de malha">
+            <button class="chip" type="button" data-v="quadriculada" aria-pressed="true">Quadriculada</button>
+            <button class="chip" type="button" data-v="pontilhada" aria-pressed="false">Pontilhada</button>
+            <button class="chip" type="button" data-v="isometrica" aria-pressed="false">Isométrica</button>
+          </div>
+          <label class="toggle" id="lbl-tres">
+            <input type="checkbox" id="tres" />
+            Imprimir os três tipos (3 páginas)
+          </label>
+        </div>
+
+        <div class="card">
+          <h2>Tamanho</h2>
+          <p class="hint">Distância entre duas linhas vizinhas — o <em>lado do quadrado</em>, ou o
+          <em>lado do triângulo</em> na isométrica.</p>
+
+          <div class="slider">
+            <label for="passo">Passo da malha <b id="passo-val">0,5 cm</b></label>
+            <input type="range" id="passo" min="0.25" max="2.5" step="0.05" value="0.5" />
+          </div>
+
+          <div class="chips" id="passo-presets" aria-label="Passos usuais">
+            <button class="chip mini" type="button" data-p="0.25">0,25 cm</button>
+            <button class="chip mini" type="button" data-p="0.5">0,5 cm</button>
+            <button class="chip mini" type="button" data-p="0.7">0,7 cm</button>
+            <button class="chip mini" type="button" data-p="1">1 cm</button>
+            <button class="chip mini" type="button" data-p="2">2 cm</button>
+          </div>
+
+          <div class="campo" style="margin-top:16px">
+            <div class="card-label">Traço</div>
+            <div class="chips" id="traco" role="group" aria-label="Espessura do traço">
+              <button class="chip" type="button" data-v="claro" aria-pressed="false">Claro</button>
+              <button class="chip" type="button" data-v="medio" aria-pressed="true">Médio</button>
+              <button class="chip" type="button" data-v="escuro" aria-pressed="false">Escuro</button>
+            </div>
+            <p class="dica">Impressoras a jato costumam engordar o traço; se a malha sair pesada, use <b>claro</b>.</p>
+          </div>
+
+          <label class="toggle on" id="lbl-moldura">
+            <input type="checkbox" id="moldura" checked />
+            Moldura em volta da malha
+          </label>
+        </div>
+
+        <div class="card">
+          <h2>Folha</h2>
+          <p class="hint">A4, com 1 cm de margem em cada borda.</p>
+          <div class="chips" id="orientacao" role="group" aria-label="Orientação da folha">
+            <button class="chip" type="button" data-v="retrato" aria-pressed="true">Retrato</button>
+            <button class="chip" type="button" data-v="paisagem" aria-pressed="false">Paisagem</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Cabeçalho</h2>
+          <p class="hint">Deixe um campo em branco para ele sumir da folha.</p>
+
+          <div class="chips" style="margin-bottom:14px">
+            <button class="chip" type="button" id="btn-pura">Malha pura</button>
+            <button class="chip" type="button" id="btn-completo">Folha de aula</button>
+          </div>
+
+          <div class="campo">
+            <label class="card-label" for="escola">Nome da escola</label>
+            <input type="text" id="escola" maxlength="70" placeholder="Ex.: Escola SESI Poços de Caldas" />
+          </div>
+
+          <div class="campo">
+            <label class="card-label" for="titulo">Título da atividade</label>
+            <input type="text" id="titulo" maxlength="90" placeholder="Ex.: Sólidos em perspectiva isométrica" />
+          </div>
+
+          <label class="toggle on" id="lbl-ident">
+            <input type="checkbox" id="ident" checked />
+            Espaço para aluno, turma e data
+          </label>
+          <label class="toggle" id="lbl-regua">
+            <input type="checkbox" id="regua" />
+            Régua de conferência no rodapé
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <section class="theory">
+      <h2>As três malhas</h2>
+      <p><b>Quadriculada</b> — o papel escolar de sempre. Área e perímetro, ampliação e redução,
+      plano cartesiano, gráficos. O passo de <b>0,5 cm</b> é o padrão dos cadernos.</p>
+      <p><b>Pontilhada</b> — os mesmos pontos da quadriculada, sem as linhas. Como quase nada já
+      está traçado, o desenho do aluno aparece limpo: é a malha certa para polígonos,
+      transformações geométricas e composição de áreas.</p>
+      <p><b>Isométrica</b> — linhas verticais e linhas a ±30°, formando triângulos equiláteros.
+      É a malha da perspectiva isométrica: cubos e sólidos empilhados saem com as três direções
+      na mesma escala, sem a distorção da perspectiva cônica. Aqui o passo é o
+      <b>lado do triângulo</b> — as verticais ficam a <span class="nowrap">passo × √3⁄2</span>
+      uma da outra.</p>
+
+      <h2>Escala de impressão</h2>
+      <p>O tamanho impresso só corresponde ao que está escrito se a impressora não redimensionar
+      a página. Escolha <b>A4</b> e escala <b>100%</b> (e não “ajustar à página”). Na primeira
+      impressão, ligue a <b>régua de conferência</b> e meça os 5 cm com uma régua de verdade: se
+      bater, todas as folhas seguintes batem.</p>
+      <p class="nota-final">Malhas geradas a partir das folhas em LaTeX/TikZ que uso em sala.
+      Nada é enviado para servidor nenhum — a folha é montada e impressa aqui mesmo.
+      <span class="marca">Yuri Tobias · Escola SESI Poços de Caldas</span></p>
+    </section>
+
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Malhas para imprimir
+     Todo o CSS abaixo é escopado sob .mal-root para não vazar
+     para o resto do site. As variáveis ficam no próprio .mal-root.
+
+     Duas decisões que sustentam a fidelidade da impressão:
+     1) A folha e tudo dentro dela são medidos em MILÍMETROS — o
+        mesmo valor vale na tela e no papel, sem conversão.
+     2) A pré-visualização é encolhida por transform:scale(), que
+        não altera o layout; na impressão o transform é removido e
+        a folha volta ao tamanho real.
+     ============================================================ */
+
+  .mal-root{
+    /* tokens (escopados nesta ferramenta) */
+    --bg:#F8F6F1;
+    --ink:#1C1917;
+    --muted:#78716C;
+    --accent:#1B4F4F;
+    --rule-c:#E2DDD6;
+    --paper:#FFFFFF;
+    --destaque:#A8442B;               /* terracota — ações */
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+    --radius:14px;
+
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    color:var(--ink);
+    max-width:1180px;
+    margin:0 auto;
+    padding:30px 22px 56px;
+  }
+  .mal-root, .mal-root *{box-sizing:border-box}
+  .mal-root .nowrap{white-space:nowrap}
+
+  /* ----- cabeçalho ----- */
+  .mal-root header.masthead{margin-bottom:22px}
+  .mal-root .eyebrow{
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px
+  }
+  .mal-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .mal-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .mal-root h1{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em
+  }
+  .mal-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .mal-root .lede{color:var(--muted);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .mal-root .lede em{font-style:normal;color:var(--ink)}
+
+  /* ----- layout ----- */
+  .mal-root .stage{display:grid;grid-template-columns:1fr .82fr;gap:22px;align-items:start;margin-top:26px}
+  /* Sem isto, a folha em paisagem (277 mm de largura natural) estoura a coluna:
+     item de grid não encolhe abaixo do próprio conteúdo por padrão. */
+  .mal-root .stage > *{min-width:0}
+  @media (max-width:940px){.mal-root .stage{grid-template-columns:1fr}}
+
+  .mal-root .canvas-card{
+    background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);
+    padding:18px;box-shadow:0 18px 44px -30px rgba(28,25,23,.45)
+  }
+
+  /* O palco recorta; a pilha é encolhida por scale() para caber. */
+  .mal-root .palco{
+    overflow:hidden;background:var(--bg);border-radius:10px;
+    padding:14px;min-height:120px
+  }
+  .mal-root .pilha{
+    width:max-content;display:flex;flex-direction:column;gap:16px;
+    transform-origin:top left
+  }
+
+  .mal-root .caption{
+    font-family:var(--font-mono);font-size:11.5px;color:var(--muted);
+    margin:12px 2px 0;line-height:1.6
+  }
+  .mal-root .export{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+  .mal-root .export-nota{margin:10px 2px 0;font-size:12px;color:var(--muted);line-height:1.55}
+  .mal-root .export-nota b{color:var(--ink);font-weight:600}
+
+  .mal-root .panel{display:flex;flex-direction:column;gap:16px}
+  .mal-root .card{
+    background:var(--paper);border:1px solid var(--rule-c);
+    border-radius:var(--radius);padding:18px
+  }
+  .mal-root .card h2{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0 0 4px}
+  .mal-root .card .hint{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+  .mal-root .card .hint em{font-style:normal;color:var(--ink)}
+  .mal-root .card-label{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:9px;display:block
+  }
+  .mal-root .campo{margin-bottom:16px}
+  .mal-root .campo:last-of-type{margin-bottom:0}
+
+  .mal-root input[type="text"]{
+    width:100%;font-family:var(--font-body);font-size:14px;color:var(--ink);
+    border:1px solid var(--rule-c);border-radius:10px;padding:10px 12px;background:var(--bg)
+  }
+  .mal-root input[type="text"]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  .mal-root input[type="text"]::placeholder{color:#A8A29E}
+
+  .mal-root .slider{margin-bottom:12px}
+  .mal-root .slider label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13px;color:var(--muted);margin-bottom:7px
+  }
+  .mal-root .slider label b{font-family:var(--font-mono);font-size:12.5px;color:var(--ink);font-weight:600}
+  .mal-root input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer}
+
+  .mal-root .dica{margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .mal-root .dica b{color:var(--ink);font-weight:600}
+
+  /* ----- botões, chips e toggles ----- */
+  .mal-root .ghost, .mal-root .primary, .mal-root .chip{
+    appearance:none;font-family:var(--font-body);font-size:13px;font-weight:500;
+    border-radius:999px;padding:9px 16px;cursor:pointer;transition:.16s
+  }
+  .mal-root .ghost, .mal-root .chip{
+    background:transparent;color:var(--muted);border:1px solid var(--rule-c)
+  }
+  .mal-root .ghost:hover, .mal-root .chip:hover{color:var(--ink);border-color:var(--muted)}
+  .mal-root .primary{
+    background:var(--destaque);border:1px solid var(--destaque);color:#fff;
+    box-shadow:0 8px 20px -12px var(--destaque)
+  }
+  .mal-root .primary:hover{filter:brightness(1.06)}
+  .mal-root .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mal-root .chip.mini{padding:6px 12px;font-size:12.5px;font-family:var(--font-mono)}
+  .mal-root .chip.mini.ativo{border-color:var(--accent);color:var(--accent)}
+  .mal-root .chips{display:flex;flex-wrap:wrap;gap:7px}
+
+  .mal-root .toggle{
+    display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    border:1px solid var(--rule-c);border-radius:999px;padding:7px 14px;cursor:pointer;
+    user-select:none;transition:.16s;margin-top:10px;width:fit-content
+  }
+  .mal-root .toggle:hover{color:var(--ink)}
+  .mal-root .toggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+  .mal-root .toggle.on{color:var(--ink);border-color:var(--muted)}
+
+  /* ============================================================
+     A FOLHA — daqui para baixo tudo é medido em mm, porque é
+     exatamente isto que vai para o papel.
+     ============================================================ */
+  .mal-root .folha{
+    background:#fff;color:#1a1a1a;flex:none;
+    display:flex;flex-direction:column;
+    outline:1px solid var(--rule-c);            /* outline não consome largura */
+    box-shadow:0 18px 44px -30px rgba(28,25,23,.55)
+  }
+
+  .mal-root .cab{
+    border:.3mm solid #4a4a4a;border-radius:1mm;overflow:hidden;
+    margin-bottom:4mm;flex:none
+  }
+  .mal-root .cab-topo{padding:3mm 4mm;text-align:center}
+  .mal-root .cab-escola{
+    font-family:var(--font-display);font-weight:700;font-size:4.6mm;line-height:1.2;margin:0
+  }
+  .mal-root .cab-titulo{font-size:3.2mm;line-height:1.3;color:#555;margin:1.2mm 0 0}
+  .mal-root .cab-topo .cab-escola + .cab-titulo{margin-top:1.2mm}
+
+  .mal-root .cab-ident{
+    display:flex;gap:5mm;align-items:baseline;
+    padding:2.8mm 4mm;border-top:.3mm solid #4a4a4a
+  }
+  .mal-root .cab-ident:first-child{border-top:0}
+  .mal-root .cab-ident span{display:flex;align-items:baseline;gap:1.8mm}
+  .mal-root .cab-ident b{
+    font-weight:600;font-size:2.7mm;letter-spacing:.09em;color:#444;flex:none
+  }
+  .mal-root .cab-ident i{flex:1;border-bottom:.25mm solid #8a8a8a;height:4.2mm}
+  .mal-root .cab-ident .nome{flex:3}
+  .mal-root .cab-ident .turma{flex:1.15}
+  .mal-root .cab-ident .data{flex:1.35}
+
+  .mal-root .area{
+    flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center
+  }
+  .mal-root .area svg{display:block}
+
+  .mal-root .pe{
+    flex:none;margin-top:3mm;display:flex;align-items:flex-end;justify-content:space-between;
+    gap:6mm;font-size:2.7mm;color:#6a6a6a;line-height:1.3
+  }
+  .mal-root .pe .conf{display:flex;align-items:flex-end;gap:1.6mm;flex:none}
+  .mal-root .pe .conf em{font-style:normal;font-size:2.5mm}
+
+  /* ============================================================
+     IMPRESSÃO — só a folha sai no papel
+     ============================================================ */
+  @media print{
+    html, body{background:#fff !important}
+    body > nav, body > footer{display:none !important}
+    .mal-root{padding:0;max-width:none;color:#000}
+    .mal-root .masthead,
+    .mal-root .panel,
+    .mal-root .caption,
+    .mal-root .export,
+    .mal-root .export-nota,
+    .mal-root .theory{display:none !important}
+    .mal-root .stage{display:block;margin:0;gap:0}
+    .mal-root .canvas-card{
+      border:0;border-radius:0;padding:0;box-shadow:none;background:#fff
+    }
+    .mal-root .palco{
+      overflow:visible !important;background:#fff;border-radius:0;padding:0;
+      height:auto !important;min-height:0
+    }
+    .mal-root .pilha{
+      transform:none !important;width:auto;display:block;gap:0
+    }
+    .mal-root .folha{outline:0;box-shadow:none;margin:0}
+    .mal-root .folha + .folha{break-before:page}
+    .mal-root *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+
+  @media (prefers-reduced-motion:reduce){.mal-root *{transition:none !important}}
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+
+/* ==========================================================================
+   0) CONSTANTES
+   ========================================================================== */
+const PX_MM = 96 / 25.4;            // 1 mm em px CSS (referência fixa do CSS)
+const MARGEM_PAGINA = 10;           // mm de margem da @page, em cada borda
+
+/* Folha útil = A4 menos as margens. 1 mm de folga na altura evita que um
+   arredondamento de sub-pixel empurre uma página em branco. */
+const FOLHA = {
+  retrato:  { larg: 210 - 2 * MARGEM_PAGINA, alt: 297 - 2 * MARGEM_PAGINA - 1 },
+  paisagem: { larg: 297 - 2 * MARGEM_PAGINA, alt: 210 - 2 * MARGEM_PAGINA - 1 },
+};
+
+const TIPOS = ['quadriculada', 'pontilhada', 'isometrica'];
+const NOME_TIPO = {
+  quadriculada: 'malha quadriculada',
+  pontilhada:   'malha pontilhada',
+  isometrica:   'malha isométrica',
+};
+
+/* Espessuras em mm. O TikZ original usa 0,3pt (≈0,106 mm) para o fio e
+   0,8pt (≈0,28 mm) para a moldura; "médio" fica por aí. */
+const TRACOS = {
+  claro:  { cor: '#C4C4C4', esp: 0.14, borda: '#9A9A9A', bordaEsp: 0.25, ponto: 0.85 },
+  medio:  { cor: '#9E9E9E', esp: 0.17, borda: '#6E6E6E', bordaEsp: 0.30, ponto: 1.00 },
+  escuro: { cor: '#6E6E6E', esp: 0.22, borda: '#3D3D3D', bordaEsp: 0.38, ponto: 1.25 },
+};
+
+const PADRAO = {
+  tipo: 'quadriculada', passo: 0.5, traco: 'medio', moldura: true,
+  orientacao: 'retrato', tres: false,
+  escola: '', titulo: '', ident: true, regua: false,
+};
+
+const est = { ...PADRAO };
+
+const $ = (id) => document.getElementById(id);
+const num = (n) => Math.round(n * 1000) / 1000;          // encurta o "d" do path
+const cm = (n) => n.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+
+/* A regra @page não aceita valores dinâmicos vindos do CSS estático:
+   a orientação é reescrita aqui a cada mudança. */
+const cssPagina = document.createElement('style');
+document.head.appendChild(cssPagina);
+
+/* ==========================================================================
+   1) GEOMETRIA — quantas casas cabem na área livre
+   Como no arquivo TikZ, a malha é truncada para um número INTEIRO de casas,
+   de modo que a moldura caia exatamente sobre uma linha da rede.
+   ========================================================================== */
+/* Quantas casas inteiras cabem em `disp`. Quando a divisão dá quase exata — o
+   caso comum, 19 cm de largura com passo 0,5 cm — a última casa se perderia
+   por um erro de sub-pixel na medição: aqui ela é mantida, ao custo de um
+   décimo de milímetro de traço avançando sobre a margem da página, que tem
+   1 cm de folga. Fora dessa vizinhança, trunca. */
+function casas(disp, passo) {
+  const n = disp / passo;
+  const inteiro = Math.round(n);
+  return Math.max(1, Math.abs(n - inteiro) < 0.02 ? inteiro : Math.floor(n));
+}
+
+function geometria(tipo, largDisp, altDisp, p) {
+  if (tipo === 'isometrica') {
+    // As verticais distam passo·√3/2; as diagonais a ±30° cruzam o eixo
+    // vertical de passo em passo, o que dá triângulos equiláteros de lado p.
+    const hv = p * Math.sqrt(3) / 2;
+    const cols = casas(largDisp, hv);
+    const rows = casas(altDisp, p);
+    return { W: cols * hv, H: rows * p, cols, rows, off: 0, hv };
+  }
+  // Na pontilhada os pontos ficam nos vértices da rede; a moldura recua meio
+  // passo para não passar em cima da última fileira de pontos.
+  const off = tipo === 'pontilhada' ? p / 2 : 0;
+  const cols = casas(largDisp - 2 * off, p);
+  const rows = casas(altDisp - 2 * off, p);
+  return { W: cols * p, H: rows * p, cols, rows, off };
+}
+
+/* ==========================================================================
+   2) DESENHO DA MALHA (SVG em milímetros: 1 unidade do viewBox = 1 mm)
+   ========================================================================== */
+function svgMalha(tipo, g, p) {
+  const T = TRACOS[est.traco];
+  const m = 0.3;                                   // meia espessura da moldura mais grossa
+  const { W, H, off } = g;
+  const x0 = -off - m, y0 = -off - m;
+  const larg = W + 2 * off + 2 * m, alt = H + 2 * off + 2 * m;
+
+  let miolo = '';
+  let defs = '';
+
+  if (tipo === 'quadriculada') {
+    const d = [];
+    for (let i = 0; i <= g.cols; i++) d.push(`M${num(i * p)} 0V${num(H)}`);
+    for (let j = 0; j <= g.rows; j++) d.push(`M0 ${num(j * p)}H${num(W)}`);
+    miolo = `<path d="${d.join('')}" fill="none" stroke="${T.cor}" stroke-width="${T.esp}"/>`;
+
+  } else if (tipo === 'pontilhada') {
+    // Milhares de pontos viram um <pattern> — um elemento em vez de um por ponto.
+    // O deslocamento de meio passo põe o círculo no centro do ladrilho (longe da
+    // borda, que recortaria o desenho) e ainda assim nos vértices da rede.
+    const r = Math.min(0.55, Math.max(0.17, p * 0.048)) * T.ponto;
+    const id = 'malha-pontos';
+    defs = `<pattern id="${id}" x="${num(-p / 2)}" y="${num(-p / 2)}" width="${num(p)}" height="${num(p)}" patternUnits="userSpaceOnUse">`
+         + `<circle cx="${num(p / 2)}" cy="${num(p / 2)}" r="${num(r)}" fill="${T.cor}"/></pattern>`;
+    miolo = `<rect x="${num(-r - 0.1)}" y="${num(-r - 0.1)}" width="${num(W + 2 * r + 0.2)}" height="${num(H + 2 * r + 0.2)}" fill="url(#${id})"/>`;
+
+  } else {
+    // Isométrica: verticais + duas famílias a ±30°, recortadas no retângulo.
+    const hv = g.hv;
+    const dy = W / Math.sqrt(3);                   // subida da diagonal ao cruzar a folha
+    const d = [];
+    for (let i = 0; i <= g.cols; i++) d.push(`M${num(i * hv)} 0V${num(H)}`);
+    const kIni = Math.floor(-dy / p) - 1, kFim = Math.ceil((H + dy) / p) + 1;
+    for (let k = kIni; k <= kFim; k++) {
+      const y = k * p;
+      if (y + dy >= -0.001 && y <= H + 0.001) d.push(`M0 ${num(y)}L${num(W)} ${num(y + dy)}`);
+      if (y - dy <= H + 0.001 && y >= -0.001) d.push(`M0 ${num(y)}L${num(W)} ${num(y - dy)}`);
+    }
+    defs = `<clipPath id="malha-corte"><rect x="0" y="0" width="${num(W)}" height="${num(H)}"/></clipPath>`;
+    miolo = `<g clip-path="url(#malha-corte)"><path d="${d.join('')}" fill="none" stroke="${T.cor}" stroke-width="${T.esp}"/></g>`;
+  }
+
+  // A moldura fecha a malha por fora. Na quadriculada as linhas de borda já
+  // saem dos próprios laços; na isométrica, não: a última vertical cai em cima
+  // do recorte e sairia com metade da espessura, então é redesenhada aqui.
+  let borda = '';
+  if (est.moldura) {
+    borda = `<rect x="${num(-off)}" y="${num(-off)}" width="${num(W + 2 * off)}" height="${num(H + 2 * off)}"`
+          + ` fill="none" stroke="${T.borda}" stroke-width="${T.bordaEsp}"/>`;
+  } else if (tipo === 'isometrica') {
+    borda = `<path d="M${num(W)} 0V${num(H)}" fill="none" stroke="${T.cor}" stroke-width="${T.esp}"/>`;
+  }
+
+  return `<svg width="${num(larg)}mm" height="${num(alt)}mm" viewBox="${num(x0)} ${num(y0)} ${num(larg)} ${num(alt)}"`
+       + ` xmlns="http://www.w3.org/2000/svg" role="img"`
+       + ` aria-label="${NOME_TIPO[tipo]} de passo ${cm(est.passo)} centímetros">`
+       + `<defs>${defs}</defs>${miolo}${borda}</svg>`;
+}
+
+/* Régua de 5 cm impressa no rodapé, para conferir a escala da impressora. */
+function svgRegua() {
+  const d = ['M0.3 5.3H50.3'];
+  for (let i = 0; i <= 5; i++) d.push(`M${(0.3 + i * 10).toFixed(1)} 5.3V1.7`);
+  for (let i = 0; i < 5; i++) d.push(`M${(5.3 + i * 10).toFixed(1)} 5.3V3.3`);
+  return `<svg width="50.6mm" height="6mm" viewBox="0 0 50.6 6" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`
+       + `<path d="${d.join('')}" fill="none" stroke="#6a6a6a" stroke-width="0.25"/></svg>`;
+}
+
+/* ==========================================================================
+   3) MONTAGEM DA FOLHA
+   O cabeçalho e o rodapé entram primeiro; a área da malha é o que sobra, e o
+   tamanho dela é MEDIDO no layout — assim um título que ocupa duas linhas
+   simplesmente encurta a malha, sem cálculo à mão.
+   ========================================================================== */
+function montarFolha(tipo) {
+  const dim = FOLHA[est.orientacao];
+  const folha = document.createElement('div');
+  folha.className = 'folha';
+  folha.style.width = dim.larg + 'mm';
+  folha.style.height = dim.alt + 'mm';
+
+  const escola = est.escola.trim();
+  const titulo = est.titulo.trim();
+
+  if (escola || titulo || est.ident) {
+    const cab = document.createElement('div');
+    cab.className = 'cab';
+
+    if (escola || titulo) {
+      const topo = document.createElement('div');
+      topo.className = 'cab-topo';
+      if (escola) {
+        const h = document.createElement('p');
+        h.className = 'cab-escola';
+        h.textContent = escola;
+        topo.appendChild(h);
+      }
+      if (titulo) {
+        const s = document.createElement('p');
+        s.className = 'cab-titulo';
+        s.textContent = titulo;
+        topo.appendChild(s);
+      }
+      cab.appendChild(topo);
+    }
+
+    if (est.ident) {
+      const linha = document.createElement('div');
+      linha.className = 'cab-ident';
+      for (const [classe, rotulo] of [['nome', 'ALUNO'], ['turma', 'TURMA'], ['data', 'DATA']]) {
+        const s = document.createElement('span');
+        s.className = classe;
+        const b = document.createElement('b');
+        b.textContent = rotulo;
+        s.append(b, document.createElement('i'));
+        linha.appendChild(s);
+      }
+      cab.appendChild(linha);
+    }
+    folha.appendChild(cab);
+  }
+
+  const area = document.createElement('div');
+  area.className = 'area';
+  folha.appendChild(area);
+
+  if (est.regua) {
+    const pe = document.createElement('footer');
+    pe.className = 'pe';
+    const legenda = document.createElement('span');
+    legenda.textContent = NOME_TIPO[tipo].replace('malha', 'Malha') + ' · passo ' + cm(est.passo) + ' cm';
+    const conf = document.createElement('span');
+    conf.className = 'conf';
+    conf.innerHTML = svgRegua();
+    const rot = document.createElement('em');
+    rot.textContent = '5 cm';
+    conf.appendChild(rot);
+    pe.append(legenda, conf);
+    folha.appendChild(pe);
+  }
+
+  return folha;
+}
+
+/* Preenche a malha depois que a folha já está no layout (para poder medir). */
+function preencherMalha(tipo, folha) {
+  const area = folha.querySelector('.area');
+  const caixa = area.getBoundingClientRect();      // sem transform neste instante
+  const p = est.passo * 10;                        // cm → mm
+  const g = geometria(tipo, caixa.width / PX_MM, caixa.height / PX_MM, p);
+  area.innerHTML = svgMalha(tipo, g, p);
+  return g;
+}
+
+/* ==========================================================================
+   4) RENDER
+   ========================================================================== */
+function render() {
+  cssPagina.textContent =
+    `@page{size:A4 ${est.orientacao === 'paisagem' ? 'landscape' : 'portrait'};margin:${MARGEM_PAGINA}mm}`;
+
+  const pilha = $('pilha');
+  pilha.style.transform = 'none';                  // medir sempre em escala 1:1
+  pilha.textContent = '';
+
+  const tipos = est.tres ? TIPOS : [est.tipo];
+  const folhas = tipos.map((t) => {
+    const f = montarFolha(t);
+    pilha.appendChild(f);
+    return { tipo: t, folha: f };
+  });
+  const geos = folhas.map(({ tipo, folha }) => preencherMalha(tipo, folha));
+
+  legendar(tipos, geos);
+  ajustarZoom();
+}
+
+function legendar(tipos, geos) {
+  const p = cm(est.passo);
+  const folha = est.orientacao === 'paisagem' ? 'A4 paisagem' : 'A4 retrato';
+  let txt;
+  if (est.tres) {
+    txt = `${folha} · 3 páginas: quadriculada, pontilhada e isométrica · passo ${p} cm`;
+  } else {
+    const g = geos[0];
+    const medida = `${cm(g.W / 10)} × ${cm(g.H / 10)} cm`;
+    txt = tipos[0] === 'isometrica'
+      ? `${folha} · ${NOME_TIPO.isometrica} · triângulos de ${p} cm · ${g.cols} × ${g.rows} · ${medida}`
+      : `${folha} · ${NOME_TIPO[tipos[0]]} · ${g.cols} × ${g.rows} casas de ${p} cm · ${medida}`;
+  }
+  $('caption').textContent = txt;
+}
+
+/* A folha tem largura real (em mm); na tela ela é encolhida para caber na
+   coluna. transform não altera o layout, então a altura do palco é acertada
+   à mão a partir da altura natural da pilha. */
+function ajustarZoom() {
+  const palco = $('palco'), pilha = $('pilha');
+  const disp = palco.clientWidth - 28;             // desconta o padding do palco
+  const larg = pilha.offsetWidth, alt = pilha.offsetHeight;
+  if (disp <= 0 || larg <= 0) return;
+  const k = Math.min(1, disp / larg);
+  pilha.style.transform = k < 1 ? `scale(${k})` : 'none';
+  palco.style.height = Math.ceil(alt * k + 28) + 'px';
+}
+
+/* ==========================================================================
+   5) CONTROLES
+   ========================================================================== */
+function ligarChips(id, chave, depois) {
+  const grupo = $(id);
+  grupo.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-v]');
+    if (!b) return;
+    est[chave] = b.dataset.v;
+    grupo.querySelectorAll('button[data-v]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    if (depois) depois();
+    render();
+  });
+}
+
+function ligarToggle(id, chave, rotuloId) {
+  const el = $(id), lbl = $(rotuloId);
+  el.addEventListener('change', () => {
+    est[chave] = el.checked;
+    lbl.classList.toggle('on', el.checked);
+    render();
+  });
+}
+
+function marcarPreset() {
+  $('passo-presets').querySelectorAll('button').forEach((b) =>
+    b.classList.toggle('ativo', Math.abs(parseFloat(b.dataset.p) - est.passo) < 0.001));
+}
+
+function sincronizar() {
+  $('passo').value = String(est.passo);
+  $('passo-val').textContent = cm(est.passo) + ' cm';
+  $('escola').value = est.escola;
+  $('titulo').value = est.titulo;
+  for (const [id, chave] of [['moldura', 'moldura'], ['ident', 'ident'], ['regua', 'regua'], ['tres', 'tres']]) {
+    $(id).checked = est[chave];
+    $('lbl-' + id).classList.toggle('on', est[chave]);
+  }
+  for (const [id, chave] of [['tipo', 'tipo'], ['traco', 'traco'], ['orientacao', 'orientacao']]) {
+    $(id).querySelectorAll('button[data-v]').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.v === est[chave])));
+  }
+  marcarPreset();
+}
+
+ligarChips('tipo', 'tipo');
+ligarChips('traco', 'traco');
+ligarChips('orientacao', 'orientacao');
+ligarToggle('moldura', 'moldura', 'lbl-moldura');
+ligarToggle('ident', 'ident', 'lbl-ident');
+ligarToggle('regua', 'regua', 'lbl-regua');
+ligarToggle('tres', 'tres', 'lbl-tres');
+
+$('passo').addEventListener('input', (e) => {
+  est.passo = parseFloat(e.target.value);
+  $('passo-val').textContent = cm(est.passo) + ' cm';
+  marcarPreset();
+  render();
+});
+
+$('passo-presets').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-p]');
+  if (!b) return;
+  est.passo = parseFloat(b.dataset.p);
+  $('passo').value = String(est.passo);
+  $('passo-val').textContent = cm(est.passo) + ' cm';
+  marcarPreset();
+  render();
+});
+
+$('escola').addEventListener('input', (e) => { est.escola = e.target.value; render(); });
+$('titulo').addEventListener('input', (e) => { est.titulo = e.target.value; render(); });
+
+$('btn-pura').addEventListener('click', () => {
+  Object.assign(est, { escola: '', titulo: '', ident: false, regua: false });
+  sincronizar();
+  render();
+});
+
+$('btn-completo').addEventListener('click', () => {
+  Object.assign(est, { ident: true, regua: true });
+  sincronizar();
+  render();
+  $('escola').focus();
+});
+
+$('btn-restaurar').addEventListener('click', () => {
+  Object.assign(est, PADRAO);
+  sincronizar();
+  render();
+});
+
+$('btn-imprimir').addEventListener('click', () => window.print());
+
+let redimensionar;
+window.addEventListener('resize', () => {
+  clearTimeout(redimensionar);
+  redimensionar = setTimeout(ajustarZoom, 120);
+});
+
+/* As fontes mudam a altura do cabeçalho; ao terminarem de carregar, a área da
+   malha muda de tamanho e a folha precisa ser remontada. */
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+
+sincronizar();
+render();
+</script>
