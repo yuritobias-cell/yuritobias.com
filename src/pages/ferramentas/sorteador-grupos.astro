@@ -33,6 +33,11 @@ import Layout from '../../layouts/Layout.astro';
           placeholder="Ana Lima&#10;Bruno Souza&#10;Carla Mendes&#10;Daniel Costa&#10;..."></textarea>
       </div>
 
+      <div class="campo">
+        <label class="card-label" for="titulo">Título da folha (opcional)</label>
+        <input type="text" id="titulo" placeholder="Ex.: Trabalho de Geometria — 8º B" />
+      </div>
+
       <div class="row">
         <div class="field">
           <label class="card-label" for="mode">Modo</label>
@@ -60,8 +65,16 @@ import Layout from '../../layouts/Layout.astro';
         <div class="info-actions">
           <button class="ghost" id="btn-copy" type="button">Copiar grupos</button>
           <button class="ghost" id="btn-resortear" type="button">Sortear novamente</button>
+          <button class="primary" id="btn-imprimir" type="button">Imprimir / Salvar PDF</button>
         </div>
       </div>
+
+      <!-- Cabeçalho que só existe no papel; na tela essa informação já está na info-bar. -->
+      <header class="folha-cab">
+        <h2 id="folha-titulo">Grupos sorteados</h2>
+        <p id="folha-sub"></p>
+      </header>
+
       <div class="groups-grid" id="groups-grid"></div>
     </section>
 
@@ -177,6 +190,17 @@ import Layout from '../../layouts/Layout.astro';
     border-radius: 10px;
     padding: 9px 12px;
   }
+  .srt-root input[type="text"] {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 9px 12px;
+  }
+  .srt-root input[type="text"]::placeholder { color: #A8A29E; }
   .srt-root select { min-width: 11rem; }
   .srt-root input[type="number"] { width: 6rem; font-family: var(--font-mono); }
 
@@ -315,8 +339,58 @@ import Layout from '../../layouts/Layout.astro';
     flex-shrink: 0;
   }
 
+  /* Cabeçalho da folha: existe só na impressão. */
+  .srt-root .folha-cab { display: none; }
+
   @media (prefers-reduced-motion: reduce) {
     .srt-root .group-card { animation: none; }
+  }
+
+  /* ---------- IMPRESSÃO: só os grupos saem no papel ---------- */
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    html, body { background: #fff !important; }
+    body > nav, body > footer { display: none !important; }
+
+    /* O body do site é flex-column: com `margin: 0 auto` o item encolheria
+       para a largura do conteúdo assim que os controles saem da folha. */
+    .srt-root { max-width: none; padding: 0; margin: 0; width: 100%; }
+    .srt-root .masthead,
+    .srt-root .card,
+    .srt-root .info-bar { display: none !important; }
+
+    .srt-root .folha-cab {
+      display: block;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+    .srt-root .folha-cab h2 {
+      font-family: var(--font-display);
+      font-size: 17pt;
+      font-weight: 700;
+      margin: 0 0 2px;
+    }
+    .srt-root .folha-cab p {
+      font-family: var(--font-mono);
+      font-size: 8.5pt;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .srt-root #results-section { display: block !important; }
+    .srt-root .groups-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .srt-root .group-card {
+      animation: none;
+      break-inside: avoid;
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+    .srt-root .group-title { font-size: 11pt; }
+    .srt-root .student-item { font-size: 9.5pt; padding: 2px 0; }
+    .srt-root .group-count, .srt-root .group-badge { font-size: 8pt; }
+
+    .srt-root * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 
   @media (max-width: 560px) {
@@ -351,6 +425,7 @@ import Layout from '../../layouts/Layout.astro';
       $('names').value = salvo.nomes ?? '';
       $('mode').value = salvo.modo ?? 'per_group';
       $('qty').value = salvo.qtd ?? 4;
+      $('titulo').value = salvo.titulo ?? '';
     }
   } catch { /* estado corrompido: ignora e segue com os padrões */ }
 
@@ -359,10 +434,12 @@ import Layout from '../../layouts/Layout.astro';
       nomes: $('names').value,
       modo: $('mode').value,
       qtd: $('qty').value,
+      titulo: $('titulo').value,
     }));
   }
   $('names').addEventListener('input', persistir);
   $('qty').addEventListener('input', persistir);
+  $('titulo').addEventListener('input', persistir);
 
   function atualizarLabelModo() {
     $('qty-label').textContent =
@@ -391,6 +468,7 @@ import Layout from '../../layouts/Layout.astro';
 
   // Copiar grupos como texto (para colar no WhatsApp da turma)
   let ultimosGrupos = [];
+  let ultimaEstatistica = '';
   $('btn-copy').addEventListener('click', async function () {
     if (ultimosGrupos.length === 0) return;
     const texto = ultimosGrupos
@@ -403,6 +481,23 @@ import Layout from '../../layouts/Layout.astro';
       this.textContent = 'Não foi possível copiar';
     }
     setTimeout(() => { this.textContent = 'Copiar grupos'; }, 1800);
+  });
+
+  // O cabeçalho só aparece no papel, então é montado na hora de imprimir —
+  // assim o título digitado depois do sorteio também entra na folha.
+  function montarCabecalho() {
+    const titulo = $('titulo').value.trim();
+    $('folha-titulo').textContent = titulo || 'Grupos sorteados';
+    const data = new Date().toLocaleDateString('pt-BR');
+    $('folha-sub').textContent = ultimaEstatistica
+      ? `${ultimaEstatistica} · ${data}`
+      : data;
+  }
+  window.addEventListener('beforeprint', montarCabecalho);
+
+  $('btn-imprimir').addEventListener('click', () => {
+    montarCabecalho();
+    window.print();
   });
 
   function sortear() {
@@ -439,6 +534,7 @@ import Layout from '../../layouts/Layout.astro';
     const sizeText = sizes.length === 1 ? `${sizes[0]} alunos` : `${sizes.join(' ou ')} alunos`;
     $('stat-text').innerHTML =
       `<b>${names.length}</b> alunos em <b>${numGroups}</b> grupos · ${sizeText} cada`;
+    ultimaEstatistica = `${names.length} alunos em ${numGroups} grupos · ${sizeText} cada`;
 
     groups.forEach((group, idx) => {
       const card = document.createElement('div');
