@@ -1,74 +1,324 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 
+/* Dois tipos de ferramenta, na ordem em que aparecem na página.
+   O `id` é a âncora da seção e o valor do filtro em /ferramentas?tipo=suporte. */
+const categorias = [
+  {
+    id: 'suporte',
+    titulo: 'Suporte ao professor',
+    descricao: 'Geradores de material e utilidades para preparar a aula e resolver a rotina — a maioria sai pronta para imprimir.',
+  },
+  {
+    id: 'simulacoes',
+    titulo: 'Exemplos e simulações',
+    descricao: 'Simuladores interativos para explorar um conceito com a turma — no projetor, no laboratório ou no celular do aluno.',
+  },
+];
+
+/* Dentro de cada categoria, da mais recente para a mais antiga. */
 const ferramentas = [
   {
-    slug: 'sorteador-grupos',
-    titulo: 'Sorteador de Grupos',
-    descricao: 'Distribua alunos em grupos aleatórios a partir de uma lista. Escolha o número de grupos ou o tamanho de cada um.',
-  },
-  {
-    slug: 'testador-senhas',
-    titulo: 'Testador de Senhas',
-    descricao: 'Simule quanto tempo levaria para quebrar uma senha por força bruta e entenda o que torna uma senha segura.',
-  },
-  {
-    slug: 'pluviometria-biomas',
-    titulo: 'Pluviometria dos Biomas',
-    descricao: 'Precipitação média histórica dos seis biomas brasileiros — distribuição mensal interativa e comparativo de totais anuais.',
-  },
-  {
-    slug: 'angulos-circunferencia',
-    titulo: 'Ângulos na Circunferência',
-    descricao: 'Simulador dos cinco tipos de ângulo na circunferência — central, inscrito, de segmento e excêntricos. Arraste os vértices e veja a relação com os arcos se atualizar ao vivo.',
-  },
-  {
-    slug: 'transformacoes-geometricas',
-    titulo: 'Transformações Geométricas',
-    descricao: 'Translação por um vetor, rotação de 90° em torno da origem, simetria axial e simetria central. Arraste os vértices no plano cartesiano e acompanhe a regra e as coordenadas da imagem.',
-  },
-  {
-    slug: 'corrida-ao-20',
-    titulo: 'Corrida ao 20',
-    descricao: 'Jogo de estratégia adaptado do Nim: avance 1 ou 2 e diga a meta primeiro. Jogue contra o computador ou outra pessoa, registre os resultados e descubra a estratégia vencedora.',
-  },
-  {
-    slug: 'cifrador-silabico',
-    titulo: 'Cifrador Silábico',
-    descricao: 'Gere fichas imprimíveis com palavras ou frases cifradas por sílabas ou letras — com emojis ou símbolos, chave, linhas de escrita e gabarito do professor. Para atividades de alfabetização.',
-  },
-  {
-    slug: 'monty-hall',
-    titulo: 'Paradoxo de Monty Hall',
-    descricao: 'Simule o famoso problema das três portas: jogue rodada a rodada, registre os resultados e rode milhares de simulações comparando manter × trocar — com 3, 10 ou até 100 portas.',
-  },
-  {
-    slug: 'malhas-para-imprimir',
-    titulo: 'Malhas para Imprimir',
-    descricao: 'Folhas A4 de malha quadriculada, pontilhada ou isométrica. Escolha o passo em centímetros, a espessura do traço e o cabeçalho — com nome da escola e espaço para o aluno — ou imprima a malha pura.',
+    slug: 'gerador-equacoes',
+    titulo: 'Gerador de Equações',
+    assunto: 'Álgebra',
+    tipo: 'suporte',
+    descricao: 'Listas sorteadas de equações e inequações do 1º e do 2º grau. Escolha os tipos, a natureza das raízes e a quantidade — sai folha A4 pronta, com gabarito do professor e várias versões da mesma prova.',
   },
   {
     slug: 'gerador-qrcode',
     titulo: 'Gerador de QR Code',
+    assunto: 'Utilidades',
+    tipo: 'suporte',
     descricao: 'Crie QR codes personalizados a partir de um link ou texto: cores, formato dos módulos, margem e a sua imagem no centro. Baixe em PNG ou SVG — tudo gerado no navegador, sem enviar nada.',
   },
+  {
+    slug: 'malhas-para-imprimir',
+    titulo: 'Malhas para Imprimir',
+    assunto: 'Geometria',
+    tipo: 'suporte',
+    descricao: 'Folhas A4 de malha quadriculada, pontilhada ou isométrica. Escolha o passo em centímetros, a espessura do traço e o cabeçalho — com nome da escola e espaço para o aluno — ou imprima a malha pura.',
+  },
+  {
+    slug: 'cifrador-silabico',
+    titulo: 'Cifrador Silábico',
+    assunto: 'Alfabetização',
+    tipo: 'suporte',
+    descricao: 'Gere fichas imprimíveis com palavras ou frases cifradas por sílabas ou letras — com emojis ou símbolos, chave, linhas de escrita e gabarito do professor. Para atividades de alfabetização.',
+  },
+  {
+    slug: 'sorteador-grupos',
+    titulo: 'Sorteador de Grupos',
+    assunto: 'Sala de aula',
+    tipo: 'suporte',
+    descricao: 'Distribua alunos em grupos aleatórios a partir de uma lista. Escolha o número de grupos ou o tamanho de cada um.',
+  },
+  {
+    slug: 'monty-hall',
+    titulo: 'Paradoxo de Monty Hall',
+    assunto: 'Probabilidade',
+    tipo: 'simulacoes',
+    descricao: 'Simule o famoso problema das três portas: jogue rodada a rodada, registre os resultados e rode milhares de simulações comparando manter × trocar — com 3, 10 ou até 100 portas.',
+  },
+  {
+    slug: 'corrida-ao-20',
+    titulo: 'Corrida ao 20',
+    assunto: 'Jogos matemáticos',
+    tipo: 'simulacoes',
+    descricao: 'Jogo de estratégia adaptado do Nim: avance 1 ou 2 e diga a meta primeiro. Jogue contra o computador ou outra pessoa, registre os resultados e descubra a estratégia vencedora.',
+  },
+  {
+    slug: 'transformacoes-geometricas',
+    titulo: 'Transformações Geométricas',
+    assunto: 'Geometria analítica',
+    tipo: 'simulacoes',
+    descricao: 'Translação por um vetor, rotação de 90° em torno da origem, simetria axial e simetria central. Arraste os vértices no plano cartesiano e acompanhe a regra e as coordenadas da imagem.',
+  },
+  {
+    slug: 'angulos-circunferencia',
+    titulo: 'Ângulos na Circunferência',
+    assunto: 'Geometria',
+    tipo: 'simulacoes',
+    descricao: 'Simulador dos cinco tipos de ângulo na circunferência — central, inscrito, de segmento e excêntricos. Arraste os vértices e veja a relação com os arcos se atualizar ao vivo.',
+  },
+  {
+    slug: 'pluviometria-biomas',
+    titulo: 'Pluviometria dos Biomas',
+    assunto: 'Climatologia',
+    tipo: 'simulacoes',
+    descricao: 'Precipitação média histórica dos seis biomas brasileiros — distribuição mensal interativa e comparativo de totais anuais.',
+  },
+  {
+    slug: 'testador-senhas',
+    titulo: 'Testador de Senhas',
+    assunto: 'Análise combinatória',
+    tipo: 'simulacoes',
+    descricao: 'Simule quanto tempo levaria para quebrar uma senha por força bruta e entenda o que torna uma senha segura.',
+  },
 ];
+
+const porTipo = (id: string) => ferramentas.filter((f) => f.tipo === id);
 ---
 
-<Layout title="Ferramentas">
-  <main class="max-w-3xl mx-auto px-6 py-16">
-    <h1 class="text-4xl font-display mb-2">Ferramentas</h1>
-    <p class="text-stone-500 mb-12">Aplicações desenvolvidas para uso em sala de aula e no dia a dia.</p>
+<Layout
+  title="Ferramentas"
+  description="Geradores de material para imprimir e simuladores interativos para usar em sala de aula — tudo roda no navegador, de graça e sem cadastro."
+>
+  <main>
+    <header>
+      <h1>Ferramentas</h1>
+      <p class="subtitle">
+        Aplicações desenvolvidas para uso em sala de aula e no dia a dia. Tudo roda no navegador,
+        sem cadastro e sem enviar nada para lugar nenhum.
+      </p>
+    </header>
 
-    <div class="grid gap-6 sm:grid-cols-2">
-      {ferramentas.map(f => (
-        <a href={`/ferramentas/${f.slug}`} class="group block border border-stone-200 rounded-xl p-6 hover:border-[var(--color-accent)] transition-colors">
-          <h2 class="text-lg font-display mb-2 group-hover:text-[var(--color-accent)] transition-colors">
-            {f.titulo}
-          </h2>
-          <p class="text-sm text-stone-500 leading-relaxed">{f.descricao}</p>
-        </a>
+    <div class="filtros" role="group" aria-label="Filtrar ferramentas por tipo">
+      <button type="button" class="chip" data-filtro="todas" aria-pressed="true">
+        Todas <span class="n">{ferramentas.length}</span>
+      </button>
+      {categorias.map((c) => (
+        <button type="button" class="chip" data-filtro={c.id} aria-pressed="false">
+          {c.titulo} <span class="n">{porTipo(c.id).length}</span>
+        </button>
       ))}
     </div>
+
+    {categorias.map((c) => (
+      <section class="secao" id={c.id} data-tipo={c.id}>
+        <div class="secao-head">
+          <h2>{c.titulo}</h2>
+          <p>{c.descricao}</p>
+        </div>
+
+        <div class="grid">
+          {porTipo(c.id).map((f) => (
+            <a href={`/ferramentas/${f.slug}`} class="card">
+              <span class="assunto">{f.assunto}</span>
+              <span class="titulo">{f.titulo}</span>
+              <p class="descricao">{f.descricao}</p>
+              <span class="cta">Abrir →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
   </main>
 </Layout>
+
+<script>
+  // Filtro por tipo. Sem JS a página continua completa: as duas seções já vêm
+  // renderizadas e só os chips deixam de funcionar.
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.chip'));
+  const secoes = Array.from(document.querySelectorAll<HTMLElement>('.secao'));
+  const validos = new Set(['todas', ...secoes.map((s) => s.dataset.tipo!)]);
+
+  function aplicar(filtro: string, gravarUrl = true) {
+    if (!validos.has(filtro)) filtro = 'todas';
+
+    for (const chip of chips) {
+      chip.setAttribute('aria-pressed', String(chip.dataset.filtro === filtro));
+    }
+    for (const secao of secoes) {
+      secao.hidden = filtro !== 'todas' && secao.dataset.tipo !== filtro;
+    }
+    if (gravarUrl) {
+      // Query string, e não hash: o filtro é estado, não âncora — assim a página
+      // não salta para a seção e os chips continuam à vista.
+      const url = filtro === 'todas' ? location.pathname : `${location.pathname}?tipo=${filtro}`;
+      history.replaceState(null, '', url);
+    }
+  }
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => aplicar(chip.dataset.filtro!));
+  }
+
+  // /ferramentas?tipo=simulacoes abre já filtrado — dá para linkar uma categoria direto.
+  aplicar(new URLSearchParams(location.search).get('tipo') ?? 'todas', false);
+</script>
+
+<style>
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { margin-bottom: 2rem; max-width: 680px; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+  /* ---------------- filtros ---------------- */
+
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chip {
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .chip[aria-pressed='true'] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: 500;
+  }
+
+  .chip .n { opacity: 0.6; margin-left: 0.15rem; }
+
+  /* ---------------- seções ---------------- */
+
+  .secao { padding-top: 2.5rem; scroll-margin-top: 2rem; }
+
+  .secao-head { margin-bottom: 1.25rem; max-width: 680px; }
+
+  .secao-head h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+  }
+
+  .secao-head p { font-size: 0.88rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+  /* ---------------- cards ---------------- */
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+  .assunto {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .titulo {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .card:hover .titulo { color: var(--accent); }
+
+  .descricao {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .cta {
+    margin-top: auto;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    main { animation: none; }
+    .card:hover { transform: none; }
+  }
+
+  @media (max-width: 520px) {
+    main { padding: 3rem 1.25rem; }
+    .card { padding: 1.25rem 1.35rem; }
+  }
+</style>

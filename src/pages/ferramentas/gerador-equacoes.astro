@@ -1,0 +1,1194 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Gerador de Equações"
+  description="Gere listas aleatórias de equações e inequações do 1º e do 2º grau — escolha os tipos, a natureza das raízes e a quantidade. Sai folha A4 pronta para imprimir, com gabarito do professor."
+>
+
+  <div class="eqg-root">
+    <div class="wrap">
+
+      <header class="masthead">
+        <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Álgebra</p>
+        <h1>Gerador de <em>equações</em></h1>
+        <p class="lede">Escolha os tipos de questão, a <em>natureza das soluções</em> e quantas
+        você quer: a lista sai sorteada na hora, com folha do aluno em A4 e gabarito do professor
+        em página separada. As equações são montadas <em>a partir da resposta</em> — se você pediu
+        raiz inteira, toda raiz é inteira. Dá para gerar várias <em>versões</em> da mesma lista,
+        com questões diferentes e a mesma dificuldade. O que sai no papel é só a folha; os
+        controles não são impressos. Tudo roda no seu navegador.</p>
+      </header>
+
+      <!-- ================= CONTROLES (não imprimem) ================= -->
+      <div class="toolbar">
+
+        <div class="blocos">
+
+          <section class="bloco">
+            <h2>Tipos de questão</h2>
+            <p class="hint">A quantidade é dividida entre os tipos marcados.</p>
+            <div class="chips" id="tipos" role="group" aria-label="Tipos de questão">
+              <button class="chip" type="button" data-v="eq1"  aria-pressed="true">Equação 1º grau</button>
+              <button class="chip" type="button" data-v="eq1f" aria-pressed="false">1º grau · parênteses e frações</button>
+              <button class="chip" type="button" data-v="eq2i" aria-pressed="false">2º grau · incompletas</button>
+              <button class="chip" type="button" data-v="eq2"  aria-pressed="true">2º grau · completas</button>
+              <button class="chip" type="button" data-v="in1"  aria-pressed="false">Inequação 1º grau</button>
+              <button class="chip" type="button" data-v="in2"  aria-pressed="false">Inequação 2º grau</button>
+              <button class="chip" type="button" data-v="inpq" aria-pressed="false">Inequação-produto e quociente</button>
+            </div>
+          </section>
+
+          <section class="bloco">
+            <h2>Natureza das soluções</h2>
+            <p class="hint">Vale para as raízes das equações e para os extremos dos intervalos.</p>
+            <div class="chips" id="naturezas" role="group" aria-label="Natureza das soluções">
+              <button class="chip" type="button" data-v="inteira"    aria-pressed="true">Inteiras</button>
+              <button class="chip" type="button" data-v="racional"   aria-pressed="false">Racionais</button>
+              <button class="chip" type="button" data-v="irracional" aria-pressed="false">Irracionais</button>
+              <button class="chip" type="button" data-v="vazio"      aria-pressed="false">Δ &lt; 0</button>
+            </div>
+            <label class="check"><input type="checkbox" id="soPositivas" /> Preferir raízes positivas (naturais)</label>
+            <label class="check"><input type="checkbox" id="raizDupla" /> Permitir raiz dupla (Δ = 0)</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Lista</h2>
+            <div class="campos">
+              <label class="num"><span class="card-label">Questões</span>
+                <input type="number" id="qtd" min="1" max="40" step="1" value="12" /></label>
+              <label class="num"><span class="card-label">Versões</span>
+                <input type="number" id="versoes" min="1" max="8" step="1" value="1" /></label>
+            </div>
+            <p class="hint">Cada versão é uma folha com questões diferentes e a mesma dificuldade.</p>
+            <div class="campo">
+              <span class="card-label">Incógnita</span>
+              <div class="chips" id="incognita" role="group" aria-label="Incógnita">
+                <button class="chip mini" type="button" data-v="x"       aria-pressed="true">sempre x</button>
+                <button class="chip mini" type="button" data-v="sortear" aria-pressed="false">sortear</button>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" id="agrupar" /> Agrupar as questões por tipo</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Folha do aluno</h2>
+            <div class="chips" id="layout" role="group" aria-label="Layout da folha">
+              <button class="chip" type="button" data-v="compacta" aria-pressed="true">Compacta · 2 colunas</button>
+              <button class="chip" type="button" data-v="espaco"   aria-pressed="false">Com espaço para resolver</button>
+            </div>
+            <div class="campo">
+              <label class="card-label" for="escola">Nome da escola</label>
+              <input type="text" id="escola" maxlength="70" placeholder="Ex.: Escola SESI Poços de Caldas" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="titulo">Título da atividade</label>
+              <input type="text" id="titulo" maxlength="90" value="Equações e inequações" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="instrucao">Instrução</label>
+              <input type="text" id="instrucao" maxlength="140" value="Resolva em ℝ, apresentando os cálculos." />
+            </div>
+            <label class="check"><input type="checkbox" id="ident" checked /> Espaço para nome, turma e data</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Gabarito</h2>
+            <p class="hint">Sai depois de todas as folhas dos alunos, em páginas separadas.</p>
+            <label class="check"><input type="checkbox" id="temGab" checked /> Incluir gabarito do professor</label>
+            <div class="chips" id="gabTipo" role="group" aria-label="Tipo de gabarito">
+              <button class="chip" type="button" data-v="compacto"  aria-pressed="true">Só as respostas</button>
+              <button class="chip" type="button" data-v="comentado" aria-pressed="false">Comentado</button>
+            </div>
+            <label class="check"><input type="checkbox" id="reta" checked /> Reta numérica nas inequações</label>
+          </section>
+
+        </div>
+
+        <div class="acoes">
+          <button class="btn" type="button" id="gerar">Gerar outra lista</button>
+          <button class="btn sec" type="button" id="imprimir">Imprimir / Salvar PDF</button>
+          <button class="btn sec" type="button" id="restaurar">Restaurar padrões</button>
+        </div>
+        <p class="aviso" id="aviso" hidden></p>
+      </div>
+
+      <!-- ================= SAÍDA (isto é o que imprime) ================= -->
+      <div class="saida" id="saida"></div>
+
+      <p class="rodape" id="resumo"></p>
+
+      <!-- ================= TEORIA ================= -->
+      <section class="teoria">
+        <h2>Como a lista é montada</h2>
+        <p>O caminho é o inverso do que o aluno faz: o gerador <b>sorteia primeiro a resposta</b> e
+        só depois monta a equação em volta dela. Para o 2º grau com raízes racionais, parte de
+        <span class="mat"><i>a</i>(<i>x</i> − <i>r</i><sub>1</sub>)(<i>x</i> − <i>r</i><sub>2</sub>)</span>
+        e expande; para o 1º grau, escolhe os coeficientes de um lado e calcula o outro. É isso que
+        garante que o filtro de natureza da raiz seja respeitado sempre — e não “quase sempre”,
+        como aconteceria sorteando coeficientes ao acaso e torcendo.</p>
+        <p>As raízes <b>irracionais</b> são o caso em que o caminho se inverte: aí os coeficientes
+        vêm primeiro e o gerador aceita apenas os que produzem Δ positivo e não quadrado perfeito,
+        já com o radical simplificado na resposta. Equações do 1º grau com coeficientes inteiros
+        nunca têm raiz irracional — por isso esses tipos ficam de fora quando só essa natureza
+        está marcada.</p>
+
+        <h2>Notação do conjunto solução</h2>
+        <p>As inequações são respondidas por compreensão —
+        <span class="mat">S = &#123;<i>x</i> ∈ ℝ | <i>x</i> &gt; 2&#125;</span> — acompanhadas da reta numérica,
+        com bolinha <b>aberta</b> onde o extremo não pertence ao conjunto e <b>fechada</b> onde
+        pertence. Os dois casos-limite aparecem quando Δ &lt; 0: a parábola inteira acima do eixo dá
+        <span class="mat">S = ℝ</span>, e inteira abaixo dá <span class="mat">S = ∅</span>. Na
+        inequação-quociente, a raiz do denominador fica <b>sempre</b> aberta, mesmo com ≤ ou ≥ —
+        é a condição de existência.</p>
+      </section>
+
+    </div>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Gerador de equações
+     CSS escopado sob .eqg-root para não vazar para o resto do site.
+     ============================================================ */
+
+  .eqg-root{
+    --papel:#F8F6F1; --tinta:#1B4F4F; --tinta-2:#2f6b6b;
+    --traco:#d8d2c4; --realce:#c2410c; --neutro:#6b6459;
+    /* Serifada só para a matemática: variável em itálico é a convenção
+       tipográfica, e Georgia já está no sistema (sem download extra). */
+    --mat:Georgia,'Times New Roman',Times,serif;
+
+    background:var(--papel); color:var(--tinta);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.5;
+    padding:2rem 1.2rem 4rem;
+  }
+  .eqg-root [hidden]{ display:none !important; }
+  .eqg-root .wrap{ max-width:980px; margin:0 auto; }
+
+  .eqg-root .masthead{ margin-bottom:1.4rem; }
+  .eqg-root .masthead .eyebrow{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.75rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--neutro); margin:0 0 .6rem;
+  }
+  .eqg-root .masthead .eyebrow a{ color:inherit; text-decoration:none; }
+  .eqg-root .masthead .eyebrow a:hover{ color:var(--tinta); }
+  .eqg-root .masthead h1{ font-family:'Playfair Display',Georgia,serif; font-weight:700;
+    font-size:clamp(1.6rem,4vw,2.2rem); margin:0 0 .3rem; }
+  .eqg-root .masthead h1 em{ font-style:italic; }
+  .eqg-root .masthead .lede{ color:var(--neutro); margin:0; font-size:.95rem; max-width:62ch; }
+  .eqg-root .masthead .lede em{ font-style:normal; color:var(--tinta-2); font-weight:500; }
+
+  /* ---------- barra de controles ---------- */
+  .eqg-root .toolbar{ background:#fff; border:1px solid var(--traco); border-radius:12px; padding:1.1rem 1.2rem 1.2rem; }
+  .eqg-root .blocos{ display:grid; gap:1.4rem 2rem; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); }
+  .eqg-root .bloco h2{ font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--tinta); margin:0 0 .25rem; }
+  .eqg-root .hint{ font-size:.8rem; color:var(--neutro); margin:0 0 .6rem; }
+  .eqg-root .card-label{ display:block; font-weight:600; font-size:.72rem; text-transform:uppercase;
+    letter-spacing:.06em; margin:0 0 .3rem; color:var(--tinta-2); }
+
+  .eqg-root .chips{ display:flex; flex-wrap:wrap; gap:.35rem; }
+  .eqg-root .chip{ background:#fff; color:var(--tinta); border:1px solid var(--traco); border-radius:99px;
+    font:inherit; font-size:.83rem; font-weight:500; padding:.35rem .75rem; cursor:pointer; transition:background .15s,border-color .15s; }
+  .eqg-root .chip:hover{ border-color:var(--tinta-2); }
+  .eqg-root .chip[aria-pressed="true"]{ background:var(--tinta); border-color:var(--tinta); color:var(--papel); }
+  .eqg-root .chip.mini{ font-size:.78rem; padding:.28rem .65rem; }
+
+  .eqg-root .check{ display:flex; align-items:center; gap:.42rem; font-size:.85rem; color:var(--tinta-2);
+    font-weight:500; cursor:pointer; margin-top:.55rem; }
+  .eqg-root .campo{ margin-top:.9rem; }
+  .eqg-root .campos{ display:flex; gap:.8rem; flex-wrap:wrap; }
+  .eqg-root .num{ display:block; }
+  .eqg-root input[type=text],.eqg-root input[type=number]{ background:#fff; border:1px solid var(--traco);
+    border-radius:9px; padding:.5rem .7rem; font:inherit; font-size:.9rem; color:var(--tinta); width:100%; }
+  .eqg-root .num input{ width:5.5rem; text-align:center; }
+  .eqg-root input:focus{ outline:2px solid var(--tinta); outline-offset:1px; }
+
+  .eqg-root .acoes{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.3rem; padding-top:1.1rem; border-top:1px solid var(--traco); }
+  .eqg-root .btn{ background:var(--tinta); color:var(--papel); border:0; border-radius:8px; padding:.55rem .95rem;
+    font:inherit; font-weight:600; cursor:pointer; }
+  .eqg-root .btn:hover{ background:var(--tinta-2); }
+  .eqg-root .btn.sec{ background:#fff; color:var(--tinta); border:1px solid var(--traco); }
+  .eqg-root .btn.sec:hover{ background:var(--papel); }
+  .eqg-root .aviso{ margin-top:.8rem; color:var(--realce); font-weight:600; font-size:.88rem; }
+
+  /* ---------- notação matemática ---------- */
+  .eqg-root .mat{ font-family:var(--mat); font-size:1.06em; }
+  .eqg-root i{ font-style:italic; }
+  .eqg-root sup{ font-size:.7em; vertical-align:.45em; }
+  .eqg-root sub{ font-size:.7em; vertical-align:-.25em; }
+  /* fração empilhada: numerador sobre denominador, com o traço no meio */
+  .eqg-root .fr{ display:inline-flex; flex-direction:column; align-items:center; vertical-align:-.55em;
+    margin:0 .12em; line-height:1.12; }
+  .eqg-root .fr-n{ padding:0 .25em; }
+  .eqg-root .fr-d{ padding:0 .25em; border-top:1px solid currentColor; }
+  .eqg-root .rad{ white-space:nowrap; }
+  .eqg-root .rad .rad-b{ border-top:1px solid currentColor; padding:0 .12em 0 .06em; margin-left:.02em; }
+
+  /* ---------- a FOLHA (isto é o que imprime) ---------- */
+  .eqg-root .saida{ margin-top:1.6rem; display:flex; flex-direction:column; gap:1.6rem; }
+  .eqg-root .folha{ background:#fff; padding:14mm 15mm; width:100%; max-width:210mm; margin:0 auto;
+    border:1px solid var(--traco); border-radius:6px; box-shadow:0 8px 30px rgba(27,79,79,.08); color:#1a1a1a; }
+
+  .eqg-root .folha-cab{ border-bottom:1px solid var(--traco); padding-bottom:.7rem; margin-bottom:1.1rem; }
+  .eqg-root .escola{ font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--tinta-2);
+    font-weight:600; margin:0 0 .3rem; }
+  .eqg-root .folha-titulo{ font-family:'Playfair Display',Georgia,serif; font-weight:700; font-size:1.55rem;
+    color:var(--tinta); margin:0 0 .25rem; display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
+  .eqg-root .versao{ font-family:'IBM Plex Sans',sans-serif; font-size:.7rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.08em; border:1px solid var(--tinta); border-radius:99px; padding:.12em .6em; color:var(--tinta); }
+  .eqg-root .instrucao{ font-size:.92rem; color:#333; margin:0; }
+  .eqg-root .ident{ display:flex; gap:1.4rem; flex-wrap:wrap; font-size:.88rem; color:#333; margin-top:.9rem; }
+  .eqg-root .ident span{ flex:1 1 auto; white-space:nowrap; }
+  .eqg-root .identline{ display:inline-block; border-bottom:1px solid #999; min-width:7rem; }
+
+  .eqg-root .questoes{ display:grid; gap:.55rem 2.2rem; grid-template-columns:1fr 1fr; }
+  .eqg-root .questoes[data-modo="espaco"]{ grid-template-columns:1fr; gap:.2rem; }
+  .eqg-root .q{ break-inside:avoid; padding:.28rem 0; display:flex; gap:.5rem; align-items:baseline; }
+  .eqg-root .q .n{ font-weight:600; font-size:.85rem; color:var(--tinta-2); min-width:1.5rem; flex:none; }
+  .eqg-root .q .enun{ font-family:var(--mat); font-size:1.08rem; }
+  .eqg-root .questoes[data-modo="espaco"] .qbox{ break-inside:avoid; padding:.35rem 0 0; }
+  .eqg-root .pauta{ height:24mm; margin:.3rem 0 .5rem 2rem; border-bottom:1px solid #ddd;
+    background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.9mm,#eee 8mm); }
+
+  /* ---------- gabarito ---------- */
+  .eqg-root .folha.gab{ background:#fffdf9; }
+  .eqg-root .selo{ display:inline-block; background:var(--realce); color:#fff; font-size:.7rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.08em; padding:.22em .7em; border-radius:99px; margin-bottom:.9rem; }
+  .eqg-root .respostas{ display:grid; gap:.4rem 2rem; grid-template-columns:1fr 1fr; }
+  .eqg-root .respostas[data-modo="comentado"]{ grid-template-columns:1fr; gap:.1rem; }
+  .eqg-root .r{ break-inside:avoid; display:flex; gap:.5rem; align-items:baseline; padding:.15rem 0; }
+  .eqg-root .r .n{ font-weight:600; font-size:.85rem; color:var(--tinta-2); min-width:1.5rem; flex:none; }
+  .eqg-root .r .resp{ font-family:var(--mat); font-size:1rem; }
+  .eqg-root .rcom{ break-inside:avoid; border-bottom:1px solid #efe9df; padding:.5rem 0; }
+  .eqg-root .rcom:last-child{ border-bottom:0; }
+  .eqg-root .rcom .enun{ font-family:var(--mat); font-size:1.05rem; }
+  .eqg-root .passos{ margin:.35rem 0 0 2rem; display:flex; flex-direction:column; gap:.18rem; }
+  .eqg-root .passos p{ margin:0; font-size:.92rem; color:#444; }
+  .eqg-root .passos .mat{ color:#1a1a1a; }
+  .eqg-root .passos .nota{ font-family:'IBM Plex Sans',sans-serif; font-size:.82rem; color:var(--neutro); font-style:italic; }
+  .eqg-root .final{ font-weight:600; color:var(--realce) !important; }
+  .eqg-root .reta{ display:block; margin:.3rem 0 .1rem 0; }
+  .eqg-root .r .reta{ margin:.1rem 0 0; }
+
+  .eqg-root .rodape{ margin-top:1.6rem; font-size:.82rem; color:var(--neutro); }
+
+  /* ---------- teoria ---------- */
+  .eqg-root .teoria{ margin-top:3rem; border-top:1px solid var(--traco); padding-top:1.6rem; max-width:70ch; }
+  .eqg-root .teoria h2{ font-family:'Playfair Display',Georgia,serif; font-size:1.25rem; font-weight:700;
+    margin:1.4rem 0 .5rem; }
+  .eqg-root .teoria h2:first-child{ margin-top:0; }
+  .eqg-root .teoria p{ margin:0 0 .8rem; color:var(--neutro); font-size:.93rem; }
+  .eqg-root .teoria b{ color:var(--tinta); font-weight:600; }
+
+  @media (max-width:640px){
+    .eqg-root{ padding:1.2rem .8rem 3rem; }
+    .eqg-root .folha{ padding:8mm 7mm; }
+    .eqg-root .questoes,.eqg-root .respostas{ grid-template-columns:1fr; }
+  }
+
+  /* ---------- IMPRESSÃO: só as folhas saem no papel ---------- */
+  @media print{
+    @page{ size:A4; margin:12mm; }
+    html,body{ background:#fff !important; }
+    body > nav, body > footer{ display:none !important; }
+    .eqg-root{ background:#fff; padding:0; }
+    .eqg-root .masthead,.eqg-root .toolbar,.eqg-root .rodape,.eqg-root .teoria{ display:none !important; }
+    .eqg-root .saida{ display:block; margin:0; }
+    .eqg-root .folha{ margin:0; padding:0; max-width:none; border:0; border-radius:0; box-shadow:none; background:#fff; }
+    .eqg-root .folha + .folha{ break-before:page; }
+    .eqg-root .pauta{ background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.9mm,#ccc 8mm); }
+    .eqg-root *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+
+/* ==========================================================================
+   0) UTILITÁRIOS
+   ========================================================================== */
+const $ = (id) => document.getElementById(id);
+
+const MENOS = '−';                                  // U+2212 — o menos de verdade, não o hífen
+const REL  = { eq:'=', lt:'&lt;', gt:'&gt;', le:'≤', ge:'≥' };
+const VIRA  = { lt:'gt', gt:'lt', le:'ge', ge:'le' };   // ao multiplicar/dividir por negativo
+const SINAIS = ['lt', 'gt', 'le', 'ge'];
+
+const inteiro = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const naoZero = (a, b) => { let n = 0; while (n === 0) n = inteiro(a, b); return n; };
+const escolhe = (arr) => arr[inteiro(0, arr.length - 1)];
+const moeda = (p = 0.5) => Math.random() < p;
+const maisMenos = (p = 0.5) => (moeda(p) ? -1 : 1);
+
+function embaralha(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = inteiro(0, i); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/* Sorteio ponderado: pares [valor, peso]. */
+function pesado(pares) {
+  const total = pares.reduce((s, p) => s + p[1], 0);
+  let x = Math.random() * total;
+  for (const [v, p] of pares) { x -= p; if (x <= 0) return v; }
+  return pares[pares.length - 1][0];
+}
+
+/* ==========================================================================
+   1) ARITMÉTICA EXATA
+   Racionais {n, d} sempre reduzidos, com o sinal no numerador. Nada de ponto
+   flutuante nas contas: o gerador precisa saber que 1/3 é 1/3.
+   ========================================================================== */
+const mdc = (a, b) => (b ? mdc(b, a % b) : Math.abs(a));
+
+function rac(n, d = 1) {
+  if (d === 0) throw new Error('denominador zero');
+  if (d < 0) { n = -n; d = -d; }
+  const g = mdc(Math.abs(n), d) || 1;
+  return { n: n / g, d: d / g };
+}
+const rSoma = (a, b) => rac(a.n * b.d + b.n * a.d, a.d * b.d);
+const rSub  = (a, b) => rac(a.n * b.d - b.n * a.d, a.d * b.d);
+const rMul  = (a, b) => rac(a.n * b.n, a.d * b.d);
+const rDiv  = (a, b) => rac(a.n * b.d, a.d * b.n);
+const rNeg  = (a) => ({ n: -a.n, d: a.d });
+const rVal  = (a) => a.n / a.d;
+const rZero = (a) => a.n === 0;
+const rInt  = (a) => a.d === 1;
+const rIgual = (a, b) => a.n === b.n && a.d === b.d;
+
+const quadradoPerfeito = (n) => n >= 0 && Number.isInteger(Math.sqrt(n));
+
+/* √n = f·√d, com d livre de quadrados. */
+function simplificaRadical(n) {
+  let f = 1, d = n;
+  for (let i = 2; i * i <= d; i++) { while (d % (i * i) === 0) { d /= i * i; f *= i; } }
+  return { f, d };
+}
+
+/* ==========================================================================
+   2) NÚMEROS DA RESPOSTA
+   Duas formas: racional {t:'r'} e radical {t:'q'} = (p + q√r)/s.
+   ========================================================================== */
+const numR = (v) => ({ t: 'r', v });
+const numQ = (p, q, r, s) => ({ t: 'q', p, q, r, s });
+
+const numVal = (x) => (x.t === 'r' ? rVal(x.v) : (x.p + x.q * Math.sqrt(x.r)) / x.s);
+const numOrd = (a, b) => numVal(a) - numVal(b);
+const numIgual = (a, b) => Math.abs(numVal(a) - numVal(b)) < 1e-9;
+
+/* Raiz de ax² + bx + c pela fórmula, já simplificada. */
+function raizQuadratica(a, b, delta, sgn) {
+  if (delta === 0) return numR(rac(-b, 2 * a));
+  const { f, d } = simplificaRadical(delta);
+  if (d === 1) return numR(rac(-b + sgn * f, 2 * a));      // Δ é quadrado perfeito: raiz racional
+  let p = -b, q = sgn * f, s = 2 * a;
+  if (s < 0) { p = -p; q = -q; s = -s; }
+  const g = mdc(mdc(Math.abs(p), Math.abs(q)), s) || 1;
+  return numQ(p / g, q / g, d, s / g);
+}
+
+/* ==========================================================================
+   3) TIPOGRAFIA DA MATEMÁTICA
+   Frações empilhadas e radical com barra são feitos em HTML/CSS — o site não
+   carrega KaTeX nem MathJax.
+   ========================================================================== */
+const htmlVar = (v) => `<i>${v}</i>`;
+const htmlFrac = (n, d) => `<span class="fr"><span class="fr-n">${n}</span><span class="fr-d">${d}</span></span>`;
+const htmlRadical = (n) => `<span class="rad">√<span class="rad-b">${n}</span></span>`;
+
+/* Racional sem sinal explícito de + na frente. */
+function htmlRac(r) {
+  const s = r.n < 0 ? MENOS : '';
+  const a = Math.abs(r.n);
+  return r.d === 1 ? s + a : s + htmlFrac(a, r.d);
+}
+function txtRac(r) {
+  const s = r.n < 0 ? MENOS : '';
+  return r.d === 1 ? s + Math.abs(r.n) : s + Math.abs(r.n) + '/' + r.d;
+}
+
+/* Um número da resposta (racional ou radical), em HTML e em texto puro
+   (o texto vai nos rótulos da reta numérica, que é SVG e não empilha frações). */
+function htmlNum(x) {
+  if (x.t === 'r') return htmlRac(x.v);
+  const rad = (Math.abs(x.q) === 1 ? '' : Math.abs(x.q)) + htmlRadical(x.r);
+  let cima;
+  if (x.p === 0) cima = (x.q < 0 ? MENOS : '') + rad;
+  else cima = `${x.p < 0 ? MENOS + Math.abs(x.p) : x.p} ${x.q < 0 ? MENOS : '+'} ${rad}`;
+  return x.s === 1 ? cima : htmlFrac(cima, x.s);
+}
+function txtNum(x) {
+  if (x.t === 'r') return txtRac(x.v);
+  const rad = (Math.abs(x.q) === 1 ? '' : Math.abs(x.q)) + '√' + x.r;
+  let cima;
+  if (x.p === 0) cima = (x.q < 0 ? MENOS : '') + rad;
+  else cima = `${x.p < 0 ? MENOS + Math.abs(x.p) : x.p} ${x.q < 0 ? MENOS : '+'} ${rad}`;
+  return x.s === 1 ? cima : (x.p === 0 ? cima + '/' + x.s : `(${cima})/${x.s}`);
+}
+
+/* Um monômio |c|·xᵍ, sem sinal (o sinal é do lado que o contém). */
+function htmlMono(abs, g, v) {
+  if (g === 0) return htmlRac(abs);
+  const pot = g === 1 ? htmlVar(v) : `${htmlVar(v)}<sup>${g}</sup>`;
+  const coefTxt = abs.n === 1 ? '' : String(abs.n);
+  if (abs.d === 1) return coefTxt + pot;
+  return htmlFrac(coefTxt + pot, abs.d);        // (3x)/4 sai como fração empilhada
+}
+
+/* Um lado da igualdade: lista de termos {c: racional, g: grau}. */
+function htmlLado(termos, v) {
+  const vis = termos.filter((t) => !rZero(t.c));
+  if (!vis.length) return '0';
+  return vis.map((t, i) => {
+    const neg = t.c.n < 0;
+    const corpo = htmlMono({ n: Math.abs(t.c.n), d: t.c.d }, t.g, v);
+    if (i === 0) return (neg ? MENOS : '') + corpo;
+    return (neg ? ` ${MENOS} ` : ' + ') + corpo;
+  }).join('');
+}
+
+/* Fator do tipo (2x − 3), sempre entre parênteses. */
+const htmlFator = (a, b, v) => `(${htmlLado([{ c: rac(a), g: 1 }, { c: rac(b), g: 0 }], v)})`;
+
+/* Coeficiente que multiplica um parêntese: 1 some, −1 vira só o sinal. */
+const htmlCoefFator = (k) => (k === 1 ? '' : k === -1 ? MENOS : (k < 0 ? MENOS + Math.abs(k) : String(k)));
+
+const linha = (esq, rel, dir) => `${esq} ${REL[rel]} ${dir}`;
+
+/* ==========================================================================
+   4) CONJUNTO SOLUÇÃO
+   Lista ordenada de intervalos disjuntos; [] é o vazio e um intervalo com as
+   duas pontas nulas é ℝ. Ponto isolado {r} é o intervalo [r, r].
+   ========================================================================== */
+const intv = (ini, iniFec, fim, fimFec) => ({ ini, iniFec, fim, fimFec });
+
+/* Estudo do sinal de uma expressão de 2º grau (ou de um produto de dois
+   fatores lineares, que tem exatamente o mesmo sinal do quociente).
+   L = sinal do coeficiente líder; raizes = [] , [r] (dupla) ou [r1 < r2]. */
+function solucaoSinal(L, raizes, rel) {
+  const querPositivo = rel === 'gt' || rel === 'ge';
+  const fechado = rel === 'ge' || rel === 'le';
+
+  if (raizes.length === 0) {                       // Δ < 0: sinal constante, igual ao de L
+    const positiva = L > 0;
+    return positiva === querPositivo ? [intv(null, false, null, false)] : [];
+  }
+  if (raizes.length === 1) {                       // Δ = 0: sinal de L, zerando na raiz dupla
+    const r = raizes[0];
+    const positiva = L > 0;
+    if (positiva === querPositivo) {
+      return fechado ? [intv(null, false, null, false)]
+                     : [intv(null, false, r, false), intv(r, false, null, false)];
+    }
+    return fechado ? [intv(r, true, r, true)] : [];
+  }
+  const [r1, r2] = raizes;                         // Δ > 0: −L entre as raízes, L fora
+  const dentro = (L > 0) !== querPositivo;         // a região pedida é o miolo?
+  if (dentro) return [intv(r1, fechado, r2, fechado)];
+  return [intv(null, false, r1, fechado), intv(r2, fechado, null, false)];
+}
+
+/* Tira um ponto do conjunto (condição de existência do quociente). */
+function excluiPonto(sol, p) {
+  const out = [];
+  for (const i of sol) {
+    const vp = numVal(p);
+    const depoisDoIni = i.ini === null || numVal(i.ini) < vp - 1e-9;
+    const antesDoFim  = i.fim === null || numVal(i.fim) > vp + 1e-9;
+    if (depoisDoIni && antesDoFim) {               // ponto no miolo: parte o intervalo em dois
+      out.push(intv(i.ini, i.iniFec, p, false));
+      out.push(intv(p, false, i.fim, i.fimFec));
+    } else if (i.ini !== null && numIgual(i.ini, p)) {
+      out.push(intv(i.ini, false, i.fim, i.fimFec));
+    } else if (i.fim !== null && numIgual(i.fim, p)) {
+      out.push(intv(i.ini, i.iniFec, i.fim, false));
+    } else {
+      out.push(i);
+    }
+  }
+  /* [r, r] com r excluído deixa de existir */
+  return out.filter((i) => !(i.ini !== null && i.fim !== null && numIgual(i.ini, i.fim) && !(i.iniFec && i.fimFec)));
+}
+
+/* Solução de uma inequação do 1º grau: m·x ⋛ n. */
+function solucaoLinear(m, n, rel) {
+  const r = numR(rac(n.n * m.d, n.d * m.n));       // n / m
+  const rl = rVal(m) < 0 ? VIRA[rel] : rel;
+  if (rl === 'gt') return { sol: [intv(r, false, null, false)], rel: rl, raiz: r };
+  if (rl === 'ge') return { sol: [intv(r, true,  null, false)], rel: rl, raiz: r };
+  if (rl === 'lt') return { sol: [intv(null, false, r, false)], rel: rl, raiz: r };
+  return { sol: [intv(null, false, r, true)], rel: rl, raiz: r };
+}
+
+/* --- notação por compreensão --------------------------------------------- */
+function condHtml(i, v) {
+  const x = htmlVar(v);
+  if (i.ini === null && i.fim === null) return '';
+  if (i.ini === null) return `${x} ${i.fimFec ? REL.le : REL.lt} ${htmlNum(i.fim)}`;
+  if (i.fim === null) return `${x} ${i.iniFec ? REL.ge : REL.gt} ${htmlNum(i.ini)}`;
+  return `${htmlNum(i.ini)} ${i.iniFec ? REL.le : REL.lt} ${x} ${i.fimFec ? REL.le : REL.lt} ${htmlNum(i.fim)}`;
+}
+
+function conjuntoHtml(sol, v) {
+  if (!sol.length) return 'S = ∅';
+  const x = htmlVar(v);
+  if (sol.length === 1) {
+    const i = sol[0];
+    if (i.ini === null && i.fim === null) return 'S = ℝ';
+    if (i.ini !== null && i.fim !== null && numIgual(i.ini, i.fim)) return `S = {${htmlNum(i.ini)}}`;
+    return `S = {${x} ∈ ℝ | ${condHtml(i, v)}}`;
+  }
+  if (sol.length === 2) {
+    const [a, b] = sol;
+    const furo = a.ini === null && b.fim === null && a.fim !== null && b.ini !== null
+      && numIgual(a.fim, b.ini) && !a.fimFec && !b.iniFec;
+    if (furo) return `S = {${x} ∈ ℝ | ${x} ≠ ${htmlNum(a.fim)}}`;
+  }
+  return `S = {${x} ∈ ℝ | ${sol.map((i) => condHtml(i, v)).join(' ou ')}}`;
+}
+
+/* --- reta numérica -------------------------------------------------------- */
+function retaSvg(sol, marcas) {
+  const W = 264, H = 48, Y = 20, x0 = 18, x1 = W - 18;
+  const n = marcas.length;
+  const px = marcas.map((_, i) => (n === 1 ? (x0 + x1) / 2 : x0 + ((x1 - x0) * (i + 1)) / (n + 1)));
+  const posDe = (num) => {
+    for (let i = 0; i < marcas.length; i++) if (numIgual(marcas[i], num)) return px[i];
+    return (x0 + x1) / 2;
+  };
+
+  let s = `<svg class="reta" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-hidden="true">`;
+  /* faixas da solução, por baixo */
+  for (const i of sol) {
+    const a = i.ini === null ? 6 : posDe(i.ini);
+    const b = i.fim === null ? W - 6 : posDe(i.fim);
+    if (b - a < 0.5) continue;
+    s += `<line x1="${a}" y1="${Y}" x2="${b}" y2="${Y}" stroke="#1B4F4F" stroke-opacity=".28" stroke-width="7" stroke-linecap="butt"/>`;
+  }
+  /* eixo com setas nas duas pontas */
+  s += `<line x1="6" y1="${Y}" x2="${W - 6}" y2="${Y}" stroke="#57534E" stroke-width="1.2"/>`;
+  s += `<path d="M6 ${Y} l7 -3.5 v7 z" fill="#57534E"/><path d="M${W - 6} ${Y} l-7 -3.5 v7 z" fill="#57534E"/>`;
+  /* pontos marcados */
+  marcas.forEach((m, i) => {
+    let fechado = false, aberto = false;
+    for (const iv of sol) {
+      if (iv.ini !== null && numIgual(iv.ini, m)) { iv.iniFec ? (fechado = true) : (aberto = true); }
+      if (iv.fim !== null && numIgual(iv.fim, m)) { iv.fimFec ? (fechado = true) : (aberto = true); }
+    }
+    const dentro = sol.some((iv) => {
+      const va = iv.ini === null ? -Infinity : numVal(iv.ini);
+      const vb = iv.fim === null ?  Infinity : numVal(iv.fim);
+      return numVal(m) > va + 1e-9 && numVal(m) < vb - 1e-9;
+    });
+    const cheio = fechado || (dentro && !aberto);
+    s += `<circle cx="${px[i]}" cy="${Y}" r="4.6" fill="${cheio ? '#1B4F4F' : '#fff'}" stroke="#1B4F4F" stroke-width="1.6"/>`;
+    s += `<text x="${px[i]}" y="${Y + 21}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#1a1a1a">${txtNum(m)}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* ==========================================================================
+   5) GERADORES
+   Todos trabalham de trás para frente: sorteiam a resposta e montam a questão
+   em volta dela. A exceção é a raiz irracional, que não pode ser imposta — aí
+   os coeficientes vêm primeiro e só são aceitos se o Δ cooperar.
+   ========================================================================== */
+const nInt = (n) => (n < 0 ? MENOS + Math.abs(n) : String(n));
+const par  = (n) => (n < 0 ? `(${MENOS}${Math.abs(n)})` : String(n));
+const mat  = (html, final) => ({ tipo: 'mat', html, final: !!final });
+const nota = (html) => ({ tipo: 'nota', html });
+
+function sorteiaRaiz(nat, opts) {
+  if (nat === 'racional') {
+    for (let t = 0; t < 60; t++) {
+      const d = escolhe([2, 2, 3, 3, 4, 5]);
+      const n = opts.soPositivas ? inteiro(1, 14) : naoZero(-14, 14);
+      if (mdc(Math.abs(n), d) !== 1) continue;
+      return rac(n, d);
+    }
+    return rac(3, 2);
+  }
+  return rac(opts.soPositivas ? inteiro(1, 12) : naoZero(-10, 10));
+}
+
+/* --- núcleo linear: A·x + B = C·x + D, em quatro apresentações ------------ */
+function nucleoLinear(nat, opts, skins) {
+  for (let t = 0; t < 400; t++) {
+    const r = sorteiaRaiz(nat, opts);
+    const q = r.d;
+    const v = opts.varDe();
+    const skin = escolhe(skins);
+
+    if (skin === 'simples' || skin === 'doisLados') {
+      const dif = q * naoZero(1, 5) * maisMenos(0.3);
+      let A, C;
+      if (skin === 'simples') { C = 0; A = dif; }
+      else { C = naoZero(-6, 6); A = C + dif; }
+      if (A === 0 || Math.abs(A) > 22) continue;
+      const B = inteiro(-14, 14);
+      const D = rSoma(rMul(rac(dif), r), rac(B));
+      if (!rInt(D) || Math.abs(D.n) > 99) continue;
+      return {
+        v, skin, r,
+        esqHtml: htmlLado([{ c: rac(A), g: 1 }, { c: rac(B), g: 0 }], v),
+        dirHtml: htmlLado([{ c: rac(C), g: 1 }, { c: D, g: 0 }], v),
+        exp: { A, B, C, D: D.n }, abertura: null,
+      };
+    }
+
+    if (skin === 'parenteses') {
+      const k = naoZero(2, 5) * maisMenos(0.25);
+      const a = pesado([[1, 6], [2, 2], [3, 1]]);
+      const A = k * a;
+      const dif = q * naoZero(1, 4) * maisMenos(0.3);
+      const C = A - dif;
+      const m = naoZero(-9, 9);
+      const p = pesado([[0, 3], [inteiro(-10, 10), 5]]);
+      const B = k * m + p;
+      const D = rSoma(rMul(rac(dif), r), rac(B));
+      if (!rInt(D) || Math.abs(D.n) > 99 || Math.abs(C) > 22) continue;
+      const solto = p === 0 ? '' : (p > 0 ? ` + ${p}` : ` ${MENOS} ${Math.abs(p)}`);
+      return {
+        v, skin, r,
+        esqHtml: `${htmlCoefFator(k)}(${htmlLado([{ c: rac(a), g: 1 }, { c: rac(m), g: 0 }], v)})${solto}`,
+        dirHtml: htmlLado([{ c: rac(C), g: 1 }, { c: D, g: 0 }], v),
+        exp: { A, B, C, D: D.n }, abertura: 'Aplicando a distributiva:',
+      };
+    }
+
+    /* (A·x + B)/d + E = C·x + D — o passo de abrir é multiplicar tudo por d */
+    const d = escolhe([2, 3, 4, 5]);
+    const C = inteiro(-4, 4);
+    const dif = q * naoZero(1, 4) * maisMenos(0.3);
+    const A = d * C + dif;
+    if (A === 0 || Math.abs(A) > 30) continue;
+    const D0 = inteiro(-8, 8);
+    const E = moeda(0.45) ? naoZero(-6, 6) : 0;
+    const B = rSub(rac(d * (D0 - E)), rMul(rac(dif), r));
+    if (!rInt(B) || Math.abs(B.n) > 90) continue;
+    const solto = E === 0 ? '' : (E > 0 ? ` + ${E}` : ` ${MENOS} ${Math.abs(E)}`);
+    return {
+      v, skin, r,
+      esqHtml: htmlFrac(htmlLado([{ c: rac(A), g: 1 }, { c: B, g: 0 }], v), d) + solto,
+      dirHtml: htmlLado([{ c: rac(C), g: 1 }, { c: rac(D0), g: 0 }], v),
+      exp: { A, B: B.n + d * E, C: d * C, D: d * D0 },
+      abertura: `Multiplicando os dois lados por ${d}:`,
+    };
+  }
+  return null;
+}
+
+/* Passos comuns ao 1º grau: abrir (se preciso), juntar, isolar. */
+function passosLinear(nu, rel, relFinal) {
+  const v = nu.v, e = nu.exp;
+  const p = [];
+  if (nu.abertura) {
+    p.push(nota(nu.abertura));
+    p.push(mat(linha(
+      htmlLado([{ c: rac(e.A), g: 1 }, { c: rac(e.B), g: 0 }], v), rel,
+      htmlLado([{ c: rac(e.C), g: 1 }, { c: rac(e.D), g: 0 }], v))));
+  }
+  const m = e.A - e.C, n = e.D - e.B;
+  p.push(mat(linha(htmlLado([{ c: rac(m), g: 1 }], v), rel, htmlRac(rac(n)))));
+  if (rel !== 'eq' && m < 0) p.push(nota(`Dividindo por ${nInt(m)}, que é negativo, o sinal se inverte.`));
+  p.push(mat(linha(htmlVar(v), relFinal, htmlRac(rac(n, m))), false));
+  return p;
+}
+
+function eqLinear(nat, opts, skins, fam) {
+  const nu = nucleoLinear(nat, opts, skins);
+  if (!nu) return null;
+  const passos = passosLinear(nu, 'eq', 'eq');
+  passos.push(mat(`S = {${htmlRac(nu.r)}}`, true));
+  return {
+    fam, v: nu.v,
+    html: linha(nu.esqHtml, 'eq', nu.dirHtml),
+    resposta: `S = {${htmlRac(nu.r)}}`,
+    passos, reta: null,
+  };
+}
+
+function inLinear(nat, opts) {
+  const nu = nucleoLinear(nat, opts, ['simples', 'doisLados', 'doisLados', 'parenteses', 'fracao']);
+  if (!nu) return null;
+  const rel = escolhe(SINAIS);
+  const e = nu.exp;
+  const { sol, rel: relF, raiz } = solucaoLinear(rac(e.A - e.C), rac(e.D - e.B), rel);
+  const passos = passosLinear(nu, rel, relF);
+  passos.push(mat(conjuntoHtml(sol, nu.v), true));
+  return {
+    fam: 'in1', v: nu.v,
+    html: linha(nu.esqHtml, rel, nu.dirHtml),
+    resposta: conjuntoHtml(sol, nu.v),
+    passos, reta: { sol, marcas: [raiz] },
+  };
+}
+
+/* --- núcleo quadrático ---------------------------------------------------- */
+/* forma: 'completa' (b≠0 e c≠0), 'quadrado' (b=0) ou 'fatoravel' (c=0). */
+function nucleoQuadratico(nat, opts, forma) {
+  const construida = nat === 'inteira' || nat === 'racional';
+
+  for (let t = 0; t < 500; t++) {
+    let a, b, c;
+
+    if (construida) {
+      if (forma === 'fatoravel') {
+        const r = sorteiaRaiz(nat, opts);
+        const k = pesado([[1, 7], [2, 2]]) * maisMenos(0.2);
+        a = k * r.d; b = -k * r.n; c = 0;
+      } else if (forma === 'quadrado') {
+        const r = sorteiaRaiz(nat, opts);
+        const k = pesado([[1, 6], [2, 2], [3, 1]]) * maisMenos(0.2);
+        a = k * r.d * r.d; b = 0; c = -k * r.n * r.n;
+      } else {
+        let r1 = sorteiaRaiz(nat, opts);
+        let r2 = (nat === 'racional' && moeda(0.4)) ? sorteiaRaiz('inteira', opts) : sorteiaRaiz(nat, opts);
+        if (opts.raizDupla && moeda(0.14)) r2 = r1;
+        else if (rIgual(r1, r2)) continue;
+        const k = pesado([[1, 8], [2, 2]]) * maisMenos(0.2);
+        a = k * r1.d * r2.d;
+        b = -k * (r2.d * r1.n + r1.d * r2.n);
+        c = k * r1.n * r2.n;
+        if (b === 0 || c === 0) continue;             // cairia numa incompleta
+      }
+    } else {
+      if (forma === 'fatoravel') continue;            // c = 0 sempre dá raiz racional
+      const sinalA = maisMenos(0.25);
+      a = pesado([[1, 6], [2, 3], [3, 2], [4, 1]]) * sinalA;
+      b = forma === 'quadrado' ? 0 : naoZero(-12, 12);
+      c = naoZero(-14, 14);
+    }
+
+    if (Math.abs(a) > 12 || Math.abs(b) > 60 || Math.abs(c) > 99) continue;
+    const delta = b * b - 4 * a * c;
+
+    if (nat === 'vazio' && delta >= 0) continue;
+    if (nat === 'irracional' && (delta <= 0 || quadradoPerfeito(delta))) continue;
+    if (construida && delta < 0) continue;
+    if (nat === 'irracional' && simplificaRadical(delta).d > 60) continue;
+    if (delta === 0 && !opts.raizDupla) continue;
+
+    let raizes;
+    if (delta < 0) raizes = [];
+    else if (delta === 0) raizes = [raizQuadratica(a, b, 0, 1)];
+    else {
+      const r1 = raizQuadratica(a, b, delta, -1), r2 = raizQuadratica(a, b, delta, 1);
+      raizes = numOrd(r1, r2) <= 0 ? [r1, r2] : [r2, r1];
+    }
+    /* Em ax² + c = 0 as raízes são ±r — exigir só positivas ali é impossível. */
+    if (opts.soPositivas && forma !== 'quadrado' && raizes.some((r) => numVal(r) < -1e-9)) continue;
+
+    return { a, b, c, delta, raizes, forma };
+  }
+  return null;
+}
+
+/* Como a questão aparece no papel: em ordem, fora de ordem ou com termos
+   dos dois lados do sinal (mover termo não inverte relação nenhuma). */
+function apresentaQuad(a, b, c, v) {
+  let esq = [{ c: rac(a), g: 2 }, { c: rac(b), g: 1 }, { c: rac(c), g: 0 }].filter((t) => !rZero(t.c));
+  let dir = [];
+  const modo = pesado([['padrao', 5], ['desordem', 2], ['doisLados', 3]]);
+  if (modo === 'desordem' && esq.length > 1) esq = embaralha(esq);
+  if (modo === 'doisLados') {
+    const moveis = esq.filter((t) => t.g < 2);
+    if (moveis.length) {
+      const mover = embaralha(moveis).slice(0, moveis.length === 1 ? 1 : inteiro(1, 2));
+      esq = esq.filter((t) => !mover.includes(t));
+      dir = mover.map((t) => ({ c: rNeg(t.c), g: t.g }));
+    }
+  }
+  return { esqHtml: htmlLado(esq, v), dirHtml: htmlLado(dir, v) };
+}
+
+/* Passos até as raízes — o caminho muda conforme a forma da equação. */
+function passosRaizes(nq, v) {
+  const { a, b, c, delta, raizes, forma } = nq;
+  const p = [];
+
+  if (forma === 'fatoravel') {
+    p.push(nota('Sem termo independente: fatore.'));
+    p.push(mat(`${htmlVar(v)}(${htmlLado([{ c: rac(a), g: 1 }, { c: rac(b), g: 0 }], v)}) ${REL.eq} 0`));
+    p.push(mat(`${htmlVar(v)} = 0 &nbsp; ou &nbsp; ${htmlVar(v)} = ${htmlRac(rac(-b, a))}`));
+    return p;
+  }
+  if (forma === 'quadrado') {
+    p.push(nota(`Sem termo em ${v}: isole o quadrado.`));
+    p.push(mat(linha(htmlLado([{ c: rac(a), g: 2 }], v), 'eq', nInt(-c))));
+    p.push(mat(linha(`${htmlVar(v)}<sup>2</sup>`, 'eq', htmlRac(rac(-c, a)))));
+    if (delta < 0) {
+      p.push(nota('Nenhum quadrado é negativo — não há raiz real.'));
+    } else {
+      /* A raiz positiva já vem simplificada (8/3, 2√3) — nada de √(64/9) no gabarito. */
+      p.push(mat(`${htmlVar(v)} = ±${htmlNum(raizes[raizes.length - 1])}`));
+    }
+    return p;
+  }
+
+  p.push(nota(`a = ${nInt(a)}, b = ${nInt(b)}, c = ${nInt(c)}`));
+  p.push(mat(`Δ = ${par(b)}<sup>2</sup> ${MENOS} 4·${par(a)}·${par(c)} = ${nInt(delta)}`));
+  if (delta < 0) { p.push(nota('Δ &lt; 0: a equação não tem raiz real.')); return p; }
+  if (delta === 0) {
+    p.push(mat(`${htmlVar(v)} = ${htmlFrac(nInt(-b), `2·${par(a)}`)} = ${htmlNum(raizes[0])}`));
+    p.push(nota('Δ = 0: raiz dupla.'));
+    return p;
+  }
+  p.push(mat(`${htmlVar(v)} = ${htmlFrac(`${nInt(-b)} ± ${htmlRadical(delta)}`, `2·${par(a)}`)}`));
+  p.push(mat(`${htmlVar(v)}<sub>1</sub> = ${htmlNum(raizes[0])} &nbsp;&nbsp; ${htmlVar(v)}<sub>2</sub> = ${htmlNum(raizes[1])}`));
+  return p;
+}
+
+function respostaRaizes(raizes) {
+  if (!raizes.length) return 'S = ∅';
+  if (raizes.length === 1) return `S = {${htmlNum(raizes[0])}}`;
+  return `S = {${htmlNum(raizes[0])}, ${htmlNum(raizes[1])}}`;
+}
+
+function eqQuad(nat, opts, forma, fam) {
+  const nq = nucleoQuadratico(nat, opts, forma);
+  if (!nq) return null;
+  const v = opts.varDe();
+  const ap = apresentaQuad(nq.a, nq.b, nq.c, v);
+  const passos = passosRaizes(nq, v);
+  passos.push(mat(respostaRaizes(nq.raizes), true));
+  return {
+    fam, v,
+    html: linha(ap.esqHtml, 'eq', ap.dirHtml),
+    resposta: respostaRaizes(nq.raizes),
+    passos, reta: null,
+  };
+}
+
+/* Frase do estudo de sinal — é o passo que o aluno erra, então vale explicitar. */
+function descreveSinal(a, raizes, rel) {
+  const cima = a > 0;
+  const conc = `Concavidade para ${cima ? 'cima' : 'baixo'} (a ${cima ? '&gt;' : '&lt;'} 0):`;
+  if (!raizes.length) return `${conc} sem raízes reais, a expressão tem o sinal de a em todo ℝ.`;
+  if (raizes.length === 1) return `${conc} a expressão zera na raiz dupla e tem o sinal de a em todo o resto.`;
+  return `${conc} a expressão é ${cima ? 'negativa' : 'positiva'} entre as raízes e ${cima ? 'positiva' : 'negativa'} fora delas.`;
+}
+
+function inQuad(nat, opts) {
+  let forma = pesado([['completa', 7], ['quadrado', 2], ['fatoravel', 1]]);
+  if (forma === 'fatoravel' && nat !== 'inteira' && nat !== 'racional') forma = 'completa';
+  const nq = nucleoQuadratico(nat, opts, forma);
+  if (!nq) return null;
+  const v = opts.varDe();
+  const rel = escolhe(SINAIS);
+  const ap = apresentaQuad(nq.a, nq.b, nq.c, v);
+  const sol = solucaoSinal(nq.a > 0 ? 1 : -1, nq.raizes, rel);
+
+  const passos = passosRaizes(nq, v);
+  passos.push(nota(descreveSinal(nq.a, nq.raizes, rel)));
+  passos.push(mat(conjuntoHtml(sol, v), true));
+  return {
+    fam: 'in2', v,
+    html: linha(ap.esqHtml, rel, ap.dirHtml),
+    resposta: conjuntoHtml(sol, v),
+    passos, reta: { sol, marcas: nq.raizes },
+  };
+}
+
+/* --- inequação-produto e inequação-quociente ------------------------------ */
+function inProdQuo(nat, opts) {
+  const v = opts.varDe();
+  for (let t = 0; t < 300; t++) {
+    let r1 = sorteiaRaiz(nat, opts), r2 = sorteiaRaiz(nat, opts);
+    if (rIgual(r1, r2)) continue;
+    if (rVal(r1) > rVal(r2)) { const w = r1; r1 = r2; r2 = w; }
+
+    const fator = (r) => {
+      const k = pesado([[1, 8], [2, 2]]) * maisMenos(0.15);
+      return { a: k * r.d, b: -k * r.n };
+    };
+    const f1 = fator(r1), f2 = fator(r2);
+    if (Math.abs(f1.b) > 30 || Math.abs(f2.b) > 30) continue;
+
+    const tipo = moeda(0.5) ? 'produto' : 'quociente';
+    const rel = escolhe(SINAIS);
+    const L = f1.a * f2.a > 0 ? 1 : -1;
+    const raizes = [numR(r1), numR(r2)];
+    /* No quociente sorteia-se qual fator vai embaixo — a raiz dele nunca entra. */
+    const baixo = tipo === 'quociente' ? (moeda(0.5) ? 1 : 2) : 0;
+    let sol = solucaoSinal(L, raizes, rel);
+    const excluida = baixo === 1 ? numR(r1) : baixo === 2 ? numR(r2) : null;
+    if (excluida) sol = excluiPonto(sol, excluida);
+
+    const l1 = htmlLado([{ c: rac(f1.a), g: 1 }, { c: rac(f1.b), g: 0 }], v);
+    const l2 = htmlLado([{ c: rac(f2.a), g: 1 }, { c: rac(f2.b), g: 0 }], v);
+    const esqHtml = tipo === 'produto'
+      ? `(${l1})(${l2})`
+      : (baixo === 2 ? htmlFrac(l1, l2) : htmlFrac(l2, l1));
+
+    const passos = [];
+    passos.push(nota(`Raízes dos fatores: ${v} = ${txtRac(r1)} e ${v} = ${txtRac(r2)}.`));
+    if (excluida) passos.push(nota(`Condição de existência: ${v} ≠ ${txtNum(excluida)} — essa bolinha fica sempre aberta.`));
+    passos.push(nota(`Quadro de sinais: o ${tipo} é ${L > 0 ? 'positivo' : 'negativo'} fora do intervalo das raízes e ${L > 0 ? 'negativo' : 'positivo'} entre elas.`));
+    passos.push(mat(conjuntoHtml(sol, v), true));
+
+    return {
+      fam: 'inpq', v,
+      html: linha(esqHtml, rel, '0'),
+      resposta: conjuntoHtml(sol, v),
+      passos, reta: { sol, marcas: raizes },
+    };
+  }
+  return null;
+}
+
+/* --- catálogo ------------------------------------------------------------- */
+const FAMILIAS = {
+  eq1:  { nome: 'Equação do 1º grau', nats: ['inteira', 'racional'],
+          gerar: (nat, o) => eqLinear(nat, o, ['simples', 'simples', 'doisLados'], 'eq1') },
+  eq1f: { nome: 'Equação do 1º grau com parênteses e frações', nats: ['inteira', 'racional'],
+          gerar: (nat, o) => eqLinear(nat, o, ['parenteses', 'fracao'], 'eq1f') },
+  eq2i: { nome: 'Equação do 2º grau incompleta', nats: ['inteira', 'racional', 'irracional', 'vazio'],
+          gerar: (nat, o) => eqQuad(nat, o,
+            (nat === 'inteira' || nat === 'racional') && moeda(0.45) ? 'fatoravel' : 'quadrado', 'eq2i') },
+  eq2:  { nome: 'Equação do 2º grau', nats: ['inteira', 'racional', 'irracional', 'vazio'],
+          gerar: (nat, o) => eqQuad(nat, o, 'completa', 'eq2') },
+  in1:  { nome: 'Inequação do 1º grau', nats: ['inteira', 'racional'], gerar: inLinear },
+  in2:  { nome: 'Inequação do 2º grau', nats: ['inteira', 'racional', 'irracional', 'vazio'], gerar: inQuad },
+  inpq: { nome: 'Inequação-produto e quociente', nats: ['inteira', 'racional'], gerar: inProdQuo },
+};
+
+/* ==========================================================================
+   6) MONTAGEM DA LISTA
+   ========================================================================== */
+const PESO_NAT = { inteira: 1, racional: 0.75, irracional: 0.55, vazio: 0.35 };
+const VARIAVEIS = ['x', 'y', 't', 'm'];
+const ROTULOS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+function montaLista(viaveis, cfg) {
+  const cotas = new Array(viaveis.length).fill(Math.floor(cfg.qtd / viaveis.length));
+  let resto = cfg.qtd - cotas.reduce((a, b) => a + b, 0);
+  for (const i of embaralha(viaveis.map((_, i) => i))) { if (resto <= 0) break; cotas[i]++; resto--; }
+
+  const vistos = new Set();
+  const qs = [];
+  viaveis.forEach((f, i) => {
+    for (let n = 0; n < cotas[i]; n++) {
+      let q = null;
+      for (let t = 0; t < 40; t++) {
+        const cand = f.gerar(pesado(f.nats.map((x) => [x, PESO_NAT[x]])), cfg.opts);
+        if (!cand) continue;
+        if (vistos.has(cand.html) && t < 34) continue;   // sem questão repetida na mesma folha
+        q = cand; break;
+      }
+      if (q) { vistos.add(q.html); qs.push(q); }
+    }
+  });
+  return cfg.agrupar ? qs : embaralha(qs);
+}
+
+/* ==========================================================================
+   7) INTERFACE
+   ========================================================================== */
+const PADRAO = {
+  tipos: ['eq1', 'eq2'], naturezas: ['inteira'], incognita: 'x',
+  layout: 'compacta', gabTipo: 'compacto',
+  soPositivas: false, raizDupla: false, qtd: 12, versoes: 1, agrupar: false,
+  escola: '', titulo: 'Equações e inequações',
+  instrucao: 'Resolva em ℝ, apresentando os cálculos.',
+  ident: true, temGab: true, reta: true,
+};
+
+const est = { tipos: [], naturezas: [], incognita: 'x', layout: 'compacta', gabTipo: 'compacto' };
+let listas = [];
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const limita = (el, min, max) => {
+  const n = parseInt(el.value, 10);
+  const v = Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min;
+  if (String(v) !== el.value) el.value = v;
+  return v;
+};
+
+function lerConfig() {
+  const incognita = est.incognita;
+  return {
+    tipos: est.tipos.slice(),
+    naturezas: est.naturezas.slice(),
+    qtd: limita($('qtd'), 1, 40),
+    versoes: limita($('versoes'), 1, 8),
+    agrupar: $('agrupar').checked,
+    layout: est.layout,
+    escola: $('escola').value.trim(),
+    titulo: $('titulo').value.trim(),
+    instrucao: $('instrucao').value.trim(),
+    ident: $('ident').checked,
+    temGab: $('temGab').checked,
+    gabTipo: est.gabTipo,
+    reta: $('reta').checked,
+    opts: {
+      soPositivas: $('soPositivas').checked,
+      raizDupla: $('raizDupla').checked,
+      varDe: () => (incognita === 'x' ? 'x' : escolhe(VARIAVEIS)),
+    },
+  };
+}
+
+/* --- folhas --------------------------------------------------------------- */
+function cabecalho(cfg, rotulo, selo) {
+  const ident = `<div class="ident">
+      <span>Nome: <span class="identline"></span></span>
+      <span>Turma: <span class="identline" style="min-width:4rem"></span></span>
+      <span>Data: <span class="identline" style="min-width:5rem"></span></span>
+    </div>`;
+  return `<header class="folha-cab">
+      ${selo ? `<span class="selo">Gabarito — folha do professor</span>` : ''}
+      ${cfg.escola ? `<p class="escola">${esc(cfg.escola)}</p>` : ''}
+      <h2 class="folha-titulo">${esc(cfg.titulo || 'Lista de exercícios')}${rotulo ? `<span class="versao">Versão ${rotulo}</span>` : ''}</h2>
+      ${!selo && cfg.instrucao ? `<p class="instrucao">${esc(cfg.instrucao)}</p>` : ''}
+      ${!selo && cfg.ident ? ident : ''}
+    </header>`;
+}
+
+function folhaAluno(qs, cfg, rotulo) {
+  const itens = qs.map((q, i) => {
+    const q1 = `<div class="q"><span class="n">${i + 1})</span><span class="enun">${q.html}</span></div>`;
+    return cfg.layout === 'espaco' ? `<div class="qbox">${q1}<div class="pauta"></div></div>` : q1;
+  }).join('');
+  return `<article class="folha">${cabecalho(cfg, rotulo, false)}
+      <div class="questoes" data-modo="${cfg.layout}">${itens}</div>
+    </article>`;
+}
+
+function folhaGabarito(qs, cfg, rotulo) {
+  const comReta = (q) => (cfg.reta && q.reta ? retaSvg(q.reta.sol, q.reta.marcas) : '');
+  const itens = qs.map((q, i) => {
+    if (cfg.gabTipo === 'compacto') {
+      return `<div class="r"><span class="n">${i + 1})</span><span class="resp">${q.resposta}${comReta(q)}</span></div>`;
+    }
+    const passos = q.passos.map((p) =>
+      `<p class="${p.tipo === 'nota' ? 'nota' : 'mat'}${p.final ? ' final' : ''}">${p.html}</p>`).join('');
+    return `<div class="rcom">
+        <div class="q"><span class="n">${i + 1})</span><span class="enun">${q.html}</span></div>
+        <div class="passos">${passos}${comReta(q)}</div>
+      </div>`;
+  }).join('');
+  return `<article class="folha gab">${cabecalho(cfg, rotulo, true)}
+      <div class="respostas" data-modo="${cfg.gabTipo}">${itens}</div>
+    </article>`;
+}
+
+/* --- geração e pintura ---------------------------------------------------- */
+function viaveisDe(cfg) {
+  return cfg.tipos
+    .map((k) => ({ k, nome: FAMILIAS[k].nome, gerar: FAMILIAS[k].gerar,
+                   nats: FAMILIAS[k].nats.filter((n) => cfg.naturezas.includes(n)) }));
+}
+
+function gerar() {
+  const cfg = lerConfig();
+  const todas = viaveisDe(cfg);
+  const viaveis = todas.filter((f) => f.nats.length);
+  const fora = todas.filter((f) => !f.nats.length);
+
+  const aviso = $('aviso');
+  if (!viaveis.length) {
+    listas = [];
+    aviso.hidden = false;
+    aviso.textContent = 'Nenhum tipo marcado produz soluções com a natureza escolhida. '
+      + 'Equações e inequações do 1º grau (e os fatores lineares) só têm raízes racionais — '
+      + 'marque “Inteiras” ou “Racionais”, ou escolha um tipo do 2º grau.';
+    $('saida').innerHTML = '';
+    $('resumo').textContent = '';
+    return;
+  }
+  if (fora.length) {
+    aviso.hidden = false;
+    aviso.textContent = `Fora da lista: ${fora.map((f) => f.nome).join(', ')} — `
+      + 'esses tipos não têm raiz irracional nem Δ < 0.';
+  } else {
+    aviso.hidden = true;
+  }
+
+  listas = [];
+  for (let i = 0; i < cfg.versoes; i++) listas.push(montaLista(viaveis, cfg));
+  pintar();
+}
+
+function pintar() {
+  const cfg = lerConfig();
+  if (!listas.length) return;
+  const varias = listas.length > 1;
+  const alunos = listas.map((qs, i) => folhaAluno(qs, cfg, varias ? ROTULOS[i] : ''));
+  const gabs = cfg.temGab ? listas.map((qs, i) => folhaGabarito(qs, cfg, varias ? ROTULOS[i] : '')) : [];
+  $('saida').innerHTML = alunos.concat(gabs).join('');
+
+  const n = listas[0].length;
+  const nomes = cfg.tipos.filter((k) => FAMILIAS[k].nats.some((x) => cfg.naturezas.includes(x)))
+    .map((k) => FAMILIAS[k].nome.toLowerCase());
+  $('resumo').textContent = `${n} ${n === 1 ? 'questão' : 'questões'} · `
+    + `${listas.length} ${listas.length === 1 ? 'versão' : 'versões'}`
+    + `${cfg.temGab ? ' + gabarito' : ''} · ${nomes.join(', ')}.`;
+}
+
+/* --- ligações dos controles ----------------------------------------------- */
+function ligaChips(id, campo, multi) {
+  const cx = $(id);
+  est[campo] = multi
+    ? [...cx.querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.v)
+    : cx.querySelector('[aria-pressed="true"]').dataset.v;
+
+  cx.addEventListener('click', (ev) => {
+    const b = ev.target.closest('.chip');
+    if (!b) return;
+    if (multi) {
+      const marcados = [...cx.querySelectorAll('[aria-pressed="true"]')];
+      if (b.getAttribute('aria-pressed') === 'true' && marcados.length === 1) return;  // nunca zero
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      est[campo] = [...cx.querySelectorAll('[aria-pressed="true"]')].map((x) => x.dataset.v);
+    } else {
+      cx.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      est[campo] = b.dataset.v;
+    }
+    (campo === 'layout' || campo === 'gabTipo') ? pintar() : gerar();
+  });
+}
+
+ligaChips('tipos', 'tipos', true);
+ligaChips('naturezas', 'naturezas', true);
+ligaChips('incognita', 'incognita', false);
+ligaChips('layout', 'layout', false);
+ligaChips('gabTipo', 'gabTipo', false);
+
+['qtd', 'versoes', 'soPositivas', 'raizDupla', 'agrupar'].forEach((id) =>
+  $(id).addEventListener('change', gerar));
+['escola', 'titulo', 'instrucao'].forEach((id) => $(id).addEventListener('input', pintar));
+['ident', 'temGab', 'reta'].forEach((id) => $(id).addEventListener('change', pintar));
+
+$('gerar').addEventListener('click', gerar);
+$('imprimir').addEventListener('click', () => window.print());
+$('restaurar').addEventListener('click', () => {
+  ['tipos', 'naturezas'].forEach((id) => {
+    $(id).querySelectorAll('.chip').forEach((b) =>
+      b.setAttribute('aria-pressed', String(PADRAO[id].includes(b.dataset.v))));
+    est[id] = PADRAO[id].slice();
+  });
+  [['incognita', 'incognita'], ['layout', 'layout'], ['gabTipo', 'gabTipo']].forEach(([id, campo]) => {
+    $(id).querySelectorAll('.chip').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.v === PADRAO[campo])));
+    est[campo] = PADRAO[campo];
+  });
+  $('qtd').value = PADRAO.qtd;
+  $('versoes').value = PADRAO.versoes;
+  $('escola').value = PADRAO.escola;
+  $('titulo').value = PADRAO.titulo;
+  $('instrucao').value = PADRAO.instrucao;
+  ['soPositivas', 'raizDupla', 'agrupar', 'ident', 'temGab', 'reta'].forEach((id) => {
+    $(id).checked = PADRAO[id];
+  });
+  gerar();
+});
+
+gerar();
+</script>

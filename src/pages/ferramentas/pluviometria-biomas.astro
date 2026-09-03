@@ -2,168 +2,323 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="Pluviometria dos Biomas Brasileiros">
-  <div class="plv-page">
+<Layout
+  title="Pluviometria dos Biomas Brasileiros"
+  description="Precipitação média histórica dos seis biomas brasileiros: distribuição mês a mês em gráfico interativo e comparativo dos totais anuais, com a sazonalidade de cada bioma."
+>
 
-    <div class="plv-header">
-      <div class="plv-badge">Climatologia</div>
-      <h1>Pluviometria dos Biomas Brasileiros</h1>
-      <p>Precipitação média histórica por bioma · Valores em milímetros (mm)</p>
-    </div>
+  <!-- IBM Plex Mono carregado só nesta página (números e rótulos técnicos usam mono).
+       Playfair Display + IBM Plex Sans já vêm do Layout. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    <div class="plv-cards" id="cards"></div>
+  <div class="plv-root">
 
-    <div class="plv-panel">
-      <div class="plv-tabs">
-        <button class="plv-tab-btn active" data-tab="mensal">Distribuição Mensal</button>
-        <button class="plv-tab-btn"        data-tab="anual">Total Anual</button>
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=simulacoes">Simulações</a> · Climatologia</p>
+      <h1>Pluviometria dos <em>biomas</em></h1>
+      <p class="lede">Quanta chuva cai, mês a mês, em cada um dos seis biomas brasileiros. O que
+      separa um bioma do outro muitas vezes não é o <em>total</em> de chuva, e sim como ela se
+      distribui ao longo do ano: compare o Cerrado — que passa de 240 mm em janeiro a 8 mm em
+      julho — com o Pampa, o único sem estação seca definida. Valores em milímetros (mm),
+      médias históricas.</p>
+    </header>
+
+    <!-- ================= TOTAIS POR BIOMA ================= -->
+    <div class="cards" id="cards"></div>
+
+    <!-- ================= PAINEL DE GRÁFICOS ================= -->
+    <div class="panel">
+      <div class="tabs" role="tablist" aria-label="Visualizações">
+        <button class="tab-btn active" data-tab="mensal" role="tab" aria-selected="true" type="button">Distribuição mensal</button>
+        <button class="tab-btn"        data-tab="anual"  role="tab" aria-selected="false" type="button">Total anual</button>
       </div>
 
-      <div class="plv-inner">
+      <div class="inner">
 
         <div id="view-mensal">
-          <div class="plv-toggle-row">
-            <span class="plv-toggle-label">Exibir:</span>
-            <button class="plv-tog-all on" id="btn-all">Todos ✓</button>
-            <div id="bios-btns"></div>
+          <div class="toggle-row">
+            <span class="toggle-label">Exibir</span>
+            <button class="tog-all on" id="btn-all" type="button">Todos ✓</button>
+            <div class="togs" id="bios-btns"></div>
           </div>
-          <div class="plv-chart-wrap">
+          <div class="chart-wrap">
             <canvas id="chartMensal"></canvas>
           </div>
-          <p style="font-size:11px;color:#ccc;text-align:center;margin-top:10px;">
-            Clique nos botões acima para destacar biomas específicos
-          </p>
+          <p class="dica">Clique nos botões acima para isolar um bioma e enxergar a curva dele sozinha.</p>
         </div>
 
-        <div id="view-anual" style="display:none;">
-          <div class="plv-chart-wrap" style="height:300px;">
+        <div id="view-anual" hidden>
+          <div class="chart-wrap anual">
             <canvas id="chartAnual"></canvas>
           </div>
-          <div class="plv-desc-grid" id="desc-grid"></div>
+          <div class="desc-grid" id="desc-grid"></div>
         </div>
 
       </div>
     </div>
 
-    <p class="plv-footer">Fontes: INMET · IBGE · ANA — Médias históricas representativas por bioma · Elaborado para uso didático</p>
-  </div>
+    <p class="fonte">Fontes: INMET · IBGE · ANA — médias históricas representativas por bioma, elaboradas para uso didático.</p>
 
-  <div class="plv-ct" id="tooltip" style="position:fixed;display:none;z-index:999;"></div>
+    <div class="tooltip" id="tooltip" hidden></div>
+  </div>
 </Layout>
 
 <style is:global>
-  .plv-page {
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    color: #1a1a2e;
-    padding: 28px 20px 40px;
-    max-width: 960px;
+  /* ============================================================
+     Ferramenta: Pluviometria dos Biomas
+     CSS escopado sob .plv-root para não vazar para o resto do site.
+     is:global (e não scoped) porque cards, toggles e legendas são
+     criados por JavaScript e não carregam o atributo data-astro-cid.
+     ============================================================ */
+
+  .plv-root {
+    --bg:     #F8F6F1;
+    --ink:    #1C1917;
+    --accent: #1B4F4F;
+    --muted:  #78716C;
+    --rule:   #E2DDD6;
+    --paper:  #FFFFFF;
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    max-width: 880px;
     margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
   }
+  .plv-root, .plv-root * { box-sizing: border-box; }
 
-  .plv-header { text-align: center; margin-bottom: 28px; }
-  .plv-badge {
-    display: inline-block;
-    background: #e1f3ea; color: #1a7a50;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: .07em; text-transform: uppercase;
-    padding: 4px 14px; border-radius: 20px;
-    margin-bottom: 10px;
+  /* ---------- masthead ---------- */
+  .plv-root .masthead {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
-  .plv-header h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
-  .plv-header p  { font-size: 14px; color: #666; }
+  .plv-root .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+  .plv-root .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+  .plv-root .eyebrow a:hover { border-bottom-color: currentColor; }
+  .plv-root .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.6rem;
+  }
+  .plv-root .masthead h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .plv-root .lede {
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .plv-root .lede em { font-style: normal; color: var(--ink); }
 
-  .plv-cards {
+  /* ---------- cards de total ---------- */
+  .plv-root .cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 22px;
+    margin-bottom: 1.5rem;
   }
-  .plv-card {
-    background: #fff;
+  .plv-root .card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--c);
     border-radius: 10px;
-    border: 1.5px solid #f0f0f0;
-    border-left-width: 4px;
-    padding: 10px 14px;
-    transition: opacity .2s;
+    padding: 11px 14px;
+    transition: opacity 0.2s;
   }
-  .plv-card .c-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #999; margin-bottom: 3px; }
-  .plv-card .c-val   { font-size: 19px; font-weight: 700; }
-  .plv-card .c-unit  { font-size: 12px; font-weight: 400; color: #bbb; }
-  .plv-card .bar-bg  { height: 4px; background: #efefef; border-radius: 2px; margin-top: 7px; }
-  .plv-card .bar-fill{ height: 4px; border-radius: 2px; }
+  .plv-root .card.apagado { opacity: 0.4; }
+  .plv-root .card .c-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .plv-root .card .c-val {
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--c);
+  }
+  .plv-root .card .c-unit { font-size: 11px; font-weight: 400; color: var(--muted); }
+  .plv-root .card .bar-bg {
+    height: 3px;
+    background: var(--rule);
+    border-radius: 2px;
+    margin-top: 8px;
+  }
+  .plv-root .card .bar-fill { height: 3px; border-radius: 2px; background: var(--c); }
 
-  .plv-panel {
-    background: #fff;
+  /* ---------- painel ---------- */
+  .plv-root .panel {
+    background: var(--paper);
+    border: 1px solid var(--rule);
     border-radius: 14px;
-    border: 1px solid #e8e8e8;
     overflow: hidden;
-    margin-bottom: 14px;
+    margin-bottom: 1rem;
   }
 
-  .plv-tabs { display: flex; border-bottom: 1px solid #ececec; }
-  .plv-tab-btn {
-    padding: 13px 24px; border: none; background: none;
-    cursor: pointer; font-size: 13px; font-weight: 400; color: #999;
-    border-bottom: 2px solid transparent; margin-bottom: -1px;
-    transition: color .15s;
+  .plv-root .tabs { display: flex; border-bottom: 1px solid var(--rule); }
+  .plv-root .tab-btn {
+    appearance: none;
+    padding: 13px 22px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s;
   }
-  .plv-tab-btn.active { color: #1a1a2e; font-weight: 600; border-bottom-color: #1a1a2e; }
-
-  .plv-inner { padding: 22px 26px 18px; }
-
-  .plv-toggle-row {
-    display: flex; flex-wrap: wrap; gap: 7px;
-    align-items: center; margin-bottom: 18px;
+  .plv-root .tab-btn:hover { color: var(--ink); }
+  .plv-root .tab-btn.active {
+    color: var(--accent);
+    font-weight: 500;
+    border-bottom-color: var(--accent);
   }
-  .plv-toggle-label { font-size: 12px; color: #bbb; margin-right: 2px; }
-  .plv-tog-all {
-    font-size: 11px; padding: 5px 12px; border-radius: 16px;
-    border: 1.5px solid #ccc; background: transparent;
-    color: #555; cursor: pointer; font-weight: 600;
-    transition: all .15s;
-  }
-  .plv-tog-all.on { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
-  .plv-tog {
-    font-size: 12px; padding: 5px 12px; border-radius: 16px;
-    border: 1.5px solid; background: transparent;
-    cursor: pointer; font-weight: 600;
-    transition: all .15s;
-  }
-  .plv-tog.on  { color: #fff; }
-  .plv-tog.off { background: transparent !important; }
 
-  .plv-chart-wrap { position: relative; width: 100%; height: 340px; }
+  .plv-root .inner { padding: 20px 24px 18px; }
 
-  .plv-desc-grid {
+  /* ---------- toggles de bioma ---------- */
+  .plv-root .toggle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .plv-root .togs { display: flex; flex-wrap: wrap; gap: 7px; }
+  .plv-root .toggle-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 3px;
+  }
+  .plv-root .tog-all, .plv-root .tog {
+    appearance: none;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    background: transparent;
+    transition: 0.15s;
+  }
+  .plv-root .tog-all { border: 1px solid var(--rule); color: var(--muted); }
+  .plv-root .tog-all:hover { color: var(--ink); border-color: var(--muted); }
+  .plv-root .tog-all.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .plv-root .tog { border: 1px solid var(--c); color: var(--c); }
+  .plv-root .tog.on { background: var(--c); color: #fff; }
+
+  .plv-root .chart-wrap { position: relative; width: 100%; height: 340px; }
+  .plv-root .chart-wrap.anual { height: 300px; }
+
+  .plv-root .dica {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin: 12px 0 0;
+  }
+
+  /* ---------- legendas do total anual ---------- */
+  .plv-root .desc-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px; margin-top: 18px;
+    gap: 10px;
+    margin-top: 18px;
   }
-  .plv-desc-card {
-    display: flex; align-items: flex-start; gap: 10px;
-    border-radius: 8px; padding: 10px 12px;
+  .plv-root .desc-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 11px 13px;
+    background: color-mix(in srgb, var(--c) 8%, var(--bg));
   }
-  .plv-desc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-  .plv-desc-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-  .plv-desc-text { font-size: 11px; color: #555; line-height: 1.45; }
+  .plv-root .desc-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+    background: var(--c);
+  }
+  .plv-root .desc-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--c);
+    margin-bottom: 2px;
+  }
+  .plv-root .desc-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
-  .plv-footer { font-size: 11px; color: #ccc; text-align: center; }
-
-  .plv-ct {
-    background: #fff; border: 1px solid #e8e8e8;
-    border-radius: 10px; padding: 10px 14px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.09);
-    min-width: 180px; pointer-events: none;
+  .plv-root .fonte {
+    font-size: 11.5px;
+    color: var(--muted);
+    text-align: center;
+    margin: 0;
   }
-  .plv-ct-title { font-weight: 700; font-size: 13px; color: #333; margin-bottom: 8px; }
-  .plv-ct-row   { display: flex; justify-content: space-between; gap: 14px; font-size: 12px; margin-bottom: 3px; }
-  .plv-ct-name  { display: flex; align-items: center; gap: 5px; color: #555; }
-  .plv-ct-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .plv-ct-val   { font-weight: 700; }
+
+  /* ---------- tooltip do gráfico ---------- */
+  .plv-root .tooltip {
+    position: fixed;
+    z-index: 999;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 10px 13px;
+    box-shadow: 0 4px 20px rgba(28, 25, 23, 0.1);
+    min-width: 180px;
+    pointer-events: none;
+  }
+  .plv-root .ct-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .plv-root .ct-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  .plv-root .ct-name { display: flex; align-items: center; gap: 6px; color: var(--ink); }
+  .plv-root .ct-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--c); }
+  .plv-root .ct-val { font-family: var(--font-mono); font-weight: 600; color: var(--c); }
 
   @media (max-width: 600px) {
-    .plv-cards { grid-template-columns: 1fr 1fr; }
-    .plv-desc-grid { grid-template-columns: 1fr; }
+    .plv-root .cards { grid-template-columns: 1fr 1fr; }
+    .plv-root .desc-grid { grid-template-columns: 1fr; }
+    .plv-root .inner { padding: 18px 16px 16px; }
+    .plv-root .tab-btn { padding: 12px 16px; font-size: 12.5px; }
   }
 </style>
 
@@ -171,23 +326,35 @@ import Layout from '../../layouts/Layout.astro';
 // @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
 import Chart from 'chart.js/auto';
 
+// Tokens do tema repetidos aqui porque o Chart.js pinta no canvas e não
+// enxerga as custom properties do CSS.
+const INK = '#1C1917';
+const MUTED = '#78716C';
+const GRID = 'rgba(28, 25, 23, 0.06)';
+const PAPER = '#FFFFFF';
+const RULE = '#E2DDD6';
+
+Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+
+// Uma cor por bioma, na paleta terrosa do site. Amazônia e Pampa são os dois
+// verdes: o traço tracejado do Pampa (borderDash) separa os dois no gráfico.
 const BIOMAS = [
-  { name:'Amazônia',       color:'#1a8f60', bg:'#e6f7f0',
+  { name:'Amazônia',       color:'#1B6B4A',
     desc:'Maior bioma — chuvas abundantes o ano todo, com leve redução no inverno.',
     data:[250,260,280,260,220,165,135,120,150,195,215,205] },
-  { name:'Mata Atlântica', color:'#1e6ebd', bg:'#e6f0fb',
+  { name:'Mata Atlântica', color:'#2C5474',
     desc:'Chuvas bem distribuídas com pico no verão, influenciadas pelo oceano.',
     data:[185,165,155,105,80,65,60,65,95,130,160,225] },
-  { name:'Cerrado',        color:'#c8860e', bg:'#fdf3e3',
+  { name:'Cerrado',        color:'#936614',
     desc:'Forte sazonalidade: verão chuvoso (out–mar) e inverno muito seco (mai–set).',
     data:[240,210,175,85,30,10,8,15,45,140,210,235] },
-  { name:'Pantanal',       color:'#6b4ec8', bg:'#f0ecfb',
+  { name:'Pantanal',       color:'#4C4470',
     desc:'Verão chuvoso; relevo plano acumula a água gerando as grandes cheias.',
     data:[195,175,155,85,55,25,18,25,58,115,145,185] },
-  { name:'Pampa',          color:'#4a8c35', bg:'#edf6e8',
+  { name:'Pampa',          color:'#6E8B3D',
     desc:'Único bioma sem estação seca definida — chuvas regulares o ano todo.',
     data:[130,120,115,100,105,115,115,100,110,120,120,130] },
-  { name:'Caatinga',       color:'#c2530a', bg:'#faeee6',
+  { name:'Caatinga',       color:'#A8442B',
     desc:'Semiárido — chuvas escassas e irregulares, concentradas em jan–abr.',
     data:[85,95,100,65,25,12,8,8,12,18,22,50] },
 ];
@@ -197,90 +364,82 @@ const totals   = BIOMAS.map(b => b.data.reduce((a,v)=>a+v,0));
 const maxTotal = Math.max(...totals);
 const visible  = BIOMAS.map(()=>true);
 
-// Cards
+const $ = (id) => document.getElementById(id);
+
+// ---------- cards de total, do mais chuvoso ao mais seco ----------
 const sortedIdx = [...BIOMAS.keys()].sort((a,b)=>totals[b]-totals[a]);
-const cardsEl = document.getElementById('cards');
+const cardsEl = $('cards');
 sortedIdx.forEach(i => {
   const b = BIOMAS[i];
   const pct = Math.round(totals[i]/maxTotal*100);
   const div = document.createElement('div');
-  div.className = 'plv-card';
+  div.className = 'card';
   div.id = 'card-'+i;
-  div.style.borderLeftColor = b.color;
+  div.style.setProperty('--c', b.color);
   div.innerHTML = `
     <div class="c-label">${b.name}</div>
-    <div class="c-val" style="color:${b.color}">${totals[i].toLocaleString('pt-BR')} <span class="c-unit">mm/ano</span></div>
-    <div class="bar-bg"><div class="bar-fill" id="bar-${i}" style="width:${pct}%;background:${b.color}"></div></div>`;
+    <div class="c-val">${totals[i].toLocaleString('pt-BR')} <span class="c-unit">mm/ano</span></div>
+    <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>`;
   cardsEl.appendChild(div);
 });
 
-// Botões de toggle
-const btnsEl = document.getElementById('bios-btns');
-btnsEl.style.cssText = 'display:flex;flex-wrap:wrap;gap:7px;';
+// ---------- botões de toggle ----------
+const btnsEl = $('bios-btns');
 BIOMAS.forEach((b,i) => {
   const btn = document.createElement('button');
-  btn.className='plv-tog on';
-  btn.id='tog-'+i;
-  btn.textContent=b.name;
-  btn.style.borderColor=b.color;
-  btn.style.background=b.color;
-  btn.style.color='#fff';
-  btn.addEventListener('click',()=>toggleBio(i));
+  btn.className = 'tog on';
+  btn.id = 'tog-'+i;
+  btn.type = 'button';
+  btn.textContent = b.name;
+  btn.style.setProperty('--c', b.color);
+  btn.setAttribute('aria-pressed', 'true');
+  btn.addEventListener('click', ()=>toggleBio(i));
   btnsEl.appendChild(btn);
 });
 
+function pintar(i) {
+  $('tog-'+i).classList.toggle('on', visible[i]);
+  $('tog-'+i).setAttribute('aria-pressed', String(visible[i]));
+  $('card-'+i).classList.toggle('apagado', !visible[i]);
+}
+
+function sincronizarTodos() {
+  const allOn = visible.every(Boolean);
+  const allBtn = $('btn-all');
+  allBtn.textContent = allOn ? 'Todos ✓' : 'Todos';
+  allBtn.classList.toggle('on', allOn);
+}
+
 function toggleBio(i) {
-  const anyOtherOn = visible.some((v,j)=>v&&j!==i);
-  if(visible[i] && !anyOtherOn) return;
-  visible[i]=!visible[i];
-  const btn  = document.getElementById('tog-'+i);
-  const card = document.getElementById('card-'+i);
-  if(visible[i]){
-    btn.classList.replace('off','on');
-    btn.style.background=BIOMAS[i].color; btn.style.color='#fff';
-    card.style.opacity='1';
-  } else {
-    btn.classList.replace('on','off');
-    btn.style.background='transparent'; btn.style.color=BIOMAS[i].color;
-    card.style.opacity='0.4';
-  }
-  const allBtn=document.getElementById('btn-all');
-  const allOn=visible.every(Boolean);
-  allBtn.textContent=allOn?'Todos ✓':'Todos';
-  allBtn.classList.toggle('on',allOn);
+  // Nunca deixa o gráfico vazio: o último bioma visível não pode ser desligado.
+  const anyOtherOn = visible.some((v,j)=>v && j!==i);
+  if (visible[i] && !anyOtherOn) return;
+  visible[i] = !visible[i];
+  pintar(i);
+  sincronizarTodos();
   updateMensal();
 }
 
-function toggleAll(){
-  const allOn=visible.every(Boolean);
-  if(allOn){
-    BIOMAS.forEach((_,i)=>{ if(i>0){ visible[i]=false; refreshBtn(i); document.getElementById('card-'+i).style.opacity='0.4'; }});
-  } else {
-    BIOMAS.forEach((_,i)=>{ visible[i]=true; refreshBtn(i); document.getElementById('card-'+i).style.opacity='1'; });
-  }
-  const nowAll=visible.every(Boolean);
-  const allBtn=document.getElementById('btn-all');
-  allBtn.textContent=nowAll?'Todos ✓':'Todos';
-  allBtn.classList.toggle('on',nowAll);
+function toggleAll() {
+  const allOn = visible.every(Boolean);
+  BIOMAS.forEach((_,i) => {
+    // Ao desligar tudo, o primeiro bioma permanece para o gráfico não zerar.
+    visible[i] = allOn ? i === 0 : true;
+    pintar(i);
+  });
+  sincronizarTodos();
   updateMensal();
 }
 
-function refreshBtn(i){
-  const btn=document.getElementById('tog-'+i);
-  if(visible[i]){ btn.classList.replace('off','on'); btn.style.background=BIOMAS[i].color; btn.style.color='#fff'; }
-  else           { btn.classList.replace('on','off'); btn.style.background='transparent'; btn.style.color=BIOMAS[i].color; }
-}
-
-// Chart mensal
-const ctxM = document.getElementById('chartMensal').getContext('2d');
-const chartM = new Chart(ctxM,{
+// ---------- gráfico mensal ----------
+const chartM = new Chart($('chartMensal').getContext('2d'), {
   type:'line',
   data:{
     labels:MESES,
     datasets:BIOMAS.map((b,i)=>({
       label:b.name, data:b.data,
       borderColor:b.color, backgroundColor:b.color+'22',
-      borderWidth:2.5, pointRadius:3.5, pointHoverRadius:6,
+      borderWidth:2.5, pointRadius:3, pointHoverRadius:6,
       tension:0.35, fill:false,
       borderDash:i===4?[6,3]:i===5?[2,2]:[],
     }))
@@ -293,41 +452,42 @@ const chartM = new Chart(ctxM,{
       tooltip:{ enabled:false, external: externalTooltip }
     },
     scales:{
-      x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:12},color:'#999'} },
-      y:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:11},color:'#999',callback:v=>v+' mm'},
-          title:{display:true,text:'Precipitação (mm)',font:{size:11},color:'#aaa'} }
+      x:{ grid:{color:GRID}, ticks:{font:{size:12},color:MUTED} },
+      y:{ grid:{color:GRID}, ticks:{font:{size:11},color:MUTED,callback:v=>v+' mm'},
+          title:{display:true,text:'Precipitação (mm)',font:{size:11},color:MUTED} }
     }
   }
 });
 
 function updateMensal(){
-  BIOMAS.forEach((_,i)=>{ chartM.data.datasets[i].hidden=!visible[i]; });
+  BIOMAS.forEach((_,i)=>{ chartM.data.datasets[i].hidden = !visible[i]; });
   chartM.update();
 }
 
 function externalTooltip(ctx){
-  const tip=document.getElementById('tooltip');
-  if(ctx.tooltip.opacity===0){ tip.style.display='none'; return; }
-  const items=[...ctx.tooltip.dataPoints].sort((a,b)=>b.parsed.y-a.parsed.y);
-  const label=ctx.tooltip.dataPoints[0]?.label||'';
-  tip.innerHTML=`<div class="plv-ct-title">${label}</div>`+
-    items.map(it=>`<div class="plv-ct-row">
-      <span class="plv-ct-name"><span class="plv-ct-dot" style="background:${it.dataset.borderColor}"></span>${it.dataset.label}</span>
-      <span class="plv-ct-val" style="color:${it.dataset.borderColor}">${it.parsed.y} mm</span>
+  const tip = $('tooltip');
+  if (ctx.tooltip.opacity === 0) { tip.hidden = true; return; }
+  const items = [...ctx.tooltip.dataPoints].sort((a,b)=>b.parsed.y-a.parsed.y);
+  const label = ctx.tooltip.dataPoints[0]?.label || '';
+  tip.innerHTML = `<div class="ct-title">${label}</div>` +
+    items.map(it=>`<div class="ct-row" style="--c:${it.dataset.borderColor}">
+      <span class="ct-name"><span class="ct-dot"></span>${it.dataset.label}</span>
+      <span class="ct-val">${it.parsed.y} mm</span>
     </div>`).join('');
-  const {x,y}=ctx.tooltip;
-  const canvasRect=ctx.chart.canvas.getBoundingClientRect();
-  let left=canvasRect.left+x+14;
-  let top =canvasRect.top +y-10;
-  if(left+200>window.innerWidth) left=canvasRect.left+x-210;
-  tip.style.left=left+'px'; tip.style.top=top+'px'; tip.style.display='block';
+  const { x, y } = ctx.tooltip;
+  const rect = ctx.chart.canvas.getBoundingClientRect();
+  let left = rect.left + x + 14;
+  const top = rect.top + y - 10;
+  if (left + 200 > window.innerWidth) left = rect.left + x - 210;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+  tip.hidden = false;
 }
-document.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none',true);
+document.addEventListener('mouseleave', ()=>{ $('tooltip').hidden = true; }, true);
 
-// Chart anual
-const annualSorted=[...BIOMAS.map((b,i)=>({...b,total:totals[i]}))].sort((a,z)=>a.total-z.total);
-const ctxA=document.getElementById('chartAnual').getContext('2d');
-new Chart(ctxA,{
+// ---------- gráfico anual ----------
+const annualSorted = BIOMAS.map((b,i)=>({...b, total:totals[i]})).sort((a,z)=>a.total-z.total);
+const chartA = new Chart($('chartAnual').getContext('2d'), {
   type:'bar',
   data:{
     labels:annualSorted.map(b=>b.name),
@@ -344,44 +504,49 @@ new Chart(ctxA,{
       legend:{display:false},
       tooltip:{
         callbacks:{ label:ctx=>`  ${ctx.parsed.x.toLocaleString('pt-BR')} mm/ano` },
-        backgroundColor:'#fff', titleColor:'#333', bodyColor:'#555',
-        borderColor:'#e8e8e8', borderWidth:1, padding:10, cornerRadius:8,
-        titleFont:{weight:'700'}, bodyFont:{size:12},
+        backgroundColor:PAPER, titleColor:INK, bodyColor:MUTED,
+        borderColor:RULE, borderWidth:1, padding:10, cornerRadius:8,
+        titleFont:{weight:'600'}, bodyFont:{size:12},
         displayColors:false,
       }
     },
     scales:{
-      x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:11},color:'#999',callback:v=>v.toLocaleString('pt-BR')+' mm'} },
-      y:{ grid:{display:false}, ticks:{font:{size:13,weight:'600'},color:'#444'} }
+      x:{ grid:{color:GRID}, ticks:{font:{size:11},color:MUTED,callback:v=>v.toLocaleString('pt-BR')+' mm'} },
+      y:{ grid:{display:false}, ticks:{font:{size:13,weight:'500'},color:INK} }
     }
   }
 });
 
-// desc-grid
-const descEl=document.getElementById('desc-grid');
+// ---------- legendas do total anual, do mais chuvoso ao mais seco ----------
+const descEl = $('desc-grid');
 annualSorted.slice().reverse().forEach(b=>{
-  descEl.innerHTML+=`<div class="plv-desc-card" style="background:${b.bg}">
-    <div class="plv-desc-dot" style="background:${b.color}"></div>
+  descEl.innerHTML += `<div class="desc-card" style="--c:${b.color}">
+    <div class="desc-dot"></div>
     <div>
-      <div class="plv-desc-name" style="color:${b.color}">${b.name}</div>
-      <div class="plv-desc-text">${b.desc}</div>
+      <div class="desc-name">${b.name}</div>
+      <div class="desc-text">${b.desc}</div>
     </div>
   </div>`;
 });
 
-// Tab switch
-let activeTab='mensal';
+// ---------- abas ----------
+let activeTab = 'mensal';
 function switchTab(tab){
-  if(tab===activeTab) return;
-  activeTab=tab;
-  document.getElementById('view-mensal').style.display = tab==='mensal'?'block':'none';
-  document.getElementById('view-anual') .style.display = tab==='anual' ?'block':'none';
-  document.querySelectorAll('.plv-tab-btn').forEach((b,i)=>
-    b.classList.toggle('active',(i===0&&tab==='mensal')||(i===1&&tab==='anual'))
-  );
+  if (tab === activeTab) return;
+  activeTab = tab;
+  $('view-mensal').hidden = tab !== 'mensal';
+  $('view-anual').hidden  = tab !== 'anual';
+  // O gráfico nasce dentro de um painel escondido (canvas de tamanho zero);
+  // sem este resize ele aparece vazio até o ResizeObserver do Chart.js reagir.
+  if (tab === 'anual') chartA.resize();
+  document.querySelectorAll('.plv-root .tab-btn').forEach(b=>{
+    const ativo = b.dataset.tab === tab;
+    b.classList.toggle('active', ativo);
+    b.setAttribute('aria-selected', String(ativo));
+  });
 }
-document.querySelectorAll('.plv-tab-btn').forEach(b=>
-  b.addEventListener('click',()=>switchTab(b.dataset.tab))
+document.querySelectorAll('.plv-root .tab-btn').forEach(b=>
+  b.addEventListener('click', ()=>switchTab(b.dataset.tab))
 );
-document.getElementById('btn-all').addEventListener('click',toggleAll);
+$('btn-all').addEventListener('click', toggleAll);
 </script>

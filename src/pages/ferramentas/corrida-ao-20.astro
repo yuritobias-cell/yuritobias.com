@@ -13,7 +13,7 @@ import Layout from '../../layouts/Layout.astro';
   <div class="c20-root">
 
     <header class="masthead">
-      <p class="eyebrow">Ferramentas · Jogos matemáticos</p>
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=simulacoes">Simulações</a> · Jogos matemáticos</p>
       <h1>Corrida ao 20</h1>
       <p class="lede">Uma adaptação do Jogo de Nim. Na sua vez, avance 1 ou 2 unidades sobre o
       total anunciado — vence quem disser a meta. Jogue algumas partidas, anote quem venceu
@@ -161,6 +161,8 @@ import Layout from '../../layouts/Layout.astro';
     color: var(--muted);
     margin: 0 0 0.5rem;
   }
+  .c20-root .masthead .eyebrow a { color: inherit; text-decoration: none; }
+  .c20-root .masthead .eyebrow a:hover { color: var(--accent); }
   .c20-root .masthead h1 {
     font-family: var(--font-display);
     font-weight: 600;
