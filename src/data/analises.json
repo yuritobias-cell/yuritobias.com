@@ -1,5 +1,31 @@
 [
   {
+    "slug": "censo-escolar-2025",
+    "titulo": "Censo Escolar 2025 — Brasil",
+    "descricao": "Painel interativo com os microdados do Censo Escolar da Educação Básica: matrículas, turmas, docentes, gestores e infraestrutura dos 5.571 municípios brasileiros, com série histórica de 2019 a 2025, filtros cruzados por rede e zona, comparação entre cidades e detalhe escola a escola.",
+    "data": "2026-09-08",
+    "arquivo": "censo-escolar-2025.html",
+    "fonte": "INEP — Microdados do Censo Escolar da Educação Básica, release 2025 V2 e edições de 2019 a 2024",
+    "tags": [
+      "Censo Escolar",
+      "INEP",
+      "Brasil",
+      "Microdados",
+      "Educação básica"
+    ],
+    "secoes": [
+      "Visão geral — retrato do recorte e a série 2019–2025",
+      "Matrículas e etapas — composição por etapa, perfil dos alunos e tendência",
+      "Turmas e turno — alunos por turma, distribuição por turno e tempo integral",
+      "Docentes e gestores — formação, vínculo, perfil e acesso ao cargo",
+      "Infraestrutura — saneamento, conectividade, espaços e acessibilidade, com o contraste urbano × rural",
+      "Inclusão e equidade — educação especial, cor/raça e acessibilidade do parque escolar",
+      "Comparar cidades — indicadores lado a lado e posição nacional",
+      "Escolas — tabela ordenável, escola a escola, do município selecionado"
+    ],
+    "rascunho": false
+  },
+  {
     "slug": "simave-2025",
     "titulo": "SIMAVE 2025 — Poços de Caldas",
     "descricao": "Painel interativo com a linha histórica do SIMAVE nas escolas de Poços de Caldas, de 2015 a 2025: proficiência e padrões de desempenho da alfabetização ao ensino médio, comparação com Minas Gerais, ficha de cada unidade e o percurso das escolas entre as etapas.",

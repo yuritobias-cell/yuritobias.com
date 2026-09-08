@@ -151,6 +151,18 @@ e não ao painel sem contexto. Se uma análise já tiver sido divulgada em outra
 deixe no caminho antigo um arquivo curto com `meta refresh` para o novo — foi o que
 `public/analises/dashboard-ideb-2025-8268fddf8eb566e6.html` faz.
 
+### Quando o painel não cabe num arquivo só
+
+O padrão é um arquivo único, e é o que IDEB e SIMAVE fazem. O Censo Escolar 2025 é a
+exceção: a base nacional tem 5.571 municípios e 180.540 escolas, e embutir tudo daria
+mais de 13 MB. Ele carrega em dois níveis — 2,6 MB no próprio HTML (todos os municípios,
+série 2019–2025, sete das oito páginas) e `public/analises/paineis/censo-escolar-2025-escolas/`
+com um `.json.gz` por UF, buscado só quando a página de Escolas abre.
+
+Se precisar repetir isso noutra análise, nomeie a pasta com o slug da análise
+(`<slug>-escolas/`, não `escolas/`), porque `paineis/` é compartilhada. O painel continua
+sem CDN e sem back-end: os arquivos por UF são estáticos e da mesma origem.
+
 ### Tema dos painéis
 
 O painel é um arquivo solto em `public/`, fora do Tailwind, mas segue a mesma paleta e
