@@ -1,0 +1,721 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/ferramenta-folha.css';
+---
+
+<Layout
+  title="Gerador de Fatoração"
+  description="Gere listas aleatórias de fatoração e produtos notáveis — fator comum, agrupamento, diferença de quadrados, trinômio quadrado perfeito e trinômio do 2º grau. Sai folha A4 pronta, com gabarito do professor."
+>
+
+  <div class="ff-root fatoracao">
+    <div class="wrap">
+
+      <header class="masthead">
+        <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Álgebra</p>
+        <h1>Gerador de <em>fatoração</em></h1>
+        <p class="lede">Fatorar, desenvolver produtos notáveis, simplificar fração algébrica e
+        completar identidades — sorteados na hora. Aqui a construção reversa é literal: o gerador
+        <em>escolhe os fatores e multiplica</em>, então a questão sempre fatora bonito e o gabarito
+        já sai pronto, sem tentativa e erro. As expressões vêm com uma ou duas letras, como nos
+        livros. O que vai para o papel é só a folha; os controles não são impressos. Tudo roda no
+        seu navegador.</p>
+      </header>
+
+      <!-- ================= CONTROLES (não imprimem) ================= -->
+      <div class="toolbar">
+
+        <div class="blocos">
+
+          <section class="bloco">
+            <h2>O que a questão pede</h2>
+            <p class="hint">A quantidade é dividida entre as direções marcadas.</p>
+            <div class="chips" id="direcoes" role="group" aria-label="Direção da questão">
+              <button class="chip" type="button" data-v="fatorar"     aria-pressed="true">Fatorar</button>
+              <button class="chip" type="button" data-v="desenvolver" aria-pressed="true">Desenvolver</button>
+              <button class="chip" type="button" data-v="fracao"      aria-pressed="false">Simplificar fração</button>
+              <button class="chip" type="button" data-v="completar"   aria-pressed="false">Completar a identidade</button>
+            </div>
+          </section>
+
+          <section class="bloco">
+            <h2>Casos</h2>
+            <p class="hint">Valem para todas as direções marcadas ao lado.</p>
+            <div class="chips" id="casos" role="group" aria-label="Casos de fatoração">
+              <button class="chip" type="button" data-v="comum" aria-pressed="true">Fator comum e agrupamento</button>
+              <button class="chip" type="button" data-v="difq"  aria-pressed="true">Diferença de quadrados</button>
+              <button class="chip" type="button" data-v="tqp"   aria-pressed="true">Trinômio quadrado perfeito</button>
+              <button class="chip" type="button" data-v="trin"  aria-pressed="false">Trinômio do 2º grau</button>
+            </div>
+            <label class="check"><input type="checkbox" id="lider" checked /> Permitir coeficiente diferente de 1</label>
+            <label class="check"><input type="checkbox" id="cubo" /> Incluir o cubo do binômio ao desenvolver</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Letras</h2>
+            <p class="hint">Quantas incógnitas aparecem em cada expressão.</p>
+            <div class="chips" id="letras" role="group" aria-label="Quantidade de letras">
+              <button class="chip" type="button" data-v="sorteadas" aria-pressed="true">Uma e duas, sorteadas</button>
+              <button class="chip" type="button" data-v="uma"       aria-pressed="false">Só uma</button>
+              <button class="chip" type="button" data-v="duas"      aria-pressed="false">Sempre duas</button>
+            </div>
+          </section>
+
+          <section class="bloco">
+            <h2>Lista</h2>
+            <div class="campos">
+              <label class="num"><span class="card-label">Questões</span>
+                <input type="number" id="qtd" min="1" max="40" step="1" value="12" /></label>
+              <label class="num"><span class="card-label">Versões</span>
+                <input type="number" id="versoes" min="1" max="8" step="1" value="1" /></label>
+            </div>
+            <p class="hint">Cada versão é uma folha com questões diferentes e a mesma dificuldade.</p>
+            <label class="check"><input type="checkbox" id="agrupar" /> Agrupar as questões por tipo</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Folha do aluno</h2>
+            <div class="chips" id="layout" role="group" aria-label="Layout da folha">
+              <button class="chip" type="button" data-v="compacta" aria-pressed="true">Compacta · 2 colunas</button>
+              <button class="chip" type="button" data-v="espaco"   aria-pressed="false">Com espaço para resolver</button>
+            </div>
+            <div class="campo">
+              <label class="card-label" for="escola">Nome da escola</label>
+              <input type="text" id="escola" maxlength="70" placeholder="Ex.: Escola SESI Poços de Caldas" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="titulo">Título da atividade</label>
+              <input type="text" id="titulo" maxlength="90" value="Fatoração e produtos notáveis" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="instrucao">Instrução</label>
+              <input type="text" id="instrucao" maxlength="140" value="Fatore, desenvolva ou simplifique, conforme o enunciado de cada item." />
+            </div>
+            <label class="check"><input type="checkbox" id="ident" checked /> Espaço para nome, turma e data</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Gabarito</h2>
+            <p class="hint">Sai depois de todas as folhas dos alunos, em páginas separadas.</p>
+            <label class="check"><input type="checkbox" id="temGab" checked /> Incluir gabarito do professor</label>
+            <div class="chips" id="gabTipo" role="group" aria-label="Tipo de gabarito">
+              <button class="chip" type="button" data-v="compacto"  aria-pressed="true">Só as respostas</button>
+              <button class="chip" type="button" data-v="comentado" aria-pressed="false">Comentado</button>
+            </div>
+            <label class="check"><input type="checkbox" id="nomeCaso" checked /> Nomear o caso em cada resposta</label>
+          </section>
+
+        </div>
+
+        <div class="acoes">
+          <button class="btn" type="button" id="gerar">Gerar outra lista</button>
+          <button class="btn sec" type="button" id="imprimir">Imprimir / Salvar PDF</button>
+          <button class="btn sec" type="button" id="restaurar">Restaurar padrões</button>
+        </div>
+        <p class="aviso" id="aviso" hidden></p>
+      </div>
+
+      <!-- ================= SAÍDA (isto é o que imprime) ================= -->
+      <div class="saida" id="saida"></div>
+
+      <p class="rodape" id="resumo"></p>
+
+      <!-- ================= TEORIA ================= -->
+      <section class="teoria">
+        <h2>Por que fatora sempre</h2>
+        <p>Um trinômio sorteado ao acaso quase nunca fatora nos inteiros: das centenas de
+        <span class="mat"><i>x</i><sup>2</sup> + <i>bx</i> + <i>c</i></span> possíveis, só uma minoria
+        tem duas raízes inteiras. Por isso o gerador nunca sorteia a expressão — ele sorteia os
+        <b>fatores</b> e multiplica. Uma diferença de quadrados nasce de
+        <span class="mat">(<i>ax</i> + <i>b</i>)(<i>ax</i> − <i>b</i>)</span>; um trinômio quadrado
+        perfeito, de <span class="mat">(<i>ax</i> + <i>b</i>)<sup>2</sup></span>. O que o aluno vê é o
+        produto já expandido, e o gabarito é simplesmente o caminho de volta.</p>
+        <p>Nas frações algébricas, a mesma ideia com um cuidado a mais: numerador e denominador são
+        construídos com <b>exatamente um fator em comum</b>, para o corte ser único e a resposta não
+        admitir dúvida. A <b>condição de existência</b> vem das raízes do denominador
+        <em>antes</em> do corte — inclusive a do fator que sai fora, que continua proibida.</p>
+
+        <h2>Os casos e o que os distingue</h2>
+        <p><b>Fator comum</b> e <b>agrupamento</b> são a mesma ideia em escalas diferentes: pôr em
+        evidência o que se repete, seja num monômio, seja num binômio inteiro. A <b>diferença de
+        quadrados</b> é a única das identidades que exige o sinal de menos — a soma
+        <span class="mat"><i>a</i><sup>2</sup> + <i>b</i><sup>2</sup></span> não fatora nos reais, e
+        essa é a confusão mais comum da lista. O <b>trinômio quadrado perfeito</b> pede conferir se o
+        termo do meio é mesmo <span class="mat">2<i>ab</i></span>, e o gabarito comentado mostra essa
+        verificação em vez de saltar para a resposta. O <b>trinômio do 2º grau</b> generaliza:
+        procura-se a dupla cuja soma e cujo produto batem com os coeficientes.</p>
+      </section>
+
+    </div>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* Só o que é desta ferramenta — o resto vem de styles/ferramenta-folha.css. */
+
+  /* Lacuna a preencher nas identidades incompletas. */
+  .ff-root .lacuna{ display:inline-block; min-width:3.4em; border-bottom:1.5px solid #666;
+    margin:0 .15em; vertical-align:-.15em; }
+
+  /* Nome do caso, ao lado da resposta no gabarito. */
+  .ff-root .caso{ display:inline-block; font-family:'IBM Plex Sans',sans-serif; font-size:.7rem;
+    font-weight:600; letter-spacing:.03em; color:var(--neutro); margin-left:.6em; vertical-align:.1em; }
+
+  /* O verbo do enunciado (Fatore, Desenvolva…) fora da serifada da fórmula. */
+  .ff-root .ordem{ font-family:'IBM Plex Sans',sans-serif; font-size:.82rem; color:#555;
+    margin-right:.45em; }
+
+  .ff-root.fatoracao .questoes{ gap:.75rem 2.4rem; }
+  .ff-root.fatoracao .pauta{ height:22mm; }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+
+import {
+  MENOS, inteiro, naoZero, escolhe, moeda, pesado, mdc,
+  rac, rSoma, rMul, rNeg, rZero, htmlSoma, htmlFrac, htmlRac, mat, nota,
+} from '../../utils/matematica.js';
+import { $, limita, chips, montaLista, montaFolhas, resumo } from '../../utils/folha.js';
+
+/* ==========================================================================
+   1) MOTOR DE POLINÔMIOS
+   Monômio = { c: racional, e: [expoentes] }, com os expoentes alinhados ao
+   array de letras da questão — uma letra dá e = [2], duas dão e = [2, 1].
+   Só o que a fatoração precisa: multiplicar e imprimir.
+   ========================================================================== */
+const mono = (c, e) => ({ c: typeof c === 'number' ? rac(c) : c, e: e.slice() });
+const grauT = (t) => t.e.reduce((s, x) => s + x, 0);
+
+function normaliza(p) {
+  const m = new Map();
+  for (const t of p) {
+    if (rZero(t.c)) continue;
+    const k = t.e.join(',');
+    const at = m.get(k);
+    m.set(k, at ? { c: rSoma(at.c, t.c), e: t.e } : { c: t.c, e: t.e.slice() });
+  }
+  /* grau total decrescente, desempatando pela primeira letra — a ordem em que
+     os livros escrevem. */
+  return [...m.values()].filter((t) => !rZero(t.c))
+    .sort((a, b) => grauT(b) - grauT(a) || b.e[0] - a.e[0]);
+}
+
+const mulPol = (a, b) => normaliza(
+  a.flatMap((s) => b.map((t) => ({ c: rMul(s.c, t.c), e: s.e.map((x, i) => x + t.e[i]) }))));
+
+const potPol = (p, k) => { let r = [mono(1, p[0].e.map(() => 0))]; for (let i = 0; i < k; i++) r = mulPol(r, p); return r; };
+
+const simb = (e, vars) =>
+  e.map((k, i) => (k === 0 ? '' : `<i>${vars[i]}</i>${k > 1 ? `<sup>${k}</sup>` : ''}`)).join('');
+
+const polHtml = (p, vars) => htmlSoma(p.map((t) => ({ c: t.c, s: simb(t.e, vars) })));
+const parHtml = (p, vars) => (p.length > 1 ? `(${polHtml(p, vars)})` : polHtml(p, vars));
+
+/* ==========================================================================
+   2) FÁBRICA DE FATORES
+   Nada é sorteado já expandido: sorteiam-se os fatores e multiplica-se. É o
+   que garante que toda questão fature nos inteiros — um trinômio sorteado ao
+   acaso quase nunca fatura.
+   ========================================================================== */
+/* Um fator só está fatorado até o fim se os seus coeficientes não tiverem
+   divisor comum: (2x + 8)(y − 3) esconde um 2 que deveria estar em evidência. */
+const primitivo = (pol) => pol.reduce((g, t) => mdc(g, Math.abs(t.c.n)), 0) === 1;
+
+const PARES = [['x', 'y'], ['a', 'b'], ['m', 'n'], ['x', 'y'], ['x', 'a']];
+const SOZINHAS = ['x', 'x', 'x', 'x', 'a', 'y', 'm'];
+
+function sorteiaVars(cfg) {
+  const duas = cfg.letras === 'duas' || (cfg.letras === 'sorteadas' && moeda(0.4));
+  return duas ? escolhe(PARES).slice() : [escolhe(SOZINHAS)];
+}
+
+/* expoentes de "a primeira letra elevada a k" e "a segunda elevada a k" */
+const eA = (vars, k) => (vars.length === 2 ? [k, 0] : [k]);
+const eB = (vars, k) => (vars.length === 2 ? [0, k] : [0]);
+const eZero = (vars) => (vars.length === 2 ? [0, 0] : [0]);
+
+/* --- diferença de quadrados: (A·u + B·v)(A·u − B·v) ----------------------- */
+function fabDifq(vars, cfg) {
+  const dois = vars.length === 2;
+  const A = cfg.lider ? pesado([[1, 5], [2, 3], [3, 2], [4, 1], [5, 1], [6, 1]]) : 1;
+  const B = inteiro(1, 12);
+  const m = pesado([[1, 8], [2, 2]]);
+  const n = dois ? pesado([[1, 8], [2, 2]]) : 0;
+  const u = eA(vars, m), v = dois ? eB(vars, n) : eZero(vars);
+  if (A === 1 && B === 1 || mdc(A, B) !== 1) return null;
+  const f1 = normaliza([mono(A, u), mono(B, v)]);
+  const f2 = normaliza([mono(A, u), mono(-B, v)]);
+  return {
+    caso: 'difq', nome: 'diferença de quadrados',
+    fatores: [f1, f2], expandido: mulPol(f1, f2),
+    respHtml: `${parHtml(f1, vars)}${parHtml(f2, vars)}`,
+    prodHtml: `${parHtml(f1, vars)}${parHtml(f2, vars)}`,
+    dados: { A, B, u, v, f1, f2 },
+  };
+}
+
+/* --- trinômio quadrado perfeito: (A·u ± B·v)² ----------------------------- */
+function fabTqp(vars, cfg) {
+  const dois = vars.length === 2;
+  const A = cfg.lider ? pesado([[1, 6], [2, 3], [3, 2], [4, 1], [5, 1]]) : 1;
+  const B = inteiro(1, 12);
+  const sinal = moeda(0.5) ? 1 : -1;
+  const u = eA(vars, pesado([[1, 8], [2, 2]]));
+  const v = dois ? eB(vars, 1) : eZero(vars);
+  if (A === 1 && B === 1 || mdc(A, B) !== 1) return null;
+  const f = normaliza([mono(A, u), mono(sinal * B, v)]);
+  return {
+    caso: 'tqp', nome: 'trinômio quadrado perfeito',
+    fatores: [f, f], expandido: mulPol(f, f),
+    respHtml: `${parHtml(f, vars)}<sup>2</sup>`,
+    prodHtml: `${parHtml(f, vars)}<sup>2</sup>`,
+    dados: { A, B, sinal, u, v, f },
+  };
+}
+
+/* --- trinômio do 2º grau: (a·u + p·v)(b·u + q·v) -------------------------- */
+function fabTrin(vars, cfg) {
+  const dois = vars.length === 2;
+  const u = eA(vars, 1), v = dois ? eB(vars, 1) : eZero(vars);
+  const usaLider = cfg.lider && moeda(0.32);
+  const a = usaLider ? inteiro(2, 4) : 1;
+  const p = naoZero(-9, 9), q = naoZero(-9, 9);
+  if (a === 1 && p === q) return null;                    // seria quadrado perfeito
+  /* Com mdc(a, p) > 1 o próprio binômio (a·u + p) teria fator comum, e a
+     resposta (4a + 8)(a + 2) não estaria fatorada até o fim. */
+  if (mdc(a, Math.abs(p)) !== 1) return null;
+  const f1 = normaliza([mono(a, u), mono(p, v)]);
+  const f2 = normaliza([mono(1, u), mono(q, v)]);
+  const exp = mulPol(f1, f2);
+  if (exp.length !== 3) return null;                      // sem termo do meio não é trinômio
+  return {
+    caso: 'trin', nome: 'trinômio do 2º grau',
+    fatores: [f1, f2], expandido: exp,
+    respHtml: `${parHtml(f1, vars)}${parHtml(f2, vars)}`,
+    prodHtml: `${parHtml(f1, vars)}${parHtml(f2, vars)}`,
+    dados: { a, p, q, soma: p + q * a, produto: p * q, f1, f2 },
+  };
+}
+
+/* --- fator comum: k·u^i·v^j vezes um polinômio de conteúdo 1 -------------- */
+function fabComum(vars, cfg) {
+  const dois = vars.length === 2;
+  const k = pesado([[2, 3], [3, 4], [4, 3], [5, 3], [6, 2], [7, 1], [8, 1], [9, 1]]);
+  const i = inteiro(0, 2), j = dois ? inteiro(0, 1) : 0;
+  if (k === 1 && i === 0 && j === 0) return null;
+  const fator = [mono(k, dois ? [i, j] : [i])];
+
+  /* O último termo é constante e o mdc dos coeficientes é 1: com isso o fator
+     posto em evidência é mesmo o máximo, e a resposta é única. */
+  const nt = moeda(0.65) ? 2 : 3;
+  const cs = [], es = [];
+  for (let t = 0; t < nt - 1; t++) {
+    cs.push(naoZero(-9, 9));
+    es.push(dois ? [inteiro(1, 2), inteiro(0, 1)] : [inteiro(1, 2)]);
+  }
+  cs.push(naoZero(-9, 9));
+  es.push(eZero(vars));
+  if (cs.reduce((g, c) => mdc(g, Math.abs(c)), 0) !== 1) return null;
+  let dentro = normaliza(cs.map((c, t) => mono(c, es[t])));
+  if (dentro.length !== nt) return null;
+
+  /* Convenção dos livros: o que fica dentro do parêntese começa positivo, e o
+     sinal de menos, quando existe, vai para o fator em evidência. */
+  let posto = fator;
+  if (dentro[0].c.n < 0) {
+    dentro = dentro.map((m) => ({ c: rNeg(m.c), e: m.e }));
+    posto = fator.map((m) => ({ c: rNeg(m.c), e: m.e }));
+  }
+
+  return {
+    caso: 'comum', nome: 'fator comum',
+    fatores: [posto, dentro], expandido: mulPol(posto, dentro),
+    respHtml: `${polHtml(posto, vars)}${parHtml(dentro, vars)}`,
+    prodHtml: `${polHtml(posto, vars)}${parHtml(dentro, vars)}`,
+    dados: { fator: posto, dentro },
+  };
+}
+
+/* --- agrupamento: (A·u + B)(C·w + D), quatro termos ----------------------- */
+function fabAgrupamento(vars, cfg) {
+  const dois = vars.length === 2;
+  const f1 = normaliza([mono(pesado([[1, 6], [2, 2], [3, 1]]), eA(vars, 1)), mono(naoZero(-8, 8), eZero(vars))]);
+  const f2 = dois
+    ? normaliza([mono(pesado([[1, 6], [2, 2]]), eB(vars, 1)), mono(naoZero(-8, 8), eZero(vars))])
+    : normaliza([mono(pesado([[1, 6], [2, 2]]), eA(vars, 2)), mono(naoZero(-8, 8), eZero(vars))]);
+  const exp = mulPol(f1, f2);
+  if (exp.length !== 4 || !primitivo(f1) || !primitivo(f2)) return null;
+  return {
+    caso: 'comum', nome: 'agrupamento',
+    fatores: [f1, f2], expandido: exp,
+    respHtml: `${parHtml(f1, vars)}${parHtml(f2, vars)}`,
+    prodHtml: `${parHtml(f1, vars)}${parHtml(f2, vars)}`,
+    dados: { f1, f2 },
+  };
+}
+
+const FABRICA = {
+  difq: fabDifq,
+  tqp: fabTqp,
+  trin: fabTrin,
+  comum: (vars, cfg) => (moeda(0.62) ? fabComum(vars, cfg) : fabAgrupamento(vars, cfg)),
+};
+
+/* Tenta até sair uma peça válida — as fábricas recusam o que ficaria feio. */
+function peca(caso, vars, cfg) {
+  for (let t = 0; t < 60; t++) {
+    const p = FABRICA[caso](vars, cfg);
+    if (p && p.expandido.length) return p;
+  }
+  return null;
+}
+
+/* ==========================================================================
+   3) AS QUATRO DIREÇÕES
+   ========================================================================== */
+const absMono = (t) => ({ c: { n: Math.abs(t.c.n), d: t.c.d }, e: t.e });
+
+/* Junta pedaços já com o sinal certo: nunca "+ −3(x + 1)". */
+const juntaSinal = (ps) => ps.map((p, i) => (i === 0
+  ? (p.neg ? MENOS + ' ' : '') + p.html
+  : (p.neg ? ` ${MENOS} ` : ' + ') + p.html)).join('');
+
+const selo = (p, cfg) => (cfg.nomeCaso ? `<span class="caso">${p.nome}</span>` : '');
+
+/* --- fatorar -------------------------------------------------------------- */
+function passosFatorar(p, vars) {
+  const d = p.dados;
+  if (p.caso === 'difq') {
+    const a = polHtml([mono(d.A, d.u)], vars), b = polHtml([mono(d.B, d.v)], vars);
+    return [
+      nota(`Diferença de quadrados: <i>a</i><sup>2</sup> ${MENOS} <i>b</i><sup>2</sup> = (<i>a</i> + <i>b</i>)(<i>a</i> ${MENOS} <i>b</i>).`),
+      mat(`<i>a</i> = ${a} &nbsp;&nbsp; <i>b</i> = ${b}`),
+      mat(p.respHtml, true),
+    ];
+  }
+  if (p.caso === 'tqp') {
+    const a = polHtml([mono(d.A, d.u)], vars), b = polHtml([mono(d.B, d.v)], vars);
+    const meio = polHtml([mono(2 * d.A * d.B, d.u.map((x, i) => x + d.v[i]))], vars);
+    return [
+      nota(`Quadrado perfeito: (<i>a</i> ${d.sinal < 0 ? MENOS : '+'} <i>b</i>)<sup>2</sup> = `
+         + `<i>a</i><sup>2</sup> ${d.sinal < 0 ? MENOS : '+'} 2<i>ab</i> + <i>b</i><sup>2</sup>.`),
+      mat(`<i>a</i> = ${a} &nbsp;&nbsp; <i>b</i> = ${b} &nbsp;&nbsp; 2<i>ab</i> = ${meio} ✓`),
+      mat(p.respHtml, true),
+    ];
+  }
+  if (p.caso === 'trin') {
+    const [t2, t1, t0] = [p.expandido[0], p.expandido[1], p.expandido[2]];
+    const ac = t2.c.n * t0.c.n, b = t1.c.n;
+    const m = d.a * d.q, n = d.p;
+    const passos = d.a === 1
+      ? [nota(`Soma e produto: procure a dupla que soma ${b} e multiplica ${ac}.`),
+         mat(`${nEx(m)} + ${nEx(n)} = ${b} &nbsp;&nbsp; ${nEx(m)}·${nEx(n)} = ${ac}`)]
+      : [nota(`Coeficiente líder ${d.a}: procure a dupla que soma <i>b</i> = ${b} e multiplica `
+            + `<i>a</i>·<i>c</i> = ${ac}, e use-a para partir o termo do meio.`),
+         mat(`${nEx(m)} + ${nEx(n)} = ${b} &nbsp;&nbsp; ${nEx(m)}·${nEx(n)} = ${ac}`)];
+    passos.push(mat(p.respHtml, true));
+    return passos;
+  }
+  if (p.nome === 'agrupamento') {
+    const [f1, f2] = p.fatores;
+    const g1 = mulPol([f1[0]], f2), g2 = mulPol([f1[1]], f2);
+    return [
+      nota('Agrupe dois a dois e ponha o fator comum de cada grupo em evidência.'),
+      mat(juntaSinal([{ neg: false, html: `(${polHtml(g1, vars)})` },
+                      { neg: false, html: `(${polHtml(g2, vars)})` }])),
+      mat(juntaSinal([
+        { neg: f1[0].c.n < 0, html: `${polHtml([absMono(f1[0])], vars)}${parHtml(f2, vars)}` },
+        { neg: f1[1].c.n < 0, html: `${polHtml([absMono(f1[1])], vars)}${parHtml(f2, vars)}` }])),
+      nota(`O binômio ${parHtml(f2, vars)} se repete: é ele que vai para fora.`),
+      mat(p.respHtml, true),
+    ];
+  }
+  return [
+    nota(`O que se repete em todos os termos é ${polHtml(p.dados.fator, vars)} — esse é o fator comum.`),
+    mat(p.respHtml, true),
+  ];
+}
+
+const nEx = (n) => (n < 0 ? `(${MENOS}${Math.abs(n)})` : String(n));
+
+function qFatorar(caso, vars, cfg) {
+  const p = peca(caso, vars, cfg);
+  if (!p) return null;
+  return {
+    html: `<span class="ordem">Fatore:</span> ${polHtml(p.expandido, vars)}`,
+    resposta: p.respHtml + selo(p, cfg),
+    passos: passosFatorar(p, vars),
+  };
+}
+
+/* --- desenvolver ---------------------------------------------------------- */
+function qDesenvolver(caso, vars, cfg) {
+  /* O cubo do binômio entra por opção, e só no lugar do quadrado. */
+  if (caso === 'tqp' && cfg.cubo && moeda(0.4)) {
+    const p = peca('tqp', vars, cfg);
+    if (!p) return null;
+    const f = p.dados.f, exp = potPol(f, 3);
+    const a = polHtml([mono(p.dados.A, p.dados.u)], vars);
+    const b = polHtml([mono(Math.abs(p.dados.B), p.dados.v)], vars);
+    const sinal = p.dados.sinal < 0 ? MENOS : '+';
+    return {
+      html: `<span class="ordem">Desenvolva:</span> ${parHtml(f, vars)}<sup>3</sup>`,
+      resposta: polHtml(exp, vars) + (cfg.nomeCaso ? '<span class="caso">cubo do binômio</span>' : ''),
+      passos: [
+        nota(`(<i>a</i> ${sinal} <i>b</i>)<sup>3</sup> = <i>a</i><sup>3</sup> ${sinal} 3<i>a</i><sup>2</sup><i>b</i> `
+           + `+ 3<i>ab</i><sup>2</sup> ${sinal} <i>b</i><sup>3</sup>`),
+        mat(`<i>a</i> = ${a} &nbsp;&nbsp; <i>b</i> = ${b}`),
+        mat(polHtml(exp, vars), true),
+      ],
+    };
+  }
+
+  const p = peca(caso, vars, cfg);
+  if (!p) return null;
+  const d = p.dados;
+  let passos;
+  if (p.caso === 'difq') {
+    const a = polHtml([mono(d.A, d.u)], vars), b = polHtml([mono(d.B, d.v)], vars);
+    passos = [
+      nota(`Produto da soma pela diferença: (<i>a</i> + <i>b</i>)(<i>a</i> ${MENOS} <i>b</i>) = <i>a</i><sup>2</sup> ${MENOS} <i>b</i><sup>2</sup>.`),
+      mat(`<i>a</i><sup>2</sup> = ${polHtml([mono(d.A * d.A, d.u.map((x) => 2 * x))], vars)} &nbsp;&nbsp; `
+        + `<i>b</i><sup>2</sup> = ${polHtml([mono(d.B * d.B, d.v.map((x) => 2 * x))], vars)}`),
+    ];
+  } else if (p.caso === 'tqp') {
+    const a = polHtml([mono(d.A, d.u)], vars), b = polHtml([mono(Math.abs(d.B), d.v)], vars);
+    const sinal = d.sinal < 0 ? MENOS : '+';
+    passos = [
+      nota(`Quadrado do binômio: (<i>a</i> ${sinal} <i>b</i>)<sup>2</sup> = <i>a</i><sup>2</sup> ${sinal} 2<i>ab</i> + <i>b</i><sup>2</sup>.`),
+      mat(`<i>a</i> = ${a} &nbsp;&nbsp; <i>b</i> = ${b}`),
+    ];
+  } else {
+    passos = [nota('Distributiva: cada termo do primeiro fator multiplica cada termo do segundo.')];
+  }
+  passos.push(mat(polHtml(p.expandido, vars), true));
+  const rotulo = { difq: 'produto da soma pela diferença', tqp: 'quadrado do binômio' }[p.caso] || 'distributiva';
+  return {
+    html: `<span class="ordem">Desenvolva:</span> ${p.prodHtml}`,
+    resposta: polHtml(p.expandido, vars) + selo({ nome: rotulo }, cfg),
+    passos,
+  };
+}
+
+/* --- simplificar fração algébrica -----------------------------------------
+   Numerador e denominador são construídos com exatamente um fator em comum:
+   o corte é único e a resposta não admite dúvida.                            */
+function qFracao(caso, vars, cfg) {
+  const u = eA(vars, 1), z = eZero(vars);
+  for (let t = 0; t < 80; t++) {
+    const p = naoZero(-9, 9), q = naoZero(-9, 9), s = naoZero(-9, 9);
+    if (p === q || p === s || q === s) continue;
+    const F = normaliza([mono(1, u), mono(p, z)]);
+    const B = normaliza([mono(1, u), mono(s, z)]);
+    let A, nomeN;
+    if (caso === 'difq')      { A = normaliza([mono(1, u), mono(-p, z)]); nomeN = 'diferença de quadrados'; }
+    else if (caso === 'tqp')  { A = F; nomeN = 'trinômio quadrado perfeito'; }
+    else if (caso === 'comum'){ A = [mono(inteiro(2, 7), z)]; nomeN = 'fator comum'; }
+    else                      { A = normaliza([mono(1, u), mono(q, z)]); nomeN = 'trinômio do 2º grau'; }
+
+    const N = mulPol(F, A), D = mulPol(F, B);
+    if (N.length < 2 || D.length < 2) continue;
+    const resp = A.length > 1 || caso !== 'comum'
+      ? htmlFrac(parHtml(A, vars), parHtml(B, vars))
+      : htmlFrac(polHtml(A, vars), parHtml(B, vars));
+    const ce = `<i>${vars[0]}</i> ≠ ${htmlRac(rac(-p))} e <i>${vars[0]}</i> ≠ ${htmlRac(rac(-s))}`;
+    return {
+      html: `<span class="ordem">Simplifique:</span> ${htmlFrac(polHtml(N, vars), polHtml(D, vars))}`,
+      resposta: resp + `<span class="pergunta">Com ${ce}.</span>`,
+      passos: [
+        nota(`Fatore os dois: no numerador, ${nomeN}; no denominador, o produto de dois binômios. `
+           + `O fator ${parHtml(F, vars)} se repete.`),
+        mat(htmlFrac(`${parHtml(F, vars)}${parHtml(A, vars)}`, `${parHtml(F, vars)}${parHtml(B, vars)}`)),
+        nota(`Condição de existência, lida no denominador <b>antes</b> do corte: ${ce}.`),
+        mat(`${parHtml(F, vars)} cancela em cima e embaixo.`),
+        mat(resp, true),
+      ],
+    };
+  }
+  return null;
+}
+
+/* --- completar a identidade ------------------------------------------------ */
+const LAC = '<span class="lacuna"></span>';
+const respLacunas = (its) => its.map((v, i) => `${i + 1}ª: ${v}`).join(' &nbsp;·&nbsp; ');
+
+function qCompletar(caso, vars, cfg) {
+  /* No fator comum a lacuna é o monômio em evidência — o agrupamento, que
+     divide a mesma chave, não serve a esse molde. */
+  let p = null;
+  if (caso === 'comum') { for (let t = 0; t < 60 && !p; t++) p = fabComum(vars, cfg); }
+  else p = peca(caso, vars, cfg);
+  if (!p) return null;
+  const d = p.dados;
+
+  if (p.caso === 'tqp') {
+    const a2 = polHtml([mono(d.A * d.A, d.u.map((x) => 2 * x))], vars);
+    const b2 = polHtml([mono(d.B * d.B, d.v.map((x) => 2 * x))], vars);
+    const meio = polHtml([mono(2 * d.A * d.B, d.u.map((x, i) => x + d.v[i]))], vars);
+    const b = polHtml([mono(Math.abs(d.B), d.v)], vars);
+    const a = polHtml([mono(d.A, d.u)], vars);
+    const sinal = d.sinal < 0 ? MENOS : '+';
+    return {
+      html: `<span class="ordem">Complete:</span> ${a2} ${sinal} ${LAC} + ${b2} = (${a} ${sinal} ${LAC})<sup>2</sup>`,
+      resposta: respLacunas([meio, b]) + selo(p, cfg),
+      passos: [
+        nota('O termo do meio é 2<i>ab</i>, e dentro do parêntese vai a raiz quadrada do último termo.'),
+        mat(`<i>a</i> = ${a} &nbsp;&nbsp; <i>b</i> = ${b} &nbsp;&nbsp; 2<i>ab</i> = ${meio}`),
+        mat(respLacunas([meio, b]), true),
+      ],
+    };
+  }
+
+  if (p.caso === 'difq') {
+    const a2 = polHtml([mono(d.A * d.A, d.u.map((x) => 2 * x))], vars);
+    const b2 = polHtml([mono(d.B * d.B, d.v.map((x) => 2 * x))], vars);
+    const a = polHtml([mono(d.A, d.u)], vars), b = polHtml([mono(d.B, d.v)], vars);
+    return {
+      html: `<span class="ordem">Complete:</span> ${a2} ${MENOS} ${LAC} = (${a} + ${b})(${a} ${MENOS} ${LAC})`,
+      resposta: respLacunas([b2, b]) + selo(p, cfg),
+      passos: [
+        nota('A primeira lacuna é <i>b</i><sup>2</sup>; a segunda, o próprio <i>b</i>.'),
+        mat(`<i>b</i> = ${b} &nbsp;⟹&nbsp; <i>b</i><sup>2</sup> = ${b2}`),
+        mat(respLacunas([b2, b]), true),
+      ],
+    };
+  }
+
+  if (p.caso === 'trin') {
+    if (d.q <= 0) return null;                 // "+ ___" não comporta uma resposta negativa
+    const [f1, f2] = p.fatores;
+    const q = polHtml([f2[f2.length - 1]], vars);
+    return {
+      html: `<span class="ordem">Complete:</span> ${polHtml(p.expandido, vars)} = ${parHtml(f1, vars)}`
+          + `(${polHtml([f2[0]], vars)} + ${LAC})`,
+      resposta: respLacunas([q]) + selo(p, cfg),
+      passos: [
+        nota(`Dividindo o trinômio por ${parHtml(f1, vars)}, sobra ${parHtml(f2, vars)}.`),
+        mat(respLacunas([q]), true),
+      ],
+    };
+  }
+
+  /* fator comum: a lacuna é o próprio fator */
+  const fator = polHtml(p.dados.fator, vars);
+  return {
+    html: `<span class="ordem">Complete:</span> ${polHtml(p.expandido, vars)} = ${LAC}${parHtml(p.dados.dentro, vars)}`,
+    resposta: respLacunas([fator]) + selo(p, cfg),
+    passos: [
+      nota('A lacuna é o fator comum a todos os termos.'),
+      mat(respLacunas([fator]), true),
+    ],
+  };
+}
+
+/* ==========================================================================
+   4) CATÁLOGO E INTERFACE
+   ========================================================================== */
+const FAMILIAS = {
+  fatorar:     { nome: 'fatorar',                gerar: qFatorar },
+  desenvolver: { nome: 'desenvolver',            gerar: qDesenvolver },
+  fracao:      { nome: 'simplificar fração',     gerar: qFracao },
+  completar:   { nome: 'completar a identidade', gerar: qCompletar },
+};
+
+/* O trinômio do 2º grau entra em minoria quando está junto dos outros: é o
+   caso mais demorado de resolver e uma lista inteira dele cansa. */
+const PESO_CASO = { comum: 1, difq: 1, tqp: 0.9, trin: 0.7 };
+
+const PADRAO = {
+  direcoes: ['fatorar', 'desenvolver'], casos: ['comum', 'difq', 'tqp'], letras: 'sorteadas',
+  layout: 'compacta', gabTipo: 'compacto',
+  qtd: 12, versoes: 1, agrupar: false, lider: true, cubo: false, nomeCaso: true,
+  escola: '', titulo: 'Fatoração e produtos notáveis',
+  instrucao: 'Fatore, desenvolva ou simplifique, conforme o enunciado de cada item.',
+  ident: true, temGab: true,
+};
+
+let listas = [];
+
+const ctl = {
+  direcoes: chips('direcoes', true, gerar),
+  casos:    chips('casos', true, gerar),
+  letras:   chips('letras', false, gerar),
+  layout:   chips('layout', false, pintar),
+  gabTipo:  chips('gabTipo', false, pintar),
+};
+
+function lerConfig() {
+  return {
+    direcoes: ctl.direcoes.ler(),
+    casos: ctl.casos.ler(),
+    letras: ctl.letras.ler(),
+    qtd: limita($('qtd'), 1, 40),
+    versoes: limita($('versoes'), 1, 8),
+    agrupar: $('agrupar').checked,
+    lider: $('lider').checked,
+    cubo: $('cubo').checked,
+    nomeCaso: $('nomeCaso').checked,
+    layout: ctl.layout.ler(),
+    escola: $('escola').value.trim(),
+    titulo: $('titulo').value.trim(),
+    instrucao: $('instrucao').value.trim(),
+    ident: $('ident').checked,
+    temGab: $('temGab').checked,
+    gabTipo: ctl.gabTipo.ler(),
+  };
+}
+
+const viaveisDe = (cfg) => cfg.direcoes.map((k) => ({ k, nome: FAMILIAS[k].nome, gerar: FAMILIAS[k].gerar }));
+
+function gerar() {
+  const cfg = lerConfig();
+  const viaveis = viaveisDe(cfg);
+  const gerarDe = (f) => {
+    const caso = pesado(cfg.casos.map((c) => [c, PESO_CASO[c]]));
+    return f.gerar(caso, sorteiaVars(cfg), cfg);
+  };
+
+  listas = [];
+  for (let i = 0; i < cfg.versoes; i++) listas.push(montaLista(viaveis, cfg.qtd, cfg.agrupar, gerarDe));
+
+  /* Aqui nenhuma combinação é impossível — os chips já impedem zero marcados.
+     O que pode acontecer é uma fábrica recusar muitas vezes seguidas. */
+  const faltou = cfg.qtd - listas[0].length;
+  const aviso = $('aviso');
+  if (faltou > 0) {
+    aviso.hidden = false;
+    aviso.textContent = `Saíram ${listas[0].length} das ${cfg.qtd} questões pedidas: com poucos casos `
+      + 'marcados, o gerador esgota as combinações que não se repetem. Marque mais um caso ou peça menos questões.';
+  } else {
+    aviso.hidden = true;
+  }
+  pintar();
+}
+
+function pintar() {
+  const cfg = lerConfig();
+  if (!listas.length) return;
+  $('saida').innerHTML = montaFolhas(listas, cfg, () => '');
+  $('resumo').textContent = resumo(listas[0].length, listas.length, cfg.temGab,
+    viaveisDe(cfg).map((f) => f.nome));
+}
+
+/* --- ligações dos controles ----------------------------------------------- */
+['qtd', 'versoes', 'agrupar', 'lider', 'cubo'].forEach((id) => $(id).addEventListener('change', gerar));
+['escola', 'titulo', 'instrucao'].forEach((id) => $(id).addEventListener('input', pintar));
+['ident', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
+$('nomeCaso').addEventListener('change', gerar);
+
+$('gerar').addEventListener('click', gerar);
+$('imprimir').addEventListener('click', () => window.print());
+$('restaurar').addEventListener('click', () => {
+  Object.entries(ctl).forEach(([campo, c]) => c.repor(PADRAO[campo]));
+  ['qtd', 'versoes', 'escola', 'titulo', 'instrucao'].forEach((id) => { $(id).value = PADRAO[id]; });
+  ['agrupar', 'ident', 'temGab', 'lider', 'cubo', 'nomeCaso'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  gerar();
+});
+
+gerar();
+</script>

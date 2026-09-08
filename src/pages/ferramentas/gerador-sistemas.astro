@@ -1,0 +1,913 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/ferramenta-folha.css';
+---
+
+<Layout
+  title="Gerador de Sistemas"
+  description="Gere listas aleatórias de sistemas lineares 2×2 e 3×3, com parâmetro ou em problemas contextualizados — possíveis, indeterminados ou impossíveis. Sai folha A4 pronta, com gabarito pelo método que você ensina."
+>
+
+  <div class="ff-root sistemas">
+    <div class="wrap">
+
+      <header class="masthead">
+        <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Álgebra</p>
+        <h1>Gerador de <em>sistemas lineares</em></h1>
+        <p class="lede">Sistemas <em>2×2</em> e <em>3×3</em>, com <em>parâmetro</em> ou vestidos de
+        problema, sorteados na hora. Cada sistema é montado <em>a partir da solução</em>, então a
+        resposta é sempre do tipo que você pediu — e os casos <em>indeterminado</em> e
+        <em>impossível</em> são construídos de propósito, com as linhas proporcionais, em vez de
+        aparecerem por acaso. O gabarito sai pelo método que você está ensinando. O que vai para o
+        papel é só a folha; os controles não são impressos. Tudo roda no seu navegador.</p>
+      </header>
+
+      <!-- ================= CONTROLES (não imprimem) ================= -->
+      <div class="toolbar">
+
+        <div class="blocos">
+
+          <section class="bloco">
+            <h2>Tipos de questão</h2>
+            <p class="hint">A quantidade é dividida entre os tipos marcados.</p>
+            <div class="chips" id="tipos" role="group" aria-label="Tipos de questão">
+              <button class="chip" type="button" data-v="s2"    aria-pressed="true">Sistema 2×2</button>
+              <button class="chip" type="button" data-v="s3"    aria-pressed="false">Sistema 3×3</button>
+              <button class="chip" type="button" data-v="param" aria-pressed="false">Com parâmetro m</button>
+              <button class="chip" type="button" data-v="prob"  aria-pressed="false">Problema contextualizado</button>
+            </div>
+          </section>
+
+          <section class="bloco">
+            <h2>Solução</h2>
+            <p class="hint">Coeficientes são sempre inteiros; isto vale para a resposta.</p>
+            <div class="chips" id="naturezas" role="group" aria-label="Natureza da solução">
+              <button class="chip" type="button" data-v="inteira"  aria-pressed="true">Inteira</button>
+              <button class="chip" type="button" data-v="racional" aria-pressed="false">Racional</button>
+            </div>
+            <div class="campo">
+              <span class="card-label">Classificação</span>
+              <div class="chips" id="casos" role="group" aria-label="Classificação do sistema">
+                <button class="chip mini" type="button" data-v="spd" aria-pressed="true">SPD · solução única</button>
+                <button class="chip mini" type="button" data-v="spi" aria-pressed="false">SPI · infinitas</button>
+                <button class="chip mini" type="button" data-v="si"  aria-pressed="false">SI · impossível</button>
+              </div>
+              <p class="dica">Problemas contextualizados são sempre SPD, com solução inteira.</p>
+            </div>
+          </section>
+
+          <section class="bloco">
+            <h2>Método do gabarito</h2>
+            <p class="hint">Vale para os sistemas 2×2. Nos 3×3 o caminho é o escalonamento — a menos que você escolha Cramer, que serve aos dois.</p>
+            <div class="chips" id="metodo" role="group" aria-label="Método do gabarito">
+              <button class="chip" type="button" data-v="adicao"       aria-pressed="true">Adição</button>
+              <button class="chip" type="button" data-v="substituicao" aria-pressed="false">Substituição</button>
+              <button class="chip" type="button" data-v="comparacao"   aria-pressed="false">Comparação</button>
+              <button class="chip" type="button" data-v="cramer"       aria-pressed="false">Cramer</button>
+            </div>
+            <label class="check"><input type="checkbox" id="grafica" checked /> Leitura gráfica no gabarito comentado</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Lista</h2>
+            <div class="campos">
+              <label class="num"><span class="card-label">Questões</span>
+                <input type="number" id="qtd" min="1" max="30" step="1" value="8" /></label>
+              <label class="num"><span class="card-label">Versões</span>
+                <input type="number" id="versoes" min="1" max="8" step="1" value="1" /></label>
+            </div>
+            <p class="hint">Cada versão é uma folha com questões diferentes e a mesma dificuldade.</p>
+            <label class="check"><input type="checkbox" id="agrupar" /> Agrupar as questões por tipo</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Folha do aluno</h2>
+            <div class="chips" id="layout" role="group" aria-label="Layout da folha">
+              <button class="chip" type="button" data-v="compacta" aria-pressed="true">Compacta · 2 colunas</button>
+              <button class="chip" type="button" data-v="espaco"   aria-pressed="false">Com espaço para resolver</button>
+            </div>
+            <div class="campo">
+              <label class="card-label" for="escola">Nome da escola</label>
+              <input type="text" id="escola" maxlength="70" placeholder="Ex.: Escola SESI Poços de Caldas" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="titulo">Título da atividade</label>
+              <input type="text" id="titulo" maxlength="90" value="Sistemas de equações do 1º grau" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="instrucao">Instrução</label>
+              <input type="text" id="instrucao" maxlength="140" value="Resolva e classifique cada sistema, apresentando os cálculos." />
+            </div>
+            <label class="check"><input type="checkbox" id="ident" checked /> Espaço para nome, turma e data</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Gabarito</h2>
+            <p class="hint">Sai depois de todas as folhas dos alunos, em páginas separadas.</p>
+            <label class="check"><input type="checkbox" id="temGab" checked /> Incluir gabarito do professor</label>
+            <div class="chips" id="gabTipo" role="group" aria-label="Tipo de gabarito">
+              <button class="chip" type="button" data-v="compacto"  aria-pressed="true">Só as respostas</button>
+              <button class="chip" type="button" data-v="comentado" aria-pressed="false">Comentado</button>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="acoes">
+          <button class="btn" type="button" id="gerar">Gerar outra lista</button>
+          <button class="btn sec" type="button" id="imprimir">Imprimir / Salvar PDF</button>
+          <button class="btn sec" type="button" id="restaurar">Restaurar padrões</button>
+        </div>
+        <p class="aviso" id="aviso" hidden></p>
+      </div>
+
+      <!-- ================= SAÍDA (isto é o que imprime) ================= -->
+      <div class="saida" id="saida"></div>
+
+      <p class="rodape" id="resumo"></p>
+
+      <!-- ================= TEORIA ================= -->
+      <section class="teoria">
+        <h2>Como os sistemas são montados</h2>
+        <p>Para o caso possível e determinado, o gerador sorteia a solução <span class="mat">(<i>x</i><sub>0</sub>, <i>y</i><sub>0</sub>)</span>
+        e depois os coeficientes, com o cuidado de manter o determinante diferente de zero; os termos
+        independentes saem de substituir a solução nas equações. Quando a solução pedida é racional, os
+        coeficientes de cada incógnita são sorteados como <b>múltiplos do denominador</b> dela — é o que
+        mantém todo coeficiente inteiro e ainda assim leva a uma resposta fracionária.</p>
+        <p>Os casos degenerados não podem ser sorteados por acaso: um sistema aleatório é possível e
+        determinado quase sempre. Aqui a segunda equação é construída como <b>múltipla da primeira</b> —
+        se o termo independente acompanha o múltiplo, o sistema é indeterminado; se destoa, é impossível.
+        No 3×3 a mesma ideia vale com a terceira linha escrita como combinação das duas primeiras.</p>
+
+        <h2>Classificação e leitura gráfica</h2>
+        <p>Num sistema 2×2, cada equação é uma reta no plano. <b>SPD</b> são retas <em>concorrentes</em>,
+        que se cruzam num ponto — o par ordenado da resposta. <b>SPI</b> são retas <em>coincidentes</em>:
+        a mesma reta escrita duas vezes, e a solução é todo ponto dela, o que se escreve por compreensão.
+        <b>SI</b> são retas <em>paralelas distintas</em>, sem ponto em comum, e o conjunto solução é vazio.
+        O determinante separa os três casos: <span class="mat">D ≠ 0</span> dá SPD, e
+        <span class="mat">D = 0</span> deixa a decisão entre SPI e SI para os termos independentes.</p>
+      </section>
+
+    </div>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* Só o que é desta ferramenta — o resto vem de styles/ferramenta-folha.css.
+     O seletor duplo .ff-root.sistemas vence a folha compartilhada por
+     especificidade, independentemente da ordem em que os dois CSS entram. */
+
+  /* Chave do sistema: um { em serifada, dimensionado pelo número de linhas.
+     Os múltiplos vêm da medida da tinta do glifo no Georgia (a caixa da fonte
+     é bem maior que o desenho), para a chave cobrir a altura das equações.
+     Como o tamanho está em em, vale igual no enunciado e no gabarito. */
+  .ff-root .sist{ display:inline-flex; align-items:center; gap:.35em; }
+  .ff-root .sist .chave{ font-family:var(--mat); line-height:.86; font-weight:400; }
+  .ff-root .sist[data-n="2"] .chave{ font-size:3.4em; }
+  .ff-root .sist[data-n="3"] .chave{ font-size:5.15em; }
+  .ff-root .sist .eqs{ display:flex; flex-direction:column; gap:.12em; }
+
+  /* Sistemas ocupam mais altura que uma equação: mais respiro entre as questões. */
+  .ff-root.sistemas .questoes{ gap:1.1rem 2.4rem; }
+  .ff-root.sistemas .questoes[data-modo="espaco"]{ gap:.4rem; }
+  .ff-root.sistemas .pauta{ height:30mm; }
+  .ff-root.sistemas .q{ align-items:flex-start; }
+  .ff-root.sistemas .r{ align-items:flex-start; }
+  .ff-root.sistemas .rcom .q{ align-items:flex-start; }
+
+  .ff-root .classif{ display:inline-block; font-family:'IBM Plex Sans',sans-serif; font-size:.7rem;
+    font-weight:700; letter-spacing:.06em; border:1px solid currentColor; border-radius:99px;
+    padding:.1em .55em; margin-left:.5em; vertical-align:.15em; }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+
+import {
+  MENOS, inteiro, naoZero, escolhe, moeda, maisMenos, embaralha, pesado, mdc,
+  rac, rSoma, rSub, rMul, rDiv, rNeg, rVal, rZero, rInt, rIgual,
+  htmlVar, htmlRac, txtRac, htmlSoma, mat, nota, nInt,
+} from '../../utils/matematica.js';
+import { $, limita, chips, montaLista, montaFolhas, resumo } from '../../utils/folha.js';
+
+/* ==========================================================================
+   1) ÁLGEBRA DE SISTEMAS
+   Coeficientes são sempre inteiros; a solução é racional exata. Uma linha do
+   sistema é { c: [coeficientes], t: termo independente }.
+   ========================================================================== */
+const VARS2 = ['x', 'y'];
+const VARS3 = ['x', 'y', 'z'];
+
+const linhaDe = (c, t) => ({ c: c.slice(), t });
+
+const det2 = (a, b, c, d) => a * d - b * c;
+
+function det3(M) {
+  return M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1])
+       - M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0])
+       + M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+}
+
+/* Substitui a solução na linha e devolve o termo independente exato. */
+function termoDe(coefs, sol) {
+  return coefs.reduce((s, c, i) => rSoma(s, rMul(rac(c), sol[i])), rac(0));
+}
+
+/* --- tipografia do sistema ------------------------------------------------ */
+const eqHtml = (lin, vars) =>
+  htmlSoma(lin.c.map((c, i) => ({ c: rac(c), s: htmlVar(vars[i]) }))) + ' = ' + htmlRac(rac(lin.t));
+
+function sistHtml(linhas, vars) {
+  const eqs = linhas.map((l) => `<span class="eq">${eqHtml(l, vars)}</span>`).join('');
+  return `<span class="sist" data-n="${linhas.length}"><span class="chave">{</span><span class="eqs">${eqs}</span></span>`;
+}
+
+/* Par ou terna ordenada da resposta. */
+const ternaHtml = (sol) => `(${sol.map((r) => htmlRac(r)).join(', ')})`;
+
+const SELO = { spd: 'SPD', spi: 'SPI', si: 'SI' };
+const NOME_CASO = {
+  spd: 'possível e determinado',
+  spi: 'possível e indeterminado',
+  si: 'impossível',
+};
+const selo = (caso) => `<span class="classif">${SELO[caso]}</span>`;
+
+/* Leitura gráfica de um 2×2 — cada equação é uma reta no plano. */
+const LEITURA = {
+  spd: 'Retas concorrentes: cruzam-se num único ponto, que é o par ordenado da solução.',
+  spi: 'Retas coincidentes: a segunda equação é a primeira multiplicada por uma constante, então é a mesma reta — todo ponto dela serve.',
+  si: 'Retas paralelas distintas: mesma inclinação e termos independentes incompatíveis, sem ponto em comum.',
+};
+
+/* ==========================================================================
+   2) GERADORES
+   Como no gerador de equações, o caminho é o inverso do que o aluno faz: a
+   solução vem primeiro e o sistema é montado em volta dela. Os casos SPI e SI
+   não são sorteados — são construídos com as linhas proporcionais, porque um
+   sistema aleatório é determinado quase sempre.
+   ========================================================================== */
+function sorteiaSol(nat) {
+  if (nat === 'racional') {
+    for (let t = 0; t < 60; t++) {
+      const d = escolhe([2, 2, 3, 3, 4, 5]);
+      const n = naoZero(-12, 12);
+      if (mdc(Math.abs(n), d) !== 1) continue;
+      return rac(n, d);
+    }
+    return rac(3, 2);
+  }
+  return rac(inteiro(-9, 9));
+}
+
+/* Coeficiente inteiro múltiplo do denominador da incógnita — é o que mantém
+   os termos independentes inteiros mesmo com solução fracionária. */
+const coefPara = (sol, max) => sol.d * naoZero(1, max) * maisMenos(0.35);
+
+/* --- 2×2 ------------------------------------------------------------------ */
+function sistema2(nat, caso) {
+  for (let t = 0; t < 400; t++) {
+    if (caso === 'spd') {
+      const sol = [sorteiaSol(nat), sorteiaSol(nat)];
+      const a = coefPara(sol[0], 4), b = coefPara(sol[1], 4);
+      const c = coefPara(sol[0], 4), d = coefPara(sol[1], 4);
+      if (det2(a, b, c, d) === 0) continue;
+      if ([a, b, c, d].some((k) => Math.abs(k) > 9)) continue;
+      const e = termoDe([a, b], sol), f = termoDe([c, d], sol);
+      if (!rInt(e) || !rInt(f) || Math.abs(e.n) > 99 || Math.abs(f.n) > 99) continue;
+      return { linhas: [linhaDe([a, b], e.n), linhaDe([c, d], f.n)], sol, caso };
+    }
+
+    /* SPI e SI: a segunda linha é k vezes a primeira nos coeficientes. */
+    const a = naoZero(-6, 6), b = naoZero(-6, 6);
+    const e = inteiro(-12, 12);
+    const k = escolhe([2, 3, -2, -3, 2, -1]);
+    const desvio = caso === 'si' ? naoZero(-9, 9) : 0;
+    const c = k * a, d = k * b, f = k * e + desvio;
+    if ([c, d].some((x) => Math.abs(x) > 18) || Math.abs(f) > 99) continue;
+    return { linhas: [linhaDe([a, b], e), linhaDe([c, d], f)], sol: null, caso, k };
+  }
+  return null;
+}
+
+/* --- 3×3 ------------------------------------------------------------------ */
+function sistema3(nat, caso) {
+  for (let t = 0; t < 500; t++) {
+    if (caso === 'spd') {
+      const sol = [sorteiaSol(nat), sorteiaSol(nat), sorteiaSol(nat)];
+      /* Primeiro pivô ±1 na maioria das vezes: o escalonamento sai limpo. */
+      const linha = (primeira) => [
+        primeira ? sol[0].d * pesado([[1, 6], [2, 2], [-1, 2]]) : coefPara(sol[0], 3),
+        coefPara(sol[1], 3), coefPara(sol[2], 3),
+      ];
+      const M = [linha(true), linha(false), linha(false)];
+      if (det3(M) === 0) continue;
+      if (M.some((l) => l.every((c) => c === 0)) || M.flat().some((c) => Math.abs(c) > 8)) continue;
+      const ts = M.map((l) => termoDe(l, sol));
+      if (ts.some((x) => !rInt(x) || Math.abs(x.n) > 99)) continue;
+      return { linhas: M.map((l, i) => linhaDe(l, ts[i].n)), sol, caso };
+    }
+
+    /* SPI e SI: a terceira linha é combinação das duas primeiras. */
+    const L1 = [naoZero(-4, 4), naoZero(-4, 4), inteiro(-4, 4)];
+    const L2 = [naoZero(-4, 4), inteiro(-4, 4), naoZero(-4, 4)];
+    if (det2(L1[0], L1[1], L2[0], L2[1]) === 0) continue;   // as duas primeiras têm de ser independentes
+    const t1 = inteiro(-10, 10), t2 = inteiro(-10, 10);
+    const al = escolhe([1, 2, -1, -2]), be = escolhe([1, 2, -1, 1]);
+    const L3 = L1.map((c, i) => al * c + be * L2[i]);
+    if (L3.every((c) => c === 0) || L3.some((c) => Math.abs(c) > 14)) continue;
+    const desvio = caso === 'si' ? naoZero(-9, 9) : 0;
+    const t3 = al * t1 + be * t2 + desvio;
+    if (Math.abs(t3) > 99) continue;
+    return {
+      linhas: [linhaDe(L1, t1), linhaDe(L2, t2), linhaDe(L3, t3)],
+      sol: null, caso, comb: { al, be },
+    };
+  }
+  return null;
+}
+
+/* --- com parâmetro m ------------------------------------------------------
+   O m entra num dos quatro coeficientes. O determinante é afim em m, então
+   D(m) = P·m + Q, com P e Q lidos em m = 0 e m = 1 — e a raiz é o valor que
+   apaga o determinante, a fronteira entre SPD e os casos degenerados.        */
+function comParametro(nat, caso) {
+  for (let t = 0; t < 400; t++) {
+    const slot = inteiro(0, 3);
+    const K = [naoZero(-5, 5), naoZero(-5, 5), naoZero(-5, 5), naoZero(-5, 5)];
+    const D = (m) => { const k = K.slice(); k[slot] = m; return det2(k[0], k[1], k[2], k[3]); };
+    const P = D(1) - D(0), Q = D(0);
+    if (P === 0) continue;
+    const m0 = rac(-Q, P);
+    if (caso !== 'spd' && !rInt(m0)) continue;              // SPI/SI só com m inteiro
+    if (caso === 'spd' && !rInt(m0) && nat !== 'racional' && moeda(0.7)) continue;
+
+    const k = K.slice(); k[slot] = m0.n / m0.d;             // coeficientes no valor crítico
+    const L1c = [k[0], k[1]], L2c = [k[2], k[3]];
+    /* razão entre as linhas no valor crítico (existe porque o determinante zera) */
+    const i = L1c.findIndex((x) => x !== 0);
+    if (i < 0 || L2c[i] === 0) continue;
+    const lam = rac(L2c[i], L1c[i]);
+
+    let e, f;
+    if (caso === 'spd') { e = inteiro(-12, 12); f = inteiro(-12, 12); }
+    else {
+      const s = naoZero(-6, 6);
+      e = lam.d * s;
+      f = lam.n * s + (caso === 'si' ? naoZero(-9, 9) : 0);
+      if (Math.abs(e) > 60 || Math.abs(f) > 99) continue;
+    }
+
+    const linhas = [linhaDe([K[0], K[1]], e), linhaDe([K[2], K[3]], f)];
+    /* kc = coeficientes já no valor crítico, para mostrar o sistema em m = m₀ */
+    const kc = [linhaDe([k[0], k[1]], e), linhaDe([k[2], k[3]], f)];
+    return { linhas, slot, m0, caso, sol: null, P, Q, kc };
+  }
+  return null;
+}
+
+/* --- problemas contextualizados -------------------------------------------
+   Moldes fechados: o sorteio é da resposta e das grandezas, nunca da forma do
+   enunciado. Cada molde traz a própria trava de plausibilidade — é o que
+   impede a lista de pedir a idade de 200 anos ou 2,5 ingressos.              */
+const MOLDES = [
+  {
+    nome: 'ingressos',
+    monta() {
+      const x = inteiro(30, 200), y = inteiro(20, 150);
+      const p = 2 * inteiro(10, 30), q = p / 2;
+      return {
+        texto: `Um cinema vendeu <b>${x + y}</b> ingressos numa sessão, entre inteiras a `
+             + `R$&nbsp;${p},00 e meias a R$&nbsp;${q},00, e arrecadou R$&nbsp;${p * x + q * y},00. `
+             + 'Quantos ingressos de cada tipo foram vendidos?',
+        linhas: [linhaDe([1, 1], x + y), linhaDe([p, q], p * x + q * y)],
+        sol: [rac(x), rac(y)],
+        define: 'x = ingressos inteiros, y = meias',
+        conclui: `${x} inteiras e ${y} meias.`,
+      };
+    },
+  },
+  {
+    nome: 'cédulas',
+    monta() {
+      const x = inteiro(3, 25), y = inteiro(3, 25);
+      return {
+        texto: `Um caixa tem <b>${x + y}</b> cédulas, umas de R$&nbsp;10 e outras de R$&nbsp;20, `
+             + `somando R$&nbsp;${10 * x + 20 * y},00. Quantas cédulas há de cada valor?`,
+        linhas: [linhaDe([1, 1], x + y), linhaDe([10, 20], 10 * x + 20 * y)],
+        sol: [rac(x), rac(y)],
+        define: 'x = cédulas de R$ 10, y = cédulas de R$ 20',
+        conclui: `${x} cédulas de R$ 10 e ${y} de R$ 20.`,
+      };
+    },
+  },
+  {
+    nome: 'idades',
+    monta() {
+      const y = inteiro(6, 18), mult = escolhe([2, 3]), x = mult * y, anos = inteiro(3, 10);
+      return {
+        texto: `Hoje, a idade de Ana é o <b>${mult === 2 ? 'dobro' : 'triplo'}</b> da idade de Bruno. `
+             + `Daqui a ${anos} anos, a soma das duas idades será <b>${x + y + 2 * anos}</b> anos. `
+             + 'Qual é a idade de cada um hoje?',
+        linhas: [linhaDe([1, -mult], 0), linhaDe([1, 1], x + y)],
+        sol: [rac(x), rac(y)],
+        define: 'x = idade de Ana, y = idade de Bruno',
+        conclui: `Ana tem ${x} anos e Bruno, ${y}.`,
+      };
+    },
+  },
+  {
+    nome: 'terreno',
+    monta() {
+      const y = inteiro(5, 30), dif = inteiro(2, 15), x = y + dif;
+      return {
+        texto: `Um terreno retangular tem <b>${2 * x + 2 * y} m</b> de perímetro, e o comprimento `
+             + `tem ${dif} m a mais que a largura. Quais são as dimensões do terreno?`,
+        linhas: [linhaDe([2, 2], 2 * x + 2 * y), linhaDe([1, -1], dif)],
+        sol: [rac(x), rac(y)],
+        define: 'x = comprimento, y = largura (em metros)',
+        conclui: `${x} m de comprimento por ${y} m de largura.`,
+      };
+    },
+  },
+  {
+    nome: 'prova',
+    monta() {
+      const n = inteiro(20, 40), x = inteiro(Math.ceil(n / 2), n - 2), y = n - x;
+      return {
+        texto: `Numa prova de <b>${n}</b> questões, cada acerto vale 4 pontos e cada erro desconta `
+             + `1 ponto. Quem respondeu todas as questões e fez <b>${4 * x - y}</b> pontos acertou quantas?`,
+        linhas: [linhaDe([1, 1], n), linhaDe([4, -1], 4 * x - y)],
+        sol: [rac(x), rac(y)],
+        define: 'x = acertos, y = erros',
+        conclui: `${x} acertos e ${y} erros.`,
+      };
+    },
+  },
+  {
+    nome: 'compras',
+    monta() {
+      const x = inteiro(8, 40), y = inteiro(2, 12);
+      const a = inteiro(2, 4), b = inteiro(1, 4), c = inteiro(1, 4), d = inteiro(2, 5);
+      if (det2(a, b, c, d) === 0) return null;
+      return {
+        texto: `Na papelaria, ${a} cadernos e ${b} ${b === 1 ? 'caneta' : 'canetas'} custam `
+             + `R$&nbsp;${a * x + b * y},00; ${c} ${c === 1 ? 'caderno' : 'cadernos'} e ${d} canetas `
+             + `custam R$&nbsp;${c * x + d * y},00. Qual é o preço de cada item?`,
+        linhas: [linhaDe([a, b], a * x + b * y), linhaDe([c, d], c * x + d * y)],
+        sol: [rac(x), rac(y)],
+        define: 'x = preço do caderno, y = preço da caneta (em reais)',
+        conclui: `Caderno R$ ${x},00 e caneta R$ ${y},00.`,
+      };
+    },
+  },
+];
+
+function problema() {
+  for (let t = 0; t < 40; t++) {
+    const m = escolhe(MOLDES).monta();
+    if (m) return { ...m, caso: 'spd' };
+  }
+  return null;
+}
+
+/* ==========================================================================
+   3) RESOLUÇÃO E GABARITO
+   Cada método devolve os passos até a conclusão; a classificação sai do
+   próprio caminho — no 2×2 pelos determinantes ou pela linha que zera, no
+   3×3 pela linha nula que sobra do escalonamento.
+   ========================================================================== */
+const R = (x) => (typeof x === 'number' ? rac(x) : x);
+const rAbs = (r) => ({ n: Math.abs(r.n), d: r.d });
+const parR = (r) => (r.n < 0 ? `(${htmlRac(r)})` : htmlRac(r));
+
+/* Renderizadores que aceitam coeficiente racional (o escalonamento gera). */
+const eqHtmlR = (lin, vars) =>
+  htmlSoma(lin.c.map((c, i) => ({ c: R(c), s: htmlVar(vars[i]) }))) + ' = ' + htmlRac(R(lin.t));
+
+const sistHtmlR = (linhas, vars) =>
+  `<span class="sist" data-n="${linhas.length}"><span class="chave">{</span><span class="eqs">`
+  + linhas.map((l) => `<span class="eq">${eqHtmlR(l, vars)}</span>`).join('')
+  + '</span></span>';
+
+/* --- classificação por determinantes (2×2) -------------------------------- */
+function resolve2(L) {
+  const [a, b] = L[0].c, e = L[0].t;
+  const [c, d] = L[1].c, f = L[1].t;
+  const D = det2(a, b, c, d), Dx = det2(e, b, f, d), Dy = det2(a, e, c, f);
+  if (D !== 0) return { caso: 'spd', sol: [rac(Dx, D), rac(Dy, D)], D, Dx, Dy };
+  return { caso: Dx === 0 && Dy === 0 ? 'spi' : 'si', sol: null, D, Dx, Dy };
+}
+
+/* Conclusão comum: resposta, classificação e (opcional) leitura gráfica. */
+function conclui2(L, r, vars, cfg) {
+  const p = [];
+  if (r.caso === 'spd') {
+    p.push(mat(`S = {${ternaHtml(r.sol)}}${selo('spd')}`, true));
+  } else if (r.caso === 'spi') {
+    const [a, b] = L[0].c;
+    const g = mdc(mdc(Math.abs(a), Math.abs(b)), Math.abs(L[0].t)) || 1;
+    const red = { c: [a / g, b / g], t: L[0].t / g };
+    p.push(nota('As duas equações dizem a mesma coisa: sobra uma só condição.'));
+    p.push(mat(`S = {(${htmlVar(vars[0])}, ${htmlVar(vars[1])}) ∈ ℝ² | ${eqHtml(red, vars)}}${selo('spi')}`, true));
+  } else {
+    p.push(nota('Mesmos coeficientes, termos independentes incompatíveis: nenhuma dupla serve.'));
+    p.push(mat(`S = ∅${selo('si')}`, true));
+  }
+  if (cfg.grafica) p.push(nota(LEITURA[r.caso]));
+  return p;
+}
+
+/* --- adição --------------------------------------------------------------- */
+function porAdicao(L, vars) {
+  const p = [];
+  const [a, b] = L[0].c, e = L[0].t;
+  const [c, d] = L[1].c, f = L[1].t;
+  /* multiplicadores que deixam os coeficientes de y opostos */
+  const g = mdc(Math.abs(b), Math.abs(d)) || 1;
+  let k1 = d / g, k2 = -b / g;
+  if (k1 < 0) { k1 = -k1; k2 = -k2; }
+
+  if (k1 !== 1 || k2 !== 1) {
+    const quais = k1 === 1 ? `a 2ª equação por ${nInt(k2)}`
+                : k2 === 1 ? `a 1ª equação por ${nInt(k1)}`
+                : `a 1ª equação por ${nInt(k1)} e a 2ª por ${nInt(k2)}`;
+    p.push(nota(`Multiplicando ${quais}, os coeficientes de ${vars[1]} ficam opostos:`));
+    p.push(mat(sistHtml([linhaDe([a * k1, b * k1], e * k1), linhaDe([c * k2, d * k2], f * k2)], vars)));
+  }
+  const A = a * k1 + c * k2, T = e * k1 + f * k2;
+  p.push(nota('Somando membro a membro:'));
+  p.push(mat(`${htmlSoma([{ c: rac(A), s: htmlVar(vars[0]) }])} = ${htmlRac(rac(T))}`));
+  if (A !== 0) {
+    const x = rac(T, A);
+    p.push(mat(`${htmlVar(vars[0])} = ${htmlRac(x)}`));
+    if (b !== 0) {
+      const y = rDiv(rSub(rac(e), rMul(rac(a), x)), rac(b));
+      p.push(nota(`Levando na 1ª equação:`));
+      p.push(mat(`${htmlVar(vars[1])} = ${htmlRac(y)}`));
+    }
+  }
+  return p;
+}
+
+/* --- substituição --------------------------------------------------------- */
+function porSubstituicao(L, vars) {
+  const p = [];
+  /* isola a incógnita de coeficiente ±1, se houver — é o que o método pede */
+  let li = 0, vi = 0, melhor = Infinity;
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
+    const custo = Math.abs(L[i].c[j]);
+    if (custo && custo < melhor) { melhor = custo; li = i; vi = j; }
+  }
+  const outra = 1 - li, ov = 1 - vi;
+  const cj = L[li].c[vi], co = L[li].c[ov];
+  /* x_vi = (t − co·x_ov)/cj */
+  const iso = (t, coef) => htmlSoma([{ c: rDiv(rac(t), rac(cj)), s: '' },
+                                      { c: rNeg(rDiv(rac(coef), rac(cj))), s: htmlVar(vars[ov]) }]);
+  p.push(nota(`Isolando ${vars[vi]} na ${li + 1}ª equação:`));
+  p.push(mat(`${htmlVar(vars[vi])} = ${iso(L[li].t, co)}`));
+
+  /* substitui na outra: A·x_ov = T */
+  const A = rSub(rac(L[outra].c[ov]), rMul(rac(L[outra].c[vi]), rDiv(rac(co), rac(cj))));
+  const T = rSub(rac(L[outra].t), rMul(rac(L[outra].c[vi]), rDiv(rac(L[li].t), rac(cj))));
+  p.push(nota(`Substituindo na ${outra + 1}ª equação e simplificando:`));
+  p.push(mat(`${htmlSoma([{ c: A, s: htmlVar(vars[ov]) }])} = ${htmlRac(T)}`));
+  if (!rZero(A)) {
+    const xo = rDiv(T, A);
+    const xj = rDiv(rSub(rac(L[li].t), rMul(rac(co), xo)), rac(cj));
+    p.push(mat(`${htmlVar(vars[ov])} = ${htmlRac(xo)} &nbsp;⟹&nbsp; ${htmlVar(vars[vi])} = ${htmlRac(xj)}`));
+  }
+  return p;
+}
+
+/* --- comparação ----------------------------------------------------------- */
+function porComparacao(L, vars) {
+  const p = [];
+  const [a, b] = L[0].c, e = L[0].t;
+  const [c, d] = L[1].c, f = L[1].t;
+  const iso = (t, coefX, coefY) => htmlSoma([{ c: rDiv(rac(t), rac(coefY)), s: '' },
+                                             { c: rNeg(rDiv(rac(coefX), rac(coefY))), s: htmlVar(vars[0]) }]);
+  p.push(nota(`Isolando ${vars[1]} nas duas equações:`));
+  p.push(mat(`${htmlVar(vars[1])} = ${iso(e, a, b)} &nbsp;&nbsp; e &nbsp;&nbsp; ${htmlVar(vars[1])} = ${iso(f, c, d)}`));
+  p.push(nota('Igualando as duas expressões e juntando os termos:'));
+  /* (e − a x)/b = (f − c x)/d  ⟹  (c/d − a/b)x = f/d − e/b */
+  const A = rSub(rDiv(rac(c), rac(d)), rDiv(rac(a), rac(b)));
+  const T = rSub(rDiv(rac(f), rac(d)), rDiv(rac(e), rac(b)));
+  p.push(mat(`${htmlSoma([{ c: A, s: htmlVar(vars[0]) }])} = ${htmlRac(T)}`));
+  if (!rZero(A)) {
+    const x = rDiv(T, A);
+    const y = rDiv(rSub(rac(e), rMul(rac(a), x)), rac(b));
+    p.push(mat(`${htmlVar(vars[0])} = ${htmlRac(x)} &nbsp;⟹&nbsp; ${htmlVar(vars[1])} = ${htmlRac(y)}`));
+  }
+  return p;
+}
+
+/* --- Cramer --------------------------------------------------------------- */
+function porCramer2(L, r, vars) {
+  const [a, b] = L[0].c, e = L[0].t;
+  const [c, d] = L[1].c, f = L[1].t;
+  const p = [];
+  p.push(mat(`D = ${parR(rac(a))}·${parR(rac(d))} ${MENOS} ${parR(rac(b))}·${parR(rac(c))} = ${nInt(r.D)}`));
+  p.push(mat(`D<sub>${vars[0]}</sub> = ${nInt(r.Dx)} &nbsp;&nbsp; D<sub>${vars[1]}</sub> = ${nInt(r.Dy)}`));
+  if (r.D !== 0) {
+    p.push(mat(`${htmlVar(vars[0])} = ${htmlRac(rac(r.Dx, r.D))} &nbsp;&nbsp; `
+             + `${htmlVar(vars[1])} = ${htmlRac(rac(r.Dy, r.D))}`));
+  } else {
+    p.push(nota(r.caso === 'spi'
+      ? 'D = 0 com todos os determinantes das incógnitas nulos.'
+      : 'D = 0 com algum determinante de incógnita não nulo.'));
+  }
+  return p;
+}
+
+/* --- escalonamento (3×3) --------------------------------------------------- */
+function escalona(linhas) {
+  const M = linhas.map((l) => ({ c: l.c.map((x) => rac(x)), t: rac(l.t) }));
+  const p = [];
+  for (let col = 0; col < 2; col++) {
+    let piv = -1;
+    for (let i = col; i < 3; i++) if (!rZero(M[i].c[col])) { piv = i; break; }
+    if (piv < 0) continue;
+    if (piv !== col) {
+      [M[col], M[piv]] = [M[piv], M[col]];
+      p.push(nota(`Trocando L<sub>${col + 1}</sub> com L<sub>${piv + 1}</sub> para ter pivô não nulo.`));
+    }
+    const feitas = [];
+    for (let i = col + 1; i < 3; i++) {
+      if (rZero(M[i].c[col])) continue;
+      const m = rDiv(M[i].c[col], M[col].c[col]);
+      M[i] = {
+        c: M[i].c.map((x, j) => rSub(x, rMul(m, M[col].c[j]))),
+        t: rSub(M[i].t, rMul(m, M[col].t)),
+      };
+      const fator = rIgual(rAbs(m), rac(1)) ? '' : `${htmlRac(rAbs(m))}·`;   // "− L2", não "− 1·L2"
+      feitas.push(`L<sub>${i + 1}</sub> ← L<sub>${i + 1}</sub> ${m.n < 0 ? '+' : MENOS} ${fator}L<sub>${col + 1}</sub>`);
+    }
+    if (feitas.length) {
+      p.push(nota(feitas.join(' &nbsp;·&nbsp; ')));
+      p.push(mat(sistHtmlR(M, VARS3)));
+    }
+  }
+  return { M, passos: p };
+}
+
+function porEscalonamento(L, vars, cfg) {
+  const { M, passos } = escalona(L);
+  const p = passos;
+  const ultima = M[2];
+
+  if (ultima.c.every((c) => rZero(c))) {
+    if (rZero(ultima.t)) {
+      /* posto 2: uma incógnita livre — z = t e as outras em função de t */
+      const [c00, c01, c02] = M[0].c, t0 = M[0].t;
+      const [, c11, c12] = M[1].c, t1 = M[1].t;
+      const yA = rDiv(t1, c11), yB = rNeg(rDiv(c12, c11));
+      const xA = rDiv(rSub(rSub(t0, rMul(c01, yA)), rac(0)), c00);
+      const xB = rDiv(rNeg(rSoma(rMul(c01, yB), c02)), c00);
+      p.push(nota('A terceira linha zerou por inteiro: sobram duas condições para três incógnitas.'));
+      p.push(mat(`Com ${htmlVar('z')} = <i>t</i>: &nbsp; ${htmlVar('y')} = ${htmlSoma([{ c: yA, s: '' }, { c: yB, s: '<i>t</i>' }])}`
+               + ` &nbsp;e&nbsp; ${htmlVar('x')} = ${htmlSoma([{ c: xA, s: '' }, { c: xB, s: '<i>t</i>' }])}`));
+      p.push(mat(`S = {(${htmlSoma([{ c: xA, s: '' }, { c: xB, s: '<i>t</i>' }])}, `
+               + `${htmlSoma([{ c: yA, s: '' }, { c: yB, s: '<i>t</i>' }])}, <i>t</i>) ; <i>t</i> ∈ ℝ}${selo('spi')}`, true));
+      return { passos: p, caso: 'spi', sol: null };
+    }
+    p.push(nota(`A terceira linha virou 0 = ${htmlRac(ultima.t)}, que é falso.`));
+    p.push(mat(`S = ∅${selo('si')}`, true));
+    return { passos: p, caso: 'si', sol: null };
+  }
+
+  const z = rDiv(ultima.t, ultima.c[2]);
+  const y = rDiv(rSub(M[1].t, rMul(M[1].c[2], z)), M[1].c[1]);
+  const x = rDiv(rSub(rSub(M[0].t, rMul(M[0].c[1], y)), rMul(M[0].c[2], z)), M[0].c[0]);
+  p.push(nota('De baixo para cima:'));
+  p.push(mat(`${htmlVar('z')} = ${htmlRac(z)} &nbsp;⟹&nbsp; ${htmlVar('y')} = ${htmlRac(y)} &nbsp;⟹&nbsp; ${htmlVar('x')} = ${htmlRac(x)}`));
+  p.push(mat(`S = {${ternaHtml([x, y, z])}}${selo('spd')}`, true));
+  return { passos: p, caso: 'spd', sol: [x, y, z] };
+}
+
+function porCramer3(L, vars) {
+  const M = L.map((l) => l.c), T = L.map((l) => l.t);
+  const troca = (j) => M.map((lin, i) => lin.map((c, k) => (k === j ? T[i] : c)));
+  const D = det3(M), Ds = [0, 1, 2].map((j) => det3(troca(j)));
+  const p = [mat(`D = ${nInt(D)} &nbsp;&nbsp; D<sub>x</sub> = ${nInt(Ds[0])} &nbsp;&nbsp; `
+              + `D<sub>y</sub> = ${nInt(Ds[1])} &nbsp;&nbsp; D<sub>z</sub> = ${nInt(Ds[2])}`)];
+  const sol = Ds.map((d) => rac(d, D));
+  p.push(mat(`${htmlVar('x')} = ${htmlRac(sol[0])} &nbsp;&nbsp; ${htmlVar('y')} = ${htmlRac(sol[1])} `
+           + `&nbsp;&nbsp; ${htmlVar('z')} = ${htmlRac(sol[2])}`));
+  p.push(mat(`S = {${ternaHtml(sol)}}${selo('spd')}`, true));
+  return { passos: p, caso: 'spd', sol };
+}
+
+/* ==========================================================================
+   4) AS QUESTÕES
+   ========================================================================== */
+function metodoPassos2(L, r, metodo, vars) {
+  if (metodo === 'cramer') return porCramer2(L, r, vars);
+  if (metodo === 'substituicao') return porSubstituicao(L, vars);
+  if (metodo === 'comparacao') return porComparacao(L, vars);
+  return porAdicao(L, vars);
+}
+
+/* O passo marcado como final é também a resposta curta do gabarito compacto:
+   uma fonte só, sem repetir a montagem da string. */
+const respostaDe = (passos) => (passos.find((p) => p.final) || { html: '' }).html;
+
+function q2x2(nat, caso, cfg) {
+  const s = sistema2(nat, caso);
+  if (!s) return null;
+  const r = resolve2(s.linhas);
+  const passos = metodoPassos2(s.linhas, r, cfg.metodo, VARS2).concat(conclui2(s.linhas, r, VARS2, cfg));
+  return { fam: 's2', caso: r.caso, html: sistHtml(s.linhas, VARS2), passos, resposta: respostaDe(passos) };
+}
+
+function q3x3(nat, caso, cfg) {
+  const s = sistema3(nat, caso);
+  if (!s) return null;
+  const podeCramer = cfg.metodo === 'cramer' && caso === 'spd';
+  const res = podeCramer ? porCramer3(s.linhas, VARS3) : porEscalonamento(s.linhas, VARS3, cfg);
+  const passos = res.passos;
+  if (cfg.metodo === 'cramer' && !podeCramer) {
+    passos.unshift(nota('Com D = 0, Cramer não separa SPI de SI — aqui o caminho é o escalonamento.'));
+  }
+  return { fam: 's3', caso: res.caso, html: sistHtml(s.linhas, VARS3), passos, resposta: respostaDe(passos) };
+}
+
+const PERGUNTA = {
+  spd: 'Determine os valores de <i>m</i> para que o sistema seja possível e determinado.',
+  spi: 'Determine <i>m</i> para que o sistema tenha infinitas soluções.',
+  si:  'Determine <i>m</i> para que o sistema seja impossível.',
+};
+
+/* O sistema com o parâmetro no lugar de um coeficiente. */
+function sistParamHtml(linhas, slot, vars) {
+  const eqs = linhas.map((l, i) => {
+    const termos = l.c.map((c, j) => (i * 2 + j === slot
+      ? { c: rac(1), s: `<i>m</i>${htmlVar(vars[j])}` }
+      : { c: rac(c), s: htmlVar(vars[j]) }));
+    return `<span class="eq">${htmlSoma(termos)} = ${htmlRac(rac(l.t))}</span>`;
+  }).join('');
+  return `<span class="sist" data-n="2"><span class="chave">{</span><span class="eqs">${eqs}</span></span>`;
+}
+
+function qParam(nat, caso, cfg) {
+  const s = comParametro(nat, caso);
+  if (!s) return null;
+  const p = [];
+  p.push(nota('O determinante é do 1º grau em <i>m</i>:'));
+  p.push(mat(`D = ${htmlSoma([{ c: rac(s.P), s: '<i>m</i>' }, { c: rac(s.Q), s: '' }])}`));
+  p.push(mat(`D = 0 ⟺ <i>m</i> = ${htmlRac(s.m0)}`));
+
+  if (caso === 'spd') {
+    p.push(nota('Fora desse valor o determinante não zera, e o sistema tem solução única.'));
+    p.push(mat(`<i>m</i> ≠ ${htmlRac(s.m0)}${selo('spd')}`, true));
+  } else {
+    p.push(nota(`Em <i>m</i> = ${htmlRac(s.m0)} o sistema fica:`));
+    p.push(mat(sistHtml(s.kc, VARS2)));
+    p.push(nota(caso === 'spi'
+      ? 'A segunda equação é a primeira multiplicada por uma constante — as duas dizem a mesma coisa.'
+      : 'Coeficientes proporcionais, mas os termos independentes não acompanham a proporção.'));
+    p.push(mat(`<i>m</i> = ${htmlRac(s.m0)}${selo(caso)}`, true));
+  }
+  return {
+    fam: 'param', caso,
+    html: sistParamHtml(s.linhas, s.slot, VARS2)
+        + `<span class="pergunta">${PERGUNTA[caso]}</span>`,
+    passos: p, resposta: respostaDe(p),
+  };
+}
+
+function qProb(nat, caso, cfg) {
+  const m = problema();
+  if (!m) return null;
+  const r = resolve2(m.linhas);
+  if (r.caso !== 'spd') return null;
+  const p = [nota(`Sejam ${m.define}.`), mat(sistHtml(m.linhas, VARS2))]
+    .concat(metodoPassos2(m.linhas, r, cfg.metodo, VARS2));
+  p.push(mat(`S = {${ternaHtml(r.sol)}}<span class="pergunta">${m.conclui}</span>`, true));
+  return { fam: 'prob', caso: 'spd', html: `<span class="prob">${m.texto}</span>`, passos: p, resposta: respostaDe(p) };
+}
+
+const FAMILIAS = {
+  s2:    { nome: 'sistema 2×2',                nats: ['inteira', 'racional'], casos: ['spd', 'spi', 'si'], gerar: q2x2 },
+  s3:    { nome: 'sistema 3×3',                nats: ['inteira', 'racional'], casos: ['spd', 'spi', 'si'], gerar: q3x3 },
+  param: { nome: 'sistema com parâmetro',      nats: ['inteira', 'racional'], casos: ['spd', 'spi', 'si'], gerar: qParam },
+  prob:  { nome: 'problema contextualizado',   nats: ['inteira'],             casos: ['spd'],              gerar: qProb },
+};
+
+/* ==========================================================================
+   5) INTERFACE
+   ========================================================================== */
+const PESO_NAT = { inteira: 1, racional: 0.6 };
+/* Os casos degenerados são o tempero, não o prato: entram em minoria mesmo
+   quando marcados. */
+const PESO_CASO = { spd: 1, spi: 0.45, si: 0.45 };
+
+const PADRAO = {
+  tipos: ['s2'], naturezas: ['inteira'], casos: ['spd'], metodo: 'adicao',
+  layout: 'compacta', gabTipo: 'compacto',
+  qtd: 8, versoes: 1, agrupar: false, grafica: true,
+  escola: '', titulo: 'Sistemas de equações do 1º grau',
+  instrucao: 'Resolva e classifique cada sistema, apresentando os cálculos.',
+  ident: true, temGab: true,
+};
+
+let listas = [];
+
+const ctl = {
+  tipos:     chips('tipos', true, gerar),
+  naturezas: chips('naturezas', true, gerar),
+  casos:     chips('casos', true, gerar),
+  metodo:    chips('metodo', false, gerar),
+  layout:    chips('layout', false, pintar),
+  gabTipo:   chips('gabTipo', false, pintar),
+};
+
+function lerConfig() {
+  return {
+    tipos: ctl.tipos.ler(),
+    naturezas: ctl.naturezas.ler(),
+    casos: ctl.casos.ler(),
+    metodo: ctl.metodo.ler(),
+    qtd: limita($('qtd'), 1, 30),
+    versoes: limita($('versoes'), 1, 8),
+    agrupar: $('agrupar').checked,
+    grafica: $('grafica').checked,
+    layout: ctl.layout.ler(),
+    escola: $('escola').value.trim(),
+    titulo: $('titulo').value.trim(),
+    instrucao: $('instrucao').value.trim(),
+    ident: $('ident').checked,
+    temGab: $('temGab').checked,
+    gabTipo: ctl.gabTipo.ler(),
+  };
+}
+
+function viaveisDe(cfg) {
+  return cfg.tipos.map((k) => ({
+    k, nome: FAMILIAS[k].nome, gerar: FAMILIAS[k].gerar,
+    nats:  FAMILIAS[k].nats.filter((n) => cfg.naturezas.includes(n)),
+    casos: FAMILIAS[k].casos.filter((c) => cfg.casos.includes(c)),
+  }));
+}
+
+function gerar() {
+  const cfg = lerConfig();
+  const todas = viaveisDe(cfg);
+  const viaveis = todas.filter((f) => f.nats.length && f.casos.length);
+  const fora = todas.filter((f) => !f.nats.length || !f.casos.length);
+  const aviso = $('aviso');
+
+  if (!viaveis.length) {
+    listas = [];
+    aviso.hidden = false;
+    aviso.textContent = 'Nenhum tipo marcado produz questões com o que está selecionado. '
+      + 'Problemas contextualizados são sempre possíveis e determinados, e de solução inteira — '
+      + 'para SPI, SI ou solução racional, marque um dos sistemas.';
+    $('saida').innerHTML = '';
+    $('resumo').textContent = '';
+    return;
+  }
+  if (fora.length) {
+    aviso.hidden = false;
+    aviso.textContent = `Fora da lista: ${fora.map((f) => f.nome).join(', ')} — `
+      + 'não existe questão desse tipo com a solução e a classificação marcadas.';
+  } else {
+    aviso.hidden = true;
+  }
+
+  const gerarDe = (f) => f.gerar(
+    pesado(f.nats.map((n) => [n, PESO_NAT[n]])),
+    pesado(f.casos.map((c) => [c, PESO_CASO[c]])),
+    cfg);
+
+  listas = [];
+  for (let i = 0; i < cfg.versoes; i++) listas.push(montaLista(viaveis, cfg.qtd, cfg.agrupar, gerarDe));
+  pintar();
+}
+
+function pintar() {
+  const cfg = lerConfig();
+  if (!listas.length) return;
+  $('saida').innerHTML = montaFolhas(listas, cfg, () => '');
+  const nomes = viaveisDe(cfg).filter((f) => f.nats.length && f.casos.length).map((f) => f.nome);
+  $('resumo').textContent = resumo(listas[0].length, listas.length, cfg.temGab, nomes);
+}
+
+/* --- ligações dos controles ----------------------------------------------- */
+['qtd', 'versoes', 'agrupar'].forEach((id) => $(id).addEventListener('change', gerar));
+['grafica'].forEach((id) => $(id).addEventListener('change', gerar));
+['escola', 'titulo', 'instrucao'].forEach((id) => $(id).addEventListener('input', pintar));
+['ident', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
+
+$('gerar').addEventListener('click', gerar);
+$('imprimir').addEventListener('click', () => window.print());
+$('restaurar').addEventListener('click', () => {
+  Object.entries(ctl).forEach(([campo, c]) => c.repor(PADRAO[campo]));
+  ['qtd', 'versoes', 'escola', 'titulo', 'instrucao'].forEach((id) => { $(id).value = PADRAO[id]; });
+  ['agrupar', 'ident', 'temGab', 'grafica'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  gerar();
+});
+
+gerar();
+</script>

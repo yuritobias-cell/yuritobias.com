@@ -1,0 +1,727 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/ferramenta-folha.css';
+---
+
+<Layout
+  title="Gerador de Progressões"
+  description="Gere listas aleatórias de PA e PG — termo geral, somas e problemas contextualizados, com razão inteira, fracionária ou alternada. Sai folha A4 pronta para imprimir, com gabarito do professor."
+>
+
+  <div class="ff-root progressoes">
+    <div class="wrap">
+
+      <header class="masthead">
+        <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Álgebra</p>
+        <h1>Gerador de <em>PA e PG</em></h1>
+        <p class="lede">Progressões <em>aritméticas</em> e <em>geométricas</em> sorteadas na hora:
+        termo geral, somas e problemas de juros, população e empilhamento. Cada questão nasce da
+        <em>resposta</em> — se você pediu razão inteira, nenhum termo sai quebrado no meio do
+        caminho. O enunciado varia entre dar os <em>dados nomeados</em> e escrever a
+        <em>sequência</em>, que é onde o aluno tem de achar a razão sozinho. O que vai para o papel
+        é só a folha; os controles não são impressos. Tudo roda no seu navegador.</p>
+      </header>
+
+      <!-- ================= CONTROLES (não imprimem) ================= -->
+      <div class="toolbar">
+
+        <div class="blocos">
+
+          <section class="bloco">
+            <h2>Progressão</h2>
+            <p class="hint">A quantidade é dividida entre as combinações marcadas aqui e ao lado.</p>
+            <div class="chips" id="progs" role="group" aria-label="Progressão">
+              <button class="chip" type="button" data-v="pa" aria-pressed="true">PA · aritmética</button>
+              <button class="chip" type="button" data-v="pg" aria-pressed="true">PG · geométrica</button>
+            </div>
+            <div class="campo">
+              <span class="card-label">Tipos de questão</span>
+              <div class="chips" id="tipos" role="group" aria-label="Tipos de questão">
+                <button class="chip mini" type="button" data-v="termo" aria-pressed="true">Termo geral</button>
+                <button class="chip mini" type="button" data-v="soma"  aria-pressed="true">Somas</button>
+                <button class="chip mini" type="button" data-v="prob"  aria-pressed="false">Problemas</button>
+              </div>
+              <p class="dica">Termo geral cobre achar aₙ, achar a razão a partir de dois termos e
+              descobrir a posição de um termo dado.</p>
+            </div>
+          </section>
+
+          <section class="bloco">
+            <h2>Razões</h2>
+            <p class="hint">Vale para as duas progressões; a alternada é só da PG.</p>
+            <div class="chips" id="razoes" role="group" aria-label="Razões">
+              <button class="chip" type="button" data-v="inteira"     aria-pressed="true">Inteiras</button>
+              <button class="chip" type="button" data-v="fracionaria" aria-pressed="false">Fracionárias</button>
+              <button class="chip" type="button" data-v="alternada"   aria-pressed="false">PG alternada · q &lt; 0</button>
+            </div>
+            <p class="dica">A soma dos infinitos termos da PG só aparece com razão de módulo menor
+            que 1 — ou seja, com fracionárias marcadas.</p>
+          </section>
+
+          <section class="bloco">
+            <h2>Lista</h2>
+            <div class="campos">
+              <label class="num"><span class="card-label">Questões</span>
+                <input type="number" id="qtd" min="1" max="30" step="1" value="10" /></label>
+              <label class="num"><span class="card-label">Versões</span>
+                <input type="number" id="versoes" min="1" max="8" step="1" value="1" /></label>
+            </div>
+            <p class="hint">Cada versão é uma folha com questões diferentes e a mesma dificuldade.</p>
+            <label class="check"><input type="checkbox" id="agrupar" /> Agrupar as questões por tipo</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Folha do aluno</h2>
+            <div class="chips" id="layout" role="group" aria-label="Layout da folha">
+              <button class="chip" type="button" data-v="compacta" aria-pressed="true">Compacta · 2 colunas</button>
+              <button class="chip" type="button" data-v="espaco"   aria-pressed="false">Com espaço para resolver</button>
+            </div>
+            <div class="campo">
+              <label class="card-label" for="escola">Nome da escola</label>
+              <input type="text" id="escola" maxlength="70" placeholder="Ex.: Escola SESI Poços de Caldas" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="titulo">Título da atividade</label>
+              <input type="text" id="titulo" maxlength="90" value="Progressões aritméticas e geométricas" />
+            </div>
+            <div class="campo">
+              <label class="card-label" for="instrucao">Instrução</label>
+              <input type="text" id="instrucao" maxlength="140" value="Resolva, apresentando a fórmula usada e os cálculos." />
+            </div>
+            <label class="check"><input type="checkbox" id="ident" checked /> Espaço para nome, turma e data</label>
+          </section>
+
+          <section class="bloco">
+            <h2>Gabarito</h2>
+            <p class="hint">Sai depois de todas as folhas dos alunos, em páginas separadas.</p>
+            <label class="check"><input type="checkbox" id="temGab" checked /> Incluir gabarito do professor</label>
+            <div class="chips" id="gabTipo" role="group" aria-label="Tipo de gabarito">
+              <button class="chip" type="button" data-v="compacto"  aria-pressed="true">Só as respostas</button>
+              <button class="chip" type="button" data-v="comentado" aria-pressed="false">Comentado</button>
+            </div>
+            <label class="check"><input type="checkbox" id="formula" checked /> Abrir com a fórmula no gabarito comentado</label>
+          </section>
+
+        </div>
+
+        <div class="acoes">
+          <button class="btn" type="button" id="gerar">Gerar outra lista</button>
+          <button class="btn sec" type="button" id="imprimir">Imprimir / Salvar PDF</button>
+          <button class="btn sec" type="button" id="restaurar">Restaurar padrões</button>
+        </div>
+        <p class="aviso" id="aviso" hidden></p>
+      </div>
+
+      <!-- ================= SAÍDA (isto é o que imprime) ================= -->
+      <div class="saida" id="saida"></div>
+
+      <p class="rodape" id="resumo"></p>
+
+      <!-- ================= TEORIA ================= -->
+      <section class="teoria">
+        <h2>Como as questões são montadas</h2>
+        <p>O gerador sorteia o primeiro termo e a razão, e daí em diante tudo é consequência — os
+        termos, a soma, a posição pedida. Não há chute: a aritmética é <b>exata</b>, com frações de
+        verdade, então uma PG de razão <span class="mat">2/3</span> chega ao décimo termo sem o erro
+        de arredondamento que apareceria com número decimal. O que o gerador recusa são as questões
+        feias: termo maior que sete dígitos, denominador impronunciável, posição que não cai num
+        inteiro.</p>
+        <p>Nas questões de <b>achar a razão a partir de dois termos</b>, a PG impõe um cuidado que a
+        PA não tem. De <span class="mat"><i>a</i><sub>2</sub></span> e
+        <span class="mat"><i>a</i><sub>5</sub></span> tira-se <span class="mat"><i>q</i><sup>3</sup></span>,
+        e a raiz cúbica devolve um valor só; já um salto <em>par</em> deixaria
+        <span class="mat"><i>q</i><sup>2</sup></span>, que tem duas raízes de sinais opostos. Por
+        isso, quando a razão é negativa, o gerador só usa saltos ímpares — a resposta continua única.</p>
+
+        <h2>As fórmulas do gabarito</h2>
+        <p>PA: <span class="mat"><i>a</i><sub>n</sub> = <i>a</i><sub>1</sub> + (<i>n</i> − 1)·<i>r</i></span>
+        e <span class="mat">S<sub>n</sub> = (<i>a</i><sub>1</sub> + <i>a</i><sub>n</sub>)·<i>n</i>/2</span>.
+        PG: <span class="mat"><i>a</i><sub>n</sub> = <i>a</i><sub>1</sub>·<i>q</i><sup>n−1</sup></span>
+        e <span class="mat">S<sub>n</sub> = <i>a</i><sub>1</sub>(<i>q</i><sup>n</sup> − 1)/(<i>q</i> − 1)</span>.
+        A soma dos infinitos termos, <span class="mat">S = <i>a</i><sub>1</sub>/(1 − <i>q</i>)</span>,
+        existe apenas quando <span class="mat">|<i>q</i>| &lt; 1</span> — fora daí os termos não
+        encolhem e a soma não converge, e é por isso que ela não aparece nas listas de razão inteira.</p>
+      </section>
+
+    </div>
+  </div>
+
+</Layout>
+
+<style is:global>
+  /* Só o que é desta ferramenta — o resto vem de styles/ferramenta-folha.css. */
+
+  /* A sequência não deve quebrar no meio: (3, 8, 13, …) fica numa linha só. */
+  .ff-root .seq{ white-space:nowrap; }
+
+  /* Enunciados de progressão são mais compridos que uma equação e mais curtos
+     que um sistema: uma coluna generosa em vez de duas apertadas. */
+  .ff-root.progressoes .questoes{ gap:.9rem 2.4rem; }
+  .ff-root.progressoes .q .enun{ font-size:1.02rem; }
+  .ff-root.progressoes .pauta{ height:26mm; }
+
+  /* A fórmula que abre o passo a passo, destacada do resto da conta. */
+  .ff-root .formula{ display:inline-block; border-bottom:1px dotted #bbb; padding-bottom:.05em; }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+
+import {
+  MENOS, inteiro, naoZero, escolhe, moeda, pesado, mdc,
+  rac, rSoma, rSub, rMul, rDiv, rNeg, rVal, rZero, rInt, rIgual,
+  htmlRac, txtRac, mat, nota, nInt,
+} from '../../utils/matematica.js';
+import { $, limita, chips, montaLista, montaFolhas, resumo } from '../../utils/folha.js';
+
+/* ==========================================================================
+   1) NÚCLEO DAS PROGRESSÕES
+   Tudo em racional exato: uma PG de razão 2/3 chega ao décimo termo sem o
+   arredondamento que um número decimal traria.
+   ========================================================================== */
+const aN = (n) => `<i>a</i><sub>${n}</sub>`;
+const Sn = (n) => `S<sub>${n}</sub>`;
+
+/* Recusa a questão feia antes de ela existir: termo gigante ou denominador
+   impronunciável não ajudam ninguém. */
+const cabe = (r) => r !== null && Math.abs(r.n) <= 9999999 && r.d <= 10000;
+
+function rPow(r, k) {
+  if (k < 0) return rPow(rac(r.d, r.n), -k);
+  const n = Math.pow(r.n, k), d = Math.pow(r.d, k);
+  return Number.isSafeInteger(n) && Number.isSafeInteger(d) ? rac(n, d) : null;
+}
+
+const termoPA = (a1, r, n) => rSoma(a1, rMul(rac(n - 1), r));
+const termoPG = (a1, q, n) => { const p = rPow(q, n - 1); return p && rMul(a1, p); };
+const somaPA  = (a1, r, n) => rDiv(rMul(rSoma(a1, termoPA(a1, r, n)), rac(n)), rac(2));
+const somaPG  = (a1, q, n) => {
+  const p = rPow(q, n);
+  return p && rDiv(rMul(a1, rSub(p, rac(1))), rSub(q, rac(1)));
+};
+const somaInf = (a1, q) => rDiv(a1, rSub(rac(1), q));
+
+const primeiros = (a1, r, prog, k) =>
+  Array.from({ length: k }, (_, i) => (prog === 'pa' ? termoPA(a1, r, i + 1) : termoPG(a1, r, i + 1)));
+
+const seqHtml = (ts) => `<span class="seq">(${ts.map(htmlRac).join(', ')}, …)</span>`;
+const seqFechada = (ts, ult) => `<span class="seq">(${ts.map(htmlRac).join(', ')}, …, ${htmlRac(ult)})</span>`;
+
+/* Parênteses onde a leitura exige: 31·(−3/2), e nunca 31·−3/2.
+   Na base de uma potência a fração também entra entre parênteses, para
+   (2/3)⁷ não se confundir com 2/3⁷. */
+const parRac = (r) => (r.n < 0 ? `(${htmlRac(r)})` : htmlRac(r));
+const baseRac = (r) => (r.n < 0 || r.d !== 1 ? `(${htmlRac(r)})` : htmlRac(r));
+
+const NOME = { pa: 'PA', pg: 'PG' };
+const LETRA = { pa: '<i>r</i>', pg: '<i>q</i>' };
+
+/* Abertura do enunciado: ora a sequência escrita, ora os dados nomeados. */
+function abertura(prog, a1, r, forma) {
+  if (forma === 'seq') return `Na ${NOME[prog]} ${seqHtml(primeiros(a1, r, prog, 3))},`;
+  return `Numa ${NOME[prog]} em que ${aN(1)} = ${htmlRac(a1)} e ${LETRA[prog]} = ${htmlRac(r)},`;
+}
+
+/* Quando a sequência é dada escrita, achar a razão é o primeiro passo — e é o
+   passo que o aluno erra. Aparece explicitamente no gabarito. */
+function passoRazao(prog, a1, r, forma) {
+  if (forma !== 'seq') return [];
+  const t = primeiros(a1, r, prog, 2);
+  return prog === 'pa'
+    ? [nota(`Razão: <i>r</i> = ${aN(2)} ${MENOS} ${aN(1)} = ${htmlRac(t[1])} ${MENOS} ${parRac(t[0])} = ${htmlRac(r)}.`)]
+    : [nota(`Razão: <i>q</i> = ${aN(2)} ÷ ${aN(1)} = ${htmlRac(t[1])} ÷ ${parRac(t[0])} = ${htmlRac(r)}.`)];
+}
+
+/* ==========================================================================
+   2) RAZÕES E PRIMEIRO TERMO
+   ========================================================================== */
+function fracao(maxN, dens) {
+  for (let t = 0; t < 40; t++) {
+    const d = escolhe(dens), n = naoZero(-maxN, maxN);
+    if (mdc(Math.abs(n), d) !== 1 || Math.abs(n) === d) continue;
+    return rac(n, d);
+  }
+  return rac(3, 2);
+}
+
+const razaoPA = (tipo) => (tipo === 'fracionaria'
+  ? fracao(9, [2, 2, 3, 4])
+  : rac(inteiro(2, 12) * (moeda(0.72) ? 1 : -1)));
+
+function razaoPG(tipo) {
+  if (tipo === 'inteira') return rac(escolhe([2, 2, 2, 3, 3, 4, 5]));
+  if (tipo === 'fracionaria') return escolhe([rac(1, 2), rac(1, 2), rac(1, 3), rac(2, 3), rac(1, 4), rac(3, 4), rac(2, 5)]);
+  /* alternada: negativa, ora inteira, ora fracionária */
+  return moeda(0.55) ? rac(-escolhe([2, 2, 3])) : rNeg(escolhe([rac(1, 2), rac(1, 3), rac(2, 3)]));
+}
+
+const razaoDe = (prog, tipo) => (prog === 'pa' ? razaoPA(tipo) : razaoPG(tipo));
+const primeiroDe = (prog) => (prog === 'pa'
+  ? rac(inteiro(-15, 25))
+  : rac(inteiro(1, 12) * (moeda(0.82) ? 1 : -1)));
+
+/* ==========================================================================
+   3) TERMO GERAL
+   ========================================================================== */
+function qTermo(prog, tipoRazao, cfg) {
+  const pa = prog === 'pa';
+  const F = (html) => (cfg.formula ? [mat(`<span class="formula">${html}</span>`)] : []);
+  const formula = pa
+    ? `${aN('n')} = ${aN(1)} + (<i>n</i> ${MENOS} 1)·<i>r</i>`
+    : `${aN('n')} = ${aN(1)}·<i>q</i><sup><i>n</i>${MENOS}1</sup>`;
+
+  for (let t = 0; t < 300; t++) {
+    const r = razaoDe(prog, tipoRazao);
+    const a1 = primeiroDe(prog);
+    const sub = pesado([['an', 5], ['razao', 3], ['posicao', 3]]);
+    const forma = moeda(0.5) ? 'seq' : 'dados';
+
+    /* --- achar aₙ --- */
+    if (sub === 'an') {
+      const n = pa ? inteiro(8, 40) : inteiro(5, 12);
+      const an = pa ? termoPA(a1, r, n) : termoPG(a1, r, n);
+      if (!cabe(an)) continue;
+      const p = [...F(formula), ...passoRazao(prog, a1, r, forma)];
+      p.push(mat(pa
+        ? `${aN(n)} = ${htmlRac(a1)} + ${n - 1}·${parRac(r)} = ${htmlRac(an)}`
+        : `${aN(n)} = ${htmlRac(a1)}·${baseRac(r)}<sup>${n - 1}</sup> = ${htmlRac(an)}`));
+      p.push(mat(`${aN(n)} = ${htmlRac(an)}`, true));
+      return {
+        html: `${abertura(prog, a1, r, forma)} calcule ${aN(n)}.`,
+        passos: p, resposta: `${aN(n)} = ${htmlRac(an)}`,
+      };
+    }
+
+    /* --- achar a razão a partir de dois termos --- */
+    if (sub === 'razao') {
+      const pIdx = inteiro(2, 6);
+      /* Na PG, salto par com razão negativa deixaria q² e duas raízes: só ímpar. */
+      const salto = pa ? inteiro(2, 9)
+                       : (rVal(r) < 0 ? escolhe([1, 3, 3, 5]) : escolhe([1, 2, 2, 3, 3]));
+      const qIdx = pIdx + salto;
+      const ap = pa ? termoPA(a1, r, pIdx) : termoPG(a1, r, pIdx);
+      const aq = pa ? termoPA(a1, r, qIdx) : termoPG(a1, r, qIdx);
+      if (!cabe(ap) || !cabe(aq) || rZero(ap)) continue;
+      const p = [...F(formula)];
+      if (pa) {
+        p.push(mat(`${aN(qIdx)} = ${aN(pIdx)} + ${salto}<i>r</i> &nbsp;⟹&nbsp; ${htmlRac(aq)} = ${htmlRac(ap)} + ${salto}<i>r</i>`));
+        p.push(mat(`<i>r</i> = ${htmlRac(rDiv(rSub(aq, ap), rac(salto)))}`));
+      } else {
+        const pot = rDiv(aq, ap);
+        p.push(mat(`${aN(qIdx)} = ${aN(pIdx)}·<i>q</i><sup>${salto}</sup> &nbsp;⟹&nbsp; <i>q</i><sup>${salto}</sup> = ${htmlRac(pot)}`));
+        p.push(mat(`<i>q</i> = ${htmlRac(r)}`));
+      }
+      p.push(nota(`E daí ${aN(1)} = ${aN(pIdx)} ${pa ? MENOS + ' ' + (pIdx - 1) + '<i>r</i>' : '÷ <i>q</i><sup>' + (pIdx - 1) + '</sup>'}.`));
+      p.push(mat(`${LETRA[prog]} = ${htmlRac(r)} &nbsp;&nbsp; ${aN(1)} = ${htmlRac(a1)}`, true));
+      return {
+        html: `Numa ${NOME[prog]}, ${aN(pIdx)} = ${htmlRac(ap)} e ${aN(qIdx)} = ${htmlRac(aq)}. `
+            + `Determine a razão e o primeiro termo.`,
+        passos: p, resposta: `${LETRA[prog]} = ${htmlRac(r)} e ${aN(1)} = ${htmlRac(a1)}`,
+      };
+    }
+
+    /* --- achar a posição de um termo --- */
+    const k = pa ? inteiro(12, 50) : inteiro(5, 12);
+    const ak = pa ? termoPA(a1, r, k) : termoPG(a1, r, k);
+    if (!cabe(ak) || rZero(a1)) continue;
+    const p = [...F(formula), ...passoRazao(prog, a1, r, forma)];
+    if (pa) {
+      p.push(mat(`${htmlRac(ak)} = ${htmlRac(a1)} + (<i>n</i> ${MENOS} 1)·${parRac(r)}`));
+      p.push(mat(`<i>n</i> ${MENOS} 1 = ${htmlRac(rDiv(rSub(ak, a1), r))} &nbsp;⟹&nbsp; <i>n</i> = ${k}`));
+    } else {
+      p.push(mat(`${htmlRac(ak)} = ${htmlRac(a1)}·<i>q</i><sup><i>n</i>${MENOS}1</sup> &nbsp;⟹&nbsp; `
+               + `<i>q</i><sup><i>n</i>${MENOS}1</sup> = ${htmlRac(rDiv(ak, a1))} = ${baseRac(r)}<sup>${k - 1}</sup>`));
+      p.push(mat(`<i>n</i> ${MENOS} 1 = ${k - 1} &nbsp;⟹&nbsp; <i>n</i> = ${k}`));
+    }
+    p.push(mat(`<i>n</i> = ${k} — é o ${k}º termo`, true));
+    return {
+      html: `${abertura(prog, a1, r, forma)} que posição ocupa o termo ${htmlRac(ak)}?`,
+      passos: p, resposta: `<i>n</i> = ${k} (${k}º termo)`,
+    };
+  }
+  return null;
+}
+
+/* ==========================================================================
+   4) SOMAS
+   ========================================================================== */
+function qSoma(prog, tipoRazao, cfg) {
+  const pa = prog === 'pa';
+  const F = (html) => (cfg.formula ? [mat(`<span class="formula">${html}</span>`)] : []);
+
+  for (let t = 0; t < 300; t++) {
+    const r = razaoDe(prog, tipoRazao);
+    const a1 = primeiroDe(prog);
+    const forma = moeda(0.5) ? 'seq' : 'dados';
+    /* A soma infinita exige |q| < 1 — senão os termos não encolhem. */
+    const podeInf = !pa && Math.abs(rVal(r)) < 1;
+    const sub = pa ? pesado([['sn', 6], ['ate', 4]])
+                   : (podeInf ? pesado([['sn', 5], ['inf', 5]]) : 'sn');
+
+    if (sub === 'inf') {
+      if (rZero(a1)) continue;
+      const S = somaInf(a1, r);
+      if (!cabe(S)) continue;
+      const p = [...F(`S = ${aN(1)} / (1 ${MENOS} <i>q</i>)`), ...passoRazao(prog, a1, r, forma)];
+      p.push(nota(`Como |<i>q</i>| &lt; 1, a soma converge.`));
+      p.push(mat(`S = ${htmlRac(a1)} ÷ (1 ${MENOS} ${parRac(r)}) = ${htmlRac(S)}`));
+      p.push(mat(`S = ${htmlRac(S)}`, true));
+      return {
+        html: `${abertura(prog, a1, r, forma)} calcule a soma dos infinitos termos.`,
+        passos: p, resposta: `S = ${htmlRac(S)}`,
+      };
+    }
+
+    if (sub === 'sn') {
+      const n = pa ? inteiro(10, 30) : inteiro(5, 10);
+      const S = pa ? somaPA(a1, r, n) : somaPG(a1, r, n);
+      const an = pa ? termoPA(a1, r, n) : termoPG(a1, r, n);
+      if (!cabe(S) || !cabe(an)) continue;
+      const p = pa
+        ? [...F(`${Sn('n')} = (${aN(1)} + ${aN('n')})·<i>n</i> / 2`), ...passoRazao(prog, a1, r, forma),
+           mat(`${aN(n)} = ${htmlRac(a1)} + ${n - 1}·${parRac(r)} = ${htmlRac(an)}`),
+           mat(`${Sn(n)} = (${htmlRac(a1)} + ${parRac(an)})·${n} / 2 = ${htmlRac(S)}`)]
+        : [...F(`${Sn('n')} = ${aN(1)}(<i>q</i><sup><i>n</i></sup> ${MENOS} 1) / (<i>q</i> ${MENOS} 1)`),
+           ...passoRazao(prog, a1, r, forma),
+           mat(`${Sn(n)} = ${htmlRac(a1)}·(${baseRac(r)}<sup>${n}</sup> ${MENOS} 1) ÷ (${parRac(r)} ${MENOS} 1) = ${htmlRac(S)}`)];
+      p.push(mat(`${Sn(n)} = ${htmlRac(S)}`, true));
+      return {
+        html: `${abertura(prog, a1, r, forma)} calcule a soma dos ${n} primeiros termos.`,
+        passos: p, resposta: `${Sn(n)} = ${htmlRac(S)}`,
+      };
+    }
+
+    /* --- PA finita, escrita até o último termo --- */
+    const n = inteiro(10, 30);
+    const an = termoPA(a1, r, n), S = somaPA(a1, r, n);
+    if (!cabe(an) || !cabe(S)) continue;
+    const p = [...F(`${aN('n')} = ${aN(1)} + (<i>n</i> ${MENOS} 1)·<i>r</i>`)];
+    p.push(nota('Primeiro, quantos termos são:'));
+    p.push(mat(`${htmlRac(an)} = ${htmlRac(a1)} + (<i>n</i> ${MENOS} 1)·${parRac(r)} &nbsp;⟹&nbsp; <i>n</i> = ${n}`));
+    p.push(mat(`${Sn(n)} = (${htmlRac(a1)} + ${parRac(an)})·${n} / 2 = ${htmlRac(S)}`));
+    p.push(mat(`${Sn(n)} = ${htmlRac(S)}`, true));
+    return {
+      html: `Calcule a soma de todos os termos da PA ${seqFechada(primeiros(a1, r, 'pa', 3), an)}.`,
+      passos: p, resposta: `${Sn(n)} = ${htmlRac(S)}`,
+    };
+  }
+  return null;
+}
+
+/* ==========================================================================
+   5) PROBLEMAS CONTEXTUALIZADOS
+   Moldes fechados, com trava de plausibilidade própria: o sorteio é dos
+   valores, nunca da forma do enunciado. Cada molde declara com que razões
+   funciona — juros simples só existe com razão inteira, e a bola quicando
+   precisa de |q| < 1 para a soma convergir.
+   ========================================================================== */
+const reais = (r) => rVal(r).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const inteiroBR = (r) => rVal(r).toLocaleString('pt-BR');
+
+const MOLDES = {
+  pa: [
+    {
+      razoes: ['inteira'],
+      monta() {
+        const C = 100 * inteiro(5, 60), i = escolhe([1, 2, 3, 4, 5, 10]), n = inteiro(6, 24);
+        const j = rac(C * i, 100), M = rSoma(rac(C), rMul(rac(n), j));
+        return {
+          texto: `Um capital de R$&nbsp;${inteiroBR(rac(C))},00 é aplicado a <b>juros simples</b> de `
+               + `${i}% ao mês. Qual será o montante depois de ${n} meses?`,
+          passos: [
+            nota('Os montantes mês a mês formam uma PA: o juro de cada mês é sempre o mesmo.'),
+            mat(`<i>r</i> = ${inteiroBR(rac(C))} · ${i}% = ${htmlRac(j)}`),
+            mat(`M = ${inteiroBR(rac(C))} + ${n}·${htmlRac(j)} = ${htmlRac(M)}`),
+          ],
+          resposta: `R$ ${reais(M)}`,
+        };
+      },
+    },
+    {
+      razoes: ['inteira'],
+      monta() {
+        const a1 = inteiro(24, 44), r = inteiro(2, 4), n = inteiro(5, 10);
+        const an = termoPA(rac(a1), rac(-r), n);
+        if (rVal(an) < 1) return null;
+        const total = somaPA(rac(a1), rac(-r), n);
+        const querTotal = moeda(0.5);
+        return {
+          texto: `Latas são empilhadas em fileiras: a de baixo tem <b>${a1}</b> latas e cada fileira `
+               + `acima tem ${r} a menos que a de baixo. `
+               + (querTotal ? `Quantas latas há na pilha, que tem ${n} fileiras?`
+                            : `Quantas latas há na ${n}ª fileira?`),
+          passos: querTotal
+            ? [nota(`PA de ${aN(1)} = ${a1} e <i>r</i> = ${MENOS}${r}.`),
+               mat(`${aN(n)} = ${a1} + ${n - 1}·(${MENOS}${r}) = ${htmlRac(an)}`),
+               mat(`${Sn(n)} = (${a1} + ${parRac(an)})·${n} / 2 = ${htmlRac(total)}`)]
+            : [nota(`PA de ${aN(1)} = ${a1} e <i>r</i> = ${MENOS}${r}.`),
+               mat(`${aN(n)} = ${a1} + ${n - 1}·(${MENOS}${r}) = ${htmlRac(an)}`)],
+          resposta: querTotal ? `${inteiroBR(total)} latas` : `${inteiroBR(an)} latas`,
+        };
+      },
+    },
+    {
+      razoes: ['inteira'],
+      monta() {
+        const a1 = 10 * inteiro(8, 20), r = 5 * inteiro(1, 5), n = 12;
+        const an = termoPA(rac(a1), rac(r), n), S = somaPA(rac(a1), rac(r), n);
+        const querTotal = moeda(0.5);
+        return {
+          texto: `Uma fábrica produziu <b>${a1}</b> peças em janeiro e, a cada mês, produz ${r} peças `
+               + `a mais que no mês anterior. `
+               + (querTotal ? 'Quantas peças serão produzidas no ano todo?' : 'Quantas peças serão produzidas em dezembro?'),
+          passos: querTotal
+            ? [mat(`${aN(12)} = ${a1} + 11·${r} = ${htmlRac(an)}`),
+               mat(`${Sn(12)} = (${a1} + ${parRac(an)})·12 / 2 = ${htmlRac(S)}`)]
+            : [nota('Dezembro é o 12º mês.'),
+               mat(`${aN(12)} = ${a1} + 11·${r} = ${htmlRac(an)}`)],
+          resposta: querTotal ? `${inteiroBR(S)} peças` : `${inteiroBR(an)} peças`,
+        };
+      },
+    },
+    {
+      razoes: ['inteira'],
+      monta() {
+        const a1 = 10 * inteiro(3, 10), r = 5 * inteiro(1, 6), n = inteiro(8, 18);
+        const an = termoPA(rac(a1), rac(r), n), S = somaPA(rac(a1), rac(r), n);
+        return {
+          texto: `Uma pessoa depositou R$&nbsp;${a1},00 no primeiro mês e, em cada mês seguinte, `
+               + `R$&nbsp;${r},00 a mais que no mês anterior. Quanto terá depositado ao todo em ${n} meses?`,
+          passos: [
+            nota(`Os depósitos formam uma PA de ${aN(1)} = ${a1} e <i>r</i> = ${r}.`),
+            mat(`${aN(n)} = ${a1} + ${n - 1}·${r} = ${htmlRac(an)}`),
+            mat(`${Sn(n)} = (${a1} + ${parRac(an)})·${n} / 2 = ${htmlRac(S)}`),
+          ],
+          resposta: `R$ ${reais(S)}`,
+        };
+      },
+    },
+  ],
+
+  pg: [
+    {
+      razoes: ['inteira'],
+      monta() {
+        const a1 = 10 * inteiro(5, 50), q = escolhe([2, 2, 3]), n = inteiro(4, 9);
+        const an = termoPG(rac(a1), rac(q), n);
+        if (!cabe(an)) return null;
+        const unidade = q === 2 ? 'dobra' : 'triplica';
+        return {
+          texto: `Uma cultura de bactérias <b>${unidade}</b> a cada hora. Começando com ${inteiroBR(rac(a1))} `
+               + `bactérias, quantas haverá depois de ${n - 1} horas?`,
+          passos: [
+            nota(`PG de ${aN(1)} = ${a1} e <i>q</i> = ${q}; a contagem inicial é o 1º termo, `
+               + `então ${n - 1} horas depois é o ${n}º termo.`),
+            mat(`${aN(n)} = ${a1}·${q}<sup>${n - 1}</sup> = ${htmlRac(an)}`),
+          ],
+          resposta: `${inteiroBR(an)} bactérias`,
+        };
+      },
+    },
+    {
+      razoes: ['inteira'],
+      monta() {
+        const a1 = inteiro(3, 20), q = escolhe([2, 2, 3]), n = inteiro(5, 9);
+        const an = termoPG(rac(a1), rac(q), n);
+        if (!cabe(an)) return null;
+        const total = somaPG(rac(a1), rac(q), n);
+        const querTotal = moeda(0.45);
+        return {
+          texto: `Uma corrente de mensagens começa com <b>${a1}</b> pessoas e, a cada rodada, `
+               + `${q === 2 ? 'o dobro' : 'o triplo'} de pessoas da rodada anterior recebe a mensagem. `
+               + (querTotal ? `Quantas pessoas terão recebido a mensagem ao fim de ${n} rodadas?`
+                            : `Quantas pessoas recebem a mensagem na ${n}ª rodada?`),
+          passos: querTotal
+            ? [nota(`PG de ${aN(1)} = ${a1} e <i>q</i> = ${q}; some as ${n} rodadas.`),
+               mat(`${Sn(n)} = ${a1}·(${q}<sup>${n}</sup> ${MENOS} 1) ÷ (${q} ${MENOS} 1) = ${htmlRac(total)}`)]
+            : [nota(`PG de ${aN(1)} = ${a1} e <i>q</i> = ${q}.`),
+               mat(`${aN(n)} = ${a1}·${q}<sup>${n - 1}</sup> = ${htmlRac(an)}`)],
+          resposta: querTotal ? `${inteiroBR(total)} pessoas` : `${inteiroBR(an)} pessoas`,
+        };
+      },
+    },
+    {
+      razoes: ['fracionaria'],
+      monta() {
+        const C = 1000 * inteiro(1, 10), i = escolhe([10, 20, 25, 50]), n = inteiro(2, 5);
+        const q = rac(100 + i, 100), M = termoPG(rac(C), q, n + 1);
+        if (!M || !rInt(rMul(M, rac(100)))) return null;
+        return {
+          texto: `Um capital de R$&nbsp;${inteiroBR(rac(C))},00 é aplicado a <b>juros compostos</b> de `
+               + `${i}% ao mês. Qual será o montante depois de ${n} meses?`,
+          passos: [
+            nota('Os montantes formam uma PG: cada mês multiplica o anterior pelo mesmo fator.'),
+            mat(`<i>q</i> = 1 + ${i}% = ${htmlRac(q)}`),
+            mat(`M = ${inteiroBR(rac(C))}·${htmlRac(q)}<sup>${n}</sup> = ${htmlRac(M)}`),
+          ],
+          resposta: `R$ ${reais(M)}`,
+        };
+      },
+    },
+    {
+      razoes: ['fracionaria'],
+      monta() {
+        const C = 1000 * inteiro(2, 12), perda = escolhe([20, 25, 50]), n = inteiro(2, 4);
+        const q = rac(100 - perda, 100), V = termoPG(rac(C), q, n + 1);
+        if (!V || !rInt(rMul(V, rac(100)))) return null;
+        return {
+          texto: `Um equipamento comprado por R$&nbsp;${inteiroBR(rac(C))},00 perde <b>${perda}%</b> do `
+               + `seu valor a cada ano. Quanto valerá depois de ${n} anos?`,
+          passos: [
+            nota(`Perder ${perda}% é ficar com ${100 - perda}% — os valores formam uma PG.`),
+            mat(`<i>q</i> = ${htmlRac(q)}`),
+            mat(`V = ${inteiroBR(rac(C))}·${htmlRac(q)}<sup>${n}</sup> = ${htmlRac(V)}`),
+          ],
+          resposta: `R$ ${reais(V)}`,
+        };
+      },
+    },
+    {
+      razoes: ['fracionaria'],
+      monta() {
+        const h = inteiro(6, 30), f = escolhe([rac(1, 2), rac(2, 3), rac(3, 4), rac(2, 5)]);
+        const S = somaInf(rMul(rac(h), f), f);
+        if (!cabe(S)) return null;
+        return {
+          texto: `Uma bola é solta de <b>${h} m</b> de altura e, a cada vez que bate no chão, sobe `
+               + `${htmlRac(f)} da altura anterior. Somando todas as subidas, quantos metros a bola sobe ao todo?`,
+          passos: [
+            nota(`As alturas das subidas formam uma PG de ${aN(1)} = ${h}·${htmlRac(f)} = ${htmlRac(rMul(rac(h), f))} `
+               + `e <i>q</i> = ${htmlRac(f)}. Como |<i>q</i>| &lt; 1, a soma converge.`),
+            mat(`S = ${htmlRac(rMul(rac(h), f))} ÷ (1 ${MENOS} ${htmlRac(f)}) = ${htmlRac(S)}`),
+          ],
+          resposta: `${htmlRac(S)} m`,
+        };
+      },
+    },
+  ],
+};
+
+function qProb(prog, tipoRazao, cfg) {
+  const candidatos = MOLDES[prog].filter((m) => m.razoes.includes(tipoRazao));
+  if (!candidatos.length) return null;
+  for (let t = 0; t < 40; t++) {
+    const m = escolhe(candidatos).monta();
+    if (!m) continue;
+    const p = m.passos.slice();
+    p.push(mat(`<b>${m.resposta}</b>`, true));
+    return { html: `<span class="prob">${m.texto}</span>`, passos: p, resposta: m.resposta };
+  }
+  return null;
+}
+
+/* ==========================================================================
+   6) CATÁLOGO E INTERFACE
+   ========================================================================== */
+const FAMILIAS = {
+  'pa-termo': { nome: 'PA · termo geral', prog: 'pa', tipo: 'termo', razoes: ['inteira', 'fracionaria'], gerar: qTermo },
+  'pa-soma':  { nome: 'PA · somas',       prog: 'pa', tipo: 'soma',  razoes: ['inteira', 'fracionaria'], gerar: qSoma },
+  'pa-prob':  { nome: 'PA · problemas',   prog: 'pa', tipo: 'prob',  razoes: ['inteira'],                gerar: qProb },
+  'pg-termo': { nome: 'PG · termo geral', prog: 'pg', tipo: 'termo', razoes: ['inteira', 'fracionaria', 'alternada'], gerar: qTermo },
+  'pg-soma':  { nome: 'PG · somas',       prog: 'pg', tipo: 'soma',  razoes: ['inteira', 'fracionaria', 'alternada'], gerar: qSoma },
+  'pg-prob':  { nome: 'PG · problemas',   prog: 'pg', tipo: 'prob',  razoes: ['inteira', 'fracionaria'], gerar: qProb },
+};
+
+const PESO_RAZAO = { inteira: 1, fracionaria: 0.7, alternada: 0.55 };
+
+const PADRAO = {
+  progs: ['pa', 'pg'], tipos: ['termo', 'soma'], razoes: ['inteira'],
+  layout: 'compacta', gabTipo: 'compacto',
+  qtd: 10, versoes: 1, agrupar: false, formula: true,
+  escola: '', titulo: 'Progressões aritméticas e geométricas',
+  instrucao: 'Resolva, apresentando a fórmula usada e os cálculos.',
+  ident: true, temGab: true,
+};
+
+let listas = [];
+
+const ctl = {
+  progs:   chips('progs', true, gerar),
+  tipos:   chips('tipos', true, gerar),
+  razoes:  chips('razoes', true, gerar),
+  layout:  chips('layout', false, pintar),
+  gabTipo: chips('gabTipo', false, pintar),
+};
+
+function lerConfig() {
+  return {
+    progs: ctl.progs.ler(),
+    tipos: ctl.tipos.ler(),
+    razoes: ctl.razoes.ler(),
+    qtd: limita($('qtd'), 1, 30),
+    versoes: limita($('versoes'), 1, 8),
+    agrupar: $('agrupar').checked,
+    formula: $('formula').checked,
+    layout: ctl.layout.ler(),
+    escola: $('escola').value.trim(),
+    titulo: $('titulo').value.trim(),
+    instrucao: $('instrucao').value.trim(),
+    ident: $('ident').checked,
+    temGab: $('temGab').checked,
+    gabTipo: ctl.gabTipo.ler(),
+  };
+}
+
+function viaveisDe(cfg) {
+  return Object.entries(FAMILIAS)
+    .filter(([, f]) => cfg.progs.includes(f.prog) && cfg.tipos.includes(f.tipo))
+    .map(([k, f]) => ({ k, nome: f.nome, prog: f.prog, gerar: f.gerar,
+                        razoes: f.razoes.filter((r) => cfg.razoes.includes(r)) }));
+}
+
+function gerar() {
+  const cfg = lerConfig();
+  const todas = viaveisDe(cfg);
+  const viaveis = todas.filter((f) => f.razoes.length);
+  const fora = todas.filter((f) => !f.razoes.length);
+  const aviso = $('aviso');
+
+  if (!viaveis.length) {
+    listas = [];
+    aviso.hidden = false;
+    aviso.textContent = 'Nenhuma combinação marcada produz questões. A razão alternada é só da PG, '
+      + 'e os problemas contextualizados da PA pedem razão inteira — marque “Inteiras” ou '
+      + '“Fracionárias”, ou acrescente um tipo de questão.';
+    $('saida').innerHTML = '';
+    $('resumo').textContent = '';
+    return;
+  }
+  if (fora.length) {
+    aviso.hidden = false;
+    aviso.textContent = `Fora da lista: ${fora.map((f) => f.nome).join(', ')} — `
+      + 'não há questão desse tipo com as razões marcadas.';
+  } else {
+    aviso.hidden = true;
+  }
+
+  const gerarDe = (f) => f.gerar(f.prog, pesado(f.razoes.map((r) => [r, PESO_RAZAO[r]])), cfg);
+  listas = [];
+  for (let i = 0; i < cfg.versoes; i++) listas.push(montaLista(viaveis, cfg.qtd, cfg.agrupar, gerarDe));
+  pintar();
+}
+
+function pintar() {
+  const cfg = lerConfig();
+  if (!listas.length) return;
+  $('saida').innerHTML = montaFolhas(listas, cfg, () => '');
+  const nomes = viaveisDe(cfg).filter((f) => f.razoes.length).map((f) => f.nome);
+  $('resumo').textContent = resumo(listas[0].length, listas.length, cfg.temGab, nomes);
+}
+
+/* --- ligações dos controles ----------------------------------------------- */
+['qtd', 'versoes', 'agrupar'].forEach((id) => $(id).addEventListener('change', gerar));
+['escola', 'titulo', 'instrucao'].forEach((id) => $(id).addEventListener('input', pintar));
+['ident', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
+$('formula').addEventListener('change', gerar);
+
+$('gerar').addEventListener('click', gerar);
+$('imprimir').addEventListener('click', () => window.print());
+$('restaurar').addEventListener('click', () => {
+  Object.entries(ctl).forEach(([campo, c]) => c.repor(PADRAO[campo]));
+  ['qtd', 'versoes', 'escola', 'titulo', 'instrucao'].forEach((id) => { $(id).value = PADRAO[id]; });
+  ['agrupar', 'ident', 'temGab', 'formula'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  gerar();
+});
+
+gerar();
+</script>

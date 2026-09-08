@@ -36,19 +36,51 @@ src/
 │   └── ...                       # curso FET + dados de posts (enem/)
 ├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
 ├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
-├── utils/           # Utilitários (slug de tags, tempo de leitura, template das imagens OG)
+├── utils/           # Utilitários do build em .ts (slug de tags, tempo de leitura, imagens OG)
+│   ├── matematica.js             # núcleo das ferramentas geradoras: racionais exatos e tipografia
+│   ├── intervalos.js             # conjunto solução em ℝ + reta numérica (inequações)
+│   └── folha.js                  # folha A4, gabarito, versões A–H e chips dos controles
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
 │   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
-│   ├── ferramentas/              # ferramentas interativas (JS próprio por página)
+│   ├── ferramentas/              # ferramentas interativas (uma página autocontida cada)
 │   ├── analises/                 # índice + capa [slug] de cada análise
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
 │   ├── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
 │   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
-└── styles/global.css             # @theme com cores e fontes do site
+└── styles/
+    ├── global.css                # @theme com cores e fontes do site
+    └── ferramenta-folha.css      # chrome comum das ferramentas que imprimem folha (.ff-root)
 public/materiais/<serie>/         # PDFs servidos para download
 public/analises/paineis/          # painéis HTML autocontidos das análises
 ```
+
+## Ferramentas
+
+Cada ferramenta é uma página autocontida em `src/pages/ferramentas/`, com o próprio HTML,
+CSS e JS — e uma entrada no array de `index.astro` (`tipo` define a seção: `suporte` ou
+`simulacoes`). O service worker precacheia as ferramentas sozinho, a partir dos arquivos
+da pasta; nada a registrar à mão.
+
+As **geradoras de lista** (`gerador-equacoes`, `gerador-sistemas`, `gerador-progressoes`,
+`gerador-fatoracao`) são a exceção à regra do
+"JS próprio por página": elas compartilham quatro arquivos, porque um bug no renderizador de
+fração não deve precisar de correção em dois lugares.
+
+| Arquivo | O que traz |
+| :--- | :--- |
+| `src/utils/matematica.js` | Sorteios, racionais exatos (`rac`, `rSoma`, …), radicais simplificados e a tipografia da matemática em HTML — fração empilhada e radical com barra, **sem KaTeX nem MathJax** |
+| `src/utils/intervalos.js` | Conjunto solução como lista de intervalos, notação por compreensão e a reta numérica em SVG |
+| `src/utils/folha.js` | Cabeçalho, folha do aluno, gabarito, versões A–H, distribuição das questões entre os tipos e o comportamento dos chips |
+| `src/styles/ferramenta-folha.css` | Todo o visual comum, escopado em `.ff-root` — barra de controles, folha A4 e as regras de `@media print` |
+
+São `.js`, e não `.ts`, de propósito: rodam no navegador, importados pelos `<script>` das
+páginas. Os `.ts` da mesma pasta rodam no build e são checados pelo `astro check`.
+
+O princípio das duas geradoras é o mesmo: **sorteie a resposta e monte a questão em volta
+dela**. É o que garante que o filtro de natureza da solução valha sempre — e não "quase
+sempre", como aconteceria sorteando coeficientes e torcendo. As exceções estão documentadas
+na seção "teoria" de cada página.
 
 ## Como adicionar um material
 

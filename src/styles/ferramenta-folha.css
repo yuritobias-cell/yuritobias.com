@@ -1,0 +1,166 @@
+/* ============================================================
+   Chrome compartilhado das ferramentas que geram folha impressa
+   (gerador de equações, sistemas lineares, …).
+
+   Tudo mora sob .ff-root para não vazar para o resto do site;
+   cada página acrescenta só o que for dela. Importe no
+   frontmatter da página: import '../../styles/ferramenta-folha.css';
+   ============================================================ */
+
+.ff-root{
+  --papel:#F8F6F1; --tinta:#1B4F4F; --tinta-2:#2f6b6b;
+  --traco:#d8d2c4; --realce:#c2410c; --neutro:#6b6459;
+  /* Serifada só para a matemática: variável em itálico é a convenção
+     tipográfica, e Georgia já está no sistema (sem download extra). */
+  --mat:Georgia,'Times New Roman',Times,serif;
+
+  background:var(--papel); color:var(--tinta);
+  font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.5;
+  padding:2rem 1.2rem 4rem;
+}
+.ff-root [hidden]{ display:none !important; }
+
+.ff-root .wrap{ max-width:980px; margin:0 auto; }
+
+.ff-root .masthead{ margin-bottom:1.4rem; }
+.ff-root .masthead .eyebrow{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.75rem;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--neutro); margin:0 0 .6rem;
+}
+.ff-root .masthead .eyebrow a{ color:inherit; text-decoration:none; }
+.ff-root .masthead .eyebrow a:hover{ color:var(--tinta); }
+.ff-root .masthead h1{ font-family:'Playfair Display',Georgia,serif; font-weight:700;
+  font-size:clamp(1.6rem,4vw,2.2rem); margin:0 0 .3rem; }
+.ff-root .masthead h1 em{ font-style:italic; }
+.ff-root .masthead .lede{ color:var(--neutro); margin:0; font-size:.95rem; max-width:62ch; }
+.ff-root .masthead .lede em{ font-style:normal; color:var(--tinta-2); font-weight:500; }
+
+/* ---------- barra de controles ---------- */
+.ff-root .toolbar{ background:#fff; border:1px solid var(--traco); border-radius:12px; padding:1.1rem 1.2rem 1.2rem; }
+.ff-root .blocos{ display:grid; gap:1.4rem 2rem; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); }
+.ff-root .bloco h2{ font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--tinta); margin:0 0 .25rem; }
+.ff-root .hint{ font-size:.8rem; color:var(--neutro); margin:0 0 .6rem; }
+.ff-root .card-label{ display:block; font-weight:600; font-size:.72rem; text-transform:uppercase;
+  letter-spacing:.06em; margin:0 0 .3rem; color:var(--tinta-2); }
+
+.ff-root .chips{ display:flex; flex-wrap:wrap; gap:.35rem; }
+.ff-root .chip{ background:#fff; color:var(--tinta); border:1px solid var(--traco); border-radius:99px;
+  font:inherit; font-size:.83rem; font-weight:500; padding:.35rem .75rem; cursor:pointer; transition:background .15s,border-color .15s; }
+.ff-root .chip:hover{ border-color:var(--tinta-2); }
+.ff-root .chip[aria-pressed="true"]{ background:var(--tinta); border-color:var(--tinta); color:var(--papel); }
+.ff-root .chip.mini{ font-size:.78rem; padding:.28rem .65rem; }
+
+.ff-root .check{ display:flex; align-items:center; gap:.42rem; font-size:.85rem; color:var(--tinta-2);
+  font-weight:500; cursor:pointer; margin-top:.55rem; }
+.ff-root .campo{ margin-top:.9rem; }
+.ff-root .campos{ display:flex; gap:.8rem; flex-wrap:wrap; }
+.ff-root .num{ display:block; }
+.ff-root input[type=text],.ff-root input[type=number]{ background:#fff; border:1px solid var(--traco);
+  border-radius:9px; padding:.5rem .7rem; font:inherit; font-size:.9rem; color:var(--tinta); width:100%; }
+.ff-root .num input{ width:5.5rem; text-align:center; }
+.ff-root input:focus{ outline:2px solid var(--tinta); outline-offset:1px; }
+
+.ff-root .acoes{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.3rem; padding-top:1.1rem; border-top:1px solid var(--traco); }
+.ff-root .btn{ background:var(--tinta); color:var(--papel); border:0; border-radius:8px; padding:.55rem .95rem;
+  font:inherit; font-weight:600; cursor:pointer; }
+.ff-root .btn:hover{ background:var(--tinta-2); }
+.ff-root .btn.sec{ background:#fff; color:var(--tinta); border:1px solid var(--traco); }
+.ff-root .btn.sec:hover{ background:var(--papel); }
+.ff-root .aviso{ margin-top:.8rem; color:var(--realce); font-weight:600; font-size:.88rem; }
+
+/* ---------- notação matemática ---------- */
+.ff-root .mat{ font-family:var(--mat); font-size:1.06em; }
+.ff-root i{ font-style:italic; }
+.ff-root sup{ font-size:.7em; vertical-align:.45em; }
+.ff-root sub{ font-size:.7em; vertical-align:-.25em; }
+/* fração empilhada: numerador sobre denominador, com o traço no meio */
+.ff-root .fr{ display:inline-flex; flex-direction:column; align-items:center; vertical-align:-.55em;
+  margin:0 .12em; line-height:1.12; }
+.ff-root .fr-n{ padding:0 .25em; }
+.ff-root .fr-d{ padding:0 .25em; border-top:1px solid currentColor; }
+.ff-root .rad{ white-space:nowrap; }
+.ff-root .rad .rad-b{ border-top:1px solid currentColor; padding:0 .12em 0 .06em; margin-left:.02em; }
+
+/* ---------- a FOLHA (isto é o que imprime) ---------- */
+.ff-root .saida{ margin-top:1.6rem; display:flex; flex-direction:column; gap:1.6rem; }
+.ff-root .folha{ background:#fff; padding:14mm 15mm; width:100%; max-width:210mm; margin:0 auto;
+  border:1px solid var(--traco); border-radius:6px; box-shadow:0 8px 30px rgba(27,79,79,.08); color:#1a1a1a; }
+
+.ff-root .folha-cab{ border-bottom:1px solid var(--traco); padding-bottom:.7rem; margin-bottom:1.1rem; }
+.ff-root .escola{ font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--tinta-2);
+  font-weight:600; margin:0 0 .3rem; }
+.ff-root .folha-titulo{ font-family:'Playfair Display',Georgia,serif; font-weight:700; font-size:1.55rem;
+  color:var(--tinta); margin:0 0 .25rem; display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
+.ff-root .versao{ font-family:'IBM Plex Sans',sans-serif; font-size:.7rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.08em; border:1px solid var(--tinta); border-radius:99px; padding:.12em .6em; color:var(--tinta); }
+.ff-root .instrucao{ font-size:.92rem; color:#333; margin:0; }
+.ff-root .ident{ display:flex; gap:1.4rem; flex-wrap:wrap; font-size:.88rem; color:#333; margin-top:.9rem; }
+.ff-root .ident span{ flex:1 1 auto; white-space:nowrap; }
+.ff-root .identline{ display:inline-block; border-bottom:1px solid #999; min-width:7rem; }
+
+.ff-root .questoes{ display:grid; gap:.55rem 2.2rem; grid-template-columns:1fr 1fr; }
+.ff-root .questoes[data-modo="espaco"]{ grid-template-columns:1fr; gap:.2rem; }
+.ff-root .q{ break-inside:avoid; padding:.28rem 0; display:flex; gap:.5rem; align-items:baseline; }
+.ff-root .q .n{ font-weight:600; font-size:.85rem; color:var(--tinta-2); min-width:1.5rem; flex:none; }
+.ff-root .q .enun{ font-family:var(--mat); font-size:1.08rem; }
+.ff-root .questoes[data-modo="espaco"] .qbox{ break-inside:avoid; padding:.35rem 0 0; }
+.ff-root .pauta{ height:24mm; margin:.3rem 0 .5rem 2rem; border-bottom:1px solid #ddd;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.9mm,#eee 8mm); }
+
+/* Enunciado em texto — problema contextualizado, pergunta de um item — em
+   oposição à fórmula, que fica na serifada de .enun. */
+.ff-root .pergunta{ display:block; font-family:'IBM Plex Sans',sans-serif; font-size:.85rem;
+  color:#444; margin-top:.4rem; max-width:34em; }
+.ff-root .prob{ font-family:'IBM Plex Sans',sans-serif; font-size:.9rem; line-height:1.5; max-width:34em; }
+.ff-root .prob .mat{ font-size:1em; }
+
+/* ---------- gabarito ---------- */
+.ff-root .folha.gab{ background:#fffdf9; }
+.ff-root .selo{ display:inline-block; background:var(--realce); color:#fff; font-size:.7rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; padding:.22em .7em; border-radius:99px; margin-bottom:.9rem; }
+.ff-root .respostas{ display:grid; gap:.4rem 2rem; grid-template-columns:1fr 1fr; }
+.ff-root .respostas[data-modo="comentado"]{ grid-template-columns:1fr; gap:.1rem; }
+.ff-root .r{ break-inside:avoid; display:flex; gap:.5rem; align-items:baseline; padding:.15rem 0; }
+.ff-root .r .n{ font-weight:600; font-size:.85rem; color:var(--tinta-2); min-width:1.5rem; flex:none; }
+.ff-root .r .resp{ font-family:var(--mat); font-size:1rem; }
+.ff-root .rcom{ break-inside:avoid; border-bottom:1px solid #efe9df; padding:.5rem 0; }
+.ff-root .rcom:last-child{ border-bottom:0; }
+.ff-root .rcom .enun{ font-family:var(--mat); font-size:1.05rem; }
+.ff-root .passos{ margin:.35rem 0 0 2rem; display:flex; flex-direction:column; gap:.18rem; }
+.ff-root .passos p{ margin:0; font-size:.92rem; color:#444; }
+.ff-root .passos .mat{ color:#1a1a1a; }
+.ff-root .passos .nota{ font-family:'IBM Plex Sans',sans-serif; font-size:.82rem; color:var(--neutro); font-style:italic; }
+.ff-root .final{ font-weight:600; color:var(--realce) !important; }
+.ff-root .reta{ display:block; margin:.3rem 0 .1rem 0; }
+.ff-root .r .reta{ margin:.1rem 0 0; }
+
+.ff-root .rodape{ margin-top:1.6rem; font-size:.82rem; color:var(--neutro); }
+
+/* ---------- teoria ---------- */
+.ff-root .teoria{ margin-top:3rem; border-top:1px solid var(--traco); padding-top:1.6rem; max-width:70ch; }
+.ff-root .teoria h2{ font-family:'Playfair Display',Georgia,serif; font-size:1.25rem; font-weight:700;
+  margin:1.4rem 0 .5rem; }
+.ff-root .teoria h2:first-child{ margin-top:0; }
+.ff-root .teoria p{ margin:0 0 .8rem; color:var(--neutro); font-size:.93rem; }
+.ff-root .teoria b{ color:var(--tinta); font-weight:600; }
+
+@media (max-width:640px){
+  .ff-root{ padding:1.2rem .8rem 3rem; }
+  .ff-root .folha{ padding:8mm 7mm; }
+  .ff-root .questoes,.ff-root .respostas{ grid-template-columns:1fr; }
+}
+
+/* ---------- IMPRESSÃO: só as folhas saem no papel ---------- */
+@media print{
+  @page{ size:A4; margin:12mm; }
+  html,body{ background:#fff !important; }
+  body > nav, body > footer{ display:none !important; }
+  .ff-root{ background:#fff; padding:0; }
+  .ff-root .masthead,.ff-root .toolbar,.ff-root .rodape,.ff-root .teoria{ display:none !important; }
+  .ff-root .saida{ display:block; margin:0; }
+  .ff-root .folha{ margin:0; padding:0; max-width:none; border:0; border-radius:0; box-shadow:none; background:#fff; }
+  .ff-root .folha + .folha{ break-before:page; }
+  .ff-root .pauta{ background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.9mm,#ccc 8mm); }
+  .ff-root *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
