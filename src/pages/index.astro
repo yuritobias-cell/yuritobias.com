@@ -1,27 +1,74 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const schema = {
+// O nome completo aparece no texto da página, no <title>/descrição e no JSON-LD
+// para que buscas pelo nome de registro (e não só por "Yuri Tobias") cheguem aqui.
+const nomeCompleto = 'Yuri Tobias Aquiel Correa Ramos';
+const site = Astro.site?.toString();
+const descricao = `${nomeCompleto} — professor de matemática na Escola SESI e analista de dados educacionais na Secretaria Municipal de Educação de Poços de Caldas (MG).`;
+
+const perfis = [
+  'https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/',
+  'https://lattes.cnpq.br/2782196498099761',
+  'https://github.com/yuritobias-cell',
+];
+
+const pessoa = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': 'https://yuritobias.com/#eu',
   name: 'Yuri Tobias',
-  url: Astro.site?.toString(),
+  alternateName: nomeCompleto,
+  givenName: 'Yuri',
+  additionalName: 'Tobias Aquiel',
+  familyName: 'Correa Ramos',
+  description: descricao,
+  url: site,
+  mainEntityOfPage: site,
+  image: new URL('/og.png', Astro.site).toString(),
+  email: 'yuritobias@gmail.com',
   jobTitle: ['Professor de Matemática', 'Analista de Dados Educacionais'],
   worksFor: [
     { '@type': 'Organization', name: 'Escola SESI Poços de Caldas' },
     { '@type': 'Organization', name: 'Secretaria Municipal de Educação de Poços de Caldas' },
   ],
-  sameAs: [
-    'https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/',
-    'https://lattes.cnpq.br/2782196498099761',
+  homeLocation: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Poços de Caldas',
+      addressRegion: 'MG',
+      addressCountry: 'BR',
+    },
+  },
+  knowsAbout: [
+    'Educação matemática',
+    'Análise de dados educacionais',
+    'Censo Escolar',
+    'ENEM',
+    'SAEB',
   ],
+  sameAs: perfis,
+};
+
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': 'https://yuritobias.com/#site',
+  url: site,
+  name: 'Yuri Tobias',
+  alternateName: nomeCompleto,
+  inLanguage: 'pt-BR',
+  author: { '@id': 'https://yuritobias.com/#eu' },
+  publisher: { '@id': 'https://yuritobias.com/#eu' },
 };
 ---
 
-<Layout title="Sobre" schema={schema}>
+<Layout title="Sobre" description={descricao} schema={[pessoa, website]}>
   <main>
     <header>
       <h1>Yuri Tobias</h1>
+      <p class="nome-completo">{nomeCompleto}</p>
       <p class="roles">
         Professor de Matemática
         <span class="sep">·</span>
@@ -39,7 +86,8 @@ const schema = {
       </p>
       <p>
         Este site reúne projetos, materiais didáticos e reflexões sobre
-        os dois campos em que atuo — dados e ensino.
+        os dois campos em que atuo — dados e ensino. Nos documentos e na
+        produção acadêmica assino {nomeCompleto}.
       </p>
     </section>
 
@@ -75,6 +123,16 @@ const schema = {
     letter-spacing: -0.02em;
     line-height: 1.1;
     margin-bottom: 0.6rem;
+  }
+
+  .nome-completo {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
   }
 
   .roles { font-size: 0.95rem; font-weight: 300; color: var(--muted); }
