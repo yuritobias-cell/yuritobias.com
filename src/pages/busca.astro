@@ -1,0 +1,346 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { montarIndice } from '../utils/busca';
+
+/* A contagem vem do build só para dizer, antes de qualquer digitação, o
+   tamanho do que está sendo procurado. O índice em si é buscado pelo
+   navegador em /busca-index.json. */
+const total = (await montarIndice()).length;
+---
+
+<Layout
+  title="Busca"
+  description="Busque em todo o site — materiais por série, ferramentas, análises de dados e posts."
+>
+  <main>
+    <header>
+      <h1>Busca</h1>
+      <p class="subtitle">
+        Procure em tudo: materiais das séries, ferramentas, análises e textos —
+        {total} itens. A busca roda no seu navegador; nada do que você digita sai daqui.
+      </p>
+    </header>
+
+    <form class="campo" role="search" action="/busca" method="get">
+      <input
+        type="search"
+        id="q"
+        name="q"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="equações, trigonometria, IDEB, malha…"
+        aria-label="Buscar no site"
+      />
+    </form>
+
+    <noscript>
+      <p class="aviso">A busca precisa de JavaScript. Navegue por
+        <a href="/materiais">Materiais</a>, <a href="/ferramentas">Ferramentas</a>
+        ou <a href="/analises">Análises</a>.</p>
+    </noscript>
+
+    <p class="estado" id="estado" aria-live="polite"></p>
+    <div id="resultados"></div>
+  </main>
+</Layout>
+
+<script>
+  // Acentos fora, comprimento igual: tirando só a marca de cada caractere, as
+  // posições continuam batendo com o texto original — é o que deixa destacar o
+  // trecho encontrado sem precisar de um segundo índice.
+  const chato = /[À-ɏ]/g;
+  const simples = (s: string) => s.replace(chato, (c) => c.normalize('NFD')[0]).toLowerCase();
+
+  interface Item { t: string; d: string; u: string; s: string; c?: string; x?: string; p?: string }
+  type Preparado = Item & { ht: string; hd: string; hc: string };
+
+  const elQ = document.getElementById('q') as HTMLInputElement;
+  const elEstado = document.getElementById('estado')!;
+  const elRes = document.getElementById('resultados')!;
+
+  let itens: Preparado[] = [];
+  let carregando: Promise<void> | null = null;
+
+  const carregar = () =>
+    (carregando ??= fetch('/busca-index.json')
+      .then((r) => r.json())
+      .then((dados: Item[]) => {
+        itens = dados.map((i) => ({
+          ...i,
+          ht: simples(i.t),
+          hd: simples(i.d),
+          hc: simples([i.c ?? '', i.x ?? ''].join(' ')),
+        }));
+      })
+      .catch(() => {
+        elEstado.textContent = 'Não foi possível carregar o índice da busca. Recarregue a página.';
+      }));
+
+  /* Pontuação: o que casa no título vale mais que no resto, e quanto mais perto
+     do começo, melhor — "trigonometria" acha "Trigonometria I" antes de "Para
+     Casa — Trigonometria", e as duas antes de uma descrição que só a mencione.
+     Começo de palavra conta como começo: senão "malha" não acharia "Malhas". */
+  const inicioDePalavra = (i: number, h: string) => i === 0 || !/[a-z0-9]/.test(h[i - 1]);
+
+  function pontos(item: Preparado, termos: string[]): number {
+    let total = 0;
+    for (const termo of termos) {
+      const nt = item.ht.indexOf(termo);
+      const nd = item.hd.indexOf(termo);
+      const nc = item.hc.indexOf(termo);
+      if (nt < 0 && nd < 0 && nc < 0) return 0;         // todo termo tem de aparecer
+      if (nt === 0) total += 120;
+      else if (nt > 0) total += inicioDePalavra(nt, item.ht) ? 100 : 60;
+      if (nc >= 0) total += inicioDePalavra(nc, item.hc) ? 20 : 12;
+      if (nd >= 0) total += inicioDePalavra(nd, item.hd) ? 10 : 6;
+    }
+    return total;
+  }
+
+  const escapa = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+
+  /* Destaca os trechos encontrados. O texto é escapado antes de qualquer
+     marcação — o que chega aqui é dado, inclusive o que foi digitado. */
+  function destaca(texto: string, termos: string[]): string {
+    const alvo = simples(texto);
+    const marcas: [number, number][] = [];
+    for (const termo of termos) {
+      let i = alvo.indexOf(termo);
+      while (i >= 0) { marcas.push([i, i + termo.length]); i = alvo.indexOf(termo, i + termo.length); }
+    }
+    if (!marcas.length) return escapa(texto);
+    marcas.sort((a, b) => a[0] - b[0]);
+
+    let saida = '', fim = 0;
+    for (const [i, j] of marcas) {
+      if (i < fim) continue;                            // sobreposição: vale a primeira
+      saida += escapa(texto.slice(fim, i)) + '<mark>' + escapa(texto.slice(i, j)) + '</mark>';
+      fim = j;
+    }
+    return saida + escapa(texto.slice(fim));
+  }
+
+  function pintar(consulta: string) {
+    const termos = simples(consulta).split(/\s+/).filter(Boolean);
+    if (!termos.length) { elRes.innerHTML = ''; elEstado.textContent = ''; return; }
+
+    const achados = itens
+      .map((item) => ({ item, p: pontos(item, termos) }))
+      .filter((r) => r.p > 0)
+      .sort((a, b) => b.p - a.p || a.item.t.localeCompare(b.item.t, 'pt-BR'))
+      .slice(0, 60);
+
+    if (!achados.length) {
+      elRes.innerHTML = '';
+      elEstado.textContent = `Nada encontrado para “${consulta}”.`;
+      return;
+    }
+    elEstado.textContent = `${achados.length}${achados.length === 60 ? '+' : ''} `
+      + `${achados.length === 1 ? 'resultado' : 'resultados'}.`;
+
+    // Agrupa mantendo a ordem da pontuação: o grupo do melhor resultado vem antes.
+    const grupos = new Map<string, typeof achados>();
+    for (const r of achados) {
+      if (!grupos.has(r.item.s)) grupos.set(r.item.s, []);
+      grupos.get(r.item.s)!.push(r);
+    }
+
+    elRes.innerHTML = [...grupos].map(([secao, rs]) => `
+      <section class="grupo">
+        <h2>${escapa(secao)} <span class="n">${rs.length}</span></h2>
+        <ul>${rs.map(({ item }) => `
+          <li>
+            <a class="hit" href="${escapa(item.u)}">
+              <span class="linha">
+                <span class="titulo">${destaca(item.t, termos)}</span>
+                ${item.c ? `<span class="ctx">${destaca(item.c, termos)}</span>` : ''}
+              </span>
+              <span class="desc">${destaca(item.d, termos)}</span>
+            </a>
+            ${item.p ? `<a class="pdf" href="${escapa(item.p)}" download>PDF ↓</a>` : ''}
+          </li>`).join('')}
+        </ul>
+      </section>`).join('');
+  }
+
+  /* A consulta fica na URL: uma busca é linkável e sobrevive ao recarregar. */
+  let adiado: ReturnType<typeof setTimeout>;
+  function guardaUrl(consulta: string) {
+    clearTimeout(adiado);
+    adiado = setTimeout(() => {
+      const url = consulta ? `/busca?q=${encodeURIComponent(consulta)}` : '/busca';
+      history.replaceState(null, '', url);
+    }, 400);
+  }
+
+  async function buscar() {
+    const consulta = elQ.value.trim();
+    guardaUrl(consulta);
+    if (!consulta) { pintar(''); return; }
+    if (!itens.length) { elEstado.textContent = 'Carregando o índice…'; await carregar(); }
+    pintar(consulta);
+  }
+
+  elQ.addEventListener('input', buscar);
+  elQ.form!.addEventListener('submit', (ev) => { ev.preventDefault(); buscar(); });
+
+  // Enter vai para o primeiro resultado — buscar e clicar não devem ser dois gestos.
+  elQ.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter') return;
+    const primeiro = elRes.querySelector<HTMLAnchorElement>('a.hit');
+    if (primeiro) { ev.preventDefault(); primeiro.click(); }
+  });
+
+  const inicial = new URLSearchParams(location.search).get('q') ?? '';
+  if (inicial) { elQ.value = inicial; buscar(); } else { carregar(); }
+  elQ.focus();
+</script>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { margin-bottom: 1.75rem; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+  .campo input {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+
+  .campo input::placeholder { color: var(--muted); font-weight: 300; }
+  .campo input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* O X nativo do type=search encosta na borda em alguns navegadores */
+  .campo input::-webkit-search-cancel-button { margin-right: 0.15rem; }
+
+  .estado, .aviso {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 300;
+    margin: 1rem 0 0;
+    min-height: 1.2em;
+  }
+
+  .aviso a { color: var(--accent); }
+
+  :global(.grupo) { margin-top: 2rem; }
+
+  :global(.grupo h2) {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  :global(.grupo h2 .n) {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  :global(.grupo ul) { list-style: none; display: grid; gap: 0.5rem; }
+
+  :global(.grupo li) { display: flex; align-items: stretch; gap: 0.5rem; }
+
+  :global(a.hit) {
+    flex: 1;
+    display: block;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  :global(a.hit:hover), :global(a.hit:focus-visible) {
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  :global(a.hit .linha) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  :global(a.hit .titulo) { font-size: 0.95rem; font-weight: 500; color: var(--ink); }
+
+  :global(a.hit .ctx) {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 300;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  :global(a.hit .desc) {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.55;
+    margin-top: 0.2rem;
+  }
+
+  :global(a.pdf) {
+    display: flex;
+    align-items: center;
+    padding: 0 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  :global(a.pdf:hover) { border-color: var(--accent); }
+
+  :global(mark) {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 0.1em;
+  }
+
+  @media (max-width: 640px) {
+    main { padding: 2.5rem 1.25rem 3.5rem; }
+    :global(a.hit .linha) { flex-direction: column; gap: 0.15rem; }
+    :global(a.hit .ctx) { text-align: left; }
+  }
+</style>

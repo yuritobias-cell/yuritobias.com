@@ -92,6 +92,7 @@ import '../../styles/ferramenta-folha.css';
               <input type="text" id="instrucao" maxlength="140" value="Fatore, desenvolva ou simplifique, conforme o enunciado de cada item." />
             </div>
             <label class="check"><input type="checkbox" id="ident" checked /> Espaço para nome, turma e data</label>
+            <label class="check"><input type="checkbox" id="qr" /> QR code com o link desta lista</label>
           </section>
 
           <section class="bloco">
@@ -110,6 +111,7 @@ import '../../styles/ferramenta-folha.css';
         <div class="acoes">
           <button class="btn" type="button" id="gerar">Gerar outra lista</button>
           <button class="btn sec" type="button" id="imprimir">Imprimir / Salvar PDF</button>
+          <button class="btn sec" type="button" id="link">Copiar link da lista</button>
           <button class="btn sec" type="button" id="restaurar">Restaurar padrões</button>
         </div>
         <p class="aviso" id="aviso" hidden></p>
@@ -176,8 +178,10 @@ import '../../styles/ferramenta-folha.css';
 import {
   MENOS, inteiro, naoZero, escolhe, moeda, pesado, mdc,
   rac, rSoma, rMul, rNeg, rZero, htmlSoma, htmlFrac, htmlRac, mat, nota,
+  semear, novaSemente,
 } from '../../utils/matematica.js';
 import { $, limita, chips, montaLista, montaFolhas, resumo } from '../../utils/folha.js';
+import { aplicaUrl, guardaUrl, extrasDaFolha, copiaLink } from '../../utils/estado.js';
 
 /* ==========================================================================
    1) MOTOR DE POLINÔMIOS
@@ -633,10 +637,11 @@ const PADRAO = {
   qtd: 12, versoes: 1, agrupar: false, lider: true, cubo: false, nomeCaso: true,
   escola: '', titulo: 'Fatoração e produtos notáveis',
   instrucao: 'Fatore, desenvolva ou simplifique, conforme o enunciado de cada item.',
-  ident: true, temGab: true,
+  ident: true, qr: false, temGab: true,
 };
 
 let listas = [];
+let semente;                 // sorteia a lista e volta com ela, pela URL
 
 const ctl = {
   direcoes: chips('direcoes', true, gerar),
@@ -670,6 +675,7 @@ function lerConfig() {
 const viaveisDe = (cfg) => cfg.direcoes.map((k) => ({ k, nome: FAMILIAS[k].nome, gerar: FAMILIAS[k].gerar }));
 
 function gerar() {
+  semear(semente);
   const cfg = lerConfig();
   const viaveis = viaveisDe(cfg);
   const gerarDe = (f) => {
@@ -696,6 +702,8 @@ function gerar() {
 
 function pintar() {
   const cfg = lerConfig();
+  Object.assign(cfg, extrasDaFolha(PADRAO, ctl, semente));
+  guardaUrl(PADRAO, ctl, semente);
   if (!listas.length) return;
   $('saida').innerHTML = montaFolhas(listas, cfg, () => '');
   $('resumo').textContent = resumo(listas[0].length, listas.length, cfg.temGab,
@@ -705,17 +713,21 @@ function pintar() {
 /* --- ligações dos controles ----------------------------------------------- */
 ['qtd', 'versoes', 'agrupar', 'lider', 'cubo'].forEach((id) => $(id).addEventListener('change', gerar));
 ['escola', 'titulo', 'instrucao'].forEach((id) => $(id).addEventListener('input', pintar));
-['ident', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
+['ident', 'qr', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
 $('nomeCaso').addEventListener('change', gerar);
 
-$('gerar').addEventListener('click', gerar);
+$('gerar').addEventListener('click', () => { semente = novaSemente(); gerar(); });
 $('imprimir').addEventListener('click', () => window.print());
+$('link').addEventListener('click', (ev) => copiaLink(ev.currentTarget, PADRAO, ctl, semente));
 $('restaurar').addEventListener('click', () => {
   Object.entries(ctl).forEach(([campo, c]) => c.repor(PADRAO[campo]));
   ['qtd', 'versoes', 'escola', 'titulo', 'instrucao'].forEach((id) => { $(id).value = PADRAO[id]; });
-  ['agrupar', 'ident', 'temGab', 'lider', 'cubo', 'nomeCaso'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  ['agrupar', 'ident', 'qr', 'temGab', 'lider', 'cubo', 'nomeCaso'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  semente = novaSemente();
   gerar();
 });
 
+/* A URL manda: quem abriu o link de uma lista recebe aquela lista, não outra. */
+semente = aplicaUrl(PADRAO, ctl) || novaSemente();
 gerar();
 </script>

@@ -5,7 +5,8 @@
    - Navegação (HTML): rede primeiro, cache como fallback (atualizações chegam rápido,
      offline continua funcionando).
    - /_astro/ (assets com hash no nome): cache primeiro — são imutáveis.
-   - PDFs: rede primeiro com fallback no cache (PDF corrigido com o mesmo nome propaga).
+   - PDFs e o índice da busca: rede primeiro com fallback no cache (arquivo trocado
+     com o mesmo nome propaga).
    - Demais recursos locais (fontes, imagens): cache primeiro. */
 const VERSAO = '__VERSAO__';
 const CACHE_PAGINAS = 'paginas-' + VERSAO;
@@ -72,7 +73,11 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  if (url.origin === location.origin && url.pathname.endsWith('.pdf')) {
+  // PDFs e o índice da busca: rede primeiro, cache como reserva. Os dois mudam
+  // sem mudar de nome — material novo no site tem de aparecer na busca de quem
+  // já visitou, e PDF corrigido tem de substituir o antigo.
+  if (url.origin === location.origin
+      && (url.pathname.endsWith('.pdf') || url.pathname === '/busca-index.json')) {
     e.respondWith(networkFirst(req, CACHE_EXTRAS));
     return;
   }

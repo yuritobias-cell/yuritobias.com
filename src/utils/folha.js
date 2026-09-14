@@ -48,6 +48,8 @@ export function chips(id, multi, aoMudar) {
 
   return {
     ler,
+    /* Os valores que o grupo aceita — usado para descartar lixo vindo da URL. */
+    valores: () => [...cx.querySelectorAll('.chip')].map((b) => b.dataset.v),
     repor(valor) {
       const alvo = multi ? valor : [valor];
       cx.querySelectorAll('.chip').forEach((b) =>
@@ -93,7 +95,10 @@ function cabecalho(cfg, rotulo, selo) {
       <span>Turma: <span class="identline" style="min-width:4rem"></span></span>
       <span>Data: <span class="identline" style="min-width:5rem"></span></span>
     </div>`;
-  return `<header class="folha-cab">
+  // O QR aponta para esta mesma lista na web; só na folha do aluno.
+  const qr = !selo && cfg.qr ? cfg.qr(rotulo) : '';
+  return `<header class="folha-cab${qr ? ' com-qr' : ''}">
+      ${qr}
       ${selo ? '<span class="selo">Gabarito — folha do professor</span>' : ''}
       ${cfg.escola ? `<p class="escola">${esc(cfg.escola)}</p>` : ''}
       <h2 class="folha-titulo">${esc(cfg.titulo || 'Lista de exercícios')}${rotulo ? `<span class="versao">Versão ${rotulo}</span>` : ''}</h2>
@@ -135,8 +140,11 @@ export function folhaGabarito(qs, cfg, rotulo, extraDe = () => '') {
    versões quer as folhas dos alunos em sequência, sem intercalar. */
 export function montaFolhas(listas, cfg, extraDe) {
   const varias = listas.length > 1;
-  const alunos = listas.map((qs, i) => folhaAluno(qs, cfg, varias ? ROTULOS[i] : ''));
-  const gabs = cfg.temGab ? listas.map((qs, i) => folhaGabarito(qs, cfg, varias ? ROTULOS[i] : '', extraDe)) : [];
+  // cfg.soVersao mostra uma versão só, mantendo o rótulo que ela teria na lista
+  // inteira — é assim que o link do QR abre exatamente a folha que foi impressa.
+  const i0 = listas.map((_, i) => i).filter((i) => cfg.soVersao == null || i === cfg.soVersao);
+  const alunos = i0.map((i) => folhaAluno(listas[i], cfg, varias ? ROTULOS[i] : ''));
+  const gabs = cfg.temGab ? i0.map((i) => folhaGabarito(listas[i], cfg, varias ? ROTULOS[i] : '', extraDe)) : [];
   return alunos.concat(gabs).join('');
 }
 

@@ -1,0 +1,344 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { porTipo } from '../utils/ferramentas';
+import { seriesAtivas, series } from '../utils/materiais';
+import { analisesPublicadas } from '../utils/analises';
+
+/* Os números vêm dos manifestos: a página não envelhece sozinha quando entra
+   material novo. */
+const nGeradores = porTipo('suporte').length;
+const nSimuladores = porTipo('simulacoes').length;
+const nPdfs = series.reduce(
+  (t, s) => t + [...s.materiais, ...s.provas, ...s.formativas].filter((m) => m.arquivo).length, 0);
+/* Quantos dos geradores de suporte são geradores de lista — os que compartilham
+   o motor de sorteio e saem em folha A4. */
+const nListas = porTipo('suporte').filter((f) => f.slug.startsWith('gerador-')
+  && f.slug !== 'gerador-qrcode').length;
+
+const descricao =
+  'Ferramentas, listas e materiais de matemática livres para usar, imprimir e adaptar na sua escola — '
+  + 'sem cadastro, sem custo e sob licença Creative Commons.';
+
+/* Declarar a licença em dados estruturados é o que faz buscador e agregador
+   entenderem que o material pode ser reusado, e sob quais condições. */
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: 'Materiais e ferramentas de matemática — Yuri Tobias',
+  description: descricao,
+  url: 'https://yuritobias.com/para-professores',
+  license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+  creator: { '@id': 'https://yuritobias.com/#eu' },
+  inLanguage: 'pt-BR',
+  isAccessibleForFree: true,
+  learningResourceType: ['Lista de exercícios', 'Simulação', 'Material didático'],
+  educationalLevel: ['Ensino Fundamental — anos finais', 'Ensino Médio'],
+  about: 'Matemática',
+};
+---
+
+<Layout title="Para professores" description={descricao} schema={schema}>
+  <main>
+    <header>
+      <h1>Para professores</h1>
+      <p class="subtitle">
+        Tudo que está neste site foi feito para as minhas turmas — e está aqui para as suas
+        também. Pode usar, imprimir, adaptar e levar para a sua escola, sem pedir licença
+        e sem pagar nada.
+      </p>
+    </header>
+
+    <section class="bloco">
+      <h2>O que você encontra</h2>
+      <div class="cards">
+        <a class="card" href="/ferramentas?tipo=suporte">
+          <span class="n">{nGeradores}</span>
+          <span class="titulo">ferramentas de apoio</span>
+          <p>{nListas} geradores de lista — equações, sistemas, progressões e fatoração: você
+          escolhe os tipos de questão e a quantidade, e sai folha A4 com gabarito, em até oito
+          versões da mesma prova. Mais malhas para imprimir, QR code, sorteador de grupos e
+          cifrador silábico.</p>
+          <span class="cta">Ver geradores →</span>
+        </a>
+        <a class="card" href="/ferramentas?tipo=simulacoes">
+          <span class="n">{nSimuladores}</span>
+          <span class="titulo">simuladores</span>
+          <p>Monty Hall, transformações geométricas, ângulos na circunferência e outros — para
+          projetar na sala, abrir no laboratório ou mandar para o celular do aluno.</p>
+          <span class="cta">Ver simuladores →</span>
+        </a>
+        <a class="card" href="/materiais">
+          <span class="n">{nPdfs}</span>
+          <span class="titulo">materiais em PDF</span>
+          <p>Listas, revisões e avaliações aplicadas nas turmas de {
+            seriesAtivas.map((s) => s.titulo).join(', ')
+          } — com as provas e formativas de anos anteriores.</p>
+          <span class="cta">Ver materiais →</span>
+        </a>
+        <a class="card" href="/analises">
+          <span class="n">{analisesPublicadas.length}</span>
+          <span class="titulo">análises de dados</span>
+          <p>Painéis com IDEB, SIMAVE e Censo Escolar, navegáveis por município e por escola.
+          Servem para a reunião pedagógica tanto quanto para a aula de estatística.</p>
+          <span class="cta">Ver análises →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h2>Como funciona na prática</h2>
+      <dl class="lista">
+        <div>
+          <dt>Não precisa de cadastro</dt>
+          <dd>Não há login, não há e-mail a informar, não há versão paga. Abrir a página é tudo.</dd>
+        </div>
+        <div>
+          <dt>Nada do que você digita sai do navegador</dt>
+          <dd>As listas são sorteadas no seu computador, e o nome da escola que você escreve no
+          cabeçalho fica nele. Não existe servidor recebendo isso — nem meu, nem de ninguém.</dd>
+        </div>
+        <div>
+          <dt>Funciona sem internet</dt>
+          <dd>Depois da primeira visita, as ferramentas continuam abrindo offline. Vale para a
+          escola com wi-fi instável e para o laboratório sem rede.</dd>
+        </div>
+        <div>
+          <dt>Sai pronto para a impressora</dt>
+          <dd>Imprimir a página dá a folha A4 limpa — sem menu, sem controles, sem endereço de
+          site no rodapé. O gabarito sai em página separada, e as versões A–H saem em sequência,
+          para você imprimir a prova inteira de uma vez.</dd>
+        </div>
+        <div>
+          <dt>A lista que você gerou tem endereço</dt>
+          <dd>Cada lista sorteada vira um link: <b>Copiar link da lista</b> guarda exatamente
+          aquelas questões, para você reimprimir no ano que vem ou mandar para um colega. E o
+          QR code impresso no canto da folha leva o aluno à mesma lista no celular — sem o
+          gabarito, que fica só no seu papel.</dd>
+        </div>
+        <div>
+          <dt>Roda no celular</dt>
+          <dd>Os simuladores foram feitos para funcionar no aparelho do aluno, e não só no
+          projetor. Passe o endereço da ferramenta e peça para explorarem em dupla.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="bloco">
+      <h2>A licença, em português claro</h2>
+      <p class="lede">
+        Os materiais e textos estão sob
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt-br" target="_blank" rel="license noopener">CC BY-NC-SA 4.0</a>.
+        Na prática:
+      </p>
+      <ul class="permissoes">
+        <li class="sim">Imprimir e distribuir para os seus alunos, quantas cópias quiser</li>
+        <li class="sim">Editar, recortar, traduzir e misturar com o seu próprio material</li>
+        <li class="sim">Usar em aula, em formação de professores e em material da escola</li>
+        <li class="sim">Publicar a sua versão — desde que também sob CC BY-NC-SA</li>
+        <li class="cite">Citando a origem (o modelo está logo abaixo)</li>
+        <li class="nao">Sem vender, nem embutir em curso ou apostila paga</li>
+      </ul>
+      <p class="nota">
+        O código do site é outra história: está no
+        <a href="https://github.com/yuritobias-cell/yuritobias.com" target="_blank" rel="noopener">GitHub</a>
+        e pode ser lido e reaproveitado por quem quiser montar algo parecido.
+      </p>
+    </section>
+
+    <section class="bloco">
+      <h2>Como citar</h2>
+      <p class="lede">Numa folha adaptada, num slide ou na referência de um trabalho:</p>
+      <figure class="citar">
+        <code id="citacao">Adaptado de Yuri Tobias — yuritobias.com — CC BY-NC-SA 4.0</code>
+        <button type="button" id="copiar">Copiar</button>
+      </figure>
+    </section>
+
+    <section class="bloco">
+      <h2>Faltou alguma coisa?</h2>
+      <p class="lede">
+        Se um gerador não cobre o tipo de questão que você precisa, se um simulador seria útil
+        no conteúdo que você está dando, ou se você encontrou um erro num gabarito — me escreva.
+        Boa parte do que está aqui nasceu de um pedido de colega.
+      </p>
+      <p class="contato">
+        <a href="mailto:yuritobias@gmail.com">yuritobias@gmail.com</a>
+        <a href="https://github.com/yuritobias-cell/yuritobias.com/issues" target="_blank" rel="noopener">Relatar um erro</a>
+        <a href="/rss.xml">Acompanhar por RSS</a>
+      </p>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  const botao = document.getElementById('copiar') as HTMLButtonElement;
+  const texto = document.getElementById('citacao')!.textContent!;
+  botao.addEventListener('click', () => {
+    navigator.clipboard?.writeText(texto).then(() => {
+      botao.textContent = 'Copiado ✓';
+      setTimeout(() => { botao.textContent = 'Copiar'; }, 2200);
+    });
+  });
+</script>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { margin-bottom: 3rem; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.6rem;
+  }
+
+  .subtitle, .lede {
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .bloco { margin-bottom: 3.25rem; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  /* --- o que você encontra --- */
+  .cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    padding: 1.35rem 1.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .card .n {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-right: 0.4rem;
+  }
+
+  .card .titulo { font-size: 0.85rem; color: var(--ink); font-weight: 500; }
+
+  .card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+    margin: 0.7rem 0 0.9rem;
+  }
+
+  .card .cta { font-size: 0.78rem; color: var(--accent); letter-spacing: 0.02em; }
+
+  /* --- como funciona --- */
+  .lista { display: grid; gap: 1.25rem; }
+  .lista dt { font-size: 0.92rem; font-weight: 500; color: var(--ink); margin-bottom: 0.25rem; }
+  .lista dd {
+    font-size: 0.88rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.65;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--rule);
+  }
+  .lista dd b { font-weight: 500; color: var(--ink); }
+
+  /* --- licença --- */
+  .permissoes { list-style: none; margin: 1.1rem 0 0; display: grid; gap: 0.55rem; }
+
+  .permissoes li {
+    font-size: 0.89rem;
+    color: var(--ink);
+    font-weight: 300;
+    line-height: 1.5;
+    padding-left: 1.7rem;
+    position: relative;
+  }
+
+  .permissoes li::before {
+    position: absolute;
+    left: 0;
+    top: -0.05em;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .permissoes .sim::before  { content: '✓'; color: var(--accent); }
+  .permissoes .cite::before { content: '✎'; color: var(--accent); }
+  .permissoes .nao::before  { content: '✕'; color: #b4531f; }
+
+  .nota, .contato { font-size: 0.85rem; color: var(--muted); font-weight: 300; line-height: 1.7; margin-top: 1.2rem; }
+
+  a { color: var(--accent); }
+  .lede a, .nota a { text-decoration: underline; text-underline-offset: 2px; }
+
+  /* --- citação --- */
+  .citar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin: 1rem 0 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+  }
+
+  .citar code {
+    flex: 1;
+    min-width: 15rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .citar button {
+    background: var(--accent);
+    color: var(--bg);
+    border: 0;
+    border-radius: 4px;
+    padding: 0.45rem 0.9rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .citar button:hover { opacity: 0.9; }
+
+  .contato { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; }
+
+  @media (max-width: 640px) {
+    main { padding: 2.5rem 1.25rem 3.5rem; }
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>

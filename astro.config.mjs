@@ -21,7 +21,9 @@ function serviceWorker() {
           .filter((f) => f.endsWith('.astro') && f !== 'index.astro')
           .map((f) => `/ferramentas/${path.basename(f, '.astro')}/`)
           .sort();
-        const precache = ['/', '/ferramentas/', ...ferramentas];
+        // A busca também vai para o precache: o índice é um arquivo estático e
+        // pequeno, e sem ele /busca abre offline sem conseguir buscar nada.
+        const precache = ['/', '/ferramentas/', '/busca/', '/busca-index.json', ...ferramentas];
         const versao = crypto.createHash('sha256').update(JSON.stringify(precache)).digest('hex').slice(0, 8);
         const sw = fs
           .readFileSync('./src/sw.js', 'utf-8')

@@ -95,6 +95,23 @@
 .ff-root .versao{ font-family:'IBM Plex Sans',sans-serif; font-size:.7rem; font-weight:700; text-transform:uppercase;
   letter-spacing:.08em; border:1px solid var(--tinta); border-radius:99px; padding:.12em .6em; color:var(--tinta); }
 .ff-root .instrucao{ font-size:.92rem; color:#333; margin:0; }
+
+/* QR do link da lista, no canto do cabeçalho. O recuo é só do bloco do título
+   — a linha de nome, turma e data passa por baixo do QR e continua inteira. */
+.ff-root .folha-cab.com-qr{ position:relative; }
+.ff-root .folha-cab.com-qr .escola,
+.ff-root .folha-cab.com-qr .folha-titulo,
+.ff-root .folha-cab.com-qr .instrucao{ padding-right:30mm; }
+.ff-root .qr{ position:absolute; top:0; right:0; width:26mm; text-align:center; }
+.ff-root .qr svg{ display:block; width:100%; height:auto; }
+.ff-root .qr-txt{ display:block; font-size:.56rem; line-height:1.25; color:var(--neutro);
+  text-transform:uppercase; letter-spacing:.04em; margin-top:.15rem; }
+
+/* Chegou pelo QR de uma folha: a saída de volta para a lista inteira. */
+.ff-root .so-versao{ margin:1.6rem 0 -.4rem; padding:.6rem .8rem; border:1px solid var(--traco);
+  border-radius:8px; background:#fff; font-size:.85rem; color:var(--neutro); }
+.ff-root .so-versao b{ color:var(--tinta); }
+.ff-root .so-versao a{ color:var(--tinta); }
 .ff-root .ident{ display:flex; gap:1.4rem; flex-wrap:wrap; font-size:.88rem; color:#333; margin-top:.9rem; }
 .ff-root .ident span{ flex:1 1 auto; white-space:nowrap; }
 .ff-root .identline{ display:inline-block; border-bottom:1px solid #999; min-width:7rem; }
@@ -149,6 +166,10 @@
   .ff-root{ padding:1.2rem .8rem 3rem; }
   .ff-root .folha{ padding:8mm 7mm; }
   .ff-root .questoes,.ff-root .respostas{ grid-template-columns:1fr; }
+  .ff-root .folha-cab.com-qr .escola,
+  .ff-root .folha-cab.com-qr .folha-titulo,
+  .ff-root .folha-cab.com-qr .instrucao{ padding-right:22mm; }
+  .ff-root .qr{ width:19mm; }
 }
 
 /* ---------- IMPRESSÃO: só as folhas saem no papel ---------- */
@@ -157,7 +178,8 @@
   html,body{ background:#fff !important; }
   body > nav, body > footer{ display:none !important; }
   .ff-root{ background:#fff; padding:0; }
-  .ff-root .masthead,.ff-root .toolbar,.ff-root .rodape,.ff-root .teoria{ display:none !important; }
+  .ff-root .masthead,.ff-root .toolbar,.ff-root .rodape,.ff-root .teoria,
+  .ff-root .so-versao{ display:none !important; }
   .ff-root .saida{ display:block; margin:0; }
   .ff-root .folha{ margin:0; padding:0; max-width:none; border:0; border-radius:0; box-shadow:none; background:#fff; }
   .ff-root .folha + .folha{ break-before:page; }

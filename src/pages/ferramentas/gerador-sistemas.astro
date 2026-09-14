@@ -99,6 +99,7 @@ import '../../styles/ferramenta-folha.css';
               <input type="text" id="instrucao" maxlength="140" value="Resolva e classifique cada sistema, apresentando os cálculos." />
             </div>
             <label class="check"><input type="checkbox" id="ident" checked /> Espaço para nome, turma e data</label>
+            <label class="check"><input type="checkbox" id="qr" /> QR code com o link desta lista</label>
           </section>
 
           <section class="bloco">
@@ -116,6 +117,7 @@ import '../../styles/ferramenta-folha.css';
         <div class="acoes">
           <button class="btn" type="button" id="gerar">Gerar outra lista</button>
           <button class="btn sec" type="button" id="imprimir">Imprimir / Salvar PDF</button>
+          <button class="btn sec" type="button" id="link">Copiar link da lista</button>
           <button class="btn sec" type="button" id="restaurar">Restaurar padrões</button>
         </div>
         <p class="aviso" id="aviso" hidden></p>
@@ -188,8 +190,10 @@ import {
   MENOS, inteiro, naoZero, escolhe, moeda, maisMenos, embaralha, pesado, mdc,
   rac, rSoma, rSub, rMul, rDiv, rNeg, rVal, rZero, rInt, rIgual,
   htmlVar, htmlRac, txtRac, htmlSoma, mat, nota, nInt,
+  semear, novaSemente,
 } from '../../utils/matematica.js';
 import { $, limita, chips, montaLista, montaFolhas, resumo } from '../../utils/folha.js';
+import { aplicaUrl, guardaUrl, extrasDaFolha, copiaLink } from '../../utils/estado.js';
 
 /* ==========================================================================
    1) ÁLGEBRA DE SISTEMAS
@@ -809,10 +813,11 @@ const PADRAO = {
   qtd: 8, versoes: 1, agrupar: false, grafica: true,
   escola: '', titulo: 'Sistemas de equações do 1º grau',
   instrucao: 'Resolva e classifique cada sistema, apresentando os cálculos.',
-  ident: true, temGab: true,
+  ident: true, qr: false, temGab: true,
 };
 
 let listas = [];
+let semente;                 // sorteia a lista e volta com ela, pela URL
 
 const ctl = {
   tipos:     chips('tipos', true, gerar),
@@ -852,6 +857,7 @@ function viaveisDe(cfg) {
 }
 
 function gerar() {
+  semear(semente);
   const cfg = lerConfig();
   const todas = viaveisDe(cfg);
   const viaveis = todas.filter((f) => f.nats.length && f.casos.length);
@@ -866,6 +872,7 @@ function gerar() {
       + 'para SPI, SI ou solução racional, marque um dos sistemas.';
     $('saida').innerHTML = '';
     $('resumo').textContent = '';
+    guardaUrl(PADRAO, ctl, semente);
     return;
   }
   if (fora.length) {
@@ -888,6 +895,8 @@ function gerar() {
 
 function pintar() {
   const cfg = lerConfig();
+  Object.assign(cfg, extrasDaFolha(PADRAO, ctl, semente));
+  guardaUrl(PADRAO, ctl, semente);
   if (!listas.length) return;
   $('saida').innerHTML = montaFolhas(listas, cfg, () => '');
   const nomes = viaveisDe(cfg).filter((f) => f.nats.length && f.casos.length).map((f) => f.nome);
@@ -898,16 +907,20 @@ function pintar() {
 ['qtd', 'versoes', 'agrupar'].forEach((id) => $(id).addEventListener('change', gerar));
 ['grafica'].forEach((id) => $(id).addEventListener('change', gerar));
 ['escola', 'titulo', 'instrucao'].forEach((id) => $(id).addEventListener('input', pintar));
-['ident', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
+['ident', 'qr', 'temGab'].forEach((id) => $(id).addEventListener('change', pintar));
 
-$('gerar').addEventListener('click', gerar);
+$('gerar').addEventListener('click', () => { semente = novaSemente(); gerar(); });
 $('imprimir').addEventListener('click', () => window.print());
+$('link').addEventListener('click', (ev) => copiaLink(ev.currentTarget, PADRAO, ctl, semente));
 $('restaurar').addEventListener('click', () => {
   Object.entries(ctl).forEach(([campo, c]) => c.repor(PADRAO[campo]));
   ['qtd', 'versoes', 'escola', 'titulo', 'instrucao'].forEach((id) => { $(id).value = PADRAO[id]; });
-  ['agrupar', 'ident', 'temGab', 'grafica'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  ['agrupar', 'ident', 'qr', 'temGab', 'grafica'].forEach((id) => { $(id).checked = PADRAO[id]; });
+  semente = novaSemente();
   gerar();
 });
 
+/* A URL manda: quem abriu o link de uma lista recebe aquela lista, não outra. */
+semente = aplicaUrl(PADRAO, ctl) || novaSemente();
 gerar();
 </script>

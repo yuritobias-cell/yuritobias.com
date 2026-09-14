@@ -2,7 +2,7 @@
 
 Site pessoal de Yuri Tobias — professor de matemática (Escola SESI Poços de Caldas) e analista de dados educacionais (Secretaria Municipal de Educação de Poços de Caldas).
 
-Reúne materiais didáticos por série, ferramentas interativas para sala de aula, análises de dados educacionais, cursos em vídeo e blog.
+Reúne materiais didáticos por série, ferramentas interativas para sala de aula, análises de dados educacionais, cursos em vídeo e blog — com busca em todo o conteúdo.
 
 ## Stack
 
@@ -10,8 +10,11 @@ Reúne materiais didáticos por série, ferramentas interativas para sala de aul
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
 - Fontes auto-hospedadas em `public/fonts/` (variáveis, subset latino; `@font-face` em `src/styles/global.css`) — sem requisições ao Google Fonts
+- Busca própria: índice estático gerado no build (`/busca-index.json`) e filtrado no
+  navegador — sem motor de busca de terceiros e sem mandar a consulta para lugar nenhum
 - Service worker (offline) gerado no build: template em `src/sw.js`, precache derivado
   das páginas de `src/pages/ferramentas/` pela integração em `astro.config.mjs`
+  (mais a busca e o índice dela)
 - Deploy automático no GitHub Pages via Actions (push na `main`)
 - Analytics: GoatCounter (pageviews + eventos de download de PDF)
 
@@ -33,12 +36,16 @@ src/
 │   ├── series.json               # manifesto das séries (ativas e arquivadas) — dirige /materiais
 │   ├── materiais/<ano>-<slug>.json   # materiais de cada série (+ <ano>-<slug>-provas.json)
 │   ├── analises.json             # manifesto das análises — dirige /analises
+│   ├── ferramentas.json          # manifesto das ferramentas — dirige /ferramentas e a busca
 │   └── ...                       # curso FET + dados de posts (enem/)
 ├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
 ├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
 ├── utils/           # Utilitários do build em .ts (slug de tags, tempo de leitura, imagens OG)
-│   ├── matematica.js             # núcleo das ferramentas geradoras: racionais exatos e tipografia
+│   ├── busca.ts                  # monta o índice da busca a partir dos manifestos
+│   ├── matematica.js             # núcleo das ferramentas geradoras: sorteio com semente, racionais exatos e tipografia
 │   ├── intervalos.js             # conjunto solução em ℝ + reta numérica (inequações)
+│   ├── estado.js                 # a lista gerada na URL: configuração + semente, permalink e QR
+│   ├── qr.js                     # o QR do permalink, desenhado em SVG para a folha
 │   └── folha.js                  # folha A4, gabarito, versões A–H e chips dos controles
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
@@ -47,6 +54,8 @@ src/
 │   ├── analises/                 # índice + capa [slug] de cada análise
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
 │   ├── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
+│   ├── busca.astro               # busca do site + busca-index.json.ts (o índice)
+│   ├── para-professores.astro    # convite de uso, licença em português claro e como citar
 │   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
 └── styles/
     ├── global.css                # @theme com cores e fontes do site
@@ -58,9 +67,16 @@ public/analises/paineis/          # painéis HTML autocontidos das análises
 ## Ferramentas
 
 Cada ferramenta é uma página autocontida em `src/pages/ferramentas/`, com o próprio HTML,
-CSS e JS — e uma entrada no array de `index.astro` (`tipo` define a seção: `suporte` ou
-`simulacoes`). O service worker precacheia as ferramentas sozinho, a partir dos arquivos
+CSS e JS — e uma entrada em `src/data/ferramentas.json` (`tipo` define a seção: `suporte`
+ou `simulacoes`; `assunto` é a etiqueta do cartão). Essa entrada alimenta o índice e a
+busca ao mesmo tempo, e o build **falha** se a página existir sem entrada no manifesto,
+ou o contrário. O service worker precacheia as ferramentas sozinho, a partir dos arquivos
 da pasta; nada a registrar à mão.
+
+```json
+{ "slug": "gerador-funcoes", "titulo": "Gerador de Funções", "assunto": "Álgebra",
+  "tipo": "suporte", "descricao": "Descrição curta — vai para o cartão e para a busca." }
+```
 
 As **geradoras de lista** (`gerador-equacoes`, `gerador-sistemas`, `gerador-progressoes`,
 `gerador-fatoracao`) são a exceção à regra do
@@ -72,6 +88,7 @@ fração não deve precisar de correção em dois lugares.
 | `src/utils/matematica.js` | Sorteios, racionais exatos (`rac`, `rSoma`, …), radicais simplificados e a tipografia da matemática em HTML — fração empilhada e radical com barra, **sem KaTeX nem MathJax** |
 | `src/utils/intervalos.js` | Conjunto solução como lista de intervalos, notação por compreensão e a reta numérica em SVG |
 | `src/utils/folha.js` | Cabeçalho, folha do aluno, gabarito, versões A–H, distribuição das questões entre os tipos e o comportamento dos chips |
+| `src/utils/estado.js` | A lista gerada na URL: configuração, semente, permalink e o QR da folha (ver "A lista tem endereço") |
 | `src/styles/ferramenta-folha.css` | Todo o visual comum, escopado em `.ff-root` — barra de controles, folha A4 e as regras de `@media print` |
 
 São `.js`, e não `.ts`, de propósito: rodam no navegador, importados pelos `<script>` das
@@ -81,6 +98,57 @@ O princípio das duas geradoras é o mesmo: **sorteie a resposta e monte a quest
 dela**. É o que garante que o filtro de natureza da solução valha sempre — e não "quase
 sempre", como aconteceria sorteando coeficientes e torcendo. As exceções estão documentadas
 na seção "teoria" de cada página.
+
+### A lista tem endereço
+
+Uma lista gerada é a configuração dos controles **mais a semente do sorteio**, e as duas
+cabem na querystring — então a mesma URL devolve sempre a mesma lista, questão por questão.
+Serve para reimprimir a prova do ano passado, mandar a lista para um colega e imprimir o
+QR que leva o aluno àquela folha.
+
+O mecanismo está todo em `src/utils/estado.js` e é **genérico**: os campos saem do próprio
+`PADRAO` da página e do objeto de chips, deduzindo o tipo de cada um (chip múltiplo, chip
+único, número, texto, caixa). Ferramenta nova não precisa listar campo nenhum aqui — basta
+seguir o mesmo formato das quatro geradoras:
+
+| Onde | O que entra |
+| :--- | :--- |
+| `import` | `semear, novaSemente` de `matematica.js`; `aplicaUrl, guardaUrl, extrasDaFolha, copiaLink` de `estado.js` |
+| marcação | a caixa `id="qr"` e o botão `id="link"` |
+| `PADRAO` | `qr: false` |
+| `gerar()` | `semear(semente)` como primeira linha |
+| `pintar()` | `Object.assign(cfg, extrasDaFolha(PADRAO, ctl, semente))` e `guardaUrl(PADRAO, ctl, semente)` |
+| fim do script | `semente = aplicaUrl(PADRAO, ctl) \|\| novaSemente();` antes do `gerar()` inicial |
+
+Detalhes que importam:
+
+- **Só o que difere do padrão entra na URL.** O link fica curto e legível, e mudar um
+  padrão no código não quebra links antigos que não mencionavam aquele campo.
+- **Mudar um controle mantém a semente**; só "Gerar outra lista" sorteia outra. Assim,
+  subir a quantidade de 12 para 20 acrescenta 8 questões em vez de trocar a lista inteira.
+- **A semente é do sorteio, não do conteúdo**: mexer em `matematica.js` ou nas famílias de
+  questão de uma ferramenta muda o que uma semente antiga produz. Links são estáveis entre
+  visitas, não entre versões do gerador.
+- **O QR aponta para a própria lista**, já com `temGab=0` e `v=<versão da folha>` — o aluno
+  cai na folha dele, sem gabarito, e `estado.js` mostra o aviso com a saída para ver todas
+  as versões. É conveniência, não tranca: quem editar a URL vê o gabarito.
+- O que entra na folha é escapado por `esc()`; o que vem da URL é tratado como entrada de
+  fora (valor de chip inexistente é descartado, texto é cortado no `maxlength` do campo).
+
+## Busca
+
+`/busca` filtra um índice estático, `/busca-index.json`, montado no build por
+`src/utils/busca.ts` a partir dos mesmos manifestos que alimentam as páginas — séries,
+análises, ferramentas e a coleção do blog. **Nada é catalogado à mão**: material novo no
+JSON entra na busca sozinho.
+
+São ~120 entradas de título e descrição, e por isso não há motor de busca nem índice
+invertido: o navegador baixa o JSON (~28 KB) e filtra. A consulta não sai da máquina de
+quem busca. O casamento ignora acentos sem perder as posições dos caracteres (cada letra
+vira sua base, uma a uma), o que permite destacar o trecho encontrado no texto original.
+
+Para acrescentar uma fonte à busca, edite `montarIndice()`: cada item é
+`{ t: título, d: descrição, u: URL, s: grupo, c: contexto, x: texto só para casar, p: PDF }`.
 
 ## Como adicionar um material
 
@@ -209,7 +277,9 @@ disponível no canto da barra superior e o IDEB guarda a escolha em `localStorag
 Salvo indicação em contrário, os materiais didáticos (PDFs) e os textos do blog estão sob a licença
 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt-br) —
 podem ser usados e adaptados em sala de aula, com atribuição e sem fins comerciais.
-A nota aparece no rodapé de todas as páginas (em `src/layouts/Layout.astro`).
+A nota aparece no rodapé de todas as páginas (em `src/layouts/Layout.astro`), e
+`/para-professores` explica em português claro o que a licença permite, com o modelo
+de citação — é a página para onde mandar o colega que perguntar se pode usar.
 
 ## Como publicar um post
 

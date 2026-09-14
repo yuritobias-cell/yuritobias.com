@@ -14,10 +14,50 @@ export const REL  = { eq:'=', lt:'&lt;', gt:'&gt;', le:'≤', ge:'≥' };
 export const VIRA  = { lt:'gt', gt:'lt', le:'ge', ge:'le' };   // ao multiplicar/dividir por negativo
 export const SINAIS = ['lt', 'gt', 'le', 'ge'];
 
-export const inteiro = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+/* --------------------------------------------------------------------------
+   SORTEIO COM SEMENTE
+   Todo sorteio das ferramentas passa por aleatorio(), e não por Math.random():
+   é isso que permite guardar uma lista gerada num link — mesma semente, mesma
+   lista, questão por questão. Sem semear(), a semente inicial é aleatória e o
+   comportamento é o de sempre.
+   -------------------------------------------------------------------------- */
+let estadoPrng = (Math.random() * 4294967296) >>> 0;
+
+/* Espalha os caracteres de um texto pelos 32 bits do estado (xmur3). */
+function hash32(txt) {
+  let h = 1779033703 ^ txt.length;
+  for (let i = 0; i < txt.length; i++) {
+    h = Math.imul(h ^ txt.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  h = Math.imul(h ^ (h >>> 16), 2246822507);
+  h = Math.imul(h ^ (h >>> 13), 3266489909);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+/** Reinicia o sorteio a partir de uma semente (qualquer texto curto). */
+export function semear(semente) { estadoPrng = hash32(String(semente)); }
+
+/** Próximo número em [0, 1) — mulberry32. */
+export function aleatorio() {
+  estadoPrng = (estadoPrng + 0x6D2B79F5) >>> 0;
+  let t = estadoPrng;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+/** Semente nova em base 36 — curta o bastante para não poluir a URL. */
+export function novaSemente() {
+  const b = new Uint32Array(1);
+  crypto.getRandomValues(b);
+  return b[0].toString(36).padStart(7, '0');
+}
+
+export const inteiro = (a, b) => a + Math.floor(aleatorio() * (b - a + 1));
 export const naoZero = (a, b) => { let n = 0; while (n === 0) n = inteiro(a, b); return n; };
 export const escolhe = (arr) => arr[inteiro(0, arr.length - 1)];
-export const moeda = (p = 0.5) => Math.random() < p;
+export const moeda = (p = 0.5) => aleatorio() < p;
 export const maisMenos = (p = 0.5) => (moeda(p) ? -1 : 1);
 
 export function embaralha(arr) {
@@ -29,7 +69,7 @@ export function embaralha(arr) {
 /* Sorteio ponderado: pares [valor, peso]. */
 export function pesado(pares) {
   const total = pares.reduce((s, p) => s + p[1], 0);
-  let x = Math.random() * total;
+  let x = aleatorio() * total;
   for (const [v, p] of pares) { x -= p; if (x <= 0) return v; }
   return pares[pares.length - 1][0];
 }
