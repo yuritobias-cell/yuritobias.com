@@ -1,4 +1,9 @@
 ---
-/* Radical com a barra por cima do radicando. */
+/* Radical com a barra por cima do radicando. `i` é o índice: sem ele, raiz
+   quadrada; com ele, ∛, ∜ e o que mais vier. */
+interface Props {
+  i?: string;
+}
+const { i } = Astro.props;
 ---
-<span class="rad">√<span class="rad-b"><slot /></span></span>
+<span class="rad">{i && <sup class="rad-i">{i}</sup>}√<span class="rad-b"><slot /></span></span>

@@ -1,0 +1,59 @@
+---
+titulo: "Fração Geratriz"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre fração geratriz: converter dízimas periódicas simples e compostas em fração, operar com elas e resolver questões de vestibular."
+serie: "1em"
+material: "04"
+instrucoes: "Resolva os exercícios diretamente no seu caderno."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+import Periodo from '../../components/mat/Periodo.astro';
+import Formula from '../../components/mat/Formula.astro';
+
+1. Encontre a fração geratriz de cada uma das dízimas periódicas:
+
+   <Alt cols={2}>
+     <li>0,<Periodo>6</Periodo></li>
+     <li>1,<Periodo>5</Periodo></li>
+     <li>0,3<Periodo>2</Periodo></li>
+     <li>2,3<Periodo>26</Periodo></li>
+     <li>15,1<Periodo>3</Periodo></li>
+   </Alt>
+
+1. Calcule:
+
+   <Formula centro>
+     0,<Periodo>9</Periodo> + <Frac n="3" d="5" /> − <Frac n="1" d="5" /> + <Frac n="1" d="3" /> − <Frac n="1" d="15" />
+   </Formula>
+
+1. Qual é o valor de:
+
+   <Formula centro>
+     <i>y</i> = <Raiz>0,<Periodo>1</Periodo></Raiz> + <Frac><Fragment slot="n">14</Fragment><Fragment slot="d">0,<Periodo>7</Periodo></Fragment></Frac>
+   </Formula>
+
+1. **(UFRN)** O valor de <Frac n="2" d="0,666…" /> é:
+
+   <Alt cols={2}>
+     <li>0,333…</li>
+     <li>1,333…</li>
+     <li>3,333…</li>
+     <li>3</li>
+     <li>12</li>
+   </Alt>
+
+1. **(UF-MG)** Todas as alternativas sobre números inteiros estão corretas, **exceto**:
+
+   1. Nem todo primo é ímpar.
+   1. Todo inteiro par pode ser escrito na forma <i>n</i><sup>2</sup> + 2, <i>n</i> ∈ ℤ.
+   1. A soma de dois inteiros ímpares é sempre um inteiro par.
+   1. Todo inteiro ímpar pode ser escrito na forma 2<i>n</i> − 9, <i>n</i> ∈ ℤ.
+   1. Se <i>n</i> é um inteiro ímpar, então <i>n</i><sup>2</sup> também é ímpar.
+
+1. **(PUC-RJ)** Escreva na forma de fração <Frac n="<i>m</i>" d="<i>n</i>" /> a soma <i>S</i> = 0,222… + 0,2333…
+
+1. Seja <Frac n="<i>p</i>" d="<i>q</i>" />, com <i>q</i> diferente de zero, a fração irredutível que corresponde ao resultado de 1,666… + 0,02444… Quanto vale <i>p</i> − <i>q</i>?
+
+1. **DESAFIO:** Um grupo de alunos de uma escola deveria visitar o Museu de Ciência e o Museu de História da cidade. Quarenta e oito alunos foram visitar pelo menos um desses museus. 20% dos que foram ao de Ciência visitaram o de História e 25% dos que foram ao de História também visitaram o de Ciência. Calcule o número de alunos que visitaram os dois museus.

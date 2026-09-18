@@ -94,7 +94,9 @@ da pasta; nada a registrar à mão.
 As **geradoras de lista** (`gerador-equacoes`, `gerador-sistemas`, `gerador-progressoes`,
 `gerador-fatoracao`) são a exceção à regra do
 "JS próprio por página": elas compartilham quatro arquivos, porque um bug no renderizador de
-fração não deve precisar de correção em dois lugares.
+fração não deve precisar de correção em dois lugares. O `explorador-de-funcoes` também
+importa `matematica.js` — é dele que vêm as raízes exatas, com radical simplificado, em vez
+do decimal arredondado.
 
 | Arquivo | O que traz |
 | :--- | :--- |
@@ -267,15 +269,29 @@ de componentes que se importam no topo do arquivo:
 | Componente | Para quê | No LaTeX |
 | :--- | :--- | :--- |
 | `<Frac n="1" d="2" />` | fração empilhada (com slots `n`/`d` quando houver componente dentro) | `\dfrac{1}{2}` |
-| `<Raiz>72</Raiz>` | radical com a barra sobre o radicando | `\sqrt{72}` |
-| `<Formula>…</Formula>` | fórmula na própria linha, sem quebrar no meio | `\mbox{$…$}` |
+| `<Raiz>72</Raiz>`, `<Raiz i="3">54</Raiz>` | radical, com índice opcional | `\sqrt{72}`, `\sqrt[3]{54}` |
+| `<Periodo>6</Periodo>` | o traço sobre o período da dízima | `\overline{6}` |
+| `<Formula>…</Formula>`, `<Formula centro>` | fórmula na própria linha, sem quebrar no meio | `\mbox{$…$}`, `$$…$$` |
 | `<Alt cols={2}>` | alternativas lado a lado, em `n` colunas | `\begin{tasks}(2)` |
+| `<Sistema n={3}>` | sistema entre chaves, uma equação por `<span>` | `\begin{cases}` |
 | `<TriRet a="9" b="12" c="x" rotulo="a)" />` | triângulo retângulo com as três medidas | `\figTriRet{9}{12}{x}` |
 
-O resto é HTML normal: `<i>x</i>` para a incógnita, `<sup>2</sup>` para a potência e o
-sinal de menos U+2212 (`−`), não o hífen. Figura nova pede um componente novo em
+O resto é HTML normal: `<i>x</i>` para a incógnita, `<sup>2</sup>` para a potência, o
+sinal de menos U+2212 (`−`) e não o hífen, e os símbolos direto em Unicode (`⊂`, `∈`,
+`∅`, `π`, `°`, `ℤ`). Expoente fracionário vai com barra (`<sup>1/3</sup>`): empilhado
+fica ilegível no tamanho de um expoente. Figura nova pede um componente novo em
 `src/components/mat/` — mantenha a mesma geometria do macro TikZ correspondente, para
 que a folha e a tela contem a mesma história.
+
+Três armadilhas do MDX que valem o aviso, porque o erro não é óbvio:
+
+- **`{` e `}` literais precisam de barra invertida** (`\{1, 2, 3\}`) — sem ela o MDX lê
+  como início de expressão JSX. Aparece em conjuntos o tempo todo.
+- **Componente dentro de um parágrafo tem de caber numa linha.** Abrir `<Frac>` numa
+  linha e fechar noutra, no meio de um texto, quebra o build com "expected a closing tag".
+- **Componente que embrulha bloco tem de render `<div>`, nunca `<p>`.** Em bloco
+  multilinha o MDX envolve o conteúdo num parágrafo; parágrafo dentro de parágrafo é HTML
+  inválido, o navegador separa os dois e o componente sai **vazio**, sem erro nenhum.
 
 ## Como publicar uma análise
 

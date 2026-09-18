@@ -94,6 +94,26 @@
       ]
     },
     {
+      "slug": "explorador-de-funcoes",
+      "titulo": "Explorador de Funções",
+      "assunto": "Funções",
+      "tipo": "simulacoes",
+      "descricao": "Mexa nos coeficientes a, b e c e veja a reta ou a parábola responder na hora. Raízes, vértice, discriminante e imagem saem exatos, com fração e radical — e o rastro guarda as curvas anteriores para comparar.",
+      "assuntos": [
+        "funcoes"
+      ]
+    },
+    {
+      "slug": "circunferencia-trigonometrica",
+      "titulo": "Circunferência Trigonométrica",
+      "assunto": "Trigonometria",
+      "tipo": "simulacoes",
+      "descricao": "Arraste o ponto e veja seno, cosseno e tangente como segmentos nos seus eixos, com os valores exatos dos ângulos notáveis, o quadrante, a redução ao 1º quadrante e o gráfico da função sendo traçado.",
+      "assuntos": [
+        "trigonometria"
+      ]
+    },
+    {
       "slug": "monty-hall",
       "titulo": "Paradoxo de Monty Hall",
       "assunto": "Probabilidade",

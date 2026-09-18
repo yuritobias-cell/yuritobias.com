@@ -1,0 +1,32 @@
+---
+titulo: "Sistemas Lineares"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre sistemas lineares: resolução por escalonamento com matriz aumentada, problemas contextualizados e questões da UNICAMP e do ENEM."
+serie: "2em"
+material: "09"
+instrucoes: "Resolva os exercícios diretamente no seu caderno."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Sistema from '../../components/mat/Sistema.astro';
+
+1. Resolva os sistemas abaixo pelo método do escalonamento, apresentando a matriz aumentada e cada etapa das operações de linha.
+
+   1. <Sistema n={3}><span><i>x</i> + <i>y</i> − <i>z</i> = 4</span><span>2<i>x</i> − <i>y</i> + <i>z</i> = 2</span><span><i>x</i> + 2<i>y</i> + 3<i>z</i> = 11</span></Sistema>
+   1. <Sistema n={3}><span><i>x</i> + <i>y</i> + <i>z</i> = 2</span><span><i>x</i> − <i>y</i> + 2<i>z</i> = 6</span><span>2<i>x</i> + <i>y</i> − <i>z</i> = −1</span></Sistema>
+
+1. Três amigos que estudam juntos foram até a papelaria repor alguns materiais escolares. Cadu comprou três lápis, duas borrachas e uma caneta, gastando o total de R$ 9,70; Isa comprou dois lápis, uma borracha e três canetas, gastando R$ 11,70; e Rafa comprou uma borracha e duas canetas, pagando R$ 6,80. Após as compras, lembraram de que precisavam levar para a professora dois lápis e uma caneta. Qual o valor da compra para a professora?
+
+1. **(UNICAMP)** Considere o sistema linear nas variáveis <i>x</i>, <i>y</i>, <i>z</i> e <i>w</i>:
+
+   <Sistema n={3}><span><i>x</i> − <i>y</i> = 1</span><span><i>y</i> + <i>z</i> = 2</span><span><i>w</i> − <i>z</i> = 3</span></Sistema>
+
+   Logo, a soma <i>x</i> + <i>y</i> + <i>z</i> + <i>w</i> é igual a:
+
+   <Alt cols={4}>
+     <li>−2</li>
+     <li>0</li>
+     <li>6</li>
+     <li>8</li>
+   </Alt>
+
+1. **(ENEM)** Para sua festa de 17 anos, o aniversariante convidará 132 pessoas. Ele convidará 26 mulheres a mais que o número de homens. A empresa contratada para realizar a festa cobrará R$ 50,00 por convidado do sexo masculino e R$ 45,00 por convidado do sexo feminino. Quanto esse aniversariante terá que pagar, em real, à empresa contratada, pela quantidade de homens convidados para sua festa?

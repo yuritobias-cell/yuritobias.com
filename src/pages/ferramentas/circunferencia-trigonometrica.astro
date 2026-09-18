@@ -1,0 +1,610 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Circunferência Trigonométrica"
+  description="Simulador da circunferência trigonométrica: arraste o ponto e veja seno, cosseno e tangente como segmentos, com os valores exatos dos ângulos notáveis, o quadrante, a redução ao 1º quadrante e o gráfico da função sendo traçado."
+>
+  <div class="ct-root">
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=simulacoes">Simulações</a> · Trigonometria</p>
+      <h1>Circunferência <em>trigonométrica</em></h1>
+      <p class="lede">Arraste o ponto sobre a circunferência. Seno, cosseno e tangente aparecem
+      como <em>segmentos</em> nos seus eixos — não como números soltos — e o gráfico da função
+      vai sendo traçado ao lado, no mesmo ângulo. Nos ângulos notáveis o valor sai exato, com
+      radical e fração.</p>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Função em destaque" id="tabs">
+      <button class="tab" role="tab" data-f="sen">seno</button>
+      <button class="tab" role="tab" data-f="cos">cosseno</button>
+      <button class="tab" role="tab" data-f="tan">tangente</button>
+    </div>
+
+    <div class="stage">
+      <div class="canvas-card">
+        <svg class="board" id="board" viewBox="0 0 520 520" aria-label="Circunferência trigonométrica interativa">
+          <!-- eixos e grade -->
+          <g id="gGrade"></g>
+          <line class="eixo" x1="30" y1="260" x2="490" y2="260" />
+          <line class="eixo" x1="260" y1="30" x2="260" y2="490" />
+          <text class="rot rot-eixo" x="486" y="252" text-anchor="end">cos</text>
+          <text class="rot rot-eixo" x="268" y="42">sen</text>
+
+          <!-- eixo das tangentes: a reta x = 1 -->
+          <g id="gTan">
+            <line class="eixo-tan" x1="440" y1="40" x2="440" y2="480" />
+            <text class="rot rot-eixo" x="446" y="52">tg</text>
+          </g>
+
+          <circle class="circ" cx="260" cy="260" r="180" />
+
+          <!-- arco do ângulo -->
+          <path id="arco" class="arco" />
+
+          <!-- projeções tracejadas -->
+          <line id="projX" class="proj" />
+          <line id="projY" class="proj" />
+
+          <!-- os três segmentos -->
+          <line id="segCos" class="seg seg-cos" />
+          <line id="segSen" class="seg seg-sen" />
+          <line id="segTan" class="seg seg-tan" />
+          <line id="raio" class="raio" />
+          <line id="raioExt" class="raio-ext" />
+
+          <!-- rótulos dos segmentos -->
+          <text id="rotCos" class="rot rot-cos" text-anchor="middle"></text>
+          <text id="rotSen" class="rot rot-sen" text-anchor="middle"></text>
+          <text id="rotTan" class="rot rot-tan" text-anchor="start"></text>
+          <text id="rotAng" class="rot rot-ang" text-anchor="middle"></text>
+
+          <circle id="ponto" class="ponto" r="11" />
+        </svg>
+        <p class="dica">Arraste o ponto — ou use as setas do teclado depois de clicar nele.</p>
+      </div>
+
+      <div class="painel">
+        <div class="card card-valores">
+          <div class="rotulo">Ângulo</div>
+          <div class="angulo"><span id="vGrau"></span><span id="vRad" class="rad-txt"></span></div>
+          <div class="quadrante" id="vQuad"></div>
+
+          <div class="valores">
+            <div class="valor v-sen">
+              <span class="nome">sen</span>
+              <span class="exato" id="vSenEx"></span>
+              <span class="aprox" id="vSenAp"></span>
+            </div>
+            <div class="valor v-cos">
+              <span class="nome">cos</span>
+              <span class="exato" id="vCosEx"></span>
+              <span class="aprox" id="vCosAp"></span>
+            </div>
+            <div class="valor v-tan">
+              <span class="nome">tg</span>
+              <span class="exato" id="vTanEx"></span>
+              <span class="aprox" id="vTanAp"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Redução ao 1º quadrante</h2>
+          <p id="vReducao"></p>
+        </div>
+
+        <div class="controles">
+          <label class="toggle on"><input type="checkbox" id="tSnap" checked> Prender nos notáveis</label>
+          <label class="toggle on"><input type="checkbox" id="tTan" checked> Eixo das tangentes</label>
+          <label class="toggle"><input type="checkbox" id="tGrade"> Grade</label>
+          <button class="btn" type="button" id="zerar">Voltar a 30°</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grafico-card">
+      <div class="rotulo" id="rotGrafico"></div>
+      <svg class="grafico" id="grafico" viewBox="0 0 1040 260" aria-label="Gráfico da função trigonométrica"></svg>
+    </div>
+  </div>
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Circunferência Trigonométrica.
+     Tudo escopado sob .ct-root para não vazar para o resto do site.
+     Sem CDN: as fontes são as que o Layout já serve, e a monoespaçada
+     é a do sistema — a página tem de abrir offline.
+     ============================================================ */
+  .ct-root{
+    --bg:#F8F6F1; --ink:#1C1917; --muted:#78716C; --accent:#1B4F4F; --rule:#E2DDD6;
+    --papel:#FFFFFF; --grade:#EFEBE3;
+    --cor-sen:#B4531F;      /* terracota */
+    --cor-cos:#1B4F4F;      /* teal */
+    --cor-tan:#6E5B9B;      /* roxo */
+    --cor-ang:#936614;      /* ocre */
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --mat:Georgia,'Times New Roman',Times,serif;
+    --radius:14px;
+
+    font-family:var(--font-body); line-height:1.5; color:var(--ink);
+    max-width:1180px; margin:0 auto; padding:30px 22px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .ct-root, .ct-root *{box-sizing:border-box}
+
+  .ct-root header.masthead{margin-bottom:22px}
+  .ct-root .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .ct-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .ct-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .ct-root h1{font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em}
+  .ct-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .ct-root .lede{color:var(--muted);max-width:64ch;margin:12px 0 0;font-size:15px}
+  .ct-root .lede em{font-style:normal;color:var(--ink);font-weight:500}
+
+  /* ----- abas ----- */
+  .ct-root .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 18px}
+  .ct-root .tab{appearance:none;border:1px solid var(--rule);background:transparent;
+    color:var(--muted);font-family:var(--font-body);font-weight:500;font-size:12.5px;
+    letter-spacing:.04em;text-transform:uppercase;padding:9px 16px;border-radius:999px;
+    cursor:pointer;transition:.18s}
+  .ct-root .tab:hover{color:var(--ink);border-color:var(--muted)}
+  .ct-root .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* ----- layout ----- */
+  .ct-root .stage{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:start}
+  @media (max-width:900px){.ct-root .stage{grid-template-columns:1fr}}
+
+  .ct-root .canvas-card,.ct-root .card,.ct-root .grafico-card{
+    background:var(--papel);border:1px solid var(--rule);border-radius:var(--radius)}
+  .ct-root .canvas-card{padding:10px 10px 4px;position:relative}
+  .ct-root svg.board{display:block;width:100%;height:auto;touch-action:none}
+  .ct-root .dica{font-size:12.5px;color:var(--muted);margin:0;padding:6px 8px 8px;text-align:center}
+
+  .ct-root .painel{display:flex;flex-direction:column;gap:16px}
+  .ct-root .card{padding:18px}
+  .ct-root .card h2{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0 0 6px}
+  .ct-root .card p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+  .ct-root .card p b{color:var(--ink);font-weight:600}
+  .ct-root .rotulo{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+
+  .ct-root .angulo{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .ct-root #vGrau{font-family:var(--font-display);font-size:38px;font-weight:700;line-height:1}
+  .ct-root .rad-txt{font-family:var(--mat);font-size:19px;color:var(--accent)}
+  .ct-root .quadrante{font-size:13px;color:var(--muted);margin-top:6px}
+  .ct-root .quadrante b{color:var(--ink)}
+
+  .ct-root .valores{display:grid;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--rule)}
+  .ct-root .valor{display:grid;grid-template-columns:3.1rem 1fr auto;align-items:center;gap:10px}
+  .ct-root .valor .nome{font-family:var(--mat);font-size:17px;font-style:italic}
+  .ct-root .valor .exato{font-family:var(--mat);font-size:19px}
+  .ct-root .valor .aprox{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);
+    font-variant-numeric:tabular-nums}
+  .ct-root .v-sen .nome,.ct-root .v-sen .exato{color:var(--cor-sen)}
+  .ct-root .v-cos .nome,.ct-root .v-cos .exato{color:var(--cor-cos)}
+  .ct-root .v-tan .nome,.ct-root .v-tan .exato{color:var(--cor-tan)}
+
+  .ct-root .controles{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .ct-root .toggle{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);
+    border:1px solid var(--rule);background:var(--papel);border-radius:999px;padding:7px 13px;cursor:pointer}
+  .ct-root .toggle.on{color:var(--accent);border-color:var(--accent)}
+  .ct-root .btn{appearance:none;border:1px solid var(--rule);background:var(--papel);
+    color:var(--accent);font:inherit;font-size:12.5px;border-radius:999px;padding:7px 14px;cursor:pointer}
+  .ct-root .btn:hover{border-color:var(--accent)}
+
+  /* ----- desenho ----- */
+  .ct-root .circ{fill:none;stroke:var(--ink);stroke-width:1.6;opacity:.85}
+  .ct-root .eixo{stroke:var(--muted);stroke-width:1}
+  .ct-root .eixo-tan{stroke:var(--cor-tan);stroke-width:1;stroke-dasharray:3 4;opacity:.75}
+  .ct-root .grade-l{stroke:var(--grade);stroke-width:1}
+  .ct-root .arco{fill:none;stroke:var(--cor-ang);stroke-width:3;opacity:.9}
+  .ct-root .proj{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4;opacity:.8}
+  .ct-root .raio{stroke:var(--ink);stroke-width:1.4;opacity:.55}
+  .ct-root .raio-ext{stroke:var(--cor-tan);stroke-width:1;stroke-dasharray:2 4;opacity:.8}
+  .ct-root .seg{stroke-width:4.5;stroke-linecap:round}
+  .ct-root .seg-cos{stroke:var(--cor-cos)}
+  .ct-root .seg-sen{stroke:var(--cor-sen)}
+  .ct-root .seg-tan{stroke:var(--cor-tan)}
+  .ct-root .ponto{fill:var(--papel);stroke:var(--ink);stroke-width:2.5;cursor:grab}
+  .ct-root .ponto:active{cursor:grabbing}
+  .ct-root .ponto:focus{outline:none;stroke:var(--accent);stroke-width:3.5}
+  .ct-root .rot{font-family:var(--mat);font-size:15px;font-style:italic}
+  .ct-root .rot-eixo{font-size:13px;fill:var(--muted);font-style:normal;font-family:var(--font-body)}
+  .ct-root .rot-cos{fill:var(--cor-cos)}
+  .ct-root .rot-sen{fill:var(--cor-sen)}
+  .ct-root .rot-tan{fill:var(--cor-tan)}
+  .ct-root .rot-ang{fill:var(--cor-ang)}
+  .ct-root .oculto{display:none}
+
+  /* ----- gráfico ----- */
+  .ct-root .grafico-card{margin-top:22px;padding:16px 18px 10px}
+  .ct-root svg.grafico{display:block;width:100%;height:auto}
+  .ct-root .g-eixo{stroke:var(--muted);stroke-width:1}
+  .ct-root .g-grade{stroke:var(--grade);stroke-width:1}
+  .ct-root .g-curva{fill:none;stroke-width:2.5}
+  .ct-root .g-feito{stroke-width:3.5}
+  .ct-root .g-marca{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4}
+  .ct-root .g-rot{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+
+  /* ----- fração e radical do valor exato ----- */
+  .ct-root .fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:-.55em;
+    margin:0 .1em;line-height:1.1}
+  .ct-root .fr-n{padding:0 .22em}
+  .ct-root .fr-d{padding:0 .22em;border-top:1px solid currentColor}
+  .ct-root .rad{white-space:nowrap}
+  .ct-root .rad-b{border-top:1px solid currentColor;padding:0 .12em 0 .06em}
+
+  @media print{
+    body > nav, body > footer{display:none !important}
+    .ct-root .tabs,.ct-root .controles,.ct-root .dica,.ct-root .lede{display:none !important}
+    .ct-root .stage{grid-template-columns:1fr 1fr}
+    .ct-root *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+
+<script is:inline>
+"use strict";
+/* ============================================================
+   Circunferência trigonométrica — tudo em ângulo de grau inteiro.
+   O estado é um número só: `ang`, em graus. Todo o resto é derivado.
+   ============================================================ */
+const NS = "http://www.w3.org/2000/svg";
+const CX = 260, CY = 260, R = 180;      // centro e raio, em coordenadas do viewBox
+const XTAN = 440;                        // reta x = 1 (eixo das tangentes)
+
+const $ = (id) => document.getElementById(id);
+const board = $("board");
+
+let ang = 30;                 // graus
+let func = "sen";             // aba em destaque
+const mostrar = { snap: true, tan: true, grade: false };
+
+const rad = (g) => g * Math.PI / 180;
+const norm = (g) => ((g % 360) + 360) % 360;
+
+/* ---------- valores exatos dos ângulos notáveis ----------
+   Guardados como HTML pronto: são poucos e fixos, e assim a fração
+   empilhada e o radical saem com a mesma marcação do resto do site. */
+const frac = (n, d) => `<span class="fr"><span class="fr-n">${n}</span><span class="fr-d">${d}</span></span>`;
+const raiz = (n) => `<span class="rad">√<span class="rad-b">${n}</span></span>`;
+const MENOS = "−";
+
+const UM_MEIO = frac("1", "2");
+const R2_2 = frac(raiz(2), "2");
+const R3_2 = frac(raiz(3), "2");
+const R3_3 = frac(raiz(3), "3");
+
+// seno dos notáveis, por ângulo; o cosseno sai de sen(θ+90°) e a tangente da razão.
+const SENO = {
+  0: "0", 30: UM_MEIO, 45: R2_2, 60: R3_2, 90: "1",
+  120: R3_2, 135: R2_2, 150: UM_MEIO, 180: "0",
+  210: MENOS + UM_MEIO, 225: MENOS + R2_2, 240: MENOS + R3_2, 270: MENOS + "1",
+  300: MENOS + R3_2, 315: MENOS + R2_2, 330: MENOS + UM_MEIO,
+};
+const TANGENTE = {
+  0: "0", 30: R3_3, 45: "1", 60: raiz(3), 90: null,
+  120: MENOS + raiz(3), 135: MENOS + "1", 150: MENOS + R3_3, 180: "0",
+  210: R3_3, 225: "1", 240: raiz(3), 270: null,
+  300: MENOS + raiz(3), 315: MENOS + "1", 330: MENOS + R3_3,
+};
+const RADIANOS = {
+  0: "0", 30: frac("π", "6"), 45: frac("π", "4"), 60: frac("π", "3"), 90: frac("π", "2"),
+  120: frac("2π", "3"), 135: frac("3π", "4"), 150: frac("5π", "6"), 180: "π",
+  210: frac("7π", "6"), 225: frac("5π", "4"), 240: frac("4π", "3"), 270: frac("3π", "2"),
+  300: frac("5π", "3"), 315: frac("7π", "4"), 330: frac("11π", "6"),
+};
+
+const ehNotavel = (g) => Object.prototype.hasOwnProperty.call(SENO, norm(g));
+const senoExato = (g) => SENO[norm(g)];
+const cossenoExato = (g) => SENO[norm(g + 90)];
+const tangenteExata = (g) => TANGENTE[norm(g)];
+
+/* ---------- utilidades de desenho ---------- */
+function el(tag, attrs) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+const põe = (id, attrs) => { const n = $(id); for (const k in attrs) n.setAttribute(k, attrs[k]); };
+const num = (v) => (Math.abs(v) < 5e-4 ? 0 : v);
+/* O decimal sai com o menos de verdade (U+2212), como no resto do site. */
+const dec = (v, casas = 4) => num(v).toFixed(casas).replace("-", MENOS);
+
+/* Arredonda para o notável mais próximo quando estiver a menos de 6°. */
+function prende(g) {
+  if (!mostrar.snap) return Math.round(g);
+  let melhor = Math.round(g), dist = 7;
+  for (const k of Object.keys(SENO)) {
+    const alvo = Number(k);
+    const d = Math.min(norm(g - alvo), norm(alvo - g));
+    if (d < dist) { dist = d; melhor = alvo; }
+  }
+  return norm(melhor);
+}
+
+/* ---------- grade ---------- */
+function desenhaGrade() {
+  const g = $("gGrade");
+  g.innerHTML = "";
+  if (!mostrar.grade) return;
+  for (let i = -4; i <= 4; i++) {
+    if (i === 0) continue;
+    const p = i * (R / 4);
+    g.appendChild(el("line", { class: "grade-l", x1: 30, y1: CY + p, x2: 490, y2: CY + p }));
+    g.appendChild(el("line", { class: "grade-l", x1: CX + p, y1: 30, x2: CX + p, y2: 490 }));
+  }
+}
+
+/* ---------- o desenho principal ---------- */
+function desenha() {
+  const t = rad(ang);
+  const c = Math.cos(t), s = Math.sin(t);
+  const px = CX + R * c, py = CY - R * s;
+
+  põe("ponto", { cx: px, cy: py });
+  põe("raio", { x1: CX, y1: CY, x2: px, y2: py });
+
+  // cosseno no eixo horizontal, seno no vertical
+  põe("segCos", { x1: CX, y1: CY, x2: px, y2: CY });
+  põe("segSen", { x1: CX, y1: CY, x2: CX, y2: py });
+  põe("projX", { x1: px, y1: py, x2: px, y2: CY });
+  põe("projY", { x1: px, y1: py, x2: CX, y2: py });
+
+  // arco do ângulo, do eixo positivo até o ponto (sempre no sentido anti-horário)
+  const ra = 42;
+  const a1 = norm(ang);
+  const grande = a1 > 180 ? 1 : 0;
+  const ax = CX + ra * Math.cos(t), ay = CY - ra * Math.sin(t);
+  põe("arco", { d: `M ${CX + ra} ${CY} A ${ra} ${ra} 0 ${grande} 0 ${ax} ${ay}` });
+  const am = rad(a1 / 2);
+  põe("rotAng", { x: CX + (ra + 18) * Math.cos(am), y: CY - (ra + 18) * Math.sin(am) + 5 });
+  $("rotAng").textContent = `${Math.round(a1)}°`;
+
+  // tangente: só existe fora de 90° e 270°
+  const perto90 = Math.abs(Math.cos(t)) < 1e-9;
+  const gTan = $("gTan");
+  gTan.classList.toggle("oculto", !mostrar.tan);
+  const segTan = $("segTan"), raioExt = $("raioExt"), rotTan = $("rotTan");
+  if (mostrar.tan && !perto90) {
+    const tg = s / c;
+    const ty = CY - R * tg;
+    // o raio se estende (para a frente ou para trás) até encontrar a reta x = 1
+    const dentro = ty > 20 && ty < 500;
+    segTan.classList.toggle("oculto", !dentro);
+    raioExt.classList.toggle("oculto", !dentro);
+    rotTan.classList.toggle("oculto", !dentro);
+    if (dentro) {
+      põe("segTan", { x1: XTAN, y1: CY, x2: XTAN, y2: ty });
+      põe("raioExt", { x1: CX, y1: CY, x2: XTAN, y2: ty });
+      põe("rotTan", { x: XTAN + 8, y: (CY + ty) / 2 + 5 });
+      rotTan.textContent = "tg";
+    }
+  } else {
+    segTan.classList.add("oculto");
+    raioExt.classList.add("oculto");
+    rotTan.classList.add("oculto");
+  }
+
+  // rótulos dos segmentos, afastados do eixo para não cobrirem o traço
+  const rotCos = $("rotCos"), rotSen = $("rotSen");
+  rotCos.classList.toggle("oculto", Math.abs(c) < 0.08);
+  rotSen.classList.toggle("oculto", Math.abs(s) < 0.08);
+  põe("rotCos", { x: (CX + px) / 2, y: CY + (s >= 0 ? 20 : -10) });
+  rotCos.textContent = "cos";
+  // O rótulo do seno fica do lado oposto ao da bissetriz do ângulo — senão os
+  // dois se encontram no 2º quadrante, onde a bissetriz encosta no eixo vertical.
+  const ladoSen = Math.cos(rad(norm(ang) / 2)) > 0 ? -24 : 24;
+  põe("rotSen", { x: CX + ladoSen, y: (CY + py) / 2 + 5 });
+  rotSen.textContent = "sen";
+}
+
+/* ---------- painel ---------- */
+function atualizaPainel() {
+  const a = norm(ang);
+  const t = rad(a);
+  const s = num(Math.sin(t)), c = num(Math.cos(t));
+
+  $("vGrau").textContent = `${a}°`;
+  $("vRad").innerHTML = RADIANOS[a] ? `${RADIANOS[a]} rad` : `${(t).toFixed(3)} rad`;
+
+  const quad = (a % 90 === 0)
+    ? `<b>${a === 0 ? "origem dos arcos" : a === 90 ? "eixo dos senos" : a === 180 ? "eixo dos cossenos, à esquerda" : "eixo dos senos, abaixo"}</b> — ângulo de quadrante`
+    : `<b>${Math.floor(a / 90) + 1}º quadrante</b> — sen ${s > 0 ? "+" : MENOS}, cos ${c > 0 ? "+" : MENOS}`;
+  $("vQuad").innerHTML = quad;
+
+  const notavel = ehNotavel(a);
+  $("vSenEx").innerHTML = notavel ? senoExato(a) : "";
+  $("vCosEx").innerHTML = notavel ? cossenoExato(a) : "";
+  $("vSenAp").textContent = dec(s);
+  $("vCosAp").textContent = dec(c);
+
+  if (Math.abs(c) < 1e-9) {
+    $("vTanEx").innerHTML = "não definida";
+    $("vTanAp").textContent = "";
+  } else {
+    const tg = s / c;
+    $("vTanEx").innerHTML = notavel ? (tangenteExata(a) ?? "") : "";
+    $("vTanAp").textContent = dec(tg);
+  }
+
+  atualizaReducao(a);
+}
+
+/* A regra que o aluno usa na prova: o ângulo de referência no 1º quadrante e
+   o sinal que cada função ganha naquele quadrante. */
+function atualizaReducao(a) {
+  const alvo = $("vReducao");
+  if (a % 90 === 0) {
+    alvo.innerHTML = `<b>${a}°</b> está sobre um eixo: não há redução a fazer — o valor é 0, 1 ou ${MENOS}1.`;
+    return;
+  }
+  const q = Math.floor(a / 90) + 1;
+  const ref = q === 1 ? a : q === 2 ? 180 - a : q === 3 ? a - 180 : 360 - a;
+  const conta = q === 1 ? `${a}°`
+    : q === 2 ? `180° ${MENOS} ${a}° = ${ref}°`
+    : q === 3 ? `${a}° ${MENOS} 180° = ${ref}°`
+    : `360° ${MENOS} ${a}° = ${ref}°`;
+  const sinais = { 1: ["+", "+", "+"], 2: ["+", MENOS, MENOS], 3: [MENOS, MENOS, "+"], 4: [MENOS, "+", MENOS] }[q];
+  alvo.innerHTML = `Está no <b>${q}º quadrante</b>. O ângulo de referência é <b>${conta}</b>.<br>`
+    + `Então sen ${a}° = ${sinais[0] === "+" ? "" : MENOS} sen ${ref}°, `
+    + `cos ${a}° = ${sinais[1] === "+" ? "" : MENOS} cos ${ref}° e `
+    + `tg ${a}° = ${sinais[2] === "+" ? "" : MENOS} tg ${ref}°.`;
+}
+
+/* ---------- gráfico da função em destaque ---------- */
+const G = { x0: 60, x1: 1010, y0: 20, y1: 240 };
+const gxDe = (g) => G.x0 + (g / 360) * (G.x1 - G.x0);
+const CORES = { sen: "var(--cor-sen)", cos: "var(--cor-cos)", tan: "var(--cor-tan)" };
+const NOMES = { sen: "seno", cos: "cosseno", tan: "tangente" };
+
+function desenhaGrafico() {
+  const svg = $("grafico");
+  svg.innerHTML = "";
+  const meio = (G.y0 + G.y1) / 2;
+  const escala = (G.y1 - G.y0) / 2 / (func === "tan" ? 3 : 1.15);
+
+  const gy = (v) => meio - v * escala;
+
+  // grade de 30° em 30° e eixos
+  for (let g = 0; g <= 360; g += 30) {
+    const x = gxDe(g);
+    svg.appendChild(el("line", { class: "g-grade", x1: x, y1: G.y0, x2: x, y2: G.y1 }));
+    if (g % 90 === 0) {
+      const r = el("text", { class: "g-rot", x: x, y: G.y1 + 16, "text-anchor": "middle" });
+      r.textContent = `${g}°`;
+      svg.appendChild(r);
+    }
+  }
+  svg.appendChild(el("line", { class: "g-eixo", x1: G.x0, y1: meio, x2: G.x1, y2: meio }));
+  svg.appendChild(el("line", { class: "g-eixo", x1: G.x0, y1: G.y0, x2: G.x0, y2: G.y1 }));
+  for (const v of [-1, 1]) {
+    const y = gy(v);
+    if (y > G.y0 && y < G.y1) {
+      const r = el("text", { class: "g-rot", x: G.x0 - 8, y: y + 4, "text-anchor": "end" });
+      r.textContent = v > 0 ? "1" : MENOS + "1";
+      svg.appendChild(r);
+    }
+  }
+
+  const f = func === "sen" ? Math.sin : func === "cos" ? Math.cos : Math.tan;
+
+  /* A curva é desenhada em dois traços: até o ângulo atual, em cheio; depois
+     dele, apagada. É o que faz o gráfico "ser traçado" conforme o ponto anda. */
+  const trechos = (ate) => {
+    const ds = [];
+    let d = "", quebrou = true;
+    for (let g = 0; g <= ate + 0.001; g += 1) {
+      const v = f(rad(g));
+      // a tangente estoura perto de 90° e 270°: corta o traço ali
+      if (func === "tan" && Math.abs(Math.cos(rad(g))) < 0.02) { quebrou = true; continue; }
+      const y = gy(v);
+      if (y < G.y0 - 40 || y > G.y1 + 40) { quebrou = true; continue; }
+      d += `${quebrou ? "M" : "L"} ${gxDe(g).toFixed(1)} ${y.toFixed(1)} `;
+      quebrou = false;
+    }
+    if (d) ds.push(d);
+    return ds;
+  };
+
+  const a = norm(ang);
+  svg.appendChild(el("path", { class: "g-curva", d: trechos(360)[0] || "", stroke: CORES[func], opacity: .22 }));
+  const feito = trechos(a)[0];
+  if (feito) svg.appendChild(el("path", { class: "g-curva g-feito", d: feito, stroke: CORES[func] }));
+
+  // marca no ângulo atual
+  const v = f(rad(a));
+  const x = gxDe(a), y = gy(v);
+  if (y > G.y0 - 20 && y < G.y1 + 20 && !(func === "tan" && Math.abs(Math.cos(rad(a))) < 0.02)) {
+    svg.appendChild(el("line", { class: "g-marca", x1: x, y1: meio, x2: x, y2: y }));
+    svg.appendChild(el("circle", { cx: x, cy: y, r: 6, fill: CORES[func] }));
+  } else {
+    svg.appendChild(el("line", { class: "g-marca", x1: x, y1: G.y0, x2: x, y2: G.y1 }));
+  }
+
+  $("rotGrafico").textContent = `Gráfico de ${NOMES[func]} — 0° a 360°`;
+}
+
+/* ---------- render ---------- */
+function render() {
+  desenha();
+  atualizaPainel();
+  desenhaGrafico();
+}
+
+/* ---------- arraste e teclado ---------- */
+function anguloDoEvento(evt) {
+  const r = board.getBoundingClientRect();
+  const x = (evt.clientX - r.left) / r.width * 520;
+  const y = (evt.clientY - r.top) / r.height * 520;
+  return norm(Math.atan2(-(y - CY), x - CX) * 180 / Math.PI);
+}
+
+let arrastando = false;
+const ponto = $("ponto");
+ponto.setAttribute("tabindex", "0");
+ponto.setAttribute("role", "slider");
+ponto.setAttribute("aria-label", "Ângulo na circunferência, em graus");
+
+ponto.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  arrastando = true;
+  ponto.setPointerCapture(e.pointerId);
+});
+board.addEventListener("pointerdown", (e) => {
+  if (e.target === ponto) return;
+  ang = prende(anguloDoEvento(e));
+  render();
+});
+window.addEventListener("pointermove", (e) => {
+  if (!arrastando) return;
+  ang = prende(anguloDoEvento(e));
+  render();
+}, { passive: true });
+window.addEventListener("pointerup", () => { arrastando = false; });
+
+ponto.addEventListener("keydown", (e) => {
+  const passo = e.shiftKey ? 15 : mostrar.snap ? 15 : 1;
+  if (e.key === "ArrowRight" || e.key === "ArrowUp") { ang = norm(ang + passo); }
+  else if (e.key === "ArrowLeft" || e.key === "ArrowDown") { ang = norm(ang - passo); }
+  else return;
+  e.preventDefault();
+  if (mostrar.snap) ang = prende(ang);
+  render();
+});
+
+/* ---------- controles ---------- */
+document.querySelectorAll(".tab").forEach((b) => {
+  b.addEventListener("click", () => {
+    func = b.dataset.f;
+    document.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+    desenhaGrafico();
+  });
+});
+
+function liga(id, chave, aoMudar) {
+  const cb = $(id);
+  cb.addEventListener("change", () => {
+    mostrar[chave] = cb.checked;
+    cb.closest(".toggle").classList.toggle("on", cb.checked);
+    if (aoMudar) aoMudar();
+    render();
+  });
+}
+liga("tSnap", "snap", () => { if (mostrar.snap) ang = prende(ang); });
+liga("tTan", "tan");
+liga("tGrade", "grade", desenhaGrade);
+
+$("zerar").addEventListener("click", () => { ang = 30; render(); });
+
+/* ---------- início ---------- */
+document.querySelector('.tab[data-f="sen"]').setAttribute("aria-selected", "true");
+desenhaGrade();
+render();
+</script>

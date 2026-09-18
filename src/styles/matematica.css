@@ -31,3 +31,5 @@
 
 .rad { white-space: nowrap; }
 .rad .rad-b { border-top: 1px solid currentColor; padding: 0 .12em 0 .06em; margin-left: .02em; }
+/* Índice do radical (∛, ∜): encostado no canto do sinal, como na tipografia. */
+.rad .rad-i { font-size: .62em; vertical-align: .55em; margin-right: -.32em; }

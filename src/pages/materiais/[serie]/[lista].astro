@@ -237,6 +237,36 @@ const schema = [
     .lista :global(ol.alt) { grid-template-columns: 1fr; }
   }
 
+  /* Listas sem numeração — o `itemize` do LaTeX */
+  .lista :global(ul) {
+    list-style: none;
+    display: grid;
+    gap: 0.3rem;
+    margin: 0.6rem 0 0.2rem;
+  }
+
+  .lista :global(ul > li) {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.95rem;
+  }
+
+  .lista :global(ul > li::before) {
+    content: "·";
+    position: absolute;
+    left: 0.25rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Lacuna para o aluno preencher — o `\underline{\hspace{1cm}}` */
+  .lista :global(.lacuna) {
+    display: inline-block;
+    min-width: 3.5rem;
+    border-bottom: 1px solid var(--muted);
+    margin: 0 0.2rem;
+  }
+
   .lista :global(p) { margin: 0 0 0.5rem; }
   .lista :global(p:last-child) { margin-bottom: 0; }
   .lista :global(b), .lista :global(strong) { font-weight: 600; color: var(--ink); }

@@ -1,0 +1,22 @@
+---
+/* Sistema de equações entre chaves — o `\begin{cases}` do LaTeX. Cada linha é
+   um <span>; a chave cresce com a quantidade de equações.
+
+   Mesma marcação do gerador de sistemas (`.sist` / `.chave` / `.eqs`), para que
+   a lista na tela e a folha gerada mostrem o sistema do mesmo jeito. */
+interface Props {
+  /** Quantas equações — dimensiona a chave. */
+  n: number;
+}
+const { n } = Astro.props;
+---
+<span class="sist" data-n={n}><span class="chave">&#123;</span><span class="eqs"><slot /></span></span>
+
+<style>
+  .sist { display: inline-flex; align-items: center; gap: 0.35em; font-family: var(--mat); }
+  .chave { line-height: 0.86; font-weight: 400; }
+  .sist[data-n="2"] .chave { font-size: 3.4em; }
+  .sist[data-n="3"] .chave { font-size: 5.15em; }
+  .sist[data-n="4"] .chave { font-size: 6.9em; }
+  .eqs { display: flex; flex-direction: column; gap: 0.12em; }
+</style>

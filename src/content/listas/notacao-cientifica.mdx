@@ -1,0 +1,82 @@
+---
+titulo: "Notação Científica, Potências e Racionalização"
+descricao: "Lista de exercícios do 9º ano sobre notação científica: converter entre decimal e notação científica, operar com potências de dez, expoentes racionais e racionalizar denominadores."
+serie: "9ano"
+material: "05"
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Formula from '../../components/mat/Formula.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+
+1. O programa *Conexão Ciência* do SESI apresentou dados sobre a indústria e o meio ambiente. Analise as grandezas abaixo e escreva cada uma em **notação científica** (na forma <i>a</i> × 10<sup><i>n</i></sup>, com 1 ≤ <i>a</i> &lt; 10) ou na forma **decimal**, conforme o caso.
+
+   1. A massa de uma partícula de poeira industrial é de 0,000000045 kg.
+   1. Uma usina produziu 3,76 × 10<sup>6</sup> kWh de energia em um mês.
+   1. O diâmetro de um fio de cobre em um circuito é 0,00000012 m.
+   1. Uma indústria despejou 2,034 × 10<sup>−4</sup> toneladas de resíduo por hora.
+
+1. Um técnico de laboratório precisa comparar medidas obtidas em experimentos. Efetue as operações abaixo, deixando o resultado em notação científica.
+
+   <Alt cols={2}>
+     <li>(3,2 × 10<sup>5</sup>) · (2,5 × 10<sup>3</sup>)</li>
+     <li><Frac n="9,6 × 10<sup>8</sup>" d="3,2 × 10<sup>3</sup>" /></li>
+     <li>(1,5 × 10<sup>−4</sup>) · (4 × 10<sup>−2</sup>)</li>
+     <li><Frac n="7,2 × 10<sup>5</sup>" d="1,2 × 10<sup>−3</sup>" /></li>
+   </Alt>
+
+1. Potências com expoente racional são outra forma de escrever radicais:
+
+   <Formula><i>a</i><sup><i>m</i>/<i>n</i></sup> = <Raiz i="n"><i>a</i><sup><i>m</i></sup></Raiz></Formula>
+
+   Usando essa relação, reescreva cada expressão na forma indicada e calcule o valor quando possível.
+
+   <Alt cols={3}>
+     <li>8<sup>1/3</sup></li>
+     <li>27<sup>2/3</sup></li>
+     <li>16<sup>3/4</sup></li>
+     <li><Raiz i="5">32</Raiz></li>
+     <li><Raiz i="4">81<sup>3</sup></Raiz></li>
+     <li>(<Frac n="1" d="4" />)<sup>−1/2</sup></li>
+   </Alt>
+
+1. A fórmula da velocidade de propagação de uma onda sonora em um gás é dada por <Frac n="<i>P</i><sup>1/2</sup>" d="<i>ρ</i><sup>1/2</sup>" />, onde <i>P</i> é a pressão e <i>ρ</i> é a densidade do gás. Para simplificar a expressão, um estudante reescreveu-a como <i>v</i> = <Raiz><Frac n="<i>P</i>" d="<i>ρ</i>" /></Raiz>.
+
+   1. Mostre algebricamente que <Frac n="<i>P</i><sup>1/2</sup>" d="<i>ρ</i><sup>1/2</sup>" /> = <Raiz><Frac n="<i>P</i>" d="<i>ρ</i>" /></Raiz>.
+   1. Considerando <i>P</i> = 12 e <i>ρ</i> = 3, calcule <i>v</i>, racionalizando o denominador caso necessário.
+
+1. Racionalize o denominador de cada expressão abaixo e simplifique o resultado.
+
+   <Alt cols={3}>
+     <li>
+       <Frac>
+         <Fragment slot="n">8</Fragment>
+         <Fragment slot="d"><Raiz>6</Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n"><Raiz>3</Raiz></Fragment>
+         <Fragment slot="d"><Raiz>5</Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n">15</Fragment>
+         <Fragment slot="d"><Raiz>3</Raiz> − 2</Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n">6</Fragment>
+         <Fragment slot="d"><Raiz>7</Raiz> + 1</Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n"><Raiz>2</Raiz> + 1</Fragment>
+         <Fragment slot="d"><Raiz>2</Raiz> − 1</Fragment>
+       </Frac>
+     </li>
+   </Alt>

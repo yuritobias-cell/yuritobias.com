@@ -1,0 +1,91 @@
+---
+titulo: "Racionalização e Simplificação de Radicais"
+descricao: "Lista de exercícios do 9º ano sobre radicais: simplificar raízes quadradas e cúbicas, introduzir fatores externos no radical e racionalizar denominadores."
+serie: "9ano"
+material: "03"
+instrucoes: "Resolva as questões diretamente no seu caderno."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+
+1. Simplifique os radicais:
+
+   <Alt cols={3}>
+     <li><Raiz>72</Raiz></li>
+     <li><Raiz>128</Raiz></li>
+     <li><Raiz>200</Raiz></li>
+     <li><Raiz>180</Raiz></li>
+     <li><Raiz i="3">54</Raiz></li>
+     <li><Raiz i="3">128</Raiz></li>
+     <li><Raiz i="3">375</Raiz></li>
+     <li><Raiz i="3">216</Raiz></li>
+   </Alt>
+
+   *Dica: lembre-se de fatorar os números dentro dos radicais para encontrar os fatores externos.*
+
+1. Introduza os fatores externos nos radicais.
+
+   <Alt cols={3}>
+     <li>2<Raiz i="3">2</Raiz></li>
+     <li>7<Raiz>5</Raiz></li>
+     <li>3<Raiz i="4">2</Raiz></li>
+     <li>10<Raiz>7</Raiz></li>
+     <li>4<Raiz>2</Raiz></li>
+     <li>10<Raiz i="3">10</Raiz></li>
+   </Alt>
+
+   *Dica: veja os exemplos do caderno feitos em 05/02, ou a página 29 da apostila.*
+
+1. Racionalize o denominador de cada fração abaixo.
+
+   <Alt cols={3}>
+     <li>
+       <Frac>
+         <Fragment slot="n">3</Fragment>
+         <Fragment slot="d"><Raiz>10</Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n"><Raiz i="3">5</Raiz></Fragment>
+         <Fragment slot="d"><Raiz i="3">2</Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n">4</Fragment>
+         <Fragment slot="d"><Raiz i="5">7<sup>3</sup></Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n"><Raiz>11</Raiz></Fragment>
+         <Fragment slot="d"><Raiz>2</Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n">1</Fragment>
+         <Fragment slot="d"><Raiz>7</Raiz></Fragment>
+       </Frac>
+     </li>
+     <li>
+       <Frac>
+         <Fragment slot="n"><Raiz>5</Raiz></Fragment>
+         <Fragment slot="d">3<Raiz>2</Raiz></Fragment>
+       </Frac>
+     </li>
+   </Alt>
+
+   *Dica: veja os exemplos do caderno feitos em 09/02, ou a página 30 da apostila.*
+
+1. **(Saresp)** Simplificando a expressão (<Raiz>32</Raiz> + <Raiz>18</Raiz>) · 2, obtemos o resultado:
+
+   <Alt cols={4}>
+     <li>2</li>
+     <li>8</li>
+     <li>10</li>
+     <li>14</li>
+   </Alt>
