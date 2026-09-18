@@ -1,0 +1,68 @@
+---
+titulo: "Produtos Notáveis"
+descricao: "Lista de exercícios de produtos notáveis para o 9º ano: quadrado da soma, quadrado da diferença, forma fatorada, cálculo mental de quadrados e revisão de simplificação de radicais."
+serie: "9ano"
+material: "06"
+instrucoes: "Resolva as questões diretamente no seu caderno."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Formula from '../../components/mat/Formula.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+
+1. Expanda e simplifique as expressões abaixo, aplicando o **quadrado da soma**:
+
+   <Formula>(<i>a</i> + <i>b</i>)<sup>2</sup> = <i>a</i><sup>2</sup> + 2<i>ab</i> + <i>b</i><sup>2</sup></Formula>
+
+   <Alt cols={2}>
+     <li>(<i>x</i> + 3)<sup>2</sup></li>
+     <li>(2<i>x</i> + 5)<sup>2</sup></li>
+     <li>(3<i>a</i> + 4<i>b</i>)<sup>2</sup></li>
+     <li>(<i>x</i> + <Frac n="1" d="2" />)<sup>2</sup></li>
+   </Alt>
+
+1. Expanda e simplifique as expressões abaixo, aplicando o **quadrado da diferença**:
+
+   <Formula>(<i>a</i> − <i>b</i>)<sup>2</sup> = <i>a</i><sup>2</sup> − 2<i>ab</i> + <i>b</i><sup>2</sup></Formula>
+
+   <Alt cols={2}>
+     <li>(<i>x</i> − 7)<sup>2</sup></li>
+     <li>(5<i>x</i> − 2)<sup>2</sup></li>
+     <li>(4<i>a</i> − 3<i>b</i>)<sup>2</sup></li>
+     <li>(2<i>x</i> − <Frac n="3" d="4" />)<sup>2</sup></li>
+   </Alt>
+
+1. Identifique se cada expressão abaixo é um quadrado da soma, um quadrado da diferença ou nenhum dos dois. Em seguida, quando possível, escreva-a na forma fatorada (<i>a</i> ± <i>b</i>)<sup>2</sup>:
+
+   <Alt cols={2}>
+     <li><i>x</i><sup>2</sup> + 10<i>x</i> + 25</li>
+     <li><i>x</i><sup>2</sup> − 6<i>x</i> + 9</li>
+     <li>4<i>x</i><sup>2</sup> + 12<i>x</i> + 9</li>
+     <li><i>x</i><sup>2</sup> + 8<i>x</i> + 12</li>
+   </Alt>
+
+1. Uma praça tem formato quadrado com lado medindo (<i>x</i> + 5) metros. A prefeitura deseja calcular a área total da praça para planejar a instalação de grama. Escreva a área da praça como um polinômio expandido e, sabendo que <i>x</i> = 10 m, calcule a área numérica.
+
+1. Calcule o valor das expressões abaixo **sem usar calculadora**, utilizando os produtos notáveis de forma estratégica:
+
+   <Alt cols={2}>
+     <li>51<sup>2</sup> <em>(Dica: escreva 51 = 50 + 1)</em></li>
+     <li>98<sup>2</sup> <em>(Dica: escreva 98 = 100 − 2)</em></li>
+   </Alt>
+
+1. **(Revisão — Simplificação de Radicais)** Simplifique as expressões abaixo:
+
+   <Alt cols={3}>
+     <li><Raiz>72</Raiz></li>
+     <li><Raiz>150</Raiz></li>
+     <li><Raiz>200</Raiz></li>
+     <li>3<Raiz>12</Raiz> + <Raiz>48</Raiz></li>
+     <li><Raiz>98</Raiz> − 2<Raiz>2</Raiz></li>
+     <li>
+       <Frac>
+         <Fragment slot="n"><Raiz>180</Raiz></Fragment>
+         <Fragment slot="d"><Raiz>5</Raiz></Fragment>
+       </Frac>
+     </li>
+   </Alt>

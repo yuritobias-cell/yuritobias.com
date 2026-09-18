@@ -1,0 +1,14 @@
+---
+/* Linha de figuras lado a lado, que quebra em telas estreitas. */
+---
+<div class="figuras"><slot /></div>
+
+<style>
+  .figuras {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem 2.5rem;
+    margin: 1rem 0 0.5rem;
+  }
+</style>

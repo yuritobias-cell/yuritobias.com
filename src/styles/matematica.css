@@ -1,0 +1,33 @@
+/* ============================================================
+   Notação matemática em HTML/CSS — fração empilhada e radical
+   com barra, sem KaTeX e sem MathJax.
+
+   Saiu de ferramenta-folha.css para ser usada também pelas listas
+   em HTML (src/content/listas/): um conserto no desenho da fração
+   vale nos dois lugares. As classes são globais de propósito —
+   são nomes específicos o bastante para não colidirem.
+   ============================================================ */
+
+:root {
+  /* Serifada só para a matemática: variável em itálico é a convenção
+     tipográfica, e Georgia já está no sistema (sem download extra). */
+  --mat: Georgia, 'Times New Roman', Times, serif;
+}
+
+.mat { font-family: var(--mat); font-size: 1.06em; }
+.mat i, i.mat { font-style: italic; }
+
+/* fração empilhada: numerador sobre denominador, com o traço no meio */
+.fr {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: -.55em;
+  margin: 0 .12em;
+  line-height: 1.12;
+}
+.fr-n { padding: 0 .25em; }
+.fr-d { padding: 0 .25em; border-top: 1px solid currentColor; }
+
+.rad { white-space: nowrap; }
+.rad .rad-b { border-top: 1px solid currentColor; padding: 0 .12em 0 .06em; margin-left: .02em; }

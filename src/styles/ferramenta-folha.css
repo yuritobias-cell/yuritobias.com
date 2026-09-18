@@ -1,3 +1,5 @@
+@import './matematica.css';
+
 /* ============================================================
    Chrome compartilhado das ferramentas que geram folha impressa
    (gerador de equações, sistemas lineares, …).
@@ -10,9 +12,6 @@
 .ff-root{
   --papel:#F8F6F1; --tinta:#1B4F4F; --tinta-2:#2f6b6b;
   --traco:#d8d2c4; --realce:#c2410c; --neutro:#6b6459;
-  /* Serifada só para a matemática: variável em itálico é a convenção
-     tipográfica, e Georgia já está no sistema (sem download extra). */
-  --mat:Georgia,'Times New Roman',Times,serif;
 
   background:var(--papel); color:var(--tinta);
   font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.5;
@@ -70,17 +69,12 @@
 .ff-root .aviso{ margin-top:.8rem; color:var(--realce); font-weight:600; font-size:.88rem; }
 
 /* ---------- notação matemática ---------- */
-.ff-root .mat{ font-family:var(--mat); font-size:1.06em; }
+/* Fração, radical e a serifada da matemática vêm de matematica.css, que as
+   listas em HTML também usam. Aqui ficam só os elementos soltos, que seriam
+   largos demais para virar regra global. */
 .ff-root i{ font-style:italic; }
 .ff-root sup{ font-size:.7em; vertical-align:.45em; }
 .ff-root sub{ font-size:.7em; vertical-align:-.25em; }
-/* fração empilhada: numerador sobre denominador, com o traço no meio */
-.ff-root .fr{ display:inline-flex; flex-direction:column; align-items:center; vertical-align:-.55em;
-  margin:0 .12em; line-height:1.12; }
-.ff-root .fr-n{ padding:0 .25em; }
-.ff-root .fr-d{ padding:0 .25em; border-top:1px solid currentColor; }
-.ff-root .rad{ white-space:nowrap; }
-.ff-root .rad .rad-b{ border-top:1px solid currentColor; padding:0 .12em 0 .06em; margin-left:.02em; }
 
 /* ---------- a FOLHA (isto é o que imprime) ---------- */
 .ff-root .saida{ margin-top:1.6rem; display:flex; flex-direction:column; gap:1.6rem; }

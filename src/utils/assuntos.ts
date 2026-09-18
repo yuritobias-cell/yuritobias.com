@@ -13,6 +13,7 @@ import manifesto from '../data/assuntos.json';
 import { series, urlSerie, type Serie } from './materiais';
 import { analisesPublicadas } from './analises';
 import { ferramentas } from './ferramentas';
+import { mapaDeListas, listaDe, urlLista } from './listas';
 import cursoFet from '../data/curso-fet.json';
 
 export interface Assunto {
@@ -86,6 +87,9 @@ export async function montarAssuntos(): Promise<AssuntoCompleto[]> {
   };
 
   // --- materiais, provas e formativas ---------------------------------------
+  // Com versão em HTML, o item leva à lista; sem ela, à capa da série.
+  const listas = await mapaDeListas();
+
   for (const serie of series) {
     const base = urlSerie(serie);
     const sufixo = serie.arquivada ? ` · ${serie.ano}` : '';
@@ -99,10 +103,11 @@ export async function montarAssuntos(): Promise<AssuntoCompleto[]> {
       for (const m of lista) {
         const slugs = conferir(m.assuntos, `${serie.slug} · ${m.titulo}`);
         if (!slugs.length) continue;
+        const html = listaDe(listas, serie, m);
         juntar(materiais, slugs, {
           titulo: m.titulo,
           descricao: m.descricao,
-          url: base,
+          url: html ? urlLista(html) : base,
           contexto: `${serie.titulo} · ${grupo}${sufixo}`,
           pdf: m.arquivo ? `/materiais/${serie.pastaPdf}/${m.arquivo}` : undefined,
         });

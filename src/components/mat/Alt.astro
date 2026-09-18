@@ -1,0 +1,11 @@
+---
+/* Alternativas lado a lado — o ambiente `tasks` das listas em LaTeX, onde o
+   número de colunas é escolhido por questão (`\begin{tasks}(2)`). Os rótulos
+   a), b), c) vêm do contador da página. Em tela estreita vira uma coluna. */
+interface Props {
+  /** Colunas em tela larga; o mesmo número que está entre parênteses no LaTeX. */
+  cols?: number;
+}
+const { cols = 2 } = Astro.props;
+---
+<ol class="alt" style={`--cols:${cols}`}><slot /></ol>

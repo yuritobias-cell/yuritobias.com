@@ -1,0 +1,14 @@
+---
+/* Fórmula destacada na própria linha — o `\mbox{$...$}` das listas, que existe
+   justamente para a expressão não quebrar no meio. */
+---
+<p class="formula"><slot /></p>
+
+<style>
+  .formula {
+    font-family: var(--mat);
+    font-size: 1.05rem;
+    margin: 0.5rem 0 0.7rem;
+    padding-left: 0.1rem;
+  }
+</style>

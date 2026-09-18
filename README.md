@@ -2,7 +2,7 @@
 
 Site pessoal de Yuri Tobias — professor de matemática (Escola SESI Poços de Caldas) e analista de dados educacionais (Secretaria Municipal de Educação de Poços de Caldas).
 
-Reúne materiais didáticos por série, ferramentas interativas para sala de aula, análises de dados educacionais, cursos em vídeo e blog — com busca em todo o conteúdo.
+Reúne materiais didáticos por série — em PDF e, aos poucos, em HTML —, ferramentas interativas para sala de aula, análises de dados educacionais, cursos em vídeo e blog, com busca e índice por assunto em todo o conteúdo.
 
 ## Stack
 
@@ -39,11 +39,15 @@ src/
 │   ├── ferramentas.json          # manifesto das ferramentas — dirige /ferramentas e a busca
 │   ├── assuntos.json             # manifesto dos assuntos — dirige /assuntos
 │   └── ...                       # curso FET + dados de posts (enem/)
-├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
+├── content/
+│   ├── blog/                     # Posts do blog (.md ou .mdx com frontmatter)
+│   └── listas/                   # listas de exercícios em HTML (.mdx), ligadas ao JSON da série
 ├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
+│   └── mat/                      # notação e figuras das listas (Frac, Raiz, TriRet, Alt, Formula)
 ├── utils/           # Utilitários do build em .ts (slug de tags, tempo de leitura, imagens OG)
 │   ├── busca.ts                  # monta o índice da busca a partir dos manifestos
 │   ├── assuntos.ts               # cruza materiais, ferramentas e análises por assunto
+│   ├── listas.ts                 # liga cada lista em HTML ao material do JSON da série
 │   ├── matematica.js             # núcleo das ferramentas geradoras: sorteio com semente, racionais exatos e tipografia
 │   ├── intervalos.js             # conjunto solução em ℝ + reta numérica (inequações)
 │   ├── estado.js                 # a lista gerada na URL: configuração + semente, permalink e QR
@@ -52,6 +56,7 @@ src/
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
 │   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
+│   ├── materiais/[serie]/[lista].astro  # uma lista de exercícios em HTML
 │   ├── ferramentas/              # ferramentas interativas (uma página autocontida cada)
 │   ├── analises/                 # índice + capa [slug] de cada análise
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
@@ -62,6 +67,7 @@ src/
 │   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
 └── styles/
     ├── global.css                # @theme com cores e fontes do site
+    ├── matematica.css            # fração e radical em HTML/CSS — ferramentas e listas
     └── ferramenta-folha.css      # chrome comum das ferramentas que imprimem folha (.ff-root)
 public/materiais/<serie>/         # PDFs servidos para download
 public/analises/paineis/          # painéis HTML autocontidos das análises
@@ -97,6 +103,7 @@ fração não deve precisar de correção em dois lugares.
 | `src/utils/folha.js` | Cabeçalho, folha do aluno, gabarito, versões A–H, distribuição das questões entre os tipos e o comportamento dos chips |
 | `src/utils/estado.js` | A lista gerada na URL: configuração, semente, permalink e o QR da folha (ver "A lista tem endereço") |
 | `src/styles/ferramenta-folha.css` | Todo o visual comum, escopado em `.ff-root` — barra de controles, folha A4 e as regras de `@media print` |
+| `src/styles/matematica.css` | Fração empilhada, radical com barra e a serifada da matemática — usadas também pelas listas em HTML |
 
 São `.js`, e não `.ts`, de propósito: rodam no navegador, importados pelos `<script>` das
 páginas. Os `.ts` da mesma pasta rodam no build e são checados pelo `astro check`.
@@ -202,6 +209,7 @@ achar "Produtos Notáveis", que não traz a palavra em lugar nenhum.
 - Tarefa de apostila (sem PDF): use `"apostila": { "ordem": "Atividades X, pág. Y", "data": "2026-06-15" }` — **data em formato ISO** (`AAAA-MM-DD`); tarefas futuras ganham destaque automático.
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
 - `"assuntos"` põe o material em `/assuntos/<slug>` (um ou mais, de `src/data/assuntos.json`); sem o campo, ele fica fora do índice por assunto. Vale igual nos JSONs de provas e formativas.
+- Para dar ao material uma versão em HTML além do PDF, crie o `.mdx` correspondente em `src/content/listas/` — ver "Listas em HTML".
 
 As contagens nas páginas de índice são calculadas automaticamente a partir dos JSONs.
 
@@ -224,6 +232,50 @@ Tudo é dirigido por `src/data/series.json` — nenhuma página precisa ser edit
 
 As séries de 2026 usam `pastaPdf` sem o ano (`"9ano"` etc.) porque os PDFs foram
 publicados antes desta estrutura — as URLs dos arquivos não mudaram.
+
+## Listas em HTML
+
+As listas nascem em LaTeX e o PDF continua sendo a folha que vai para a impressora.
+A versão em HTML é a mesma lista como página de verdade: abre no celular sem baixar
+2 MB, é indexada pelo buscador (PDF quase não é), dá para ligar direto numa questão e
+continua imprimindo bem. As duas convivem — o material ganha **dois botões** na capa
+da série, "Ler online" e "Baixar PDF".
+
+Cada lista é um `.mdx` em `src/content/listas/`, transcrito do `.tex` que gerou o PDF:
+
+```yaml
+---
+titulo: "Teorema de Pitágoras"
+descricao: "Resumo — vai para as meta tags, o índice por assunto e a busca."
+serie: "9ano"        # slug em src/data/series.json
+material: "17"       # o `n` da entrada no JSON da série
+instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento."
+draft: false
+---
+```
+
+O par `serie` + `material` é a ligação com o conteúdo que já existe: é ele que faz o
+botão aparecer na capa da série e que leva a busca e o índice por assunto a apontarem
+para a página em HTML em vez da capa. O build **falha** se a série não existir, se o
+`material` não casar com nenhum `n` daquela série, ou se duas listas disputarem o mesmo
+material. Os assuntos **não** se repetem aqui: saem do próprio material no JSON da série.
+
+O corpo é uma lista numerada em Markdown; as subalíneas a), b) são uma lista aninhada.
+Não há KaTeX nem MathJax — a matemática usa as mesmas classes das ferramentas, por meio
+de componentes que se importam no topo do arquivo:
+
+| Componente | Para quê | No LaTeX |
+| :--- | :--- | :--- |
+| `<Frac n="1" d="2" />` | fração empilhada (com slots `n`/`d` quando houver componente dentro) | `\dfrac{1}{2}` |
+| `<Raiz>72</Raiz>` | radical com a barra sobre o radicando | `\sqrt{72}` |
+| `<Formula>…</Formula>` | fórmula na própria linha, sem quebrar no meio | `\mbox{$…$}` |
+| `<Alt cols={2}>` | alternativas lado a lado, em `n` colunas | `\begin{tasks}(2)` |
+| `<TriRet a="9" b="12" c="x" rotulo="a)" />` | triângulo retângulo com as três medidas | `\figTriRet{9}{12}{x}` |
+
+O resto é HTML normal: `<i>x</i>` para a incógnita, `<sup>2</sup>` para a potência e o
+sinal de menos U+2212 (`−`), não o hífen. Figura nova pede um componente novo em
+`src/components/mat/` — mantenha a mesma geometria do macro TikZ correspondente, para
+que a folha e a tela contem a mesma história.
 
 ## Como publicar uma análise
 

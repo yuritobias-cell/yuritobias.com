@@ -12,6 +12,7 @@ import { series, urlSerie } from './materiais';
 import { analisesPublicadas } from './analises';
 import { ferramentas } from './ferramentas';
 import { assuntos } from './assuntos';
+import { mapaDeListas, listaDe, urlLista } from './listas';
 import cursoFet from '../data/curso-fet.json';
 
 export interface ItemBusca {
@@ -71,6 +72,10 @@ export async function montarIndice(): Promise<ItemBusca[]> {
   }
 
   // --- materiais, provas e formativas de cada série -------------------------
+  // Quem tem versão em HTML é levado a ela: é a página da lista em si, e não a
+  // capa da série com o PDF para baixar.
+  const listas = await mapaDeListas();
+
   for (const serie of series) {
     const base = urlSerie(serie);
     const arquivo = serie.arquivada ? ` · ${serie.ano}` : '';
@@ -95,10 +100,11 @@ export async function montarIndice(): Promise<ItemBusca[]> {
       for (const m of lista) {
         const apostila = 'apostila' in m && m.apostila ? ` ${m.apostila.ordem}` : '';
         const topicos = 'video' in m && m.video ? ` ${m.video.topicos.join(' ')}` : '';
+        const html = listaDe(listas, serie, m);
         itens.push({
           t: m.titulo,
           d: m.descricao,
-          u: base,
+          u: html ? urlLista(html) : base,
           s: 'Material',
           c: `${serie.titulo} · ${grupo}${arquivo}`,
           x: [apostila, topicos, textoDeAssuntos(m.assuntos)].join(' ').trim() || undefined,

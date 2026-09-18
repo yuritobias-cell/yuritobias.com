@@ -3,6 +3,7 @@
    Usado pela página ativa (/materiais/<slug>) e pela do arquivo (/materiais/arquivo/<ano>/<slug>). */
 import type { Material, Serie } from '../utils/materiais';
 import { assuntosDaSerie } from '../utils/assuntos';
+import { mapaDeListas, listaDe, urlLista } from '../utils/listas';
 
 interface Props {
   serie: Serie;
@@ -16,6 +17,9 @@ const paracasa = serie.materiais.filter((m) => !ehRevisao(m));
 const revisoes = serie.materiais.filter(ehRevisao);
 const basePdf = `/materiais/${serie.pastaPdf}`;
 const assuntos = assuntosDaSerie(serie);
+// Materiais que também têm versão em HTML ganham o botão de ler online.
+const listas = await mapaDeListas();
+const lista = (m: { n: string }) => listaDe(listas, serie, m);
 
 function formatarData(iso: string) {
   const partes = iso.split('-');
@@ -55,6 +59,9 @@ const disponiveis = (n: number, singular: string, plural: string) =>
           </div>
         </div>
         <div class="acoes">
+          {lista(m) && (
+            <a href={urlLista(lista(m)!)} class="btn btn-html">Ler online</a>
+          )}
           {m.arquivo && (
             <a href={`${basePdf}/${m.arquivo}`} download class="btn">
               Baixar PDF
@@ -91,6 +98,9 @@ const disponiveis = (n: number, singular: string, plural: string) =>
           </div>
         </div>
         <div class="acoes">
+          {lista(m) && (
+            <a href={urlLista(lista(m)!)} class="btn btn-html">Ler online</a>
+          )}
           <a href={`${basePdf}/${m.arquivo}`} download class="btn">
             Baixar PDF
           </a>
@@ -119,9 +129,14 @@ const disponiveis = (n: number, singular: string, plural: string) =>
             <p class="descricao">{p.descricao}</p>
           </div>
         </div>
-        <a href={`${basePdf}/${p.arquivo}`} download class="btn">
-          Baixar PDF
-        </a>
+        <div class="acoes">
+          {lista(p) && (
+            <a href={urlLista(lista(p)!)} class="btn btn-html">Ler online</a>
+          )}
+          <a href={`${basePdf}/${p.arquivo}`} download class="btn">
+            Baixar PDF
+          </a>
+        </div>
       </li>
     ))}
   </ul>
@@ -142,9 +157,14 @@ const disponiveis = (n: number, singular: string, plural: string) =>
               <p class="descricao">{p.descricao}</p>
             </div>
           </div>
-          <a href={`${basePdf}/${p.arquivo}`} download class="btn">
-            Baixar PDF
-          </a>
+          <div class="acoes">
+            {lista(p) && (
+              <a href={urlLista(lista(p)!)} class="btn btn-html">Ler online</a>
+            )}
+            <a href={`${basePdf}/${p.arquivo}`} download class="btn">
+              Baixar PDF
+            </a>
+          </div>
         </li>
       ))}
     </ul>
@@ -181,6 +201,9 @@ const disponiveis = (n: number, singular: string, plural: string) =>
   .acoes { display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0; align-items: flex-end; }
   .btn { flex-shrink: 0; text-decoration: none; font-size: 0.8rem; font-weight: 500; color: var(--accent); letter-spacing: 0.03em; text-transform: uppercase; border: 1px solid var(--accent); padding: 0.4rem 0.9rem; border-radius: 3px; transition: background 0.2s ease, color 0.2s ease; }
   .btn:hover { background: var(--accent); color: white; }
+  /* Ler online vem antes do PDF e em cheio: é o caminho que não pede download. */
+  .btn-html { background: var(--accent); color: white; }
+  .btn-html:hover { background: var(--ink); border-color: var(--ink); }
   .btn-video { color: var(--muted); border-color: var(--rule); }
   .btn-video:hover { background: var(--ink); border-color: var(--ink); color: white; }
   .assuntos { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-bottom: 2.5rem; }

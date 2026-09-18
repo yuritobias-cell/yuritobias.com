@@ -1,0 +1,35 @@
+---
+/* Triângulo retângulo com as três medidas — a figura do `\figTriRet` das
+   listas em LaTeX, na mesma geometria: cateto vertical à esquerda, cateto
+   horizontal embaixo e o ângulo reto no vértice de baixo à esquerda.
+   Use "x" (ou outra letra) na medida desconhecida. */
+interface Props {
+  /** Cateto vertical. */ a: string;
+  /** Cateto horizontal. */ b: string;
+  /** Hipotenusa. */ c: string;
+  /** Legenda abaixo da figura — "a)", "b)". */
+  rotulo?: string;
+}
+const { a, b, c, rotulo } = Astro.props;
+
+// Letra é incógnita e vai em itálico; número é medida e vai reto.
+const ehLetra = (t: string) => /^[a-z]$/i.test(t);
+---
+<figure class="tri">
+  <svg viewBox="0 0 132 96" role="img"
+       aria-label={`Triângulo retângulo de catetos ${a} e ${b} e hipotenusa ${c}`}>
+    <polygon points="24,10 24,74 112,74" fill="none" stroke="currentColor" stroke-width="1.4" />
+    <polyline points="33,74 33,65 24,65" fill="none" stroke="currentColor" stroke-width="1.1" />
+    <text x="18" y="46" text-anchor="end" font-style={ehLetra(a) ? 'italic' : 'normal'}>{a}</text>
+    <text x="68" y="89" text-anchor="middle" font-style={ehLetra(b) ? 'italic' : 'normal'}>{b}</text>
+    <text x="75" y="38" text-anchor="start" font-style={ehLetra(c) ? 'italic' : 'normal'}>{c}</text>
+  </svg>
+  {rotulo && <figcaption>{rotulo}</figcaption>}
+</figure>
+
+<style>
+  .tri { display: inline-block; margin: 0; text-align: center; }
+  .tri svg { width: 148px; max-width: 100%; height: auto; color: var(--ink); }
+  .tri text { font-family: var(--mat); font-size: 13px; fill: currentColor; }
+  figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
+</style>

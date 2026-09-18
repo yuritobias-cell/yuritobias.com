@@ -1,0 +1,14 @@
+---
+/* Fração empilhada. Para numerador e denominador simples, use as props
+   (`<Frac n="1" d="2" />`); quando houver outro componente dentro — um radical,
+   por exemplo — use os slots. */
+interface Props {
+  n?: string;
+  d?: string;
+}
+const { n, d } = Astro.props;
+---
+<span class="fr"
+  ><span class="fr-n">{n ? <Fragment set:html={n} /> : <slot name="n" />}</span
+  ><span class="fr-d">{d ? <Fragment set:html={d} /> : <slot name="d" />}</span
+></span>
