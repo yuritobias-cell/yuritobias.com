@@ -89,6 +89,7 @@ const ano = new Date().getFullYear();
       <div class="nav-links">
         <a href="/" class:list={[{ active: pathname === '/' }]}>Sobre</a>
         <a href="/materiais" class:list={[{ active: pathname.startsWith('/materiais') }]}>Materiais</a>
+        <a href="/assuntos" class:list={[{ active: pathname.startsWith('/assuntos') }]}>Assuntos</a>
         <a href="/ferramentas" class:list={[{ active: pathname.startsWith('/ferramentas') }]}>Ferramentas</a>
         <a href="/analises" class:list={[{ active: pathname.startsWith('/analises') }]}>Análises</a>
         <a href="/cursos" class:list={[{ active: pathname.startsWith('/cursos') }]}>Cursos</a>
@@ -144,7 +145,7 @@ const ano = new Date().getFullYear();
     text-decoration: none;
   }
 
-  .nav-links { display: flex; gap: 2rem; }
+  .nav-links { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: flex-end; }
 
   .nav-links a {
     font-size: 0.85rem;
@@ -159,6 +160,10 @@ const ano = new Date().getFullYear();
   .nav-links a:hover,
   .nav-links a.active { color: var(--accent); }
   .nav-links a.active { font-weight: 500; }
+
+  @media (max-width: 960px) {
+    .nav-links { gap: 1.25rem; }
+  }
 
   @media (max-width: 640px) {
     nav {

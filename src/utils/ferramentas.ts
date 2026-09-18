@@ -21,6 +21,8 @@ export interface Ferramenta {
   /** `id` de uma das categorias. */
   tipo: string;
   descricao: string;
+  /** Slugs de src/data/assuntos.json — dirigem o índice por assunto. */
+  assuntos?: string[];
 }
 
 export const categorias: Categoria[] = manifesto.categorias;

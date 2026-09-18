@@ -9,6 +9,8 @@ const blog = defineCollection({
     description: z.string(),
     date: z.coerce.date(),
     tags: z.array(z.string()).optional(),
+    // Slugs de src/data/assuntos.json — dirigem o índice por assunto.
+    assuntos: z.array(z.string()).optional(),
     // Postagens em série: mesmo nome em `series` agrupa; `part` ordena as partes.
     series: z.string().optional(),
     part: z.number().int().positive().optional(),

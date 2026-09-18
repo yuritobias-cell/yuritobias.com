@@ -1,0 +1,120 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { montarAssuntos } from '../../utils/assuntos';
+
+const lista = await montarAssuntos();
+const total = lista.reduce((t, a) => t + a.total, 0);
+
+/* Singular de cada grupo — "1 materiais" não se escreve. */
+const SINGULAR: Record<string, string> = {
+  Materiais: 'material', Ferramentas: 'ferramenta',
+  Análises: 'análise', Blog: 'post', Cursos: 'curso',
+};
+
+/* Resumo do que o assunto reúne, sem citar grupo vazio. */
+const resumo = (a: (typeof lista)[number]) =>
+  a.grupos
+    .map((g) => `${g.itens.length} ${g.itens.length === 1 ? SINGULAR[g.titulo] : g.titulo.toLowerCase()}`)
+    .join(' · ');
+---
+
+<Layout
+  title="Assuntos"
+  description="Todo o site organizado por assunto — os materiais, as ferramentas e as análises de cada tema de matemática num lugar só."
+>
+  <main>
+    <header>
+      <h1>Assuntos</h1>
+      <p class="subtitle">
+        O site é organizado por formato — material, ferramenta, análise. Aqui é ao
+        contrário: cada assunto reúne tudo que existe sobre ele, venha de onde vier.
+        São {lista.length} assuntos e {total} itens.
+      </p>
+    </header>
+
+    <div class="grid">
+      {lista.map((a) => (
+        <a class="card" href={`/assuntos/${a.slug}`}>
+          <div class="card-top">
+            <span class="nome">{a.nome}</span>
+            <span class="total">{a.total}</span>
+          </div>
+          <p class="descricao">{a.descricao}</p>
+          <span class="resumo">{resumo(a)}</span>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  header { margin-bottom: 2.5rem; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.7; }
+
+  .grid { display: grid; gap: 1rem; }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover { border-color: var(--accent); transform: translateX(4px); }
+
+  .card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .nome {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .total { font-size: 0.78rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  .descricao {
+    font-size: 0.88rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 0.6rem;
+  }
+
+  .resumo { font-size: 0.72rem; color: var(--muted); font-weight: 300; letter-spacing: 0.02em; }
+
+  @media (max-width: 640px) {
+    main { padding: 2.5rem 1.25rem 3.5rem; }
+  }
+</style>

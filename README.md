@@ -37,11 +37,13 @@ src/
 │   ├── materiais/<ano>-<slug>.json   # materiais de cada série (+ <ano>-<slug>-provas.json)
 │   ├── analises.json             # manifesto das análises — dirige /analises
 │   ├── ferramentas.json          # manifesto das ferramentas — dirige /ferramentas e a busca
+│   ├── assuntos.json             # manifesto dos assuntos — dirige /assuntos
 │   └── ...                       # curso FET + dados de posts (enem/)
 ├── content/blog/    # Posts do blog (.md ou .mdx com frontmatter)
 ├── components/      # Componentes compartilhados (GraficoDistribuicao, ListaPosts, Tags)
 ├── utils/           # Utilitários do build em .ts (slug de tags, tempo de leitura, imagens OG)
 │   ├── busca.ts                  # monta o índice da busca a partir dos manifestos
+│   ├── assuntos.ts               # cruza materiais, ferramentas e análises por assunto
 │   ├── matematica.js             # núcleo das ferramentas geradoras: sorteio com semente, racionais exatos e tipografia
 │   ├── intervalos.js             # conjunto solução em ℝ + reta numérica (inequações)
 │   ├── estado.js                 # a lista gerada na URL: configuração + semente, permalink e QR
@@ -54,6 +56,7 @@ src/
 │   ├── analises/                 # índice + capa [slug] de cada análise
 │   ├── cursos/                   # cursos em vídeo (dados em src/data)
 │   ├── blog/                     # índice + [slug] + tag/[tag] (drafts não são publicados)
+│   ├── assuntos/                 # índice por assunto: índice + [slug] de cada assunto
 │   ├── busca.astro               # busca do site + busca-index.json.ts (o índice)
 │   ├── para-professores.astro    # convite de uso, licença em português claro e como citar
 │   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
@@ -75,8 +78,12 @@ da pasta; nada a registrar à mão.
 
 ```json
 { "slug": "gerador-funcoes", "titulo": "Gerador de Funções", "assunto": "Álgebra",
-  "tipo": "suporte", "descricao": "Descrição curta — vai para o cartão e para a busca." }
+  "tipo": "suporte", "descricao": "Descrição curta — vai para o cartão e para a busca.",
+  "assuntos": ["funcoes", "algebra"] }
 ```
+
+`assunto` (singular) é a etiqueta do cartão; `assuntos` (plural) é a que entra no
+índice por assunto — ver a seção abaixo.
 
 As **geradoras de lista** (`gerador-equacoes`, `gerador-sistemas`, `gerador-progressoes`,
 `gerador-fatoracao`) são a exceção à regra do
@@ -150,6 +157,37 @@ vira sua base, uma a uma), o que permite destacar o trecho encontrado no texto o
 Para acrescentar uma fonte à busca, edite `montarIndice()`: cada item é
 `{ t: título, d: descrição, u: URL, s: grupo, c: contexto, x: texto só para casar, p: PDF }`.
 
+## Índice por assunto
+
+O site é organizado por **formato** — material, ferramenta, análise, post. `/assuntos`
+é a vista transversal: cada assunto reúne tudo que existe sobre ele, venha de onde vier.
+Quem chega procurando "lei dos cossenos" quer o conjunto, não a pasta.
+
+A divisão de trabalho entre os dois arquivos é a que importa:
+
+- **O que um assunto é** fica em `src/data/assuntos.json` — `slug`, `nome` e `descricao`,
+  na ordem em que aparecem no índice.
+- **A que assunto uma coisa pertence** fica junto da própria coisa, no campo `assuntos`:
+  nos JSONs das séries, em `ferramentas.json`, em `analises.json`, em `curso-fet.json` e
+  no frontmatter dos posts.
+
+Assim, material novo entra no índice na mesma linha em que é cadastrado — não há uma
+segunda lista para lembrar de atualizar. `src/utils/assuntos.ts` cruza tudo e o build
+**falha** em dois casos:
+
+| Situação | Por quê |
+| :--- | :--- |
+| `assuntos` cita um slug que não está no manifesto | seria um erro de digitação que faz o conteúdo sumir do índice, calado |
+| um assunto do manifesto não tem nenhum conteúdo | seria uma página vazia publicada e prometida no índice |
+
+O campo é **opcional**: item sem `assuntos` simplesmente não aparece no índice. É o caso
+das apresentações e das listas de revisão genéricas, que não são de um assunto só.
+
+Os assuntos também alimentam a busca por dois caminhos: cada assunto vira um resultado
+(com peso maior, para a página que reúne o tema vir antes de um item solto sobre ele) e o
+nome do assunto entra no texto buscável de cada item — é o que faz procurar "álgebra"
+achar "Produtos Notáveis", que não traz a palavra em lugar nenhum.
+
 ## Como adicionar um material
 
 1. Coloque o PDF na pasta da série em `public/materiais/` (a pasta de cada série
@@ -157,11 +195,13 @@ Para acrescentar uma fonte à busca, edite `montarIndice()`: cada item é
 2. Adicione a entrada no JSON da série em `src/data/materiais/<ano>-<slug>.json`:
 
 ```json
-{ "n": "14", "titulo": "Título", "descricao": "Descrição curta.", "arquivo": "14-nome.pdf" }
+{ "n": "14", "titulo": "Título", "descricao": "Descrição curta.", "arquivo": "14-nome.pdf",
+  "assuntos": ["geometria"] }
 ```
 
 - Tarefa de apostila (sem PDF): use `"apostila": { "ordem": "Atividades X, pág. Y", "data": "2026-06-15" }` — **data em formato ISO** (`AAAA-MM-DD`); tarefas futuras ganham destaque automático.
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
+- `"assuntos"` põe o material em `/assuntos/<slug>` (um ou mais, de `src/data/assuntos.json`); sem o campo, ele fica fora do índice por assunto. Vale igual nos JSONs de provas e formativas.
 
 As contagens nas páginas de índice são calculadas automaticamente a partir dos JSONs.
 
@@ -204,12 +244,13 @@ dados e o botão que abre o painel em tela cheia.
   "arquivo": "ideb-2025.html",
   "fonte": "INEP — planilhas de divulgação do IDEB 2025",
   "tags": ["IDEB"],
+  "assuntos": ["dados"],
   "secoes": ["Visão geral — principais indicadores"],
   "rascunho": false
 }
 ```
 
-- `data` em formato ISO (`AAAA-MM-DD`); `tags` e `secoes` são opcionais.
+- `data` em formato ISO (`AAAA-MM-DD`); `tags`, `assuntos` e `secoes` são opcionais.
 - `"rascunho": true` mantém a análise fora do índice e sem capa publicada.
 - O build valida a data e a existência do painel, e falha cedo se algo faltar.
 - A imagem Open Graph da capa é gerada sozinha no build, a partir do título.
@@ -293,6 +334,7 @@ title: "Título"
 description: "Descrição (usada no índice, no preview e no RSS)"
 date: 2026-06-11
 tags: ["tag"]                 # etiquetas + páginas /blog/tag/<slug> automáticas
+assuntos: ["dados"]           # opcional — entra no índice por assunto
 series: "Nome da série"       # opcional — agrupa e navega entre as partes
 part: 1                       # opcional — ordem dentro da série
 draft: false                  # true = não publica

@@ -12,7 +12,8 @@ import { categorias, porTipo, ferramentas } from '../../utils/ferramentas';
       <h1>Ferramentas</h1>
       <p class="subtitle">
         Aplicações desenvolvidas para uso em sala de aula e no dia a dia. Tudo roda no navegador,
-        sem cadastro e sem enviar nada para lugar nenhum.
+        sem cadastro e sem enviar nada para lugar nenhum. Cada ferramenta também aparece
+        <a href="/assuntos">no índice por assunto</a>, junto dos materiais do mesmo tema.
       </p>
     </header>
 
@@ -106,6 +107,7 @@ import { categorias, porTipo, ferramentas } from '../../utils/ferramentas';
   }
 
   .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+  .subtitle a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
   /* ---------------- filtros ---------------- */
 

@@ -14,6 +14,8 @@ export interface Material {
   arquivo?: string;
   video?: { url: string; topicos: string[] };
   apostila?: { ordem: string; data: string };
+  /** Slugs de src/data/assuntos.json — dirigem o índice por assunto. */
+  assuntos?: string[];
 }
 
 export interface Prova {
@@ -21,6 +23,7 @@ export interface Prova {
   titulo: string;
   descricao: string;
   arquivo: string;
+  assuntos?: string[];
 }
 
 export interface Serie {
@@ -81,6 +84,10 @@ function montar(entrada: EntradaManifesto): Serie {
 
 /** Todas as séries do manifesto, com dados carregados e PDFs validados (o build falha cedo). */
 export const series: Serie[] = (manifesto as EntradaManifesto[]).map(montar);
+
+/** Endereço público de uma série — as arquivadas vivem sob /materiais/arquivo/. */
+export const urlSerie = (s: Serie) =>
+  s.arquivada ? `/materiais/arquivo/${s.ano}/${s.slug}` : `/materiais/${s.slug}`;
 
 export const seriesAtivas = series.filter((s) => !s.arquivada);
 export const seriesArquivadas = series.filter((s) => s.arquivada);

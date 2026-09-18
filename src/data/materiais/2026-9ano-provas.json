@@ -3,24 +3,38 @@
     "n": "1",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 1",
     "descricao": "Radiciação e produtos notáveis.",
-    "arquivo": "1-av1etapa.pdf"
+    "arquivo": "1-av1etapa.pdf",
+    "assuntos": [
+      "numeros",
+      "algebra"
+    ]
   },
   {
     "n": "2",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 2",
     "descricao": "Equações do 2º grau.",
-    "arquivo": "2-av1etapa.pdf"
+    "arquivo": "2-av1etapa.pdf",
+    "assuntos": [
+      "algebra"
+    ]
   },
   {
     "n": "3",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 1",
     "descricao": "Teorema de Tales, teorema da bissetriz interna e porcentagens.",
-    "arquivo": "3-av2etapa.pdf"
+    "arquivo": "3-av2etapa.pdf",
+    "assuntos": [
+      "geometria",
+      "proporcionalidade"
+    ]
   },
   {
     "n": "4",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 2",
     "descricao": "Funções afim e quadrática: raízes, vértice, concavidade, gráficos e problemas de máximo e mínimo.",
-    "arquivo": "4-av2etapa.pdf"
+    "arquivo": "4-av2etapa.pdf",
+    "assuntos": [
+      "funcoes"
+    ]
   }
 ]

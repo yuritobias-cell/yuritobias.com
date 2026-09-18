@@ -1,6 +1,7 @@
 {
   "titulo": "FET — Free Timetabling",
   "descricao": "Aprenda a criar grades horárias escolares usando o software gratuito FET.",
+  "assuntos": ["sala-de-aula"],
   "playlist": "https://www.youtube.com/playlist?list=PLj84aCw50YLBNcwaDszQlN_SvFSzV168O",
   "aulas": [
     { "n": 1, "tipo": "aula", "titulo": "Abrir o FET pela primeira vez e criar um arquivo", "url": "https://youtu.be/hgHGblYpxJM" },

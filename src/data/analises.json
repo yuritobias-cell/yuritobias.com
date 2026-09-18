@@ -23,7 +23,10 @@
       "Comparar cidades — indicadores lado a lado e posição nacional",
       "Escolas — tabela ordenável, escola a escola, do município selecionado"
     ],
-    "rascunho": false
+    "rascunho": false,
+    "assuntos": [
+      "dados"
+    ]
   },
   {
     "slug": "simave-2025",
@@ -48,7 +51,10 @@
       "Participação — quem ficou sem resultado divulgado e por quê",
       "Percurso entre etapas — a escola que alfabetiza bem é a que chega forte ao 5º ano?"
     ],
-    "rascunho": false
+    "rascunho": false,
+    "assuntos": [
+      "dados"
+    ]
   },
   {
     "slug": "ideb-2025",
@@ -68,6 +74,9 @@
       "Ranking de escolas — maiores e menores IDEB por etapa",
       "Fichas por escola — ficha completa de cada unidade"
     ],
-    "rascunho": false
+    "rascunho": false,
+    "assuntos": [
+      "dados"
+    ]
   }
 ]

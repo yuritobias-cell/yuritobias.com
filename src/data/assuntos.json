@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "numeros",
+    "nome": "Números reais",
+    "descricao": "Radiciação, racionalização, notação científica, dízimas e fração geratriz — as operações que sustentam todo o resto."
+  },
+  {
+    "slug": "conjuntos",
+    "nome": "Conjuntos",
+    "descricao": "Representação, operações, diagramas de Venn e produto cartesiano — a porta de entrada para funções."
+  },
+  {
+    "slug": "algebra",
+    "nome": "Álgebra",
+    "descricao": "Equações e inequações do 1º e do 2º grau, produtos notáveis, fatoração, sistemas lineares e progressões."
+  },
+  {
+    "slug": "funcoes",
+    "nome": "Funções",
+    "descricao": "Função afim e quadrática, domínio e imagem, zeros, vértice, gráficos e problemas de máximo e mínimo."
+  },
+  {
+    "slug": "proporcionalidade",
+    "nome": "Proporção e porcentagem",
+    "descricao": "Grandezas proporcionais, regra de três, Teorema de Tales, porcentagens sucessivas e variação percentual."
+  },
+  {
+    "slug": "geometria",
+    "nome": "Geometria plana",
+    "descricao": "Polígonos e áreas, circunferência e círculo, semelhança, Teorema de Pitágoras e relações métricas no triângulo retângulo."
+  },
+  {
+    "slug": "geometria-analitica",
+    "nome": "Geometria analítica",
+    "descricao": "Plano cartesiano, distância e ponto médio, vetores e transformações geométricas."
+  },
+  {
+    "slug": "trigonometria",
+    "nome": "Trigonometria",
+    "descricao": "Razões no triângulo retângulo, radianos, leis dos senos e dos cossenos, circunferência trigonométrica e funções trigonométricas."
+  },
+  {
+    "slug": "combinatoria",
+    "nome": "Análise combinatória",
+    "descricao": "Fatorial e somatório, princípio fundamental da contagem, arranjos, permutações e combinações."
+  },
+  {
+    "slug": "probabilidade",
+    "nome": "Probabilidade",
+    "descricao": "Espaço amostral, união de eventos, probabilidade condicional, independência e eventos sucessivos."
+  },
+  {
+    "slug": "dados",
+    "nome": "Dados e estatística",
+    "descricao": "Leitura de gráficos e séries históricas, e os painéis de dados educacionais — IDEB, SIMAVE, Censo Escolar e microdados do ENEM."
+  },
+  {
+    "slug": "sala-de-aula",
+    "nome": "Sala de aula",
+    "descricao": "O que resolve a rotina: sorteio de grupos, jogos, fichas e malhas para imprimir, QR code e a grade de horários da escola."
+  }
+]

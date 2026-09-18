@@ -12,7 +12,8 @@ const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
   <main>
     <header>
       <h1>Materiais</h1>
-      <p class="subtitle">Apostilas e listas de exercícios organizadas por série.</p>
+      <p class="subtitle">Apostilas e listas de exercícios organizadas por série —
+        ou <a href="/assuntos">por assunto</a>, se você procura um tema e não uma turma.</p>
     </header>
 
     <div class="grid">
@@ -74,7 +75,8 @@ const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
     margin-bottom: 0.5rem;
   }
 
-  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; }
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+  .subtitle a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
   .grid { display: grid; gap: 1rem; }
 

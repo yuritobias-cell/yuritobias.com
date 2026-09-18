@@ -52,7 +52,7 @@ const total = (await montarIndice()).length;
   const chato = /[À-ɏ]/g;
   const simples = (s: string) => s.replace(chato, (c) => c.normalize('NFD')[0]).toLowerCase();
 
-  interface Item { t: string; d: string; u: string; s: string; c?: string; x?: string; p?: string }
+  interface Item { t: string; d: string; u: string; s: string; c?: string; x?: string; p?: string; b?: number }
   type Preparado = Item & { ht: string; hd: string; hc: string };
 
   const elQ = document.getElementById('q') as HTMLInputElement;
@@ -95,7 +95,7 @@ const total = (await montarIndice()).length;
       if (nc >= 0) total += inicioDePalavra(nc, item.hc) ? 20 : 12;
       if (nd >= 0) total += inicioDePalavra(nd, item.hd) ? 10 : 6;
     }
-    return total;
+    return total * (item.b ?? 1);
   }
 
   const escapa = (s: string) =>

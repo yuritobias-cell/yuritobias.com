@@ -1,0 +1,211 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { montarAssuntos, type AssuntoCompleto } from '../../utils/assuntos';
+
+export async function getStaticPaths() {
+  const lista = await montarAssuntos();
+  return lista.map((assunto) => ({ params: { slug: assunto.slug }, props: { assunto } }));
+}
+
+interface Props { assunto: AssuntoCompleto }
+const { assunto } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Assuntos', item: new URL('/assuntos/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: assunto.nome },
+  ],
+};
+---
+
+<Layout
+  title={assunto.nome}
+  description={`${assunto.descricao} — ${assunto.total} itens entre materiais, ferramentas e análises.`}
+  schema={schema}
+>
+  <main>
+    <nav class="breadcrumb">
+      <a href="/assuntos">Assuntos</a>
+      <span>›</span>
+      <span>{assunto.nome}</span>
+    </nav>
+
+    <header>
+      <h1>{assunto.nome}</h1>
+      <p class="subtitle">{assunto.descricao}</p>
+      {assunto.series.length > 0 && (
+        <p class="series">
+          Nas séries:
+          {assunto.series.map((s) => <a href={s.url}>{s.titulo}</a>)}
+        </p>
+      )}
+    </header>
+
+    {assunto.grupos.map((grupo) => (
+      <section class="grupo">
+        <h2>{grupo.titulo} <span class="n">{grupo.itens.length}</span></h2>
+        <ul>
+          {grupo.itens.map((item) => (
+            <li>
+              <a class="item" href={item.url}>
+                <span class="linha">
+                  <span class="titulo">{item.titulo}</span>
+                  {item.contexto && <span class="ctx">{item.contexto}</span>}
+                </span>
+                <span class="desc">{item.descricao}</span>
+              </a>
+              {item.pdf && <a class="pdf" href={item.pdf} download>PDF ↓</a>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    <p class="volta"><a href="/assuntos">← Todos os assuntos</a></p>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  header { margin-bottom: 2.5rem; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.7; }
+
+  .series {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.1rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .series a {
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    padding: 0.15rem 0.7rem;
+    background: white;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .series a:hover { border-color: var(--accent); }
+
+  .grupo { margin-bottom: 2.25rem; }
+
+  .grupo h2 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .grupo h2 .n { font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--muted); }
+
+  .grupo ul { list-style: none; display: grid; gap: 0.5rem; }
+  .grupo li { display: flex; align-items: stretch; gap: 0.5rem; }
+
+  .item {
+    flex: 1;
+    display: block;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .item:hover, .item:focus-visible { border-color: var(--accent); transform: translateX(3px); }
+
+  .linha {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .titulo { font-size: 0.95rem; font-weight: 500; color: var(--ink); }
+
+  .ctx {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 300;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .desc {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.55;
+    margin-top: 0.2rem;
+  }
+
+  .pdf {
+    display: flex;
+    align-items: center;
+    padding: 0 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .pdf:hover { border-color: var(--accent); }
+
+  .volta { margin-top: 2.5rem; font-size: 0.85rem; }
+  .volta a { color: var(--accent); text-decoration: none; }
+  .volta a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    main { padding: 2rem 1.25rem 3.5rem; }
+    .linha { flex-direction: column; gap: 0.15rem; }
+    .ctx { text-align: left; }
+  }
+</style>

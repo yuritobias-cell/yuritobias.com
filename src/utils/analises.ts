@@ -18,14 +18,16 @@ export interface Analise {
   /** Origem dos dados, mostrada na capa. */
   fonte: string;
   tags: string[];
+  /** Slugs de src/data/assuntos.json — dirigem o índice por assunto. */
+  assuntos: string[];
   /** Seções do painel, listadas na capa. */
   secoes: string[];
   /** true = fica fora do índice e sem capa publicada. */
   rascunho: boolean;
 }
 
-type EntradaManifesto = Omit<Analise, 'tags' | 'secoes' | 'rascunho'> &
-  Partial<Pick<Analise, 'tags' | 'secoes' | 'rascunho'>>;
+type EntradaManifesto = Omit<Analise, 'tags' | 'assuntos' | 'secoes' | 'rascunho'> &
+  Partial<Pick<Analise, 'tags' | 'assuntos' | 'secoes' | 'rascunho'>>;
 
 /** Pasta dos painéis, relativa a public/ (e também o prefixo da URL). */
 export const PASTA_PAINEIS = 'analises/paineis';
@@ -41,6 +43,7 @@ function montar(entrada: EntradaManifesto): Analise {
   return {
     ...entrada,
     tags: entrada.tags ?? [],
+    assuntos: entrada.assuntos ?? [],
     secoes: entrada.secoes ?? [],
     rascunho: entrada.rascunho ?? false,
   };
