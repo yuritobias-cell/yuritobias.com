@@ -1,0 +1,197 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// O nome completo aparece no texto da página, no <title>/descrição e no JSON-LD
+// para que buscas pelo nome de registro (e não só por "Yuri Tobias") cheguem aqui.
+const nomeCompleto = 'Yuri Tobias Aquiel Correa Ramos';
+const site = Astro.site?.toString();
+const urlSobre = new URL('/sobre', Astro.site).toString();
+const descricao = `${nomeCompleto} — professor de matemática na Escola SESI e analista de dados educacionais na Secretaria Municipal de Educação de Poços de Caldas (MG).`;
+
+const perfis = [
+  'https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/',
+  'https://lattes.cnpq.br/2782196498099761',
+  'https://github.com/yuritobias-cell',
+];
+
+const pessoa = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': 'https://yuritobias.com/#eu',
+  name: 'Yuri Tobias',
+  alternateName: nomeCompleto,
+  givenName: 'Yuri',
+  additionalName: 'Tobias Aquiel',
+  familyName: 'Correa Ramos',
+  description: descricao,
+  url: site,
+  mainEntityOfPage: urlSobre,
+  image: new URL('/og.png', Astro.site).toString(),
+  email: 'yuritobias@gmail.com',
+  jobTitle: ['Professor de Matemática', 'Analista de Dados Educacionais'],
+  worksFor: [
+    { '@type': 'Organization', name: 'Escola SESI Poços de Caldas' },
+    { '@type': 'Organization', name: 'Secretaria Municipal de Educação de Poços de Caldas' },
+  ],
+  homeLocation: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Poços de Caldas',
+      addressRegion: 'MG',
+      addressCountry: 'BR',
+    },
+  },
+  knowsAbout: [
+    'Educação matemática',
+    'Análise de dados educacionais',
+    'Censo Escolar',
+    'ENEM',
+    'SAEB',
+  ],
+  sameAs: perfis,
+};
+
+const perfil = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  url: urlSobre,
+  name: `Sobre — ${nomeCompleto}`,
+  inLanguage: 'pt-BR',
+  isPartOf: { '@id': 'https://yuritobias.com/#site' },
+  mainEntity: { '@id': 'https://yuritobias.com/#eu' },
+};
+---
+
+<Layout title="Sobre" description={descricao} schema={[pessoa, perfil]}>
+  <main>
+    <header>
+      <h1>Yuri Tobias</h1>
+      <p class="nome-completo">{nomeCompleto}</p>
+      <p class="roles">
+        Professor de Matemática
+        <span class="sep">·</span>
+        Analista de Dados Educacionais
+      </p>
+    </header>
+
+    <div class="divider"></div>
+
+    <section class="bio">
+      <p>
+        Trabalho na Secretaria Municipal de Educação de Poços de Caldas
+        com análise de dados educacionais e na Escola SESI como professor de
+        matemática para o Ensino Fundamental e o Ensino Médio.
+      </p>
+      <p>
+        Este site reúne projetos, materiais didáticos e reflexões sobre
+        os dois campos em que atuo — dados e ensino. Nos documentos e na
+        produção acadêmica assino {nomeCompleto}.
+      </p>
+    </section>
+
+    <nav class="links">
+      <a href="mailto:yuritobias@gmail.com">E-mail</a>
+      <a href="https://www.linkedin.com/in/yuri-tobias-aquiel-correa-ramos-754184104/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://lattes.cnpq.br/2782196498099761" target="_blank" rel="noopener">Lattes</a>
+      <a href="https://github.com/yuritobias-cell" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+
+    <p class="volta">
+      O que este site reúne está em <a href="/materiais">Materiais</a>,
+      <a href="/ferramentas">Ferramentas</a> e <a href="/analises">Análises</a> —
+      e <a href="/para-professores">Para professores</a> explica o que a licença permite.
+    </p>
+  </main>
+</Layout>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100dvh - 68px);
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    animation: fade-up 0.6s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.6rem;
+  }
+
+  .nome-completo {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .roles { font-size: 0.95rem; font-weight: 300; color: var(--muted); }
+  .sep { margin: 0 0.5rem; opacity: 0.5; }
+
+  .divider {
+    width: 2.5rem;
+    height: 2px;
+    background: var(--accent);
+    margin: 2rem 0;
+  }
+
+  .bio { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 2.5rem; }
+
+  .bio p { font-size: 1rem; line-height: 1.75; opacity: 0.85; }
+
+  .links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
+
+  .links a {
+    text-decoration: none;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.25s ease;
+  }
+
+  .links a:hover::after { width: 100%; }
+
+  .volta {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .volta a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    main { animation: none; }
+  }
+</style>

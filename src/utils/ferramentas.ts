@@ -23,6 +23,8 @@ export interface Ferramenta {
   descricao: string;
   /** Slugs de src/data/assuntos.json — dirigem o índice por assunto. */
   assuntos?: string[];
+  /** Aparece na vitrine da home. Ver `destaques`. */
+  destaque?: boolean;
 }
 
 export const categorias: Categoria[] = manifesto.categorias;
@@ -61,3 +63,13 @@ if (semCategoria.length > 0) {
 
 /** As ferramentas de uma categoria, na ordem do manifesto. */
 export const porTipo = (id: string): Ferramenta[] => ferramentas.filter((f) => f.tipo === id);
+
+/* A home mostra três ferramentas; quais são é decisão de catálogo, não de
+   página — marque `"destaque": true` no manifesto para trocar a vitrine. */
+export const destaques: Ferramenta[] = ferramentas.filter((f) => f.destaque);
+
+if (destaques.length === 0) {
+  throw new Error(
+    '[ferramentas] nenhuma ferramenta com "destaque": true — a vitrine da home ficaria vazia'
+  );
+}

@@ -1,6 +1,7 @@
 [
   {
     "n": "1",
+    "data": "2026-05-10",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 1",
     "descricao": "Lei dos Senos, Lei dos Cossenos Circunferência trigonométrica",
     "arquivo": "1-av1etapa.pdf",
@@ -10,6 +11,7 @@
   },
   {
     "n": "2",
+    "data": "2026-05-10",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 2",
     "descricao": "Funções trigonométricas e suas aplicações.",
     "arquivo": "2-av1etapa.pdf",
@@ -20,6 +22,7 @@
   },
   {
     "n": "3",
+    "data": "2026-07-30",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 1",
     "descricao": "Análise combinatória: princípio fundamental da contagem, permutações, arranjos e combinações.",
     "arquivo": "3-av2etapa.pdf",
@@ -29,6 +32,7 @@
   },
   {
     "n": "4",
+    "data": "2026-08-30",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 2",
     "descricao": "Probabilidade: espaço amostral, união de eventos, probabilidade condicional, independência e eventos sucessivos.",
     "arquivo": "4-av2etapa.pdf",

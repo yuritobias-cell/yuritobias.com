@@ -117,3 +117,10 @@ export const imagemPost = (titulo: string) => imagemComTitulo(titulo, 'BLOG · Y
 
 /** Imagem de uma análise. */
 export const imagemAnalise = (titulo: string) => imagemComTitulo(titulo, 'ANÁLISES · YURITOBIAS.COM');
+
+/* Imagem de uma ferramenta. O kicker leva a área do conhecimento (o mesmo
+   `assunto` do cartão) em vez do endereço: num grupo de professores, "FERRAMENTA
+   · TRIGONOMETRIA" diz mais do que o domínio, e a descrição já vai ao lado da
+   imagem, vinda de `og:description`. */
+export const imagemFerramenta = (titulo: string, assunto: string) =>
+  imagemComTitulo(titulo, `FERRAMENTA · ${assunto.toLocaleUpperCase('pt-BR')}`);

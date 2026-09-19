@@ -369,8 +369,10 @@ import Layout from '../../layouts/Layout.astro';
     border:1px dashed var(--rule-c);border-radius:12px;background:var(--bg);
     padding:16px;cursor:pointer;transition:.16s;text-align:center
   }
+  /* O foco não pode parecer só um hover: a área de soltar mantém o contorno
+     da regra global, e a mudança de borda é o acréscimo, não o substituto. */
   .qr-root .dropzone:hover,
-  .qr-root .dropzone:focus-visible{border-color:var(--accent);background:rgba(27,79,79,.04);outline:none}
+  .qr-root .dropzone:focus-visible{border-color:var(--accent);background:rgba(27,79,79,.04)}
   .qr-root .dropzone.arrastando{border-color:var(--accent);background:rgba(27,79,79,.08)}
   .qr-root .dz-vazio{display:flex;flex-direction:column;align-items:center;gap:6px}
   .qr-root .dz-icone{

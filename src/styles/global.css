@@ -42,3 +42,30 @@
   --accent: var(--color-accent);
   --rule:   var(--color-rule);
 }
+
+/* Foco visível em todo o site.
+   Seis páginas já definiam o próprio `:focus-visible` (e continuam mandando nelas,
+   por especificidade); esta é a regra para todo o resto — link, botão, campo e
+   chip de ferramenta. O deslocamento tira o contorno de cima do próprio elemento,
+   para que ele apareça também sobre os botões pintados de `--accent`. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Quem pediu menos movimento ao sistema recebe menos movimento — em todas as
+   páginas, inclusive nas ferramentas e nas que vierem depois. Nada no site
+   depende de evento de transição ou de animação, então zerar a duração é seguro.
+   Páginas que precisam de mais (desligar um `transform` de hover, por exemplo)
+   acrescentam a própria regra por cima. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

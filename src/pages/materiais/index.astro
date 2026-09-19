@@ -1,11 +1,19 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { seriesAtivas, seriesArquivadas } from '../../utils/materiais';
+import { seriesAtivas, seriesArquivadas, ultimaAtualizacao } from '../../utils/materiais';
 
 // Séries arquivadas agrupadas por ano, do mais recente para o mais antigo.
 const anosArquivo = [...new Set(seriesArquivadas.map((s) => s.ano))].sort((a, b) => b - a);
 
 const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
+
+// "Atualizado em 18/09" — a data do material mais recente da série.
+const atualizado = (iso?: string) =>
+  iso
+    ? new Date(`${iso}T00:00:00Z`).toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', timeZone: 'UTC',
+      })
+    : undefined;
 ---
 
 <Layout title="Materiais" description="Materiais didáticos de matemática para 9º ano e Ensino Médio.">
@@ -24,7 +32,12 @@ const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
             <span class="count">{contagem(s.materiais.length + s.provas.length + s.formativas.length)}</span>
           </div>
           <p class="descricao">{s.descricao}</p>
-          <span class="cta">Ver materiais →</span>
+          <span class="rodape-card">
+            <span class="cta">Ver materiais →</span>
+            {atualizado(ultimaAtualizacao(s)) && (
+              <span class="atualizado">Atualizado em {atualizado(ultimaAtualizacao(s))}</span>
+            )}
+          </span>
         </a>
       ))}
     </div>
@@ -118,12 +131,27 @@ const contagem = (n: number) => (n === 1 ? '1 material' : `${n} materiais`);
     margin-bottom: 1rem;
   }
 
+  .rodape-card {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
   .cta {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--accent);
     letter-spacing: 0.02em;
     text-transform: uppercase;
+  }
+
+  .atualizado {
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
   }
 
   .arquivo { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--rule); }

@@ -48,7 +48,8 @@ export async function montarIndice(): Promise<ItemBusca[]> {
 
   // --- páginas fixas --------------------------------------------------------
   itens.push(
-    { t: 'Sobre', d: 'Professor de matemática e analista de dados educacionais em Poços de Caldas.', u: '/', s: 'Página', x: 'yuri tobias contato currículo lattes linkedin' },
+    { t: 'Início', d: 'Os últimos materiais publicados, as ferramentas em destaque e a análise mais recente.', u: '/', s: 'Página', x: 'home página inicial novidades recentes' },
+    { t: 'Sobre', d: 'Professor de matemática e analista de dados educacionais em Poços de Caldas.', u: '/sobre', s: 'Página', x: 'yuri tobias aquiel correa ramos contato currículo lattes linkedin github' },
     { t: 'Materiais', d: 'Listas, revisões e avaliações por série, em PDF.', u: '/materiais', s: 'Página' },
     { t: 'Ferramentas', d: 'Geradores de material para imprimir e simuladores para usar em sala.', u: '/ferramentas', s: 'Página' },
     { t: 'Análises', d: 'Painéis interativos com dados educacionais.', u: '/analises', s: 'Página' },

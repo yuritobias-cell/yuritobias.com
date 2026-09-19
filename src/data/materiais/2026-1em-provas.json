@@ -1,6 +1,7 @@
 [
   {
     "n": "1",
+    "data": "2026-05-10",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 1",
     "descricao": "Teoria dos Conjuntos, operações com conjuntos e diagramas de Venn.",
     "arquivo": "1-av1etapa.pdf",
@@ -10,6 +11,7 @@
   },
   {
     "n": "2",
+    "data": "2026-05-10",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 2",
     "descricao": "Polígonos e áreas de figuras planas.",
     "arquivo": "2-av1etapa.pdf",
@@ -19,6 +21,7 @@
   },
   {
     "n": "3",
+    "data": "2026-07-30",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 1",
     "descricao": "Funções: domínio e imagem, paridade, composição e função inversa.",
     "arquivo": "3-av2etapa.pdf",
@@ -28,6 +31,7 @@
   },
   {
     "n": "4",
+    "data": "2026-08-30",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 2",
     "descricao": "Circunferência e círculo: comprimento, arcos, setores, coroa circular, ângulos e quadriláteros inscritos e circunscritos.",
     "arquivo": "4-av2etapa.pdf",

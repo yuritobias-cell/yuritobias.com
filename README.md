@@ -4,6 +4,11 @@ Site pessoal de Yuri Tobias — professor de matemática (Escola SESI Poços de 
 
 Reúne materiais didáticos por série — em PDF e, aos poucos, em HTML —, ferramentas interativas para sala de aula, análises de dados educacionais, cursos em vídeo e blog, com busca e índice por assunto em todo o conteúdo.
 
+A home é a vitrine do que existe no site: os últimos materiais publicados (pela `data` de
+cada um), três ferramentas em destaque e a análise mais recente — tudo derivado dos mesmos
+manifestos que dirigem as páginas internas, sem nada catalogado à mão. A apresentação
+pessoal mora em `/sobre`.
+
 ## Stack
 
 - [Astro 6](https://astro.build) — site estático (+ MDX nos posts com componentes)
@@ -55,6 +60,8 @@ src/
 │   └── folha.js                  # folha A4, gabarito, versões A–H e chips dos controles
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
+│   ├── index.astro               # home: últimos materiais, vitrine de ferramentas e última análise
+│   ├── sobre.astro               # a biografia e o JSON-LD do perfil
 │   ├── materiais/[serie].astro   # página única para 9ano / 1em / 2em
 │   ├── materiais/[serie]/[lista].astro  # uma lista de exercícios em HTML
 │   ├── ferramentas/              # ferramentas interativas (uma página autocontida cada)
@@ -64,7 +71,8 @@ src/
 │   ├── assuntos/                 # índice por assunto: índice + [slug] de cada assunto
 │   ├── busca.astro               # busca do site + busca-index.json.ts (o índice)
 │   ├── para-professores.astro    # convite de uso, licença em português claro e como citar
-│   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
+│   └── og.png.ts, og/[slug].png.ts, og/analises/[slug].png.ts,
+│       og/ferramentas/[slug].png.ts   # imagens Open Graph geradas no build (satori + resvg)
 └── styles/
     ├── global.css                # @theme com cores e fontes do site
     ├── matematica.css            # fração e radical em HTML/CSS — ferramentas e listas
@@ -85,8 +93,19 @@ da pasta; nada a registrar à mão.
 ```json
 { "slug": "gerador-funcoes", "titulo": "Gerador de Funções", "assunto": "Álgebra",
   "tipo": "suporte", "descricao": "Descrição curta — vai para o cartão e para a busca.",
-  "assuntos": ["funcoes", "algebra"] }
+  "assuntos": ["funcoes", "algebra"], "destaque": true }
 ```
+
+Cada ferramenta ganha também a **própria imagem Open Graph**, gerada no build a partir do
+manifesto (`src/pages/og/ferramentas/[slug].png.ts`, kicker `FERRAMENTA · <assunto>`), para
+que o link compartilhado num grupo de professores mostre o nome da ferramenta em vez do
+cartão genérico do site. O `Layout` deduz o endereço da imagem pelo próprio caminho da
+página — não há `ogImage` repetido nas 16 páginas, e ferramenta nova já nasce com o cartão
+certo.
+
+`"destaque": true` põe a ferramenta na vitrine da home (as três primeiras marcadas, na
+ordem do manifesto). Qual ferramenta aparece lá é decisão de catálogo, não de página — e o
+build falha se nenhuma estiver marcada, porque a seção ficaria vazia.
 
 `assunto` (singular) é a etiqueta do cartão; `assuntos` (plural) é a que entra no
 índice por assunto — ver a seção abaixo.
@@ -204,9 +223,13 @@ achar "Produtos Notáveis", que não traz a palavra em lugar nenhum.
 2. Adicione a entrada no JSON da série em `src/data/materiais/<ano>-<slug>.json`:
 
 ```json
-{ "n": "14", "titulo": "Título", "descricao": "Descrição curta.", "arquivo": "14-nome.pdf",
-  "assuntos": ["geometria"] }
+{ "n": "14", "data": "2026-09-18", "titulo": "Título", "descricao": "Descrição curta.",
+  "arquivo": "14-nome.pdf", "assuntos": ["geometria"] }
 ```
+
+- `"data"` é a **data de publicação** em ISO (`AAAA-MM-DD`) e é **obrigatória** — o build
+  falha sem ela. É por ela que o material entra em "Publicados recentemente" na home e no
+  "Atualizado em" da capa da série. Vale igual nos JSONs de provas e formativas.
 
 - Tarefa de apostila (sem PDF): use `"apostila": { "ordem": "Atividades X, pág. Y", "data": "2026-06-15" }` — **data em formato ISO** (`AAAA-MM-DD`); tarefas futuras ganham destaque automático.
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
@@ -380,6 +403,19 @@ use um `.lg` com as amostras, que acompanha qualquer mudança de paleta.
 
 O tema claro é o padrão, como no resto do site; o seletor Auto/Claro/Escuro continua
 disponível no canto da barra superior e o IDEB guarda a escolha em `localStorage`.
+
+## Acessibilidade
+
+O que vale para o site inteiro mora em dois lugares, e não em cada página:
+
+| Onde | O que garante |
+| :--- | :--- |
+| `src/layouts/Layout.astro` | O link **"Pular para o conteúdo"** — primeiro alvo do Tab, escondido até receber o foco — e a âncora `#conteudo` logo depois do menu, de onde o Tab seguinte já cai no conteúdo. O item ativo do menu leva `aria-current="page"` além da classe `.active`, porque cor sozinha não chega ao leitor de tela. |
+| `src/styles/global.css` | O **contorno de foco** (`:focus-visible`) de todo link, botão, campo e chip, deslocado para fora do elemento — é o que o faz aparecer também sobre os botões pintados de `--accent`. E a resposta a **`prefers-reduced-motion`**, que zera animações e transições em todas as páginas, inclusive nas ferramentas. |
+
+Página ou ferramenta pode acrescentar regra própria por cima (seis já fazem isso com o
+`:focus-visible`), mas **não deve apagar o contorno**: se o foco precisa de outro visual,
+acrescente-o ao contorno em vez de trocar `outline` por `none`.
 
 ## Licença do conteúdo
 

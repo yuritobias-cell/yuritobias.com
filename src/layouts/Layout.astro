@@ -15,12 +15,21 @@ interface Props {
 const {
   title,
   description = "Analista de dados educacionais e professor de matemática em Poços de Caldas.",
-  ogImage = '/og.png',
+  ogImage: ogImageProp,
   ogType = 'website',
   schema,
 } = Astro.props;
 const pathname = Astro.url.pathname;
-const tituloCompleto = title === 'Sobre' ? 'Yuri Tobias' : `${title} · Yuri Tobias`;
+
+/* Cada ferramenta tem a própria imagem Open Graph, gerada no build a partir do
+   manifesto (src/pages/og/ferramentas/[slug].png.ts). O endereço sai daqui, e não
+   de um `ogImage` repetido nas 16 páginas: ferramenta nova já nasce com o cartão
+   certo no WhatsApp, sem ninguém ter de lembrar — como o precache do service
+   worker, que também se deduz da pasta real. */
+const slugFerramenta = pathname.match(/^\/ferramentas\/([^/]+)\/?$/)?.[1];
+const ogImage = ogImageProp ?? (slugFerramenta ? `/og/ferramentas/${slugFerramenta}.png` : '/og.png');
+// A home já traz o nome no próprio título; as outras páginas ganham o sufixo.
+const tituloCompleto = pathname === '/' ? title : `${title} · Yuri Tobias`;
 const canonical = new URL(pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 const ogImageAlt = ogImage === '/og.png'
@@ -84,20 +93,22 @@ const ano = new Date().getFullYear();
     </script>
   </head>
   <body>
+    <a href="#conteudo" class="pular">Pular para o conteúdo</a>
     <nav>
       <a href="/" class="brand">Yuri Tobias</a>
       <div class="nav-links">
-        <a href="/" class:list={[{ active: pathname === '/' }]}>Sobre</a>
-        <a href="/materiais" class:list={[{ active: pathname.startsWith('/materiais') }]}>Materiais</a>
-        <a href="/assuntos" class:list={[{ active: pathname.startsWith('/assuntos') }]}>Assuntos</a>
-        <a href="/ferramentas" class:list={[{ active: pathname.startsWith('/ferramentas') }]}>Ferramentas</a>
-        <a href="/analises" class:list={[{ active: pathname.startsWith('/analises') }]}>Análises</a>
-        <a href="/cursos" class:list={[{ active: pathname.startsWith('/cursos') }]}>Cursos</a>
-        <a href="/busca" class:list={[{ active: pathname.startsWith('/busca') }]}>Busca</a>
+        <a href="/materiais" class:list={[{ active: pathname.startsWith('/materiais') }]} aria-current={pathname.startsWith('/materiais') ? 'page' : undefined}>Materiais</a>
+        <a href="/assuntos" class:list={[{ active: pathname.startsWith('/assuntos') }]} aria-current={pathname.startsWith('/assuntos') ? 'page' : undefined}>Assuntos</a>
+        <a href="/ferramentas" class:list={[{ active: pathname.startsWith('/ferramentas') }]} aria-current={pathname.startsWith('/ferramentas') ? 'page' : undefined}>Ferramentas</a>
+        <a href="/analises" class:list={[{ active: pathname.startsWith('/analises') }]} aria-current={pathname.startsWith('/analises') ? 'page' : undefined}>Análises</a>
+        <a href="/cursos" class:list={[{ active: pathname.startsWith('/cursos') }]} aria-current={pathname.startsWith('/cursos') ? 'page' : undefined}>Cursos</a>
+        <a href="/busca" class:list={[{ active: pathname.startsWith('/busca') }]} aria-current={pathname.startsWith('/busca') ? 'page' : undefined}>Busca</a>
+        <a href="/sobre" class:list={[{ active: pathname.startsWith('/sobre') }]} aria-current={pathname.startsWith('/sobre') ? 'page' : undefined}>Sobre</a>
         <!-- Aba Blog temporariamente oculta -->
-        <!-- <a href="/blog" class:list={[{ active: pathname.startsWith('/blog') }]}>Blog</a> -->
+        <!-- <a href="/blog" class:list={[{ active: pathname.startsWith('/blog') }]} aria-current={pathname.startsWith('/blog') ? 'page' : undefined}>Blog</a> -->
       </div>
     </nav>
+    <div id="conteudo" tabindex="-1"></div>
     <slot />
     <footer>
       <p class="licenca">
@@ -107,6 +118,7 @@ const ano = new Date().getFullYear();
       </p>
       <p class="footer-links">
         <span>© {ano} Yuri Tobias</span>
+        <a href="/sobre">Sobre</a>
         <a href="/para-professores">Para professores</a>
         <a href="mailto:yuritobias@gmail.com">E-mail</a>
         <a href="/rss.xml">RSS</a>
@@ -128,6 +140,26 @@ const ano = new Date().getFullYear();
   }
 
   body { min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* Primeiro alvo do Tab: some da tela até receber o foco. O destino é a âncora
+     logo depois do menu, de onde o próximo Tab já cai no conteúdo da página. */
+  .pular {
+    position: absolute;
+    left: 0.5rem;
+    top: -4rem;
+    z-index: 10;
+    padding: 0.6rem 1rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    transition: top 0.15s ease;
+  }
+
+  .pular:focus { top: 0; }
+
+  #conteudo { outline: none; }
 
   nav {
     display: flex;

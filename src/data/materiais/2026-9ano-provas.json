@@ -1,6 +1,7 @@
 [
   {
     "n": "1",
+    "data": "2026-05-10",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 1",
     "descricao": "Radiciação e produtos notáveis.",
     "arquivo": "1-av1etapa.pdf",
@@ -11,6 +12,7 @@
   },
   {
     "n": "2",
+    "data": "2026-05-10",
     "titulo": "Prova Somativa — 1ª Etapa — Bloco 2",
     "descricao": "Equações do 2º grau.",
     "arquivo": "2-av1etapa.pdf",
@@ -20,6 +22,7 @@
   },
   {
     "n": "3",
+    "data": "2026-07-30",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 1",
     "descricao": "Teorema de Tales, teorema da bissetriz interna e porcentagens.",
     "arquivo": "3-av2etapa.pdf",
@@ -30,6 +33,7 @@
   },
   {
     "n": "4",
+    "data": "2026-08-30",
     "titulo": "Prova Somativa — 2ª Etapa — Bloco 2",
     "descricao": "Funções afim e quadrática: raízes, vértice, concavidade, gráficos e problemas de máximo e mínimo.",
     "arquivo": "4-av2etapa.pdf",

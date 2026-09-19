@@ -44,6 +44,7 @@
     },
     {
       "slug": "gerador-equacoes",
+      "destaque": true,
       "titulo": "Gerador de Equações",
       "assunto": "Álgebra",
       "tipo": "suporte",
@@ -95,6 +96,7 @@
     },
     {
       "slug": "explorador-de-funcoes",
+      "destaque": true,
       "titulo": "Explorador de Funções",
       "assunto": "Funções",
       "tipo": "simulacoes",
@@ -105,6 +107,7 @@
     },
     {
       "slug": "circunferencia-trigonometrica",
+      "destaque": true,
       "titulo": "Circunferência Trigonométrica",
       "assunto": "Trigonometria",
       "tipo": "simulacoes",
