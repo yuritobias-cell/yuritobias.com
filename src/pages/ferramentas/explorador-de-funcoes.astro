@@ -195,8 +195,8 @@ import '../../styles/matematica.css';
    geradoras de lista. É o que permite dizer que a raiz é (3 − √17)/2, e não
    −0,5616. */
 import {
-  MENOS, rac, rSoma, rSub, rMul, rDiv, rNeg, rVal, rZero, rInt, rIgual,
-  htmlRac, htmlNum, numVal, raizQuadratica, simplificaRadical, quadradoPerfeito,
+  MENOS, rac, rSoma, rSub, rMul, rDiv, rNeg, rVal, rZero,
+  htmlRac, htmlLado, htmlNum, numVal, raizQuadratica, simplificaRadical, quadradoPerfeito,
 } from '../../utils/matematica.js';
 
 const $ = (id) => document.getElementById(id);
@@ -235,27 +235,15 @@ function inteiros(a, b, c) {
 
 const txt = (r) => htmlRac(r);
 
-/* ---------- a lei da função, escrita ---------- */
-function termo(coef, corpo, primeiro) {
-  if (rZero(coef)) return '';
-  const neg = coef.n < 0;
-  const abs = { n: Math.abs(coef.n), d: coef.d };
-  const um = rIgual(abs, rac(1)) && corpo !== '';
-  const sinal = primeiro ? (neg ? MENOS : '') : (neg ? ` ${MENOS} ` : ' + ');
-  return sinal + (um ? '' : htmlRac(abs)) + corpo;
-}
-
+/* ---------- a lei da função, escrita ----------
+   Quem monta é o htmlLado() de matematica.js, o mesmo das geradoras: com
+   coeficiente fracionário a variável entra DENTRO do numerador — ½x² sai como
+   x²/2, e não como uma fração com o x² solto ao lado. */
 function leiHtml(a, b, c) {
-  const x = '<i>x</i>';
-  const partes = est.tipo === 'quad'
-    ? [[a, `${x}<sup>2</sup>`], [b, x], [c, '']]
-    : [[a, x], [b, '']];
-  let s = '', primeiro = true;
-  for (const [co, corpo] of partes) {
-    const t = termo(co, corpo, primeiro);
-    if (t) { s += t; primeiro = false; }
-  }
-  return `<i>f</i>(${x}) = ${s || '0'}`;
+  const termos = est.tipo === 'quad'
+    ? [{ c: a, g: 2 }, { c: b, g: 1 }, { c: c, g: 0 }]
+    : [{ c: a, g: 1 }, { c: b, g: 0 }];
+  return `<i>f</i>(<i>x</i>) = ${htmlLado(termos, 'x')}`;
 }
 
 /* ---------- propriedades exatas ---------- */
@@ -432,7 +420,7 @@ function render() {
 
 /* Decimal curto para o rótulo dentro do gráfico (o valor exato está no painel). */
 function fmt(v) {
-  const r = Math.round(v * 100) / 100;
+  const r = Math.sign(v) * Math.round(Math.abs(v) * 100) / 100;
   return String(r).replace('-', MENOS).replace('.', ',');
 }
 
