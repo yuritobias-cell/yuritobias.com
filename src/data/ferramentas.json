@@ -3,12 +3,16 @@
     {
       "id": "suporte",
       "titulo": "Suporte ao professor",
-      "descricao": "Geradores de material e utilidades para preparar a aula e resolver a rotina — a maioria sai pronta para imprimir."
+      "descricao": "Geradores de material e utilidades para preparar a aula e resolver a rotina — a maioria sai pronta para imprimir.",
+      "tipoRecurso": "Gerador de material didático",
+      "usoEducacional": "Preparação de aula e material impresso"
     },
     {
       "id": "simulacoes",
       "titulo": "Exemplos e simulações",
-      "descricao": "Simuladores interativos para explorar um conceito com a turma — no projetor, no laboratório ou no celular do aluno."
+      "descricao": "Simuladores interativos para explorar um conceito com a turma — no projetor, no laboratório ou no celular do aluno.",
+      "tipoRecurso": "Simulação interativa",
+      "usoEducacional": "Demonstração e exploração em sala"
     }
   ],
   "ferramentas": [

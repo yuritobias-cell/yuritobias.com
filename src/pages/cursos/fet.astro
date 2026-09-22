@@ -1,9 +1,35 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import curso from '../../data/curso-fet.json';
+import { AUTOR, DE_GRACA, LICENCA, SITE, SITE_REF, sobreAssuntos } from '../../utils/schema';
 
 const aulas = curso.aulas.filter(a => a.tipo === 'aula');
 const extras = curso.aulas.filter(a => a.tipo === 'extra');
+
+const url = `${SITE}/cursos/fet`;
+
+/* O currículo do curso vai em `teaches`, que aceita o título de cada aula como
+   está — sem inventar duração nem data de publicação, que não temos aqui.
+   Por isso também não há `hasCourseInstance`: um nó pela metade rende aviso no
+   teste de resultados ricos, e o Course simples já é válido. */
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  '@id': `${url}#curso`,
+  name: curso.titulo,
+  description: curso.descricao,
+  url,
+  sameAs: curso.playlist,
+  inLanguage: 'pt-BR',
+  provider: AUTOR,
+  author: AUTOR,
+  educationalLevel: 'Formação de professores e gestores escolares',
+  teaches: aulas.map(a => a.titulo),
+  about: sobreAssuntos(curso.assuntos),
+  license: LICENCA,
+  isPartOf: SITE_REF,
+  ...DE_GRACA,
+};
 
 function thumbnail(url: string) {
   const id = url.split('youtu.be/')[1]?.split('?')[0];
@@ -11,7 +37,7 @@ function thumbnail(url: string) {
 }
 ---
 
-<Layout title={curso.titulo}>
+<Layout title={curso.titulo} description={curso.descricao} schema={schema}>
   <main>
     <div class="cabecalho">
       <h1>{curso.titulo}</h1>

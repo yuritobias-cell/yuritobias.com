@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { esquemaDaFerramenta } from '../utils/ferramentas';
 
 interface Props {
   title: string;
@@ -17,7 +18,7 @@ const {
   description = "Analista de dados educacionais e professor de matemática em Poços de Caldas.",
   ogImage: ogImageProp,
   ogType = 'website',
-  schema,
+  schema: schemaProp,
 } = Astro.props;
 const pathname = Astro.url.pathname;
 
@@ -28,6 +29,11 @@ const pathname = Astro.url.pathname;
    worker, que também se deduz da pasta real. */
 const slugFerramenta = pathname.match(/^\/ferramentas\/([^/]+)\/?$/)?.[1];
 const ogImage = ogImageProp ?? (slugFerramenta ? `/og/ferramentas/${slugFerramenta}.png` : '/og.png');
+
+/* Os dados estruturados da ferramenta saem do mesmo manifesto, pelo mesmo
+   caminho: a página descreve a si mesma sem repetir nada. Página que passe o
+   próprio `schema` continua mandando nele. */
+const schema = schemaProp ?? (slugFerramenta ? esquemaDaFerramenta(slugFerramenta) : undefined);
 // A home já traz o nome no próprio título; as outras páginas ganham o sufixo.
 const tituloCompleto = pathname === '/' ? title : `${title} · Yuri Tobias`;
 const canonical = new URL(pathname, Astro.site);

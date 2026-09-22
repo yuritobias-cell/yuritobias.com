@@ -404,6 +404,29 @@ use um `.lg` com as amostras, que acompanha qualquer mudança de paleta.
 O tema claro é o padrão, como no resto do site; o seletor Auto/Claro/Escuro continua
 disponível no canto da barra superior e o IDEB guarda a escolha em `localStorage`.
 
+## Dados estruturados (JSON-LD)
+
+Cada página descreve a si mesma para as máquinas pelo `schema` do `Layout`. As peças que
+se repetem — a identidade do autor, a do site, a licença e a tradução de `assuntos` em nós
+do grafo — ficam em `src/utils/schema.ts`, para que duas páginas não digam coisas
+diferentes sobre a mesma pessoa.
+
+| Onde | O que declara |
+| :--- | :--- |
+| `/` | `Person` (`#eu`) e `WebSite` (`#site`), com o `SearchAction` que aponta para `/busca` — são os dois nós que o resto do site referencia por `@id` |
+| `/sobre` | a ficha completa do `Person` + `ProfilePage` |
+| `/ferramentas/<slug>` | `WebApplication` + `LearningResource`, **deduzido do manifesto pelo caminho da página** (ver "Ferramentas") |
+| `/cursos/fet` | `Course`, com o currículo em `teaches` |
+| `/materiais/<serie>/<lista>` | `LearningResource` da lista em HTML |
+| `/analises/<slug>`, `/blog/<slug>` | `Article` e `BlogPosting` |
+| capas de série e de assunto | `BreadcrumbList` |
+
+Sobre as ferramentas: o tipo é duplo de propósito — `WebApplication` diz que aquilo roda no
+navegador e é de graça, `LearningResource` diz para que serve e a quem. O que cada
+categoria é (`tipoRecurso`, `usoEducacional`) sai de `ferramentas.json`, de modo que
+categoria nova obrigue a decidir isso uma vez. **Não há resultado rico do Google para esses
+tipos**: isto é sobre a página ser lida corretamente por máquina, não sobre estrela na busca.
+
 ## Acessibilidade
 
 O que vale para o site inteiro mora em dois lugares, e não em cada página:

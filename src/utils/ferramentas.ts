@@ -5,12 +5,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import manifesto from '../data/ferramentas.json';
+import { AUTOR, DE_GRACA, LICENCA, NIVEL, SITE, SITE_REF, sobreAssuntos } from './schema';
 
 export interface Categoria {
   /** Âncora da seção e valor do filtro em /ferramentas?tipo=suporte. */
   id: string;
   titulo: string;
   descricao: string;
+  /** O que a ferramenta é, para os dados estruturados (`learningResourceType`). */
+  tipoRecurso: string;
+  /** Como se usa, para os dados estruturados (`educationalUse`). */
+  usoEducacional: string;
 }
 
 export interface Ferramenta {
@@ -72,4 +77,42 @@ if (destaques.length === 0) {
   throw new Error(
     '[ferramentas] nenhuma ferramenta com "destaque": true — a vitrine da home ficaria vazia'
   );
+}
+
+/* Dados estruturados de uma ferramenta.
+
+   O tipo é duplo de propósito: `WebApplication` diz que aquilo roda no navegador
+   e é de graça; `LearningResource` diz para que serve e a quem. O que cada
+   categoria é (gerador ou simulação) sai do manifesto, de modo que categoria
+   nova obrigue a decidir isso uma vez, em vez de espalhar o vocabulário aqui.
+
+   Não há resultado rico do Google para nenhum dos dois tipos: isto é sobre a
+   página ser lida corretamente por máquina, não sobre estrela na busca. */
+export function esquemaDaFerramenta(slug: string) {
+  const f = ferramentas.find((x) => x.slug === slug);
+  if (!f) return undefined;
+  const categoria = categorias.find((c) => c.id === f.tipo)!;
+  const url = `${SITE}/ferramentas/${f.slug}`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': ['WebApplication', 'LearningResource'],
+    '@id': `${url}#ferramenta`,
+    name: f.titulo,
+    description: f.descricao,
+    url,
+    inLanguage: 'pt-BR',
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'Qualquer um com navegador web',
+    browserRequirements: 'Requer JavaScript',
+    learningResourceType: categoria.tipoRecurso,
+    educationalUse: categoria.usoEducacional,
+    educationalLevel: NIVEL,
+    about: sobreAssuntos(f.assuntos),
+    license: LICENCA,
+    author: AUTOR,
+    publisher: AUTOR,
+    isPartOf: SITE_REF,
+    ...DE_GRACA,
+  };
 }
