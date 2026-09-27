@@ -54,7 +54,12 @@ export default defineConfig({
     '/ferramentas/cifrador-emojis': '/ferramentas/cifrador-silabico',
     ...redirectsArquivo,
   },
-  integrations: [mdx(), sitemap(), serviceWorker()],
+  integrations: [
+    mdx(),
+    // /exemplos fica fora da navegação e dos buscadores: acesso só pelo endereço direto
+    sitemap({ filter: (page) => !page.includes('/exemplos') }),
+    serviceWorker(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

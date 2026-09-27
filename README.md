@@ -78,6 +78,7 @@ src/
     ├── matematica.css            # fração e radical em HTML/CSS — ferramentas e listas
     └── ferramenta-folha.css      # chrome comum das ferramentas que imprimem folha (.ff-root)
 public/materiais/<serie>/         # PDFs servidos para download
+public/exemplos/<serie>/          # PDFs de /exemplos (página oculta, ver abaixo)
 public/analises/paineis/          # painéis HTML autocontidos das análises
 ```
 
@@ -470,3 +471,12 @@ draft: false                  # true = não publica
 
 2. Confira com `npm run dev` e faça push na `main` — o deploy é automático.
    A imagem Open Graph do post é gerada sozinha no build, a partir do título.
+
+## Exemplos para a sala de aula (`/exemplos`)
+
+Página oculta para projetar exemplos em aula: fica fora do menu, do sitemap, da busca e
+dos buscadores (`noindex`) — só se chega a ela digitando `yuritobias.com/exemplos`.
+Para publicar um exemplo:
+
+1. copie o PDF para `public/exemplos/<serie>/` (`9ano`, `1em` ou `2em`);
+2. acrescente uma linha em `src/data/exemplos.json` com `serie`, `data`, `titulo` e `arquivo`.

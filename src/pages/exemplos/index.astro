@@ -1,0 +1,71 @@
+---
+/* Exemplos para projetar em sala. A página fica fora da navegação, do sitemap,
+   da busca e dos buscadores (noindex): só se chega a ela pelo endereço direto.
+   Para publicar um exemplo, basta o PDF em public/exemplos/<serie>/ e uma linha
+   em src/data/exemplos.json. */
+import Layout from '../../layouts/Layout.astro';
+import exemplos from '../../data/exemplos.json';
+import series from '../../data/series.json';
+
+const ativas = series.filter((s) => !s.arquivada);
+
+// Por série, na ordem do manifesto; dentro dela, do mais recente para o mais antigo.
+const grupos = ativas
+  .map((s) => ({
+    serie: s,
+    itens: exemplos
+      .filter((e) => e.serie === s.slug)
+      .sort((a, b) => b.data.localeCompare(a.data)),
+  }))
+  .filter((g) => g.itens.length > 0);
+
+const dataCurta = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('pt-BR', {
+    day: '2-digit', month: '2-digit', timeZone: 'UTC',
+  });
+---
+
+<Layout title="Exemplos" description="Exemplos resolvidos em sala de aula." noindex>
+  <main>
+    <header>
+      <h1>Exemplos</h1>
+      <p class="subtitle">Exemplos para acompanhar a aula.</p>
+    </header>
+
+    {grupos.map((g) => (
+      <section>
+        <h2>{g.serie.tituloLongo}</h2>
+        <ul>
+          {g.itens.map((e) => (
+            <li>
+              <a href={`/exemplos/${e.arquivo}`} class="card">
+                <span class="titulo">{e.titulo}</span>
+                <span class="data">{dataCurta(e.data)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </main>
+</Layout>
+
+<style>
+  main { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; animation: fade-up 0.5s ease both; }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  header { margin-bottom: 2.5rem; }
+  h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .subtitle { color: var(--muted); }
+  section { margin-bottom: 2.5rem; }
+  h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.8rem; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+  .card {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+    padding: 1.1rem 1.25rem; border: 1px solid var(--rule); border-radius: 10px;
+    color: inherit; text-decoration: none; font-size: 1.15rem;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .titulo { font-weight: 600; }
+  .data { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+</style>

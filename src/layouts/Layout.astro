@@ -11,6 +11,8 @@ interface Props {
   ogType?: 'website' | 'article';
   /** Dados estruturados (JSON-LD, schema.org) da página — objeto ou lista de objetos. */
   schema?: Record<string, unknown> | Record<string, unknown>[];
+  /** Tira a página dos buscadores (páginas fora da navegação, como /exemplos). */
+  noindex?: boolean;
 }
 
 const {
@@ -19,6 +21,7 @@ const {
   ogImage: ogImageProp,
   ogType = 'website',
   schema: schemaProp,
+  noindex = false,
 } = Astro.props;
 const pathname = Astro.url.pathname;
 
@@ -51,6 +54,7 @@ const ano = new Date().getFullYear();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Yuri Tobias" />
