@@ -90,6 +90,17 @@
       ]
     },
     {
+      "slug": "desenhos-no-plano-cartesiano",
+      "titulo": "Desenhos no Plano Cartesiano",
+      "assunto": "Geometria analítica",
+      "tipo": "suporte",
+      "descricao": "O desenho secreto: o aluno marca os pares ordenados, liga os pontos e descobre a figura. 16 desenhos do fácil ao desafio, no 1º quadrante ou nos quatro, com coordenadas inteiras ou com meios — folha A4 com plano, lista e gabarito.",
+      "assuntos": [
+        "geometria-analitica",
+        "sala-de-aula"
+      ]
+    },
+    {
       "slug": "cifrador-silabico",
       "titulo": "Cifrador Silábico",
       "assunto": "Alfabetização",

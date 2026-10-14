@@ -63,6 +63,8 @@ src/
 │   ├── planificacao.js           # a rede pronta para o papel: dobras, cortes e abas de colagem
 │   ├── folha-planificacao.js     # a folha A4 de uma planificação (cabeçalho, escala, abas numeradas)
 │   ├── pdf.js                    # PDF vetorial mínimo escrito à mão (e o SVG do mesmo desenho)
+│   ├── desenhos-cartesianos.js   # os desenhos secretos do plano cartesiano (traços de pontos inteiros)
+│   ├── folha-cartesiana.js       # a folha A4 do desenho secreto: plano, lista de coordenadas e gabarito
 │   └── folha.js                  # folha A4, gabarito, versões A–H e chips dos controles
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
@@ -148,6 +150,12 @@ o simulador também importa). Cada folha é uma lista de itens em milímetros mo
 `folha-planificacao.js`; `pdf.js` transforma essa lista em SVG (a pré-visualização, a
 impressão e o download SVG) ou em PDF — escrito à mão, com a Helvetica padrão do PDF e
 codificação WinAnsi, sem biblioteca. O que aparece na tela é exatamente o que sai no arquivo.
+
+`desenhos-no-plano-cartesiano` segue o mesmo caminho: `folha-cartesiana.js` monta a folha e
+`pdf.js` a desenha. Desenho novo é uma entrada em `desenhos-cartesianos.js` — traços de pontos
+inteiros no 1º quadrante; os quatro quadrantes (translação inteira para a origem) e as
+coordenadas com meios (tudo dividido por 2) saem desses mesmos pontos, e o nível vem da
+contagem de pontos.
 
 O princípio das duas geradoras é o mesmo: **sorteie a resposta e monte a questão em volta
 dela**. É o que garante que o filtro de natureza da solução valha sempre — e não "quase

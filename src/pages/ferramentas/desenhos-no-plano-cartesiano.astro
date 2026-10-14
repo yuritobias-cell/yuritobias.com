@@ -1,0 +1,389 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Desenhos no Plano Cartesiano"
+  description="Atividade de desenho secreto no plano cartesiano: o aluno marca os pares ordenados, liga os pontos na ordem e descobre a figura. Escolha entre 16 desenhos do fácil ao desafio, no 1º quadrante ou nos quatro, com coordenadas inteiras ou com meios — folha A4 pronta com gabarito, para imprimir ou baixar em PDF."
+>
+  <div class="dc-root">
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Geometria analítica</p>
+      <h1>Desenhos no <em>plano cartesiano</em></h1>
+      <p class="lede">A clássica atividade do <em>desenho secreto</em>: o aluno marca cada par
+      ordenado da lista, liga os pontos na ordem e, no fim, descobre a figura. Escolha os
+      desenhos, o nível e onde eles ficam — só no <em>1º quadrante</em> ou espalhados pelos
+      <em>quatro</em>, com coordenadas inteiras ou com <em>meios</em>. Cada folha A4 traz o plano
+      e a lista de coordenadas; o gabarito sai à parte. Tudo é gerado no seu navegador.</p>
+    </header>
+
+    <div class="stage">
+      <div class="canvas-card">
+        <div class="barra">
+          <p class="caption" id="caption"></p>
+          <div class="export">
+            <button class="primary" id="btnImprimir" type="button">Imprimir</button>
+            <button class="ghost" id="btnPdf" type="button">Baixar PDF</button>
+          </div>
+        </div>
+        <div class="vazio" id="vazio" hidden>Nenhum desenho escolhido. Marque ao menos um ao lado.</div>
+        <div class="pilha" id="pilha"></div>
+        <p class="export-nota">Na caixa de impressão, escolha papel <b>A4</b> e escala <b>100%</b>.
+        As folhas do aluno vêm primeiro e os gabaritos, no fim — dá para imprimir só as do aluno
+        desligando o gabarito ao lado.</p>
+      </div>
+
+      <div class="panel">
+        <div class="card">
+          <div class="card-cab">
+            <h2>Desenhos</h2>
+            <div class="mini-acoes">
+              <button type="button" class="link" id="todos">Todos</button>
+              <button type="button" class="link" id="nenhum">Nenhum</button>
+            </div>
+          </div>
+          <p class="hint">Cada desenho marcado vira uma folha do aluno.</p>
+          <div id="grupos"></div>
+        </div>
+
+        <div class="card">
+          <h2>Plano</h2>
+          <div class="chips" id="quad" role="group" aria-label="Quadrantes">
+            <button class="chip" type="button" data-v="1" aria-pressed="true">Só o 1º quadrante</button>
+            <button class="chip" type="button" data-v="4" aria-pressed="false">Os quatro quadrantes</button>
+          </div>
+          <p class="dica">Nos quatro quadrantes o mesmo desenho é deslocado para o centro ficar na
+          origem: aparecem coordenadas negativas e pontos sobre os eixos.</p>
+          <div class="chips" id="meios" role="group" aria-label="Coordenadas" style="margin-top:12px">
+            <button class="chip" type="button" data-v="0" aria-pressed="true">Coordenadas inteiras</button>
+            <button class="chip" type="button" data-v="1" aria-pressed="false">Com meios (0,5)</button>
+          </div>
+          <p class="dica">Com meios, cada coordenada é dividida por 2 e a malha ganha linhas a cada
+          0,5 — bom para treinar racionais na reta. Os pares passam a ser escritos com ponto e
+          vírgula: (2,5; 3).</p>
+        </div>
+
+        <div class="card">
+          <h2>Folha</h2>
+          <label class="toggle on" id="lGab"><input type="checkbox" id="gab" checked /> Gabarito do professor</label>
+          <label class="toggle on" id="lAluno"><input type="checkbox" id="aluno" checked /> Espaço para nome, turma e data</label>
+          <label class="toggle on" id="lCaixas"><input type="checkbox" id="caixas" checked /> Caixinha para riscar cada ponto</label>
+          <label class="toggle" id="lRevelar"><input type="checkbox" id="revelar" /> Mostrar o nome do desenho</label>
+          <p class="dica">Sem o nome, a folha do aluno se chama “Desenho secreto” — a graça é descobrir.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="theory">
+      <h2>Como aplicar</h2>
+      <p><b>Comece pelos fáceis.</b> Pipa, casa e coração têm poucos pontos e um ou dois traços:
+      servem para o aluno entender a ordem — primeiro o <b>x</b>, andando na horizontal, depois o
+      <b>y</b>, subindo. O robô, o dinossauro e o castelo pedem atenção por mais tempo.</p>
+      <p><b>Traços separados.</b> A lista é dividida em traços. Dentro de um traço, cada ponto é
+      ligado ao seguinte; quando começa um traço novo, o lápis sai do papel. Um traço de um
+      ponto só — o olho do peixe, por exemplo — é um ponto solto: só se marca.</p>
+      <p><b>Use o erro.</b> Um ponto trocado, como (3, 7) marcado no lugar de (7, 3), deixa um
+      “bico” estranho no desenho. É a melhor hora para conversar sobre por que a ordem do par
+      importa.</p>
+      <h2>Variações</h2>
+      <p>O mesmo desenho rende três atividades diferentes: no <b>1º quadrante</b> (6º ano), nos
+      <b>quatro quadrantes</b> (7º ano, com inteiros negativos) e <b>com meios</b> (números
+      racionais). Uma ideia é dar a mesma figura em duas versões e pedir que a turma descubra o
+      que mudou: a translação que leva uma na outra.</p>
+      <p class="nota-final">Os pontos ficam sempre nos cruzamentos da malha. Nada é enviado para
+      servidor nenhum.</p>
+    </section>
+  </div>
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Desenhos no Plano Cartesiano.
+     Escopado em .dc-root. Cada folha é um SVG em milímetros (A4
+     inteira): a tela, a impressão, o PDF e o SVG baixado saem do
+     mesmo desenho (src/utils/folha-cartesiana.js + src/utils/pdf.js).
+     ============================================================ */
+  .dc-root{
+    --bg:#F8F6F1; --ink:#1C1917; --muted:#78716C; --accent:#1B4F4F; --rule-c:#E2DDD6;
+    --paper:#FFFFFF; --destaque:#A8442B;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --radius:14px;
+    font-family:var(--font-body); line-height:1.5; color:var(--ink);
+    max-width:1180px; margin:0 auto; padding:30px 22px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .dc-root, .dc-root *{box-sizing:border-box}
+
+  .dc-root header.masthead{margin-bottom:22px}
+  .dc-root .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .dc-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .dc-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .dc-root h1{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,5vw,46px);
+    line-height:1.06;margin:0;letter-spacing:-.01em}
+  .dc-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .dc-root .lede{color:var(--muted);max-width:70ch;margin:12px 0 0;font-size:15px}
+  .dc-root .lede em{font-style:normal;color:var(--ink)}
+
+  .dc-root .stage{display:grid;grid-template-columns:1fr .78fr;gap:22px;align-items:start;margin-top:26px}
+  .dc-root .stage > *{min-width:0}
+  @media (max-width:940px){.dc-root .stage{grid-template-columns:1fr}}
+
+  .dc-root .canvas-card{background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);
+    padding:18px;box-shadow:0 18px 44px -30px rgba(28,25,23,.45)}
+  .dc-root .barra{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .dc-root .caption{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin:0}
+  .dc-root .export{display:flex;flex-wrap:wrap;gap:8px}
+  .dc-root .export-nota{margin:14px 2px 0;font-size:12px;color:var(--muted);line-height:1.55}
+  .dc-root .export-nota b{color:var(--ink);font-weight:600}
+  .dc-root .vazio{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;background:var(--bg);border-radius:10px}
+  .dc-root .vazio[hidden]{display:none}
+
+  .dc-root .pilha{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;
+    background:var(--bg);border-radius:10px;padding:14px}
+  .dc-root .pilha:empty{display:none}
+  @media (max-width:520px){.dc-root .pilha{grid-template-columns:minmax(0,1fr)}}
+  .dc-root .folha{display:flex;flex-direction:column;gap:6px;margin:0}
+  .dc-root .folha svg{display:block;width:100%;height:auto;background:#fff;
+    outline:1px solid var(--rule-c);box-shadow:0 14px 34px -26px rgba(28,25,23,.6)}
+  .dc-root .folha-pe{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+  .dc-root .folha-nome{font-size:12.5px;color:var(--ink);font-weight:500}
+  .dc-root .folha-nome .tipo{color:var(--muted);font-weight:400}
+  .dc-root .folha-acoes{display:flex;gap:4px}
+  .dc-root .folha-acoes button{appearance:none;border:1px solid var(--rule-c);background:var(--paper);
+    color:var(--accent);font:inherit;font-size:11.5px;border-radius:999px;padding:3px 10px;cursor:pointer}
+  .dc-root .folha-acoes button:hover{border-color:var(--accent)}
+
+  .dc-root .panel{display:flex;flex-direction:column;gap:16px}
+  .dc-root .card{background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);padding:18px}
+  .dc-root .card h2{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0 0 8px}
+  .dc-root .card-cab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .dc-root .card .hint{margin:0 0 4px;color:var(--muted);font-size:13.5px}
+  .dc-root .mini-acoes{display:flex;gap:10px}
+  .dc-root .link{appearance:none;border:0;background:none;padding:0;font:inherit;font-size:12.5px;
+    color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .dc-root .grupo{margin-top:12px}
+  .dc-root .grupo-cab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .dc-root .grupo-cab span{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted)}
+
+  /* escolha por miniatura */
+  .dc-root .minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+  .dc-root .mini{appearance:none;font:inherit;background:var(--paper);border:1px solid var(--rule-c);
+    border-radius:10px;padding:8px 6px 6px;cursor:pointer;color:var(--muted);display:flex;flex-direction:column;
+    align-items:center;gap:4px;transition:.16s}
+  .dc-root .mini svg{width:46px;height:46px;display:block}
+  .dc-root .mini span{font-size:11.5px;line-height:1.2;text-align:center}
+  .dc-root .mini small{font-family:var(--font-mono);font-size:10px;opacity:.75}
+  .dc-root .mini:hover{border-color:var(--muted);color:var(--ink)}
+  .dc-root .mini[aria-pressed="true"]{border-color:var(--accent);background:#EEF4F3;color:var(--accent);
+    box-shadow:inset 0 0 0 1px var(--accent)}
+
+  .dc-root .ghost, .dc-root .primary, .dc-root .chip{appearance:none;font-family:var(--font-body);
+    font-size:13px;font-weight:500;border-radius:999px;padding:8px 15px;cursor:pointer;transition:.16s}
+  .dc-root .ghost, .dc-root .chip{background:transparent;color:var(--muted);border:1px solid var(--rule-c)}
+  .dc-root .ghost:hover, .dc-root .chip:hover{color:var(--ink);border-color:var(--muted)}
+  .dc-root .primary{background:var(--destaque);border:1px solid var(--destaque);color:#fff;
+    box-shadow:0 8px 20px -12px var(--destaque)}
+  .dc-root .primary:hover{filter:brightness(1.06)}
+  .dc-root button:disabled{opacity:.45;cursor:default}
+  .dc-root .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dc-root .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .dc-root .dica{margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+
+  .dc-root .toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    border:1px solid var(--rule-c);border-radius:999px;padding:7px 14px;cursor:pointer;
+    user-select:none;transition:.16s;margin-top:8px;width:fit-content}
+  .dc-root .toggle:hover{color:var(--ink)}
+  .dc-root .toggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;margin:0}
+  .dc-root .toggle.on{color:var(--ink);border-color:var(--muted)}
+
+  .dc-root .theory{margin-top:30px;max-width:78ch}
+  .dc-root .theory h2{font-family:var(--font-display);font-size:22px;margin:22px 0 8px}
+  .dc-root .theory p{color:var(--muted);font-size:14.5px;margin:0 0 10px}
+  .dc-root .theory b{color:var(--ink)}
+  .dc-root .nota-final{font-size:13px!important}
+
+  /* ----- impressão: só as folhas, cada uma numa página, em tamanho real ----- */
+  @media print{
+    @page{size:A4 portrait;margin:0}
+    html, body{background:#fff !important;margin:0 !important}
+    body > nav, body > footer{display:none !important}
+    .dc-root{padding:0;max-width:none}
+    .dc-root .masthead,.dc-root .panel,.dc-root .theory,.dc-root .barra,.dc-root .export-nota,
+    .dc-root .folha-pe,.dc-root .vazio{display:none !important}
+    .dc-root .stage{display:block;margin:0}
+    .dc-root .canvas-card{border:0;padding:0;box-shadow:none;border-radius:0}
+    .dc-root .pilha{display:block;padding:0;background:none}
+    .dc-root .folha{display:block;break-after:page;page-break-after:always}
+    .dc-root .folha:last-child{break-after:auto;page-break-after:auto}
+    /* um fio abaixo da A4 inteira: arredondamento não empurra uma página em branco */
+    .dc-root .folha svg{width:209.5mm !important;height:296.3mm !important;outline:0;box-shadow:none}
+    .dc-root.so-uma .folha:not(.esta){display:none !important}
+    .dc-root.so-uma .folha.esta{break-after:auto;page-break-after:auto}
+    .dc-root *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+import { DESENHOS, NIVEIS, nivelDe, totalPontos, desenho } from '../../utils/desenhos-cartesianos.js';
+import { folhaDoDesenho, miniatura } from '../../utils/folha-cartesiana.js';
+import { pdfDePaginas, svgDaPagina } from '../../utils/pdf.js';
+
+const $ = (id) => document.getElementById(id);
+
+const PADRAO = { sel: ['casa'], quadrantes: 1, meios: false, gab: true, aluno: true, caixas: true, revelar: false };
+const est = { ...PADRAO, sel: [...PADRAO.sel] };
+const MINIS = Object.fromEntries(DESENHOS.map((d) => [d.id, miniatura(d)]));
+
+/* ---------- painel de escolha: miniaturas agrupadas por nível ---------- */
+function desenhaGrupos() {
+  $('grupos').innerHTML = NIVEIS.map((n) => {
+    const ds = DESENHOS.filter((d) => nivelDe(d) === n);
+    if (!ds.length) return '';
+    return `<div class="grupo"><div class="grupo-cab"><span>${n.nome}</span>` +
+      `<button type="button" class="link" data-nivel="${n.id}">${ds.every((d) => est.sel.includes(d.id)) ? 'desmarcar' : 'marcar todos'}</button></div>` +
+      `<div class="minis">${ds.map((d) => `<button type="button" class="mini" data-id="${d.id}" aria-pressed="${est.sel.includes(d.id)}">` +
+        `${MINIS[d.id]}<span>${d.nome}</span><small>${totalPontos(d)} pontos</small></button>`).join('')}</div></div>`;
+  }).join('');
+}
+$('grupos').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.id) {
+    const id = b.dataset.id;
+    est.sel = est.sel.includes(id) ? est.sel.filter((x) => x !== id) : [...est.sel, id];
+  } else if (b.dataset.nivel) {
+    const ids = DESENHOS.filter((d) => nivelDe(d).id === b.dataset.nivel).map((d) => d.id);
+    const todos = ids.every((id) => est.sel.includes(id));
+    est.sel = todos ? est.sel.filter((id) => !ids.includes(id)) : [...new Set([...est.sel, ...ids])];
+  }
+  ordenaSel();
+  render();
+});
+$('todos').addEventListener('click', () => { est.sel = DESENHOS.map((d) => d.id); render(); });
+$('nenhum').addEventListener('click', () => { est.sel = []; render(); });
+/* as folhas saem na ordem do catálogo (do mais fácil ao mais difícil), não na ordem dos cliques */
+const ordenaSel = () => { est.sel = DESENHOS.map((d) => d.id).filter((id) => est.sel.includes(id)); };
+
+/* ---------- folhas: as do aluno primeiro, os gabaritos no fim ---------- */
+let folhas = [];   // { d, tipo, f }
+function render() {
+  sincroniza();
+  const op = { quadrantes: est.quadrantes, meios: est.meios, aluno: est.aluno, caixas: est.caixas, revelar: est.revelar };
+  const ds = est.sel.map(desenho).filter(Boolean);
+  const tipos = est.gab ? ['aluno', 'gabarito'] : ['aluno'];
+  folhas = tipos.flatMap((tipo) => ds.map((d) => ({ d, tipo, f: folhaDoDesenho(d, { ...op, tipo }) })));
+  $('pilha').innerHTML = folhas.map(({ d, tipo, f }, i) => `
+    <figure class="folha" data-i="${i}">
+      ${svgDaPagina(f.itens, (tipo === 'gabarito' ? 'Gabarito: ' : 'Folha do aluno: ') + d.nome)}
+      <figcaption class="folha-pe">
+        <span class="folha-nome">${d.nome} <span class="tipo">· ${tipo === 'gabarito' ? 'gabarito' : 'aluno'}</span></span>
+        <span class="folha-acoes">
+          <button type="button" data-acao="imprimir" title="Imprimir só esta folha">Imprimir</button>
+          <button type="button" data-acao="pdf">PDF</button>
+          <button type="button" data-acao="svg">SVG</button>
+        </span>
+      </figcaption>
+    </figure>`).join('');
+  $('vazio').hidden = folhas.length > 0;
+  for (const b of ['btnImprimir', 'btnPdf']) $(b).disabled = !folhas.length;
+  const n = folhas.length;
+  $('btnImprimir').textContent = n > 1 ? `Imprimir as ${n} folhas` : 'Imprimir';
+  $('btnPdf').textContent = n > 1 ? `Baixar PDF (${n} folhas)` : 'Baixar PDF';
+  $('caption').textContent = !n ? '' : `${ds.length} ${ds.length === 1 ? 'desenho' : 'desenhos'} · ${n} ${n === 1 ? 'folha' : 'folhas'} A4` +
+    (est.gab ? ' (com gabarito)' : '');
+  guardaUrl();
+}
+
+/* ---------- impressão e downloads ---------- */
+const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const nomeArquivo = (d, tipo) => `plano-cartesiano-${slug(d.nome)}${tipo === 'gabarito' ? '-gabarito' : ''}`;
+function baixa(blob, nome) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+$('btnImprimir').addEventListener('click', () => window.print());
+$('btnPdf').addEventListener('click', () => {
+  if (!folhas.length) return;
+  const um = est.sel.length === 1;
+  const titulo = um ? `Desenho no plano cartesiano — ${folhas[0].d.nome}` : 'Desenhos no plano cartesiano';
+  baixa(pdfDePaginas(folhas.map((x) => x.f.itens), titulo), um ? nomeArquivo(folhas[0].d, 'aluno') + '.pdf' : 'desenhos-plano-cartesiano.pdf');
+});
+$('pilha').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-acao]');
+  if (!b) return;
+  const fig = b.closest('.folha');
+  const { d, tipo, f } = folhas[Number(fig.dataset.i)];
+  const titulo = `${tipo === 'gabarito' ? 'Gabarito' : 'Desenho no plano cartesiano'} — ${d.nome}`;
+  if (b.dataset.acao === 'pdf') baixa(pdfDePaginas([f.itens], titulo), nomeArquivo(d, tipo) + '.pdf');
+  else if (b.dataset.acao === 'svg') baixa(new Blob([svgDaPagina(f.itens, titulo)], { type: 'image/svg+xml' }), nomeArquivo(d, tipo) + '.svg');
+  else {
+    // só esta folha: a classe esconde as outras na impressão e sai logo depois
+    document.querySelector('.dc-root').classList.add('so-uma');
+    fig.classList.add('esta');
+    window.print();
+  }
+});
+window.addEventListener('afterprint', () => {
+  document.querySelector('.dc-root').classList.remove('so-uma');
+  document.querySelectorAll('.folha.esta').forEach((x) => x.classList.remove('esta'));
+});
+
+/* ---------- controles ---------- */
+function ligaChips(id, aplica) {
+  $(id).addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-v]');
+    if (!b) return;
+    aplica(b.dataset.v);
+    render();
+  });
+}
+ligaChips('quad', (v) => { est.quadrantes = Number(v); });
+ligaChips('meios', (v) => { est.meios = v === '1'; });
+const TOGGLES = [['gab', 'lGab'], ['aluno', 'lAluno'], ['caixas', 'lCaixas'], ['revelar', 'lRevelar']];
+for (const [id] of TOGGLES) $(id).addEventListener('change', (e) => { est[id] = e.target.checked; render(); });
+
+function sincroniza() {
+  desenhaGrupos();
+  $('quad').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === est.quadrantes)));
+  $('meios').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === '1') === est.meios)));
+  for (const [id, rot] of TOGGLES) {
+    $(id).checked = est[id];
+    $(rot).classList.toggle('on', est[id]);
+  }
+}
+
+/* ---------- endereço: a seleção e as opções vão para a URL (só o que difere do padrão) ---------- */
+function guardaUrl() {
+  const u = new URL(location.href);
+  u.search = '';
+  const todos = est.sel.length === DESENHOS.length;
+  if (est.sel.join(',') !== PADRAO.sel.join(',')) u.searchParams.set('d', todos ? 'todos' : est.sel.join(',') || '-');
+  if (est.quadrantes === 4) u.searchParams.set('q', '4');
+  if (est.meios) u.searchParams.set('meios', '1');
+  for (const [ch] of TOGGLES) if (est[ch] !== PADRAO[ch]) u.searchParams.set(ch, est[ch] ? '1' : '0');
+  // vírgula não precisa ser escapada na querystring — o link fica legível
+  history.replaceState(null, '', u.toString().replace(/%2C/g, ','));
+}
+function leUrl() {
+  const q = new URLSearchParams(location.search);
+  if (q.has('d')) est.sel = q.get('d') === 'todos' ? DESENHOS.map((d) => d.id) : q.get('d').split(',').filter((id) => desenho(id));
+  est.quadrantes = q.get('q') === '4' ? 4 : 1;
+  est.meios = q.get('meios') === '1';
+  for (const [ch] of TOGGLES) if (q.has(ch)) est[ch] = q.get(ch) === '1';
+  ordenaSel();
+}
+
+leUrl();
+render();
+</script>
