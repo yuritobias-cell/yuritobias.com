@@ -1,0 +1,1214 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Simulador de Poliedros"
+  description="Gire, abra e feche poliedros em 3D: os cinco de Platão, prismas e pirâmides retos e oblíquos, arquimedianos e côncavos — com a planificação animada, a Relação de Euler e o teste do segmento que separa convexos de côncavos."
+>
+  <div class="pl-root">
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=simulacoes">Simulações</a> · Geometria espacial</p>
+      <h1>Simulador de <em>poliedros</em></h1>
+      <p class="lede">Arraste para girar o sólido e use o controle de baixo para <em>abrir e fechar a
+      planificação</em> — face a face, em torno das arestas. Incline prismas e pirâmides para ver o
+      que muda do reto para o oblíquo, e ligue dois pontos da superfície para descobrir se o
+      poliedro é convexo ou côncavo.</p>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Família de poliedros" id="abas"></div>
+    <div class="chips" id="chips" aria-label="Poliedro"></div>
+
+    <div class="stage">
+      <div class="canvas-card">
+        <div class="palco" id="palco">
+          <canvas id="tela" role="img" aria-label="Poliedro em 3D"></canvas>
+          <div class="rotulos" id="rotulos" aria-hidden="true"></div>
+          <div class="selo" id="selo"></div>
+          <div class="aviso" id="aviso" hidden></div>
+          <p class="sem-webgl" id="semWebgl" hidden>Este navegador não conseguiu abrir o desenho em 3D
+          (WebGL desligado ou indisponível). A planificação, logo abaixo, continua funcionando.</p>
+        </div>
+
+        <div class="dobra">
+          <button class="btn btn-forte" type="button" id="abrir">Planificar</button>
+          <label class="regua">
+            <span class="ponta">fechado</span>
+            <input type="range" id="t" min="0" max="1000" value="0" aria-label="Abertura da planificação" />
+            <span class="ponta">planificado</span>
+          </label>
+        </div>
+
+        <div class="controles">
+          <label class="toggle on"><input type="checkbox" id="tGirar" checked /> Girar sozinho</label>
+          <label class="toggle"><input type="checkbox" id="tTransp" /> Transparente</label>
+          <label class="toggle on"><input type="checkbox" id="tVert" checked /> Vértices</label>
+          <label class="toggle on"><input type="checkbox" id="tChao" checked /> Plano de apoio</label>
+          <button class="btn" type="button" id="enquadrar">Enquadrar</button>
+        </div>
+        <p class="dica">Arraste para girar · Ctrl + rolar (ou pinça) para aproximar · botão direito para deslocar</p>
+      </div>
+
+      <div class="painel">
+        <div class="card card-id">
+          <div class="rotulo" id="idGrupo"></div>
+          <h2 id="idNome"></h2>
+          <div class="etiquetas" id="idEtiquetas"></div>
+          <p id="idResumo"></p>
+        </div>
+
+        <div class="card card-euler">
+          <div class="vaf">
+            <div><span class="num" id="nV"></span><span class="leg">vértices</span></div>
+            <div><span class="num" id="nA"></span><span class="leg">arestas</span></div>
+            <div><span class="num" id="nF"></span><span class="leg">faces</span></div>
+          </div>
+          <p class="euler" id="euler"></p>
+          <ul class="faces" id="faces"></ul>
+          <p class="conta" id="conta"></p>
+        </div>
+
+        <div class="card card-incl" id="cardIncl" hidden>
+          <div class="cab">
+            <h2>Reto ou oblíquo?</h2>
+            <div class="seg" role="group" aria-label="Reto ou oblíquo">
+              <button type="button" data-tipo="reto">Reto</button>
+              <button type="button" data-tipo="obliquo">Oblíquo</button>
+            </div>
+          </div>
+          <div class="deslizes">
+            <label class="desliza"><span>Lados da base</span>
+              <div class="lados" id="lados"></div>
+            </label>
+            <label class="desliza" id="lInc"><span>Inclinação <b id="vInc"></b></span>
+              <input type="range" id="inc" min="0" max="50" step="1" value="25" />
+            </label>
+            <label class="desliza"><span>Altura <b id="vH"></b></span>
+              <input type="range" id="h" min="1" max="3.2" step="0.05" value="2.2" />
+            </label>
+          </div>
+          <dl class="medidas" id="medidas"></dl>
+          <p class="explica" id="explicaIncl"></p>
+          <label class="toggle on"><input type="checkbox" id="tAltura" checked /> Mostrar altura</label>
+        </div>
+
+        <div class="card card-seg">
+          <h2>Convexo ou côncavo?</h2>
+          <p>Ligue dois pontos quaisquer do poliedro. Se o segmento <b>sempre</b> fica inteiro
+          dentro do sólido, ele é <b>convexo</b>; basta um segmento passar por fora para ele ser
+          <b>côncavo</b>.</p>
+          <div class="controles">
+            <button class="btn" type="button" id="marcar" aria-pressed="false">Marcar dois pontos</button>
+            <button class="btn" type="button" id="sortear">Sortear um segmento</button>
+            <button class="btn" type="button" id="testar">Testar 300 segmentos</button>
+            <button class="btn" type="button" id="achar">Achar um que escapa</button>
+            <button class="btn btn-leve" type="button" id="limpar">Limpar</button>
+          </div>
+          <p class="veredito" id="veredito" aria-live="polite"></p>
+          <p class="legenda-seg"><span class="sw sw-dentro"></span>dentro do sólido <span class="sw sw-fora"></span>por fora</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="rede-card" aria-labelledby="tituloRede">
+      <div class="rede-cab">
+        <div>
+          <div class="rotulo">Planificação</div>
+          <h2 id="tituloRede"></h2>
+        </div>
+        <div class="controles">
+          <label class="toggle on"><input type="checkbox" id="tAbas" checked /> Abas de colagem</label>
+          <button class="btn" type="button" id="imprimir">Imprimir planificação</button>
+        </div>
+      </div>
+      <svg class="rede" id="rede" aria-label="Planificação do poliedro"></svg>
+      <p class="dica">Linha contínua: recortar · tracejada: dobrar. Passe o mouse sobre uma face para achá-la no sólido.
+      Esta é uma das planificações possíveis — o cubo, sozinho, tem 11 diferentes.</p>
+    </section>
+
+    <section class="teoria">
+      <div class="card">
+        <h2>Relação de Euler</h2>
+        <p>Em todo poliedro convexo, <b>V − A + F = 2</b>. Ela vale também em muitos côncavos —
+        em todos os desta página —, mas não em qualquer um: num sólido com um furo
+        atravessado, como uma moldura, a conta dá 0.</p>
+      </div>
+      <div class="card">
+        <h2>Contando arestas pelas faces</h2>
+        <p>Cada aresta é lado de exatamente duas faces. Somando os lados de todas as faces, cada
+        aresta é contada duas vezes — por isso <b>A = (soma dos lados) ÷ 2</b>.</p>
+      </div>
+      <div class="card">
+        <h2>Reto × oblíquo</h2>
+        <p>No prisma <b>reto</b> as arestas laterais são perpendiculares às bases; no
+        <b>oblíquo</b>, inclinadas. Na pirâmide <b>reta</b> o pé da altura é o centro da base;
+        na <b>oblíqua</b>, não. A altura é sempre a distância entre os planos — nunca a aresta inclinada.</p>
+      </div>
+      <div class="card">
+        <h2>Poliedros de Platão</h2>
+        <p>Faces regulares e iguais, o mesmo número delas em cada vértice — e só existem cinco.
+        Nos <b>arquimedianos</b> as faces são regulares, mas de dois ou três tipos.</p>
+      </div>
+    </section>
+
+    <div class="impressao" id="impressao" aria-hidden="true"></div>
+  </div>
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Simulador de Poliedros.
+     Tudo escopado sob .pl-root. O 3D é three.js empacotado no build
+     (sem CDN — a página abre offline como as demais); a geometria
+     está em src/utils/poliedros.js e o catálogo em poliedros-catalogo.js.
+     ============================================================ */
+  .pl-root{
+    --bg:#F8F6F1; --ink:#1C1917; --muted:#78716C; --accent:#1B4F4F; --rule:#E2DDD6;
+    --papel:#FFFFFF; --palco:#FBFAF7;
+    --dentro:#2E7D5B; --fora:#C0392B; --destaque:#A8442B;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --mat:Georgia,'Times New Roman',Times,serif;
+    --radius:14px;
+
+    font-family:var(--font-body); line-height:1.5; color:var(--ink);
+    max-width:1240px; margin:0 auto; padding:30px 22px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .pl-root, .pl-root *{box-sizing:border-box}
+
+  .pl-root header.masthead{margin-bottom:22px}
+  .pl-root .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .pl-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .pl-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .pl-root h1{font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em}
+  .pl-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .pl-root .lede{color:var(--muted);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .pl-root .lede em{font-style:normal;color:var(--ink);font-weight:500}
+
+  /* ----- abas e chips ----- */
+  .pl-root .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 12px}
+  .pl-root .tab{appearance:none;border:1px solid var(--rule);background:transparent;
+    color:var(--muted);font-family:var(--font-body);font-weight:500;font-size:12.5px;
+    letter-spacing:.04em;text-transform:uppercase;padding:9px 16px;border-radius:999px;
+    cursor:pointer;transition:.18s}
+  .pl-root .tab:hover{color:var(--ink);border-color:var(--muted)}
+  .pl-root .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .pl-root .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px;min-height:34px}
+  .pl-root .chip{appearance:none;border:1px solid var(--rule);background:var(--papel);color:var(--ink);
+    font:inherit;font-size:13px;padding:6px 13px;border-radius:999px;cursor:pointer;transition:.15s}
+  .pl-root .chip:hover{border-color:var(--accent)}
+  .pl-root .chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);
+    box-shadow:inset 0 0 0 1px var(--accent);font-weight:500}
+
+  /* ----- layout ----- */
+  .pl-root .stage{display:grid;grid-template-columns:1.3fr .9fr;gap:22px;align-items:start}
+  @media (max-width:940px){.pl-root .stage{grid-template-columns:1fr}}
+
+  .pl-root .canvas-card,.pl-root .card,.pl-root .rede-card{
+    background:var(--papel);border:1px solid var(--rule);border-radius:var(--radius)}
+  .pl-root .canvas-card{padding:10px;display:flex;flex-direction:column;gap:10px}
+  .pl-root .palco{position:relative;aspect-ratio:4/3.1;border-radius:9px;overflow:hidden;
+    background:radial-gradient(ellipse at 50% 35%,#fff 0,var(--palco) 60%,#F2EFE8 100%)}
+  @media (max-width:600px){.pl-root .palco{aspect-ratio:1/1}}
+  .pl-root #tela{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+  .pl-root #tela:active{cursor:grabbing}
+  .pl-root .palco.marcando #tela{cursor:crosshair}
+  .pl-root .rotulos{position:absolute;inset:0;pointer-events:none}
+  .pl-root .r3d{position:absolute;transform:translate(-50%,-50%);font-family:var(--mat);
+    font-style:italic;font-size:15px;color:var(--ink);background:rgba(255,255,255,.82);
+    padding:0 5px;border-radius:5px;white-space:nowrap;line-height:1.35}
+  .pl-root .r3d.alt{color:var(--accent);font-weight:600}
+  .pl-root .r3d.are{color:var(--destaque);font-weight:600}
+  .pl-root .selo{position:absolute;left:12px;top:12px;font-family:var(--font-mono);font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+  .pl-root .aviso{position:absolute;left:12px;right:12px;bottom:12px;font-size:13px;
+    color:var(--accent);background:rgba(27,79,79,.08);border:1px solid rgba(27,79,79,.3);
+    border-radius:8px;padding:7px 11px;pointer-events:none}
+  .pl-root .sem-webgl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:30px;margin:0;color:var(--muted);font-size:14px}
+  .pl-root .sem-webgl[hidden],.pl-root .aviso[hidden]{display:none}
+
+  .pl-root .dobra{display:flex;align-items:center;gap:14px;padding:2px 4px}
+  .pl-root .regua{flex:1;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);
+    font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .pl-root .regua input{flex:1;accent-color:var(--accent);min-width:60px}
+  @media (max-width:520px){.pl-root .regua .ponta{display:none}}
+
+  .pl-root .painel{display:flex;flex-direction:column;gap:16px}
+  .pl-root .card{padding:18px}
+  .pl-root .card h2,.pl-root .rede-card h2{font-family:var(--font-display);font-weight:600;font-size:21px;margin:0 0 6px;line-height:1.2}
+  .pl-root .card p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+  .pl-root .card p b{color:var(--ink);font-weight:600}
+  .pl-root .rotulo{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+  .pl-root .etiquetas{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+  .pl-root .etq{font-size:11.5px;font-weight:500;letter-spacing:.03em;padding:2px 9px;border-radius:999px;
+    border:1px solid var(--rule);color:var(--muted)}
+  .pl-root .etq.convexo{color:var(--dentro);border-color:rgba(46,125,91,.45);background:rgba(46,125,91,.07)}
+  .pl-root .etq.concavo{color:var(--fora);border-color:rgba(192,57,43,.45);background:rgba(192,57,43,.07)}
+
+  .pl-root .vaf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+  .pl-root .vaf .num{display:block;font-family:var(--font-display);font-size:38px;font-weight:700;line-height:1}
+  .pl-root .vaf .leg{font-size:12px;color:var(--muted)}
+  .pl-root .euler{text-align:center;font-family:var(--mat)!important;font-size:18px!important;
+    color:var(--ink)!important;margin:12px 0 0!important;padding:8px;border-radius:9px;background:#F4F1EA}
+  .pl-root .faces{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--rule);display:grid;gap:6px}
+  .pl-root .faces li{display:flex;align-items:center;gap:9px;font-size:14px}
+  .pl-root .faces .sw{width:16px;height:16px;border-radius:4px;flex:none;border:1px solid rgba(0,0,0,.18)}
+  .pl-root .conta{margin-top:10px!important;font-size:13px!important}
+  .pl-root .conta .mat{font-family:var(--mat);font-size:15px;color:var(--ink)}
+
+  .pl-root .card-incl .cab{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .pl-root .card-incl h2{margin:0}
+  .pl-root .seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden}
+  .pl-root .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:13px;
+    color:var(--muted);padding:6px 14px;cursor:pointer}
+  .pl-root .seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .pl-root .deslizes{display:grid;gap:10px}
+  .pl-root .desliza{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+  .pl-root .desliza b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  .pl-root .desliza input{accent-color:var(--accent);width:100%}
+  .pl-root .desliza[hidden]{display:none}
+  .pl-root .lados{display:flex;flex-wrap:wrap;gap:5px}
+  .pl-root .lados button{appearance:none;border:1px solid var(--rule);background:var(--papel);font:inherit;
+    font-size:13px;min-width:34px;padding:4px 8px;border-radius:8px;cursor:pointer;color:var(--ink)}
+  .pl-root .lados button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
+  .pl-root .medidas{margin:14px 0 10px;display:grid;gap:5px;padding-top:12px;border-top:1px solid var(--rule)}
+  .pl-root .medidas div{display:grid;grid-template-columns:1fr auto;gap:10px;font-size:13.5px}
+  .pl-root .medidas dt{color:var(--muted)}
+  .pl-root .medidas dd{margin:0;font-variant-numeric:tabular-nums;font-weight:500}
+  .pl-root .explica{margin-bottom:10px!important}
+
+  .pl-root .card-seg .controles{margin:12px 0 4px}
+  .pl-root .veredito{margin-top:10px!important;font-size:14.5px!important;color:var(--ink)!important;min-height:1.6em}
+  .pl-root .veredito .ok{color:var(--dentro);font-weight:600}
+  .pl-root .veredito .nao{color:var(--fora);font-weight:600}
+  .pl-root .legenda-seg{font-size:12px!important;display:flex;align-items:center;gap:6px;margin-top:6px!important}
+  .pl-root .legenda-seg .sw{display:inline-block;width:18px;height:4px;border-radius:2px}
+  .pl-root .legenda-seg .sw-fora{margin-left:10px}
+  .pl-root .sw-dentro{background:var(--dentro)}
+  .pl-root .sw-fora{background:var(--fora)}
+
+  .pl-root .controles{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .pl-root .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);
+    border:1px solid var(--rule);background:var(--papel);border-radius:999px;padding:6px 12px;cursor:pointer;user-select:none}
+  .pl-root .toggle input{accent-color:var(--accent);margin:0}
+  .pl-root .toggle.on{color:var(--accent);border-color:var(--accent)}
+  .pl-root .btn{appearance:none;border:1px solid var(--rule);background:var(--papel);
+    color:var(--accent);font:inherit;font-size:12.5px;border-radius:999px;padding:7px 14px;cursor:pointer}
+  .pl-root .btn:hover{border-color:var(--accent)}
+  .pl-root .btn[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .pl-root .btn:disabled{opacity:.45;cursor:default}
+  .pl-root .btn-forte{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500;min-width:112px}
+  .pl-root .btn-leve{color:var(--muted)}
+  .pl-root .dica{font-size:12.5px;color:var(--muted);margin:0;text-align:center}
+
+  /* ----- planificação ----- */
+  .pl-root .rede-card{margin-top:22px;padding:18px}
+  .pl-root .rede-cab{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .pl-root svg.rede{display:block;width:100%;height:auto;max-height:560px}
+  .pl-root .rede .face{stroke:none;transition:filter .12s}
+  .pl-root .rede .face:hover,.pl-root .rede .face.acesa{filter:brightness(.88) saturate(1.3)}
+  .pl-root .rede .corte{stroke:var(--ink);stroke-width:1.6;fill:none;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+  .pl-root .rede .vinco{stroke:var(--ink);stroke-width:1.1;stroke-dasharray:5 4;fill:none;opacity:.75;vector-effect:non-scaling-stroke}
+  .pl-root .rede .aba{fill:#EEEAE2;stroke:var(--ink);stroke-width:1.1;vector-effect:non-scaling-stroke}
+  .pl-root .rede-card .dica{text-align:left;margin-top:8px}
+
+  .pl-root .teoria{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
+  .pl-root .teoria h2{font-size:18px}
+
+  .pl-root .impressao{display:none}
+
+  @media print{
+    @page{size:A4;margin:10mm}
+    html,body{background:#fff !important}
+    body > nav, body > footer{display:none !important}
+    .pl-root{padding:0;max-width:none}
+    .pl-root > *:not(.impressao){display:none !important}
+    .pl-root .impressao{display:block}
+    .pl-root .impressao h1{font-family:var(--font-display);font-size:18pt;margin:0 0 2mm}
+    .pl-root .impressao p{font-size:9.5pt;color:#444;margin:0 0 5mm}
+    .pl-root .impressao svg{display:block;margin:0 auto}
+    .pl-root .impressao .corte{stroke:#000;stroke-width:.35;fill:none;stroke-linejoin:round}
+    .pl-root .impressao .vinco{stroke:#000;stroke-width:.25;stroke-dasharray:2 1.5;fill:none}
+    .pl-root .impressao .aba{fill:#eee;stroke:#000;stroke-width:.25}
+    .pl-root *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import {
+  transformacoes, aplica, triangulaFaces, rede2D, arestas, classificaSegmento, foraDe,
+  pontoNaSuperficie, segmentoQueMaisSai, normalFace, redeSobrepoe, dist,
+} from '../../utils/poliedros.js';
+import { GRUPOS, LADOS, doGrupo, porId, monta, valor } from '../../utils/poliedros-catalogo.js';
+
+const $ = (id) => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+const fmt = (x, c = 2) => x.toFixed(c).replace('.', ',');
+
+/* ---------- cores das faces, por papel ---------- */
+const CORES = {
+  n3: '#E08A5E', n4: '#5FA39B', n5: '#E2B347', n6: '#9682C9', n8: '#6E9FD6', n10: '#C97896', n12: '#7DB36A',
+  base: '#5FA39B', lateral: '#E9BE6A', cavidade: '#E08A5E',
+};
+const corDe = (papel) => CORES[papel] || '#B9B2A6';
+
+/* ---------- estado ---------- */
+const PARAM_PADRAO = {
+  prisma: { n: 5, h: 2.2, inclinacao: 0 },
+  piramide: { n: 4, h: 2.2, inclinacao: 0 },
+};
+const est = {
+  grupo: 'platonicos',
+  id: 'cubo',
+  params: structuredClone(PARAM_PADRAO),
+  ultimo: { platonicos: 'cubo', prismas: 'prisma', piramides: 'piramide', arquimedianos: 'cuboctaedro', outros: 'paralelepipedo', concavos: 'prisma-l' },
+  t: 0,
+  transparente: false,
+  vertices: true,
+  chao: true,
+  altura: true,
+  abas: true,
+  marcando: false,
+};
+/* inclinação usada quando se aperta "Oblíquo" — lembra a última */
+const incObliqua = { prisma: 25, piramide: 25 };
+
+let M = null;            // o sólido montado (ver monta() no catálogo)
+let tris = null;         // triângulos do sólido, para o teste do segmento
+let transf1 = null;      // transformações com a rede toda aberta
+
+/* ================================================================
+   Cena 3D
+   ================================================================ */
+const palco = $('palco');
+const tela = $('tela');
+let renderer = null;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: tela, antialias: true, alpha: true });
+} catch (e) {
+  $('semWebgl').hidden = false;
+}
+
+const cena = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32, 4 / 3, 0.1, 200);
+camera.position.set(5.2, 3.6, 7.2);
+cena.add(camera);
+cena.add(new THREE.HemisphereLight(0xffffff, 0xcfc7b8, 1.9));
+const luz = new THREE.DirectionalLight(0xffffff, 1.5);
+luz.position.set(2.5, 4, 3);
+camera.add(luz); // a luz acompanha a câmera: a face de frente nunca fica no escuro
+
+const chao = new THREE.GridHelper(16, 32, 0xd8d2c7, 0xe9e5dd);
+chao.material.transparent = true;
+chao.material.opacity = 0.75;
+chao.position.y = -0.002;
+cena.add(chao);
+
+let controles = null;
+if (renderer) {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  controles = new OrbitControls(camera, tela);
+  controles.enableDamping = true;
+  controles.dampingFactor = 0.08;
+  controles.minDistance = 2.5;
+  controles.maxDistance = 40;
+  controles.autoRotate = true;
+  controles.autoRotateSpeed = 1.1;
+  /* A roda do mouse rola a página; aproximar é com Ctrl/⌘ + roda (a pinça do
+     trackpad já chega assim). Sem isso, a página fica presa no 3D ao rolar. */
+  palco.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) return;
+    e.stopPropagation();
+  }, { capture: true });
+}
+
+/* materiais compartilhados das linhas (precisam saber o tamanho da tela) */
+const matAresta = new LineMaterial({ color: 0x1c1917, linewidth: 2, worldUnits: false });
+const matAlt = new LineMaterial({ color: 0x1b4f4f, linewidth: 2.4, dashed: true, dashSize: 0.09, gapSize: 0.06, depthTest: false });
+const matAre = new LineMaterial({ color: 0xa8442b, linewidth: 4.5 });
+const matDentro = new LineMaterial({ color: 0x2e7d5b, linewidth: 5, depthTest: false, transparent: true });
+const matFora = new LineMaterial({ color: 0xc0392b, linewidth: 5, depthTest: false, transparent: true });
+const matsLinha = [matAresta, matAlt, matAre, matDentro, matFora];
+
+const raiz = new THREE.Group();          // desloca a rede aberta para o centro
+cena.add(raiz);
+let faces3D = [];                        // { g, mesh, mat }
+let pontosV = null;                      // vértices (esferas)
+let extras3D = null;                     // altura, aresta lateral, marcas
+let segs3D = new THREE.Group();          // segmentos do teste
+raiz.add(segs3D);
+const rotulos = [];                      // rótulos HTML presos a pontos 3D
+
+function linhas(pares, mat) {
+  const g = new LineSegmentsGeometry();
+  g.setPositions(pares.flat(2));
+  const l = new LineSegments2(g, mat);
+  l.computeLineDistances();
+  return l;
+}
+function limpa(obj) {
+  obj.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material && !matsLinha.includes(o.material)) o.material.dispose?.(); });
+  obj.parent?.remove(obj);
+}
+function rotulo(texto, p, classe) {
+  const el = document.createElement('span');
+  el.className = 'r3d ' + (classe || '');
+  el.innerHTML = texto;
+  $('rotulos').appendChild(el);
+  rotulos.push({ el, p: new THREE.Vector3(...p) });
+}
+function limpaRotulos() {
+  rotulos.length = 0;
+  $('rotulos').innerHTML = '';
+}
+
+function constroiCena() {
+  faces3D.forEach((f) => limpa(f.g));
+  faces3D = [];
+  if (pontosV) limpa(pontosV);
+  if (extras3D) limpa(extras3D);
+  limpaSegmentos();
+  limpaRotulos();
+
+  const s = M.solido;
+  const trisF = triangulaFaces(s);
+  s.F.forEach((f, k) => {
+    const n = normalFace(s.V, f);
+    const pos = [], nor = [];
+    for (const t of trisF[k]) for (const i of t) { pos.push(...s.V[i]); nor.push(...n); }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    const mat = new THREE.MeshStandardMaterial({
+      color: corDe(s.papel[k]), roughness: 0.78, metalness: 0, side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+      emissive: 0x000000,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.userData.face = k;
+    const g = new THREE.Group();
+    g.matrixAutoUpdate = false;
+    g.add(mesh);
+    g.add(linhas(f.map((i, j) => [s.V[i], s.V[f[(j + 1) % f.length]]]), matAresta));
+    raiz.add(g);
+    faces3D.push({ g, mesh, mat });
+  });
+
+  // vértices: uma esfera em cada, só com o sólido fechado
+  const esf = new THREE.SphereGeometry(0.05, 14, 10);
+  pontosV = new THREE.InstancedMesh(esf, new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.5 }), s.V.length);
+  const m4 = new THREE.Matrix4();
+  s.V.forEach((p, i) => pontosV.setMatrixAt(i, m4.makeTranslation(...p)));
+  raiz.add(pontosV);
+
+  constroiExtras();
+
+  transf1 = transformacoes(s, M.rede, 1);
+  tris = trisF.flat();
+  aplicaAbertura();
+  aplicaVisual();
+}
+
+/* altura (tracejada, com o ângulo reto no pé) e aresta lateral do prisma */
+function constroiExtras() {
+  extras3D = new THREE.Group();
+  raiz.add(extras3D);
+  const ex = M.extras;
+  if (!ex.altura) return;
+  const [T, P] = ex.altura;
+  const alt = linhas([[T, P]], matAlt);
+  alt.renderOrder = 5;
+  extras3D.add(alt);
+  // marca do ângulo reto: um quadradinho no plano vertical que contém a altura
+  const c = M.solido.V.reduce((a, p) => [a[0] + p[0], 0, a[2] + p[2]], [0, 0, 0]).map((x) => x / M.solido.V.length);
+  let u = [c[0] - P[0], 0, c[2] - P[2]];
+  const lu = Math.hypot(u[0], u[2]);
+  u = lu > 1e-6 ? [u[0] / lu, 0, u[2] / lu] : [1, 0, 0];
+  const q = 0.16;
+  const a = [P[0] + u[0] * q, P[1], P[2] + u[2] * q], b = [a[0], P[1] + q, a[2]], d = [P[0], P[1] + q, P[2]];
+  const marca = linhas([[a, b], [b, d]], matAlt);
+  marca.renderOrder = 5;
+  extras3D.add(marca);
+  const pe = new THREE.Mesh(new THREE.SphereGeometry(0.06, 14, 10), new THREE.MeshBasicMaterial({ color: 0x1b4f4f, depthTest: false }));
+  pe.position.set(...P);
+  pe.renderOrder = 6;
+  extras3D.add(pe);
+
+  // rótulos em alturas diferentes: a altura e a aresta lateral saem do mesmo vértice
+  const em = (X, Y, s) => [X[0] + (Y[0] - X[0]) * s, X[1] + (Y[1] - X[1]) * s, X[2] + (Y[2] - X[2]) * s];
+  rotulo('h', em(P, T, 0.62), 'alt');
+  if (ex.aresta) {
+    const [B, A] = ex.aresta;
+    extras3D.add(linhas([[B, A]], matAre));
+    rotulo('aresta lateral', em(B, A, 0.3), 'are');
+  }
+  if (ex.centro) {
+    const O = ex.centro;
+    const o = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 10), new THREE.MeshBasicMaterial({ color: 0xa8442b, depthTest: false }));
+    o.position.set(...O);
+    o.renderOrder = 6;
+    extras3D.add(o);
+    rotulo('O', [O[0], O[1] - 0.001, O[2] + 0.22], 'are');
+    if (dist(O, P) > 0.02) {
+      rotulo('H', [P[0], P[1], P[2] + 0.22], 'alt');
+      const oh = linhas([[O, P]], matAlt); // a distância entre o centro e o pé da altura
+      oh.renderOrder = 5;
+      extras3D.add(oh);
+    }
+  }
+}
+
+/* ---------- abertura da planificação ---------- */
+const suave = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+let centroRede = [0, 0];
+
+function aplicaAbertura() {
+  const s = M.solido, t = est.t;
+  const T = transformacoes(s, M.rede, t);
+  const m = new THREE.Matrix4();
+  T.forEach((A, k) => {
+    const R = A.R;
+    m.set(R[0], R[1], R[2], A.t[0], R[3], R[4], R[5], A.t[1], R[6], R[7], R[8], A.t[2], 0, 0, 0, 1);
+    faces3D[k].g.matrix.copy(m);
+    faces3D[k].g.matrixWorldNeedsUpdate = true;
+  });
+  // a rede aberta é bem maior que o sólido: leva o centro dela para o meio da cena
+  const pts = s.F.flatMap((f, k) => f.map((i) => aplica(transf1[k], s.V[i])));
+  const xs = pts.map((p) => p[0]), zs = pts.map((p) => p[2]);
+  centroRede = [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...zs) + Math.max(...zs)) / 2];
+  raiz.position.set(-centroRede[0] * suave(t), 0, -centroRede[1] * suave(t));
+
+  const fechado = t < 1e-3;
+  if (pontosV) pontosV.visible = fechado && est.vertices;
+  if (extras3D) extras3D.visible = fechado && est.altura;
+  rotulos.forEach((r) => (r.el.style.display = fechado && est.altura ? '' : 'none'));
+  segs3D.visible = fechado;
+  $('t').value = Math.round(t * 1000);
+  $('abrir').textContent = t > 0.5 ? 'Fechar' : 'Planificar';
+  for (const b of ['marcar', 'sortear', 'testar', 'achar']) $(b).disabled = !fechado;
+  $('aviso').hidden = fechado || !temSegmento();
+  if (!fechado && temSegmento()) $('aviso').textContent = 'Feche o sólido para ver o segmento de novo.';
+  pede();
+}
+
+/* ---------- enquadramento da câmera ---------- */
+function alvoDaCamera(t) {
+  const s = M.solido;
+  const H = Math.max(...s.V.map((p) => p[1]));
+  const c0 = new THREE.Vector3(0, H / 2, 0);
+  const r0 = Math.max(...s.V.map((p) => c0.distanceTo(new THREE.Vector3(...p))));
+  const pts = s.F.flatMap((f, k) => f.map((i) => aplica(transf1[k], s.V[i])));
+  const yRede = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+  const r1 = Math.max(...pts.map((p) => Math.hypot(p[0] - centroRede[0], p[2] - centroRede[1]))) * 0.92;
+  const e = suave(t);
+  const alvo = new THREE.Vector3(0, c0.y + (yRede - c0.y) * e, 0);
+  const raio = r0 + (r1 - r0) * e;
+  const aspecto = Math.min(1, camera.aspect);
+  const distancia = (raio / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) / aspecto * 1.45;
+  const elev = THREE.MathUtils.degToRad(20 + 45 * e);
+  return { alvo, distancia, elev };
+}
+let voo = null;   // animação da câmera e da abertura
+function voa(paraT, duracao = 0) {
+  if (!controles) { est.t = paraT; aplicaAbertura(); return; }
+  const off = camera.position.clone().sub(controles.target);
+  const esf = new THREE.Spherical().setFromVector3(off);
+  const fim = alvoDaCamera(paraT);
+  voo = {
+    t0: performance.now(), dur: duracao || (Math.abs(paraT - est.t) > 0.01 ? 1700 : 700),
+    deT: est.t, paraT,
+    deAlvo: controles.target.clone(), deR: esf.radius, deFi: esf.phi, teta: esf.theta,
+    fim,
+  };
+}
+function passoVoo(agora) {
+  if (!voo) return false;
+  const x = Math.min(1, (agora - voo.t0) / voo.dur), e = suave(x);
+  if (voo.paraT !== voo.deT) { est.t = voo.deT + (voo.paraT - voo.deT) * e; aplicaAbertura(); }
+  const alvo = voo.deAlvo.clone().lerp(voo.fim.alvo, e);
+  const r = voo.deR + (voo.fim.distancia - voo.deR) * e;
+  const fi = voo.deFi + (Math.PI / 2 - voo.fim.elev - voo.deFi) * e;
+  controles.target.copy(alvo);
+  camera.position.copy(alvo).add(new THREE.Vector3().setFromSphericalCoords(r, fi, voo.teta));
+  if (x >= 1) voo = null;
+  return true;
+}
+
+/* ---------- laço de desenho (só desenha quando algo mudou) ---------- */
+let sujo = true;
+const pede = () => { sujo = true; };
+function redimensiona() {
+  if (!renderer) return;
+  const w = palco.clientWidth, h = palco.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  matsLinha.forEach((m) => m.resolution.set(w, h));
+  pede();
+}
+new ResizeObserver(redimensiona).observe(palco);
+
+const v3 = new THREE.Vector3();
+function posicionaRotulos() {
+  const w = palco.clientWidth, h = palco.clientHeight;
+  for (const r of rotulos) {
+    v3.copy(r.p).add(raiz.position).project(camera);
+    r.el.style.left = ((v3.x + 1) / 2) * w + 'px';
+    r.el.style.top = ((1 - v3.y) / 2) * h + 'px';
+  }
+}
+function laco(agora) {
+  requestAnimationFrame(laco);
+  if (!renderer || !M) return;
+  const voando = passoVoo(agora);
+  const mexeu = controles.update();
+  if (voando || mexeu || sujo) {
+    renderer.render(cena, camera);
+    posicionaRotulos();
+    sujo = false;
+  }
+}
+requestAnimationFrame(laco);
+
+/* ---------- aparência: transparência, vértices, chão ---------- */
+function aplicaVisual() {
+  const transp = est.transparente || temSegmento() || est.marcando;
+  faces3D.forEach(({ mat }) => {
+    mat.transparent = transp;
+    mat.opacity = transp ? 0.32 : 1;
+    mat.depthWrite = !transp;
+    mat.needsUpdate = true;
+  });
+  chao.visible = est.chao;
+  if (pontosV) pontosV.visible = est.t < 1e-3 && est.vertices;
+  pede();
+}
+
+/* ================================================================
+   Teste do segmento
+   ================================================================ */
+let pontosMarcados = [];
+let ultimoSeg = null;
+const temSegmento = () => segs3D.children.length > 0;
+
+function limpaSegmentos() {
+  while (segs3D.children.length) limpa(segs3D.children[0]);
+  pontosMarcados = [];
+  ultimoSeg = null;
+}
+function bolinha(p, cor) {
+  const b = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 12), new THREE.MeshBasicMaterial({ color: cor, depthTest: false }));
+  b.position.set(...p);
+  b.renderOrder = 12;
+  segs3D.add(b);
+}
+const naReta = (P, Q, s) => [P[0] + (Q[0] - P[0]) * s, P[1] + (Q[1] - P[1]) * s, P[2] + (Q[2] - P[2]) * s];
+
+function desenhaSegmento(P, Q) {
+  const tr = classificaSegmento(M.solido, P, Q, tris);
+  for (const t of tr) {
+    const l = linhas([[naReta(P, Q, t.s0), naReta(P, Q, t.s1)]], t.dentro ? matDentro : matFora);
+    l.renderOrder = 11;
+    segs3D.add(l);
+  }
+  bolinha(P, 0x1c1917);
+  bolinha(Q, 0x1c1917);
+  ultimoSeg = { P, Q, tr };
+  return tr;
+}
+function contaSegmento(tr, P, Q) {
+  const fora = foraDe(tr);
+  if (fora < 1e-6) return '<span class="ok">✓ O segmento ficou inteiro dentro do sólido.</span>';
+  return `<span class="nao">✗ ${Math.round(fora * 100)}% do segmento passa por fora do sólido</span> — o poliedro é côncavo.`;
+}
+
+function mostraSegmento(P, Q, prefixo = '') {
+  limpaSegmentos();
+  const tr = desenhaSegmento(P, Q);
+  $('veredito').innerHTML = prefixo + contaSegmento(tr, P, Q);
+  aplicaVisual();
+}
+
+$('sortear').addEventListener('click', () => {
+  paraDeGirar();
+  const r = Math.random;
+  const P = pontoNaSuperficie(M.solido, r, tris), Q = pontoNaSuperficie(M.solido, r, tris);
+  mostraSegmento(P, Q);
+});
+
+$('testar').addEventListener('click', () => {
+  paraDeGirar();
+  limpaSegmentos();
+  const N = 300, r = Math.random;
+  const dentroPos = [], foraPos = [];
+  let escaparam = 0;
+  for (let i = 0; i < N; i++) {
+    const P = pontoNaSuperficie(M.solido, r, tris), Q = pontoNaSuperficie(M.solido, r, tris);
+    const tr = classificaSegmento(M.solido, P, Q, tris);
+    if (foraDe(tr) > 1e-6) escaparam++;
+    for (const t of tr) (t.dentro ? dentroPos : foraPos).push(...naReta(P, Q, t.s0), ...naReta(P, Q, t.s1));
+  }
+  const nuvem = (pos, cor, op) => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    const l = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: cor, transparent: true, opacity: op, depthTest: false }));
+    l.renderOrder = 11;
+    segs3D.add(l);
+  };
+  nuvem(dentroPos, 0x2e7d5b, 0.5);
+  if (foraPos.length) nuvem(foraPos, 0xc0392b, 0.95);
+  $('veredito').innerHTML = escaparam
+    ? `<span class="nao">${escaparam} de ${N}</span> segmentos sorteados passaram por fora. Um só já bastaria: o poliedro é <b>côncavo</b>.`
+    : `<span class="ok">Nenhum dos ${N}</span> segmentos sorteados saiu do sólido. Em um poliedro <b>convexo</b>, nenhum segmento sai — sorteie quantos quiser.`;
+  aplicaVisual();
+});
+
+$('achar').addEventListener('click', () => {
+  paraDeGirar();
+  const s = segmentoQueMaisSai(M.solido, tris);
+  if (!s) {
+    limpaSegmentos();
+    $('veredito').innerHTML = `<span class="ok">Não existe.</span> Testei os segmentos entre todos os pares de vértices e nenhum sai: este poliedro é <b>convexo</b>.`;
+    aplicaVisual();
+    return;
+  }
+  mostraSegmento(s.P, s.Q, 'Achei um entre dois vértices. ');
+});
+
+$('limpar').addEventListener('click', () => {
+  limpaSegmentos();
+  $('veredito').innerHTML = '';
+  if (est.marcando) alternaMarcar(false);
+  aplicaVisual();
+});
+
+function alternaMarcar(liga = !est.marcando) {
+  est.marcando = liga;
+  $('marcar').setAttribute('aria-pressed', liga);
+  palco.classList.toggle('marcando', liga);
+  if (liga) {
+    paraDeGirar();
+    limpaSegmentos();
+    $('veredito').innerHTML = 'Clique em um ponto da superfície do sólido…';
+  }
+  aplicaVisual();
+}
+$('marcar').addEventListener('click', () => alternaMarcar());
+
+/* clique (sem arrastar) no sólido marca um ponto */
+const raio = new THREE.Raycaster();
+let apertou = null;
+tela.addEventListener('pointerdown', (e) => {
+  apertou = { x: e.clientX, y: e.clientY, t: performance.now() };
+  paraDeGirar();
+});
+tela.addEventListener('pointerup', (e) => {
+  if (!apertou || !est.marcando || est.t > 1e-3) return;
+  if (Math.hypot(e.clientX - apertou.x, e.clientY - apertou.y) > 6) return;
+  const r = tela.getBoundingClientRect();
+  raio.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
+  const hit = raio.intersectObjects(faces3D.map((f) => f.mesh), false)[0];
+  if (!hit) return;
+  const p = raiz.worldToLocal(hit.point.clone()).toArray();
+  if (pontosMarcados.length >= 2 || ultimoSeg) limpaSegmentos();
+  pontosMarcados.push(p);
+  if (pontosMarcados.length === 1) {
+    bolinha(p, 0x1c1917);
+    $('veredito').innerHTML = 'Agora clique no segundo ponto.';
+  } else {
+    const [P, Q] = pontosMarcados;
+    limpaSegmentos();
+    const tr = desenhaSegmento(P, Q);
+    $('veredito').innerHTML = contaSegmento(tr, P, Q) + ' <span class="mais">Clique de novo para outro segmento.</span>';
+  }
+  aplicaVisual();
+});
+
+function paraDeGirar() {
+  if (!controles || !controles.autoRotate) return;
+  controles.autoRotate = false;
+  $('tGirar').checked = false;
+  $('tGirar').closest('.toggle').classList.remove('on');
+}
+
+/* ================================================================
+   Planificação em 2D (tela e impressão)
+   ================================================================ */
+function redeOrganizada() {
+  const s = M.solido;
+  let polys = rede2D(s, M.rede);
+  // gira para a menor caixa e deixa deitada (mais larga que alta)
+  const pts = polys.flat();
+  let melhor = { area: Infinity, ang: 0 };
+  for (let g = 0; g < 180; g += 1) {
+    const a = (g * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const [x, y] of pts) { const u = x * c - y * sn, v = x * sn + y * c; x0 = Math.min(x0, u); x1 = Math.max(x1, u); y0 = Math.min(y0, v); y1 = Math.max(y1, v); }
+    const area = (x1 - x0) * (y1 - y0);
+    if (area < melhor.area - 1e-9) melhor = { area, ang: a, larg: x1 - x0, alt: y1 - y0 };
+  }
+  let ang = melhor.ang;
+  if (melhor.alt > melhor.larg) ang += Math.PI / 2;
+  const c = Math.cos(ang), sn = Math.sin(ang);
+  polys = polys.map((p) => p.map(([x, y]) => [x * c - y * sn, x * sn + y * c]));
+
+  // quais arestas da rede são dobra (ligam uma face à mãe) e quais são corte
+  const chave = (i, j) => `${Math.min(i, j)}-${Math.max(i, j)}`;
+  const dobraDe = s.F.map(() => new Set());
+  M.rede.dobra.forEach((d, f) => { if (d) { dobraDe[f].add(chave(d.a, d.b)); dobraDe[d.pai].add(chave(d.a, d.b)); } });
+  const vincos = [], cortes = [], porAresta = new Map();
+  s.F.forEach((f, k) => f.forEach((i, j) => {
+    const ch = chave(i, f[(j + 1) % f.length]);
+    const seg = [polys[k][j], polys[k][(j + 1) % f.length]];
+    if (dobraDe[k].has(ch)) {
+      // a dobra aparece nas duas faces, no mesmo lugar: desenha só pela filha
+      const d = M.rede.dobra[k];
+      if (d && chave(d.a, d.b) === ch) vincos.push(seg);
+    } else {
+      cortes.push(seg);
+      if (!porAresta.has(ch)) porAresta.set(ch, []);
+      porAresta.get(ch).push({ k, seg });
+    }
+  }));
+
+  // abas: uma por par de arestas que se colam, do lado em que não bate em nada —
+  // se nenhum lado couber, a aba encolhe antes de desistir e invadir uma face
+  const lado = Math.max(...cortes.map(([a, b]) => Math.hypot(b[0] - a[0], b[1] - a[1])));
+  const abas = [];
+  const ocupados = [...polys];
+  const escala = Math.max(...pts.map(([x, y]) => Math.hypot(x, y)));
+  const fazAba = ([a, b], f) => {
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    const d = [(b[0] - a[0]) / L, (b[1] - a[1]) / L];
+    const fora = [d[1], -d[0]]; // face anti-horária: o lado de fora fica à direita
+    const w = f * Math.min(0.22 * lado, 0.38 * L), recuo = Math.min(w * 0.9, 0.3 * L);
+    return [a, b,
+      [b[0] + fora[0] * w - d[0] * recuo, b[1] + fora[1] * w - d[1] * recuo],
+      [a[0] + fora[0] * w + d[0] * recuo, a[1] + fora[1] * w + d[1] * recuo]];
+  };
+  const bate = (aba) => ocupados.some((o) => redeSobrepoe([aba, o], escala));
+  for (const pares of porAresta.values()) {
+    if (pares.length !== 2) continue;
+    let escolhida = null;
+    for (const f of [1, 0.6, 0.35]) {
+      for (const { seg } of pares) {
+        const aba = fazAba(seg, f);
+        if (!bate(aba)) { escolhida = aba; break; }
+      }
+      if (escolhida) break;
+    }
+    escolhida ??= fazAba(pares[0].seg, 0.35);
+    abas.push(escolhida);
+    ocupados.push(escolhida);
+  }
+  return { polys, vincos, cortes, abas };
+}
+
+let redeAtual = null;
+function desenhaRede() {
+  redeAtual = redeOrganizada();
+  const { polys, vincos, cortes, abas } = redeAtual;
+  const svg = $('rede');
+  const todas = [...polys, ...(est.abas ? abas : [])].flat();
+  const xs = todas.map((p) => p[0]), ys = todas.map((p) => p[1]);
+  const x0 = Math.min(...xs), y1 = Math.max(...ys);
+  const larg = Math.max(...xs) - x0, alt = y1 - Math.min(...ys);
+  /* coordenadas em "quase pixels" (a rede ocupa ~1000 de largura), para o tracejado
+     do vinco ter tamanho de tracejado — no SVG ele é medido nas unidades do desenho */
+  const k = 1000 / Math.max(larg, alt * 1.6), pad = 16;
+  svg.setAttribute('viewBox', `${-pad} ${-pad} ${larg * k + 2 * pad} ${alt * k + 2 * pad}`);
+  // o y da rede cresce para cima e o do SVG para baixo: inverter mantém a vista de fora
+  const xy = ([x, y]) => [((x - x0) * k).toFixed(1), ((y1 - y) * k).toFixed(1)];
+  const ptsStr = (p) => p.map((q) => xy(q).join(',')).join(' ');
+  const linha = (seg, cls) => { const [a, b] = seg.map(xy); return `<line class="${cls}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`; };
+  let html = '';
+  if (est.abas) for (const a of abas) html += `<polygon class="aba" points="${ptsStr(a)}"/>`;
+  polys.forEach((p, k) => { html += `<polygon class="face" data-face="${k}" fill="${corDe(M.solido.papel[k])}" fill-opacity=".55" points="${ptsStr(p)}"/>`; });
+  for (const s of vincos) html += linha(s, 'vinco');
+  for (const s of cortes) html += linha(s, 'corte');
+  svg.innerHTML = html;
+  $('tituloRede').textContent = `${M.nome} — ${M.solido.F.length} faces`;
+}
+
+/* face sob o mouse na rede acende no sólido, e vice-versa */
+$('rede').addEventListener('pointerover', (e) => {
+  const k = e.target.dataset?.face;
+  faces3D.forEach(({ mat }, i) => mat.emissive.setHex(String(i) === k ? 0x553311 : 0x000000));
+  pede();
+});
+$('rede').addEventListener('pointerleave', () => { faces3D.forEach(({ mat }) => mat.emissive.setHex(0)); pede(); });
+
+function preparaImpressao() {
+  const { polys, vincos, cortes, abas } = redeAtual;
+  const todas = [...polys, ...(est.abas ? abas : [])].flat();
+  let xs = todas.map((p) => p[0]), ys = todas.map((p) => p[1]);
+  // folha em pé: se a rede é deitada, gira 90°
+  const deitada = Math.max(...xs) - Math.min(...xs) > Math.max(...ys) - Math.min(...ys);
+  const gira = (p) => (deitada ? [p[1], -p[0]] : p);
+  const P = polys.map((p) => p.map(gira)), A = abas.map((p) => p.map(gira));
+  const V = vincos.map((s) => s.map(gira)), C = cortes.map((s) => s.map(gira));
+  const tudo = [...P, ...(est.abas ? A : [])].flat();
+  xs = tudo.map((p) => p[0]); ys = tudo.map((p) => p[1]);
+  const x0 = Math.min(...xs), y1 = Math.max(...ys), w = Math.max(...xs) - x0, h = y1 - Math.min(...ys);
+  const k = Math.min(186 / w, 255 / h); // mm por unidade — cabe na A4 com margem e título
+  const mm = ([x, y]) => [(x - x0) * k, (y1 - y) * k];
+  const pts = (p) => p.map((q) => mm(q).map((v) => v.toFixed(2)).join(',')).join(' ');
+  const ln = (s, cls) => { const [a, b] = s.map(mm); return `<line class="${cls}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`; };
+  let svg = `<svg xmlns="${NS}" width="${(w * k).toFixed(1)}mm" height="${(h * k).toFixed(1)}mm" viewBox="0 0 ${(w * k).toFixed(2)} ${(h * k).toFixed(2)}">`;
+  if (est.abas) for (const a of A) svg += `<polygon class="aba" points="${pts(a)}"/>`;
+  P.forEach((p, i) => { svg += `<polygon fill="${corDe(M.solido.papel[i])}" fill-opacity=".35" points="${pts(p)}"/>`; });
+  for (const s of V) svg += ln(s, 'vinco');
+  for (const s of C) svg += ln(s, 'corte');
+  svg += '</svg>';
+  $('impressao').innerHTML = `<h1>${M.nome}</h1><p>Recorte na linha contínua, dobre na tracejada${est.abas ? ' e cole as abas por dentro' : ''}. ` +
+    `${M.solido.V.length} vértices, ${arestas(M.solido).length} arestas e ${M.solido.F.length} faces · yuritobias.com/ferramentas/simulador-poliedros</p>${svg}`;
+}
+$('imprimir').addEventListener('click', () => { preparaImpressao(); window.print(); });
+window.addEventListener('beforeprint', preparaImpressao);
+
+/* ================================================================
+   Painel
+   ================================================================ */
+function textoEtiquetas() {
+  const e = [];
+  e.push(M.convexo ? '<span class="etq convexo">convexo</span>' : '<span class="etq concavo">côncavo</span>');
+  if (M.entrada.regular) e.push('<span class="etq">regular</span>');
+  if (M.entrada.grupo === 'arquimedianos') e.push('<span class="etq">semirregular</span>');
+  if (M.entrada.parametrico) e.push(`<span class="etq">${M.params.inclinacao ? (M.entrada.parametrico === 'prisma' ? 'oblíquo' : 'oblíqua') : (M.entrada.parametrico === 'prisma' ? 'reto' : 'reta')}</span>`);
+  return e.join('');
+}
+
+function atualizaPainel() {
+  const s = M.solido;
+  const nA = arestas(s).length, nV = s.V.length, nF = s.F.length;
+  $('idGrupo').textContent = GRUPOS.find((g) => g.id === M.entrada.grupo).nome;
+  $('idNome').textContent = M.nome;
+  $('idEtiquetas').innerHTML = textoEtiquetas();
+  $('idResumo').textContent = M.resumo;
+  $('selo').textContent = M.nome;
+  tela.setAttribute('aria-label', `${M.nome} em 3D: ${nV} vértices, ${nA} arestas e ${nF} faces`);
+  $('nV').textContent = nV; $('nA').textContent = nA; $('nF').textContent = nF;
+  $('euler').textContent = `V − A + F = ${nV} − ${nA} + ${nF} = ${nV - nA + nF}`;
+  $('faces').innerHTML = M.legenda.map((l) => `<li><span class="sw" style="background:${corDe(l.papel)}"></span>${l.texto}</li>`).join('');
+
+  // A pela soma dos lados das faces, agrupada por número de lados
+  const qtd = {};
+  s.F.forEach((f) => { qtd[f.length] = (qtd[f.length] || 0) + 1; });
+  const termos = Object.keys(qtd).map(Number).sort((a, b) => a - b).map((n) => `${qtd[n]}·${n}`);
+  const soma = s.F.reduce((a, f) => a + f.length, 0);
+  $('conta').innerHTML = `Arestas pelas faces: <span class="mat">A = (${termos.join(' + ')}) ÷ 2 = ${soma} ÷ 2 = ${soma / 2}</span>`;
+
+  atualizaInclinacao();
+}
+
+function atualizaInclinacao() {
+  const tipo = M.entrada.parametrico;
+  $('cardIncl').hidden = !tipo;
+  if (!tipo) return;
+  const p = est.params[tipo];
+  const obl = p.inclinacao > 0;
+  document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.tipo === 'obliquo') === obl));
+  $('lInc').hidden = !obl;
+  $('inc').value = p.inclinacao || incObliqua[tipo];
+  $('vInc').textContent = `${p.inclinacao}°`;
+  $('h').value = p.h;
+  $('vH').textContent = fmt(p.h);
+  $('lados').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', Number(b.dataset.n) === p.n));
+
+  const d = p.h * Math.tan((p.inclinacao * Math.PI) / 180);
+  const linhas = [];
+  if (tipo === 'prisma') {
+    const aresta = Math.hypot(p.h, d);
+    linhas.push(['Altura (h)', fmt(p.h)]);
+    linhas.push(['Aresta lateral', fmt(aresta)]);
+    linhas.push(['Ângulo da aresta lateral com a base', `${90 - p.inclinacao}°`]);
+    linhas.push(['Faces laterais', obl ? 'paralelogramos' : 'retângulos']);
+    $('explicaIncl').innerHTML = obl
+      ? 'A aresta lateral é a <b>hipotenusa</b> de um triângulo retângulo que tem a altura como cateto — por isso é sempre maior que a altura.'
+      : 'No prisma reto a aresta lateral <b>é</b> a altura: as duas medem o mesmo.';
+  } else {
+    const ex = M.extras;
+    const A = ex.altura[0];
+    const base = M.solido.F[0].map((i) => M.solido.V[i]);
+    const laterais = base.map((q) => dist(q, A));
+    const mn = Math.min(...laterais), mx = Math.max(...laterais);
+    const dentro = pontoNoPoligono([ex.altura[1][0], ex.altura[1][2]], base.map((q) => [q[0], q[2]]));
+    linhas.push(['Altura (h)', fmt(p.h)]);
+    linhas.push(['Distância do pé da altura (H) ao centro (O)', fmt(d)]);
+    linhas.push(['Arestas laterais', mx - mn < 1e-6 ? `todas iguais a ${fmt(mx)}` : `de ${fmt(mn)} a ${fmt(mx)}`]);
+    linhas.push(['O pé da altura cai', dist(ex.altura[1], ex.centro) < 1e-6 ? 'no centro da base' : dentro ? 'dentro da base' : 'fora da base']);
+    $('explicaIncl').innerHTML = obl
+      ? 'Na oblíqua o vértice não fica sobre o centro O da base: o pé H da altura se afasta de O e as arestas laterais deixam de ser iguais.'
+      : 'Na reta o vértice fica exatamente sobre o centro O da base: o pé da altura é O.';
+  }
+  $('medidas').innerHTML = linhas.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('');
+}
+
+function pontoNoPoligono([x, y], poly) {
+  let dentro = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) dentro = !dentro;
+  }
+  return dentro;
+}
+
+/* ================================================================
+   Seleção
+   ================================================================ */
+function desenhaAbas() {
+  $('abas').innerHTML = GRUPOS.map((g) => `<button class="tab" role="tab" data-grupo="${g.id}" aria-selected="${g.id === est.grupo}">${g.nome}</button>`).join('');
+}
+function desenhaChips() {
+  const lista = doGrupo(est.grupo);
+  if (lista.length === 1 && lista[0].parametrico) {
+    // prismas e pirâmides: um chip por número de lados
+    const tipo = lista[0].parametrico, n = est.params[tipo].n;
+    $('chips').innerHTML = LADOS.map((k) => `<button class="chip" type="button" data-n="${k}" aria-pressed="${k === n}">${valor(lista[0].curto, { n: k })}</button>`).join('');
+  } else {
+    $('chips').innerHTML = lista.map((e) => `<button class="chip" type="button" data-id="${e.id}" aria-pressed="${e.id === est.id}">${valor(e.curto, {})}</button>`).join('');
+  }
+}
+
+function seleciona({ suave = true } = {}) {
+  const entrada = porId(est.id);
+  const params = entrada.parametrico ? est.params[entrada.parametrico] : {};
+  M = monta(entrada, params);
+  constroiCena();
+  atualizaPainel();
+  desenhaRede();
+  $('veredito').innerHTML = '';
+  if (est.marcando) alternaMarcar(false);
+  voa(est.t, suave ? 750 : 1);
+  guardaUrl();
+}
+
+$('abas').addEventListener('click', (e) => {
+  const b = e.target.closest('.tab');
+  if (!b) return;
+  est.grupo = b.dataset.grupo;
+  est.id = est.ultimo[est.grupo];
+  desenhaAbas();
+  desenhaChips();
+  seleciona();
+});
+$('chips').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip');
+  if (!b) return;
+  if (b.dataset.n) {
+    est.params[porId(est.id).parametrico].n = Number(b.dataset.n);
+  } else {
+    est.id = b.dataset.id;
+    est.ultimo[est.grupo] = est.id;
+  }
+  desenhaChips();
+  seleciona();
+});
+
+/* controles de prisma e pirâmide */
+$('lados').innerHTML = LADOS.map((n) => `<button type="button" data-n="${n}">${n}</button>`).join('');
+$('lados').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  est.params[porId(est.id).parametrico].n = Number(b.dataset.n);
+  desenhaChips();
+  seleciona();
+});
+document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+  const tipo = porId(est.id).parametrico;
+  est.params[tipo].inclinacao = b.dataset.tipo === 'obliquo' ? incObliqua[tipo] : 0;
+  seleciona();
+}));
+/* arrastar os controles refaz o sólido sem mexer na câmera */
+function refazLeve() {
+  const entrada = porId(est.id);
+  M = monta(entrada, est.params[entrada.parametrico]);
+  constroiCena();
+  atualizaPainel();
+  desenhaRede();
+  guardaUrl();
+}
+$('inc').addEventListener('input', (e) => {
+  const tipo = porId(est.id).parametrico;
+  est.params[tipo].inclinacao = incObliqua[tipo] = Math.max(1, Number(e.target.value));
+  refazLeve();
+});
+$('h').addEventListener('input', (e) => {
+  est.params[porId(est.id).parametrico].h = Number(e.target.value);
+  refazLeve();
+});
+
+/* abertura */
+$('abrir').addEventListener('click', () => voa(est.t > 0.5 ? 0 : 1));
+$('t').addEventListener('input', (e) => { voo = null; est.t = Number(e.target.value) / 1000; aplicaAbertura(); });
+$('t').addEventListener('change', () => voa(est.t, 800));
+$('enquadrar').addEventListener('click', () => voa(est.t, 800));
+
+/* toggles */
+function liga(id, chave, depois) {
+  const cb = $(id);
+  cb.addEventListener('change', () => {
+    est[chave] = cb.checked;
+    cb.closest('.toggle').classList.toggle('on', cb.checked);
+    depois?.();
+  });
+}
+liga('tTransp', 'transparente', aplicaVisual);
+liga('tVert', 'vertices', aplicaVisual);
+liga('tChao', 'chao', aplicaVisual);
+liga('tAltura', 'altura', aplicaAbertura);
+liga('tAbas', 'abas', desenhaRede);
+$('tGirar').addEventListener('change', (e) => {
+  if (controles) controles.autoRotate = e.target.checked;
+  e.target.closest('.toggle').classList.toggle('on', e.target.checked);
+});
+
+/* ---------- endereço: o sólido escolhido vai para a URL ---------- */
+function guardaUrl() {
+  const u = new URL(location.href);
+  u.search = '';
+  u.searchParams.set('p', est.id);
+  const e = porId(est.id);
+  if (e.parametrico) {
+    const p = est.params[e.parametrico];
+    u.searchParams.set('n', p.n);
+    if (p.inclinacao) u.searchParams.set('inc', p.inclinacao);
+    if (p.h !== PARAM_PADRAO[e.parametrico].h) u.searchParams.set('h', p.h);
+  }
+  history.replaceState(null, '', u);
+}
+function leUrl() {
+  const q = new URLSearchParams(location.search);
+  const e = porId(q.get('p'));
+  if (!e) return;
+  est.id = e.id;
+  est.grupo = e.grupo;
+  est.ultimo[e.grupo] = e.id;
+  if (e.parametrico) {
+    const p = est.params[e.parametrico];
+    const n = Number(q.get('n')), inc = Number(q.get('inc')), h = Number(q.get('h'));
+    if (LADOS.includes(n)) p.n = n;
+    if (inc > 0 && inc <= 50) p.inclinacao = incObliqua[e.parametrico] = Math.round(inc);
+    if (h >= 1 && h <= 3.2) p.h = h;
+  }
+}
+
+leUrl();
+desenhaAbas();
+desenhaChips();
+redimensiona();
+seleciona({ suave: false });
+</script>

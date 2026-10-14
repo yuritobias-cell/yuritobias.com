@@ -24,7 +24,8 @@
     "chart.js": "^4.5.1",
     "qrcode-generator": "^2.0.4",
     "satori": "^0.28.0",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",

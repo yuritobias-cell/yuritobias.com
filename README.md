@@ -14,6 +14,7 @@ pessoal mora em `/sobre`.
 - [Astro 6](https://astro.build) — site estático (+ MDX nos posts com componentes)
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
+- [three.js](https://threejs.org) — o 3D do Simulador de Poliedros (empacotado, sem CDN; só essa página o carrega)
 - Fontes auto-hospedadas em `public/fonts/` (variáveis, subset latino; `@font-face` em `src/styles/global.css`) — sem requisições ao Google Fonts
 - Busca própria: índice estático gerado no build (`/busca-index.json`) e filtrado no
   navegador — sem motor de busca de terceiros e sem mandar a consulta para lugar nenhum
@@ -57,6 +58,8 @@ src/
 │   ├── intervalos.js             # conjunto solução em ℝ + reta numérica (inequações)
 │   ├── estado.js                 # a lista gerada na URL: configuração + semente, permalink e QR
 │   ├── qr.js                     # o QR do permalink, desenhado em SVG para a folha
+│   ├── poliedros.js              # geometria do simulador de poliedros: sólidos, planificação, teste do segmento
+│   ├── poliedros-catalogo.js     # os sólidos do simulador: nomes, textos e parâmetros
 │   └── folha.js                  # folha A4, gabarito, versões A–H e chips dos controles
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
@@ -101,7 +104,7 @@ Cada ferramenta ganha também a **própria imagem Open Graph**, gerada no build 
 manifesto (`src/pages/og/ferramentas/[slug].png.ts`, kicker `FERRAMENTA · <assunto>`), para
 que o link compartilhado num grupo de professores mostre o nome da ferramenta em vez do
 cartão genérico do site. O `Layout` deduz o endereço da imagem pelo próprio caminho da
-página — não há `ogImage` repetido nas 16 páginas, e ferramenta nova já nasce com o cartão
+página — não há `ogImage` repetido em cada página, e ferramenta nova já nasce com o cartão
 certo.
 
 `"destaque": true` põe a ferramenta na vitrine da home (as três primeiras marcadas, na
@@ -129,6 +132,13 @@ do decimal arredondado.
 
 São `.js`, e não `.ts`, de propósito: rodam no navegador, importados pelos `<script>` das
 páginas. Os `.ts` da mesma pasta rodam no build e são checados pelo `astro check`.
+
+O `simulador-poliedros` também tira a lógica da página: a geometria fica em
+`src/utils/poliedros.js` (sem three.js e sem DOM — dá para testar no Node) e os sólidos em
+`src/utils/poliedros-catalogo.js`. Sólido novo é uma entrada no catálogo: os vértices (o casco
+convexo acha as faces sozinho) ou uma construção (`prisma`, `piramide`, `tronco`, `poePontas`),
+mais nome, resumo e legenda. A planificação não é desenhada à mão — sai de uma árvore das
+faces escolhida entre várias candidatas por não ter sobreposição no plano.
 
 O princípio das duas geradoras é o mesmo: **sorteie a resposta e monte a questão em volta
 dela**. É o que garante que o filtro de natureza da solução valha sempre — e não "quase

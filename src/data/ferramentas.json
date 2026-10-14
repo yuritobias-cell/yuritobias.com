@@ -151,6 +151,16 @@
       ]
     },
     {
+      "slug": "simulador-poliedros",
+      "titulo": "Simulador de Poliedros",
+      "assunto": "Geometria espacial",
+      "tipo": "simulacoes",
+      "descricao": "Gire e planifique poliedros em 3D: os cinco de Platão, prismas e pirâmides retos e oblíquos, arquimedianos e côncavos. A rede abre face a face, a Relação de Euler se confere sozinha e o teste do segmento separa convexos de côncavos.",
+      "assuntos": [
+        "geometria"
+      ]
+    },
+    {
       "slug": "angulos-circunferencia",
       "titulo": "Ângulos na Circunferência",
       "assunto": "Geometria",
