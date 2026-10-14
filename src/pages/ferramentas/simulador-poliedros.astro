@@ -123,7 +123,9 @@ import Layout from '../../layouts/Layout.astro';
       </div>
       <svg class="rede" id="rede" aria-label="Planificação do poliedro"></svg>
       <p class="dica">Linha contínua: recortar · tracejada: dobrar. Passe o mouse sobre uma face para achá-la no sólido.
-      Esta é uma das planificações possíveis — o cubo, sozinho, tem 11 diferentes.</p>
+      Esta é uma das planificações possíveis — o cubo, sozinho, tem 11 diferentes.
+      Para escolher a aresta em centímetros, numerar as abas e baixar em PDF:
+      <a id="linkImprimir" href="/ferramentas/planificacoes-para-imprimir">Planificações para Imprimir</a>.</p>
     </section>
 
     <section class="teoria">
@@ -318,6 +320,7 @@ import Layout from '../../layouts/Layout.astro';
   .pl-root .rede .vinco{stroke:var(--ink);stroke-width:1.1;stroke-dasharray:5 4;fill:none;opacity:.75;vector-effect:non-scaling-stroke}
   .pl-root .rede .aba{fill:#EEEAE2;stroke:var(--ink);stroke-width:1.1;vector-effect:non-scaling-stroke}
   .pl-root .rede-card .dica{text-align:left;margin-top:8px}
+  .pl-root .rede-card .dica a{color:var(--accent)}
 
   .pl-root .teoria{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
   .pl-root .teoria h2{font-size:18px}
@@ -349,21 +352,15 @@ import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import {
-  transformacoes, aplica, triangulaFaces, rede2D, arestas, classificaSegmento, foraDe,
-  pontoNaSuperficie, segmentoQueMaisSai, normalFace, redeSobrepoe, dist,
+  transformacoes, aplica, triangulaFaces, arestas, classificaSegmento, foraDe,
+  pontoNaSuperficie, segmentoQueMaisSai, normalFace, dist,
 } from '../../utils/poliedros.js';
-import { GRUPOS, LADOS, doGrupo, porId, monta, valor } from '../../utils/poliedros-catalogo.js';
+import { organizaRede } from '../../utils/planificacao.js';
+import { GRUPOS, LADOS, doGrupo, porId, monta, valor, corDe } from '../../utils/poliedros-catalogo.js';
 
 const $ = (id) => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
 const fmt = (x, c = 2) => x.toFixed(c).replace('.', ',');
-
-/* ---------- cores das faces, por papel ---------- */
-const CORES = {
-  n3: '#E08A5E', n4: '#5FA39B', n5: '#E2B347', n6: '#9682C9', n8: '#6E9FD6', n10: '#C97896', n12: '#7DB36A',
-  base: '#5FA39B', lateral: '#E9BE6A', cavidade: '#E08A5E',
-};
-const corDe = (papel) => CORES[papel] || '#B9B2A6';
 
 /* ---------- estado ---------- */
 const PARAM_PADRAO = {
@@ -847,75 +844,7 @@ function paraDeGirar() {
 /* ================================================================
    Planificação em 2D (tela e impressão)
    ================================================================ */
-function redeOrganizada() {
-  const s = M.solido;
-  let polys = rede2D(s, M.rede);
-  // gira para a menor caixa e deixa deitada (mais larga que alta)
-  const pts = polys.flat();
-  let melhor = { area: Infinity, ang: 0 };
-  for (let g = 0; g < 180; g += 1) {
-    const a = (g * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
-    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-    for (const [x, y] of pts) { const u = x * c - y * sn, v = x * sn + y * c; x0 = Math.min(x0, u); x1 = Math.max(x1, u); y0 = Math.min(y0, v); y1 = Math.max(y1, v); }
-    const area = (x1 - x0) * (y1 - y0);
-    if (area < melhor.area - 1e-9) melhor = { area, ang: a, larg: x1 - x0, alt: y1 - y0 };
-  }
-  let ang = melhor.ang;
-  if (melhor.alt > melhor.larg) ang += Math.PI / 2;
-  const c = Math.cos(ang), sn = Math.sin(ang);
-  polys = polys.map((p) => p.map(([x, y]) => [x * c - y * sn, x * sn + y * c]));
-
-  // quais arestas da rede são dobra (ligam uma face à mãe) e quais são corte
-  const chave = (i, j) => `${Math.min(i, j)}-${Math.max(i, j)}`;
-  const dobraDe = s.F.map(() => new Set());
-  M.rede.dobra.forEach((d, f) => { if (d) { dobraDe[f].add(chave(d.a, d.b)); dobraDe[d.pai].add(chave(d.a, d.b)); } });
-  const vincos = [], cortes = [], porAresta = new Map();
-  s.F.forEach((f, k) => f.forEach((i, j) => {
-    const ch = chave(i, f[(j + 1) % f.length]);
-    const seg = [polys[k][j], polys[k][(j + 1) % f.length]];
-    if (dobraDe[k].has(ch)) {
-      // a dobra aparece nas duas faces, no mesmo lugar: desenha só pela filha
-      const d = M.rede.dobra[k];
-      if (d && chave(d.a, d.b) === ch) vincos.push(seg);
-    } else {
-      cortes.push(seg);
-      if (!porAresta.has(ch)) porAresta.set(ch, []);
-      porAresta.get(ch).push({ k, seg });
-    }
-  }));
-
-  // abas: uma por par de arestas que se colam, do lado em que não bate em nada —
-  // se nenhum lado couber, a aba encolhe antes de desistir e invadir uma face
-  const lado = Math.max(...cortes.map(([a, b]) => Math.hypot(b[0] - a[0], b[1] - a[1])));
-  const abas = [];
-  const ocupados = [...polys];
-  const escala = Math.max(...pts.map(([x, y]) => Math.hypot(x, y)));
-  const fazAba = ([a, b], f) => {
-    const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    const d = [(b[0] - a[0]) / L, (b[1] - a[1]) / L];
-    const fora = [d[1], -d[0]]; // face anti-horária: o lado de fora fica à direita
-    const w = f * Math.min(0.22 * lado, 0.38 * L), recuo = Math.min(w * 0.9, 0.3 * L);
-    return [a, b,
-      [b[0] + fora[0] * w - d[0] * recuo, b[1] + fora[1] * w - d[1] * recuo],
-      [a[0] + fora[0] * w + d[0] * recuo, a[1] + fora[1] * w + d[1] * recuo]];
-  };
-  const bate = (aba) => ocupados.some((o) => redeSobrepoe([aba, o], escala));
-  for (const pares of porAresta.values()) {
-    if (pares.length !== 2) continue;
-    let escolhida = null;
-    for (const f of [1, 0.6, 0.35]) {
-      for (const { seg } of pares) {
-        const aba = fazAba(seg, f);
-        if (!bate(aba)) { escolhida = aba; break; }
-      }
-      if (escolhida) break;
-    }
-    escolhida ??= fazAba(pares[0].seg, 0.35);
-    abas.push(escolhida);
-    ocupados.push(escolhida);
-  }
-  return { polys, vincos, cortes, abas };
-}
+const redeOrganizada = () => organizaRede(M);
 
 let redeAtual = null;
 function desenhaRede() {
@@ -1189,6 +1118,11 @@ function guardaUrl() {
     if (p.h !== PARAM_PADRAO[e.parametrico].h) u.searchParams.set('h', p.h);
   }
   history.replaceState(null, '', u);
+  // o mesmo sólido na ferramenta de impressão
+  const alvo = new URL('/ferramentas/planificacoes-para-imprimir', location.origin);
+  alvo.searchParams.set('s', e.parametrico ? `${e.id}-${est.params[e.parametrico].n}` : e.id);
+  if (e.parametrico && est.params[e.parametrico].inclinacao) alvo.searchParams.set('obliquo', '1');
+  $('linkImprimir').href = alvo.pathname + alvo.search;
 }
 function leUrl() {
   const q = new URLSearchParams(location.search);

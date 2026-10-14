@@ -1,0 +1,428 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Planificações para Imprimir"
+  description="Planificações de poliedros em folhas A4 prontas para recortar e montar: os cinco de Platão, prismas e pirâmides, arquimedianos e côncavos — com abas de colagem numeradas, escala pela aresta em centímetros, impressão direta e download em PDF ou SVG."
+>
+  <div class="pi-root">
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Geometria espacial</p>
+      <h1>Planificações para <em>imprimir</em></h1>
+      <p class="lede">Escolha os poliedros e saem folhas A4 prontas para <em>recortar, dobrar e
+      colar</em>: linha contínua para cortar, tracejada para dobrar e abas com o
+      <em>mesmo número</em> da aresta onde entram. Imprima direto ou baixe em PDF ou SVG — tudo é
+      gerado no seu navegador. Para ver cada sólido abrindo e fechando em 3D, use o
+      <a href="/ferramentas/simulador-poliedros">Simulador de Poliedros</a>.</p>
+    </header>
+
+    <div class="stage">
+      <div class="canvas-card">
+        <div class="barra">
+          <p class="caption" id="caption"></p>
+          <div class="export">
+            <button class="primary" id="btnImprimir" type="button">Imprimir</button>
+            <button class="ghost" id="btnPdf" type="button">Baixar PDF</button>
+          </div>
+        </div>
+        <div class="vazio" id="vazio" hidden>Nenhuma planificação escolhida. Marque ao menos um poliedro ao lado.</div>
+        <div class="pilha" id="pilha"></div>
+        <p class="export-nota">Na caixa de impressão, escolha papel <b>A4</b> e escala <b>100%</b> — se a
+        impressora “ajustar à página”, a aresta sai menor do que a pedida. Papel de 180 g ou mais
+        deixa o sólido firme.</p>
+      </div>
+
+      <div class="panel">
+        <div class="card">
+          <div class="card-cab">
+            <h2>Poliedros</h2>
+            <div class="mini-acoes">
+              <button type="button" class="link" id="todos">Todos</button>
+              <button type="button" class="link" id="nenhum">Nenhum</button>
+            </div>
+          </div>
+          <p class="hint">Cada poliedro marcado vira uma folha.</p>
+          <div id="grupos"></div>
+        </div>
+
+        <div class="card">
+          <h2>Tamanho</h2>
+          <div class="chips" id="modoTam" role="group" aria-label="Tamanho da planificação">
+            <button class="chip" type="button" data-v="max" aria-pressed="true">O maior que couber</button>
+            <button class="chip" type="button" data-v="aresta" aria-pressed="false">Aresta fixa</button>
+          </div>
+          <div class="slider" id="blocoAresta" hidden>
+            <label for="aresta">Maior aresta <b id="arestaVal"></b></label>
+            <input type="range" id="aresta" min="1.5" max="10" step="0.5" value="4" />
+            <p class="dica">Com a mesma aresta em todas as folhas, os sólidos montados ficam na mesma
+            escala. Se a planificação não couber na folha, ela é reduzida — e a folha avisa.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Prismas e pirâmides</h2>
+          <div class="chips" id="incl" role="group" aria-label="Retos ou oblíquos">
+            <button class="chip" type="button" data-v="reto" aria-pressed="true">Retos</button>
+            <button class="chip" type="button" data-v="obliquo" aria-pressed="false">Oblíquos</button>
+          </div>
+          <p class="dica">Nos oblíquos as arestas laterais fazem 65° com a base: as faces laterais
+          do prisma viram paralelogramos, e as da pirâmide, triângulos diferentes entre si.</p>
+        </div>
+
+        <div class="card">
+          <h2>Folha</h2>
+          <label class="toggle on" id="lCor"><input type="checkbox" id="cor" checked /> Faces coloridas</label>
+          <label class="toggle on" id="lAbas"><input type="checkbox" id="abas" checked /> Abas de colagem</label>
+          <label class="toggle on" id="lNum"><input type="checkbox" id="num" checked /> Numerar as colagens</label>
+          <label class="toggle on" id="lAluno"><input type="checkbox" id="aluno" checked /> Espaço para nome, turma e data</label>
+          <p class="dica">Sem cor, a folha sai só com o traço — para o aluno colorir antes de montar.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="theory">
+      <h2>Como montar</h2>
+      <p><b>Vinque antes de dobrar.</b> Passe uma caneta sem tinta (ou a ponta da tesoura) com uma
+      régua por cima de cada linha tracejada: a dobra sai reta, mesmo em papel grosso.</p>
+      <p><b>Recorte com as abas.</b> As abas cinzas ficam do lado de dentro do sólido. Cada uma tem
+      um número, e o mesmo número aparece na aresta onde ela deve ser colada.</p>
+      <p><b>Feche por último a face mais difícil.</b> Cole as abas de baixo para cima, deixando para
+      o fim a face que fecha o sólido — com cola em bastão dá tempo de ajustar.</p>
+      <h2>Escala</h2>
+      <p>Em <b>o maior que couber</b>, cada planificação ocupa a folha toda e a medida da maior
+      aresta sai impressa no cabeçalho. Em <b>aresta fixa</b>, todas as folhas usam a mesma
+      medida: um cubo e um octaedro de aresta 4 cm montados lado a lado mostram de verdade a
+      diferença de tamanho. Os arquimedianos têm muitas faces e, em geral, não comportam
+      aresta grande numa A4.</p>
+      <p class="nota-final">As planificações são as mesmas do Simulador de Poliedros, escolhidas
+      entre várias possíveis por não terem faces sobrepostas. Nada é enviado para servidor nenhum.</p>
+    </section>
+  </div>
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Planificações para Imprimir.
+     Escopado em .pi-root. Cada folha é um SVG em milímetros (A4
+     inteira, com as margens dentro do desenho): a tela, a impressão,
+     o PDF e o SVG baixado saem do mesmo desenho
+     (src/utils/folha-planificacao.js + src/utils/pdf.js).
+     ============================================================ */
+  .pi-root{
+    --bg:#F8F6F1; --ink:#1C1917; --muted:#78716C; --accent:#1B4F4F; --rule-c:#E2DDD6;
+    --paper:#FFFFFF; --destaque:#A8442B;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --radius:14px;
+    font-family:var(--font-body); line-height:1.5; color:var(--ink);
+    max-width:1180px; margin:0 auto; padding:30px 22px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .pi-root, .pi-root *{box-sizing:border-box}
+
+  .pi-root header.masthead{margin-bottom:22px}
+  .pi-root .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .pi-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .pi-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .pi-root h1{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,5vw,46px);
+    line-height:1.06;margin:0;letter-spacing:-.01em}
+  .pi-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .pi-root .lede{color:var(--muted);max-width:70ch;margin:12px 0 0;font-size:15px}
+  .pi-root .lede em{font-style:normal;color:var(--ink)}
+  .pi-root .lede a{color:var(--accent)}
+
+  .pi-root .stage{display:grid;grid-template-columns:1fr .78fr;gap:22px;align-items:start;margin-top:26px}
+  .pi-root .stage > *{min-width:0}
+  @media (max-width:940px){.pi-root .stage{grid-template-columns:1fr}}
+
+  .pi-root .canvas-card{background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);
+    padding:18px;box-shadow:0 18px 44px -30px rgba(28,25,23,.45)}
+  .pi-root .barra{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .pi-root .caption{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin:0}
+  .pi-root .export{display:flex;flex-wrap:wrap;gap:8px}
+  .pi-root .export-nota{margin:14px 2px 0;font-size:12px;color:var(--muted);line-height:1.55}
+  .pi-root .export-nota b{color:var(--ink);font-weight:600}
+  .pi-root .vazio{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;background:var(--bg);border-radius:10px}
+  .pi-root .vazio[hidden]{display:none}
+
+  .pi-root .pilha{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;
+    background:var(--bg);border-radius:10px;padding:14px}
+  .pi-root .pilha.uma{grid-template-columns:minmax(0,1fr)}
+  .pi-root .pilha:empty{display:none}
+  @media (max-width:520px){.pi-root .pilha{grid-template-columns:minmax(0,1fr)}}
+  .pi-root .folha{display:flex;flex-direction:column;gap:6px}
+  .pi-root .folha svg{display:block;width:100%;height:auto;background:#fff;
+    outline:1px solid var(--rule-c);box-shadow:0 14px 34px -26px rgba(28,25,23,.6)}
+  .pi-root .folha-pe{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+  .pi-root .folha-nome{font-size:12.5px;color:var(--ink);font-weight:500}
+  .pi-root .folha-nome .aviso{color:var(--destaque);font-weight:400}
+  .pi-root .folha-acoes{display:flex;gap:4px}
+  .pi-root .folha-acoes button{appearance:none;border:1px solid var(--rule-c);background:var(--paper);
+    color:var(--accent);font:inherit;font-size:11.5px;border-radius:999px;padding:3px 10px;cursor:pointer}
+  .pi-root .folha-acoes button:hover{border-color:var(--accent)}
+
+  .pi-root .panel{display:flex;flex-direction:column;gap:16px}
+  .pi-root .card{background:var(--paper);border:1px solid var(--rule-c);border-radius:var(--radius);padding:18px}
+  .pi-root .card h2{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0 0 8px}
+  .pi-root .card-cab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .pi-root .card .hint{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+  .pi-root .mini-acoes{display:flex;gap:10px}
+  .pi-root .link{appearance:none;border:0;background:none;padding:0;font:inherit;font-size:12.5px;
+    color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .pi-root .grupo{margin-top:12px}
+  .pi-root .grupo-cab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .pi-root .grupo-cab span{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted)}
+
+  .pi-root .ghost, .pi-root .primary, .pi-root .chip{appearance:none;font-family:var(--font-body);
+    font-size:13px;font-weight:500;border-radius:999px;padding:8px 15px;cursor:pointer;transition:.16s}
+  .pi-root .ghost, .pi-root .chip{background:transparent;color:var(--muted);border:1px solid var(--rule-c)}
+  .pi-root .ghost:hover, .pi-root .chip:hover{color:var(--ink);border-color:var(--muted)}
+  .pi-root .primary{background:var(--destaque);border:1px solid var(--destaque);color:#fff;
+    box-shadow:0 8px 20px -12px var(--destaque)}
+  .pi-root .primary:hover{filter:brightness(1.06)}
+  .pi-root button:disabled{opacity:.45;cursor:default}
+  .pi-root .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .pi-root .chip.mini{padding:5px 11px;font-size:12.5px}
+  .pi-root .chips{display:flex;flex-wrap:wrap;gap:6px}
+
+  .pi-root .slider{margin-top:14px}
+  .pi-root .slider[hidden]{display:none}
+  .pi-root .slider label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted);margin-bottom:7px}
+  .pi-root .slider label b{font-family:var(--font-mono);font-size:12.5px;color:var(--ink)}
+  .pi-root input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer}
+  .pi-root .dica{margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+
+  .pi-root .toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    border:1px solid var(--rule-c);border-radius:999px;padding:7px 14px;cursor:pointer;
+    user-select:none;transition:.16s;margin-top:8px;width:fit-content}
+  .pi-root .toggle:hover{color:var(--ink)}
+  .pi-root .toggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;margin:0}
+  .pi-root .toggle.on{color:var(--ink);border-color:var(--muted)}
+  .pi-root .toggle.desligado{opacity:.45;pointer-events:none}
+
+  .pi-root .theory{margin-top:30px;max-width:78ch}
+  .pi-root .theory h2{font-family:var(--font-display);font-size:22px;margin:22px 0 8px}
+  .pi-root .theory p{color:var(--muted);font-size:14.5px;margin:0 0 10px}
+  .pi-root .theory b{color:var(--ink)}
+  .pi-root .nota-final{font-size:13px!important}
+
+  /* ----- impressão: só as folhas, cada uma numa página, em tamanho real ----- */
+  @media print{
+    @page{size:A4 portrait;margin:0}
+    html, body{background:#fff !important;margin:0 !important}
+    body > nav, body > footer{display:none !important}
+    .pi-root{padding:0;max-width:none}
+    .pi-root .masthead,.pi-root .panel,.pi-root .theory,.pi-root .barra,.pi-root .export-nota,
+    .pi-root .folha-pe,.pi-root .vazio{display:none !important}
+    .pi-root .stage{display:block;margin:0}
+    .pi-root .canvas-card{border:0;padding:0;box-shadow:none;border-radius:0}
+    .pi-root .pilha{display:block;padding:0;background:none}
+    .pi-root .folha{display:block;break-after:page;page-break-after:always}
+    .pi-root .folha:last-child{break-after:auto;page-break-after:auto}
+    /* um fio abaixo da A4 inteira: arredondamento não empurra uma página em branco */
+    .pi-root .folha svg{width:209.5mm !important;height:296.3mm !important;outline:0;box-shadow:none}
+    .pi-root.so-uma .folha:not(.esta){display:none !important}
+    .pi-root.so-uma .folha.esta{break-after:auto;page-break-after:auto}
+    .pi-root *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+import { GRUPOS, LADOS, doGrupo, monta, valor } from '../../utils/poliedros-catalogo.js';
+import { folhaDaPlanificacao } from '../../utils/folha-planificacao.js';
+import { pdfDePaginas, svgDaPagina } from '../../utils/pdf.js';
+
+const $ = (id) => document.getElementById(id);
+const INCLINACAO = 25;   // graus em relação à vertical: a aresta lateral faz 65° com a base
+const ALTURA = 2.2;
+
+/* ---------- os itens imprimíveis: prismas e pirâmides viram um por número de lados ---------- */
+const ITENS = [];
+for (const g of GRUPOS) {
+  for (const e of doGrupo(g.id)) {
+    if (e.parametrico) {
+      for (const n of LADOS) ITENS.push({ id: `${e.id}-${n}`, grupo: g.id, entrada: e, n, rotulo: valor(e.curto, { n }).replace(/^(Prisma|Pirâmide) /, '') });
+    } else {
+      ITENS.push({ id: e.id, grupo: g.id, entrada: e, rotulo: valor(e.curto, {}) });
+    }
+  }
+}
+const item = (id) => ITENS.find((i) => i.id === id);
+
+const PADRAO = { sel: ['cubo'], modo: 'max', aresta: 4, obliquo: false, cor: true, abas: true, num: true, aluno: true };
+const est = { ...PADRAO, sel: [...PADRAO.sel] };
+
+/* sólidos montados: guardados, porque a planificação custa (até ~70 ms no icosaedro truncado) */
+const montados = new Map();
+function montado(it) {
+  const params = it.entrada.parametrico ? { n: it.n, h: ALTURA, inclinacao: est.obliquo ? INCLINACAO : 0 } : {};
+  const ch = `${it.id}|${params.inclinacao ?? ''}`;
+  if (!montados.has(ch)) montados.set(ch, monta(it.entrada, params));
+  return montados.get(ch);
+}
+const opcoesFolha = () => ({
+  cor: est.cor ? 'cor' : 'branco', abas: est.abas, numeros: est.num, aluno: est.aluno,
+  aresta: est.modo === 'aresta' ? est.aresta : null,
+});
+
+/* ---------- painel de escolha ---------- */
+function desenhaGrupos() {
+  $('grupos').innerHTML = GRUPOS.map((g) => {
+    const itens = ITENS.filter((i) => i.grupo === g.id);
+    return `<div class="grupo"><div class="grupo-cab"><span>${g.nome}</span>` +
+      `<button type="button" class="link" data-grupo="${g.id}">${itens.every((i) => est.sel.includes(i.id)) ? 'desmarcar' : 'marcar todos'}</button></div>` +
+      `<div class="chips">${itens.map((i) => `<button type="button" class="chip mini" data-id="${i.id}" aria-pressed="${est.sel.includes(i.id)}">${i.rotulo}</button>`).join('')}</div></div>`;
+  }).join('');
+}
+$('grupos').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.id) {
+    const id = b.dataset.id;
+    est.sel = est.sel.includes(id) ? est.sel.filter((x) => x !== id) : [...est.sel, id];
+  } else if (b.dataset.grupo) {
+    const ids = ITENS.filter((i) => i.grupo === b.dataset.grupo).map((i) => i.id);
+    const todos = ids.every((id) => est.sel.includes(id));
+    est.sel = todos ? est.sel.filter((id) => !ids.includes(id)) : [...new Set([...est.sel, ...ids])];
+  }
+  ordenaSel();
+  render();
+});
+$('todos').addEventListener('click', () => { est.sel = ITENS.map((i) => i.id); render(); });
+$('nenhum').addEventListener('click', () => { est.sel = []; render(); });
+/* as folhas saem na ordem do catálogo, não na ordem dos cliques */
+const ordenaSel = () => { est.sel = ITENS.map((i) => i.id).filter((id) => est.sel.includes(id)); };
+
+/* ---------- folhas ---------- */
+let folhas = [];   // { it, M, f }
+function render() {
+  sincroniza();
+  const op = opcoesFolha();
+  folhas = est.sel.map(item).filter(Boolean).map((it) => {
+    const M = montado(it);
+    return { it, M, f: folhaDaPlanificacao(M, op) };
+  });
+  const pilha = $('pilha');
+  pilha.classList.toggle('uma', folhas.length === 1);
+  pilha.innerHTML = folhas.map(({ it, M, f }, i) => `
+    <figure class="folha" data-i="${i}" style="margin:0">
+      ${svgDaPagina(f.itens, 'Planificação: ' + M.nome)}
+      <figcaption class="folha-pe">
+        <span class="folha-nome">${M.nome}${f.reduzida ? ' <span class="aviso">· reduzida</span>' : ''}</span>
+        <span class="folha-acoes">
+          <button type="button" data-acao="imprimir" title="Imprimir só esta folha">Imprimir</button>
+          <button type="button" data-acao="pdf">PDF</button>
+          <button type="button" data-acao="svg">SVG</button>
+        </span>
+      </figcaption>
+    </figure>`).join('');
+  $('vazio').hidden = folhas.length > 0;
+  for (const b of ['btnImprimir', 'btnPdf']) $(b).disabled = !folhas.length;
+  const n = folhas.length;
+  $('btnImprimir').textContent = n > 1 ? `Imprimir as ${n} folhas` : 'Imprimir';
+  $('btnPdf').textContent = n > 1 ? `Baixar PDF (${n} folhas)` : 'Baixar PDF';
+  const reduzidas = folhas.filter((x) => x.f.reduzida).length;
+  $('caption').textContent = !n ? '' : `${n} ${n === 1 ? 'folha' : 'folhas'} A4 · ` +
+    (est.modo === 'aresta'
+      ? `maior aresta de ${est.aresta.toLocaleString('pt-BR')} cm${reduzidas ? ` (${reduzidas} reduzida${reduzidas > 1 ? 's' : ''} para caber)` : ''}`
+      : n === 1 ? `maior aresta de ${folhas[0].f.arestaCm.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} cm` : 'cada uma no maior tamanho que cabe');
+  guardaUrl();
+}
+
+/* ---------- impressão e downloads ---------- */
+const nomeArquivo = (M) => 'planificacao-' + M.nome.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+function baixa(blob, nome) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+$('btnImprimir').addEventListener('click', () => window.print());
+$('btnPdf').addEventListener('click', () => {
+  if (!folhas.length) return;
+  const titulo = folhas.length === 1 ? `Planificação — ${folhas[0].M.nome}` : 'Planificações de poliedros';
+  baixa(pdfDePaginas(folhas.map((x) => x.f.itens), titulo), folhas.length === 1 ? nomeArquivo(folhas[0].M) + '.pdf' : 'planificacoes-poliedros.pdf');
+});
+$('pilha').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-acao]');
+  if (!b) return;
+  const fig = b.closest('.folha');
+  const { M, f } = folhas[Number(fig.dataset.i)];
+  if (b.dataset.acao === 'pdf') baixa(pdfDePaginas([f.itens], `Planificação — ${M.nome}`), nomeArquivo(M) + '.pdf');
+  else if (b.dataset.acao === 'svg') baixa(new Blob([svgDaPagina(f.itens, 'Planificação: ' + M.nome)], { type: 'image/svg+xml' }), nomeArquivo(M) + '.svg');
+  else {
+    // só esta folha: a classe esconde as outras na impressão e sai logo depois
+    document.querySelector('.pi-root').classList.add('so-uma');
+    fig.classList.add('esta');
+    window.print();
+  }
+});
+window.addEventListener('afterprint', () => {
+  document.querySelector('.pi-root').classList.remove('so-uma');
+  document.querySelectorAll('.folha.esta').forEach((x) => x.classList.remove('esta'));
+});
+
+/* ---------- controles ---------- */
+function ligaChips(id, aplica) {
+  $(id).addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-v]');
+    if (!b) return;
+    aplica(b.dataset.v);
+    render();
+  });
+}
+ligaChips('modoTam', (v) => { est.modo = v; });
+ligaChips('incl', (v) => { est.obliquo = v === 'obliquo'; });
+$('aresta').addEventListener('input', (e) => { est.aresta = Number(e.target.value); render(); });
+for (const [id, chave] of [['cor', 'cor'], ['abas', 'abas'], ['num', 'num'], ['aluno', 'aluno']]) {
+  $(id).addEventListener('change', (e) => { est[chave] = e.target.checked; render(); });
+}
+
+function sincroniza() {
+  desenhaGrupos();
+  $('modoTam').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === est.modo)));
+  $('incl').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === 'obliquo') === est.obliquo)));
+  $('blocoAresta').hidden = est.modo !== 'aresta';
+  $('aresta').value = String(est.aresta);
+  $('arestaVal').textContent = est.aresta.toLocaleString('pt-BR') + ' cm';
+  for (const [id, chave, rot] of [['cor', 'cor', 'lCor'], ['abas', 'abas', 'lAbas'], ['num', 'num', 'lNum'], ['aluno', 'aluno', 'lAluno']]) {
+    $(id).checked = est[chave];
+    $(rot).classList.toggle('on', est[chave]);
+  }
+}
+
+/* ---------- endereço: a seleção e as opções vão para a URL (só o que difere do padrão) ---------- */
+function guardaUrl() {
+  const u = new URL(location.href);
+  u.search = '';
+  const todos = est.sel.length === ITENS.length;
+  if (est.sel.join(',') !== PADRAO.sel.join(',')) u.searchParams.set('s', todos ? 'todos' : est.sel.join(',') || '-');
+  if (est.modo === 'aresta') u.searchParams.set('aresta', est.aresta);
+  if (est.obliquo) u.searchParams.set('obliquo', '1');
+  for (const ch of ['cor', 'abas', 'num', 'aluno']) if (!est[ch]) u.searchParams.set(ch, '0');
+  // vírgula não precisa ser escapada na querystring — o link fica legível
+  history.replaceState(null, '', u.toString().replace(/%2C/g, ','));
+}
+function leUrl() {
+  const q = new URLSearchParams(location.search);
+  if (q.has('s')) est.sel = q.get('s') === 'todos' ? ITENS.map((i) => i.id) : q.get('s').split(',').filter((id) => item(id));
+  const a = Number(q.get('aresta'));
+  if (a >= 1.5 && a <= 10) { est.modo = 'aresta'; est.aresta = Math.round(a * 2) / 2; }
+  est.obliquo = q.get('obliquo') === '1';
+  for (const ch of ['cor', 'abas', 'num', 'aluno']) if (q.get(ch) === '0') est[ch] = false;
+  ordenaSel();
+}
+
+leUrl();
+render();
+</script>

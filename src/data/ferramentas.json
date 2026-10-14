@@ -79,6 +79,17 @@
       ]
     },
     {
+      "slug": "planificacoes-para-imprimir",
+      "titulo": "Planificações para Imprimir",
+      "assunto": "Geometria espacial",
+      "tipo": "suporte",
+      "descricao": "Planificações de 34 poliedros em folhas A4 para recortar e montar — Platão, prismas e pirâmides retos ou oblíquos, arquimedianos e côncavos. Abas de colagem numeradas, aresta em centímetros, impressão direta e download em PDF ou SVG.",
+      "assuntos": [
+        "geometria",
+        "sala-de-aula"
+      ]
+    },
+    {
       "slug": "cifrador-silabico",
       "titulo": "Cifrador Silábico",
       "assunto": "Alfabetização",

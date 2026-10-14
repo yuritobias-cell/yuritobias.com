@@ -258,6 +258,13 @@ const CONCAVOS = [
   },
 ].map((d) => ({ ...d, grupo: 'concavos' }));
 
+/* Cor de cada papel de face — a mesma no 3D, na rede da tela e na folha impressa. */
+export const CORES = {
+  n3: '#E08A5E', n4: '#5FA39B', n5: '#E2B347', n6: '#9682C9', n8: '#6E9FD6', n10: '#C97896', n12: '#7DB36A',
+  base: '#5FA39B', lateral: '#E9BE6A', cavidade: '#E08A5E',
+};
+export const corDe = (papel) => CORES[papel] || '#B9B2A6';
+
 export const CATALOGO = [...PLATONICOS, PRISMA, PIRAMIDE, ...ARQUIMEDIANOS, ...OUTROS, ...CONCAVOS];
 export const porId = (id) => CATALOGO.find((e) => e.id === id);
 export const doGrupo = (g) => CATALOGO.filter((e) => e.grupo === g);

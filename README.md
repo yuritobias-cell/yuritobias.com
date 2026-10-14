@@ -60,6 +60,9 @@ src/
 │   ├── qr.js                     # o QR do permalink, desenhado em SVG para a folha
 │   ├── poliedros.js              # geometria do simulador de poliedros: sólidos, planificação, teste do segmento
 │   ├── poliedros-catalogo.js     # os sólidos do simulador: nomes, textos e parâmetros
+│   ├── planificacao.js           # a rede pronta para o papel: dobras, cortes e abas de colagem
+│   ├── folha-planificacao.js     # a folha A4 de uma planificação (cabeçalho, escala, abas numeradas)
+│   ├── pdf.js                    # PDF vetorial mínimo escrito à mão (e o SVG do mesmo desenho)
 │   └── folha.js                  # folha A4, gabarito, versões A–H e chips dos controles
 ├── layouts/         # Layout base (nav, meta tags, OG, analytics, rodapé)
 ├── pages/
@@ -139,6 +142,12 @@ O `simulador-poliedros` também tira a lógica da página: a geometria fica em
 convexo acha as faces sozinho) ou uma construção (`prisma`, `piramide`, `tronco`, `poePontas`),
 mais nome, resumo e legenda. A planificação não é desenhada à mão — sai de uma árvore das
 faces escolhida entre várias candidatas por não ter sobreposição no plano.
+
+`planificacoes-para-imprimir` usa o mesmo catálogo e a mesma rede (`planificacao.js`, que
+o simulador também importa). Cada folha é uma lista de itens em milímetros montada por
+`folha-planificacao.js`; `pdf.js` transforma essa lista em SVG (a pré-visualização, a
+impressão e o download SVG) ou em PDF — escrito à mão, com a Helvetica padrão do PDF e
+codificação WinAnsi, sem biblioteca. O que aparece na tela é exatamente o que sai no arquivo.
 
 O princípio das duas geradoras é o mesmo: **sorteie a resposta e monte a questão em volta
 dela**. É o que garante que o filtro de natureza da solução valha sempre — e não "quase
