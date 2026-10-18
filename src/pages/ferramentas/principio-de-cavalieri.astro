@@ -1,0 +1,905 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Princípio de Cavalieri"
+  description="Simulador do Princípio de Cavalieri: suba um plano de corte por dois sólidos de mesma altura e compare as áreas das seções. Pilha de moedas, prisma reto e oblíquo, cone e pirâmide, esfera e anticlepsidra — e o caso em que o princípio não vale."
+>
+  <div class="cv-root">
+    <header class="masthead">
+      <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=simulacoes">Simulações</a> · Geometria espacial</p>
+      <h1>Princípio de <em>Cavalieri</em></h1>
+      <p class="lede">Dois sólidos com a mesma altura, apoiados no mesmo plano. Se <em>todo plano
+      paralelo à base</em> corta os dois em seções de mesma área, eles têm o mesmo volume.
+      Arraste o plano de corte para cima e para baixo, deforme um dos sólidos e veja o que muda —
+      e o que não muda.</p>
+    </header>
+
+    <div class="chips" id="chips" aria-label="Par de sólidos"></div>
+
+    <div class="stage">
+      <div class="canvas-card">
+        <div class="palco" id="palco">
+          <canvas id="tela" role="img" aria-label="Dois sólidos cortados por um plano horizontal"></canvas>
+          <div class="rotulos" id="rotulos" aria-hidden="true"></div>
+          <div class="selo" id="selo"></div>
+          <p class="sem-webgl" id="semWebgl" hidden>Este navegador não conseguiu abrir o desenho em 3D
+          (WebGL desligado ou indisponível). As seções e o gráfico, ao lado, continuam funcionando.</p>
+        </div>
+
+        <div class="dobra">
+          <button class="btn btn-forte" type="button" id="varrer">Varrer</button>
+          <label class="regua">
+            <span class="ponta">base</span>
+            <input type="range" id="z" min="0" max="2" step="0.005" value="0.8" aria-label="Altura do plano de corte" />
+            <span class="ponta">topo</span>
+          </label>
+        </div>
+
+        <div class="controles">
+          <label class="toggle"><input type="checkbox" id="tFatias" /> Fatiar</label>
+          <label class="fatias" id="lFatias" hidden><input type="range" id="nFatias" min="2" max="40" step="1" value="12" aria-label="Número de fatias" /> <b id="vFatias"></b></label>
+          <label class="toggle on"><input type="checkbox" id="tCima" checked /> Parte de cima</label>
+          <label class="toggle"><input type="checkbox" id="tGirar" /> Girar sozinho</label>
+          <button class="btn" type="button" id="enquadrar">Enquadrar</button>
+        </div>
+        <p class="dica">Arraste o plano para subir e descer o corte · arraste fora dele para girar · Ctrl + rolar (ou pinça) para aproximar</p>
+      </div>
+
+      <div class="painel">
+        <div class="card">
+          <div class="rotulo">O par</div>
+          <h2 id="nome"></h2>
+          <p id="resumo"></p>
+          <label class="desliza" id="lDeforma" hidden><span id="rDeforma"></span> <b id="vDeforma"></b>
+            <input type="range" id="deforma" />
+          </label>
+        </div>
+
+        <div class="card card-secoes">
+          <div class="cab">
+            <h2>As seções</h2>
+            <span class="alt" id="vZ"></span>
+          </div>
+          <div class="duas">
+            <figure>
+              <svg id="svgA" viewBox="-1.25 -1.25 2.5 2.5" aria-hidden="true"></svg>
+              <figcaption><span class="tag tag-a">A</span> <span id="nomeA"></span><b id="areaA"></b></figcaption>
+            </figure>
+            <div class="sinal" id="sinal">=</div>
+            <figure>
+              <svg id="svgB" viewBox="-1.25 -1.25 2.5 2.5" aria-hidden="true"></svg>
+              <figcaption><span class="tag tag-b">B</span> <span id="nomeB"></span><b id="areaB"></b></figcaption>
+            </figure>
+          </div>
+          <p class="veredito" id="veredito" aria-live="polite"></p>
+        </div>
+
+        <div class="card">
+          <div class="cab">
+            <h2>Área × altura</h2>
+          </div>
+          <svg class="grafico" id="grafico" viewBox="0 0 320 210" aria-label="Gráfico da área da seção em função da altura"></svg>
+          <p class="legenda"><span class="sw sw-a"></span>A <span class="sw sw-b"></span>B — curvas iguais se sobrepõem</p>
+        </div>
+
+        <div class="card card-vol">
+          <h2>Volumes</h2>
+          <dl class="medidas" id="volumes"></dl>
+          <p id="porque"></p>
+        </div>
+      </div>
+    </div>
+
+    <section class="teoria">
+      <div class="card">
+        <h2>O princípio</h2>
+        <p>Dois sólidos de <b>mesma altura</b>, apoiados num plano. Se qualquer plano paralelo a
+        esse corta os dois em seções de <b>mesma área</b>, os dois sólidos têm o <b>mesmo volume</b>.
+        Bonaventura Cavalieri o publicou em 1635.</p>
+      </div>
+      <div class="card">
+        <h2>Por que funciona</h2>
+        <p>Ligue <b>Fatiar</b>: cada sólido vira uma pilha de cilindros finos, um para cada fatia.
+        As fatias correspondentes têm a mesma área e a mesma espessura — logo, o mesmo volume.
+        Quanto mais fatias, mais a soma se aproxima do volume de verdade, e ela é sempre igual nos dois.</p>
+      </div>
+      <div class="card">
+        <h2>Forma não importa</h2>
+        <p>As seções não precisam ser iguais nem parecidas: um círculo e um quadrado de mesma área
+        servem. É assim que se mostra que todo prisma e todo cilindro têm <b>V = A<sub>b</sub>·h</b>,
+        e toda pirâmide e todo cone, <b>V = ⅓·A<sub>b</sub>·h</b>.</p>
+      </div>
+      <div class="card">
+        <h2>A recíproca é falsa</h2>
+        <p>Mesmo volume <b>não</b> garante seções iguais: um cubo de aresta 2 e um paralelepípedo
+        1 × 2 × 4 em pé têm volume 8, mas a seção de um é 4 e a do outro, 2. O princípio só
+        vai num sentido.</p>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style is:global>
+  /* ============================================================
+     Ferramenta: Princípio de Cavalieri.
+     Tudo escopado sob .cv-root. O 3D é three.js empacotado no build
+     (sem CDN); os sólidos, descritos pelas seções, estão em
+     src/utils/cavalieri.js.
+     ============================================================ */
+  .cv-root{
+    --bg:#F8F6F1; --ink:#1C1917; --muted:#78716C; --accent:#1B4F4F; --rule:#E2DDD6;
+    --papel:#FFFFFF; --palco:#FBFAF7;
+    --cor-a:#1B4F4F; --cor-a-leve:#9CC5BD; --cor-b:#A8442B; --cor-b-leve:#E8BFA6;
+    --ok:#2E7D5B; --nao:#C0392B;
+    --font-display:'Playfair Display',Georgia,serif;
+    --font-body:'IBM Plex Sans',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --mat:Georgia,'Times New Roman',Times,serif;
+    --radius:14px;
+
+    font-family:var(--font-body); line-height:1.5; color:var(--ink);
+    max-width:1240px; margin:0 auto; padding:30px 22px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .cv-root, .cv-root *{box-sizing:border-box}
+
+  .cv-root header.masthead{margin-bottom:22px}
+  .cv-root .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .cv-root .eyebrow a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .cv-root .eyebrow a:hover{border-bottom-color:currentColor}
+  .cv-root h1{font-family:var(--font-display);font-weight:700;
+    font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.01em}
+  .cv-root h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .cv-root .lede{color:var(--muted);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .cv-root .lede em{font-style:normal;color:var(--ink);font-weight:500}
+
+  .cv-root .chips{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 18px}
+  .cv-root .chip{appearance:none;border:1px solid var(--rule);background:var(--papel);color:var(--ink);
+    font:inherit;font-size:13px;padding:6px 13px;border-radius:999px;cursor:pointer;transition:.15s}
+  .cv-root .chip:hover{border-color:var(--accent)}
+  .cv-root .chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);
+    box-shadow:inset 0 0 0 1px var(--accent);font-weight:500}
+  .cv-root .chip.contra[aria-pressed="true"]{border-color:var(--nao);color:var(--nao);box-shadow:inset 0 0 0 1px var(--nao)}
+
+  .cv-root .stage{display:grid;grid-template-columns:1.3fr .9fr;gap:22px;align-items:start}
+  @media (max-width:940px){.cv-root .stage{grid-template-columns:1fr}}
+
+  .cv-root .canvas-card,.cv-root .card{background:var(--papel);border:1px solid var(--rule);border-radius:var(--radius)}
+  .cv-root .canvas-card{padding:10px;display:flex;flex-direction:column;gap:10px;position:sticky;top:12px}
+  @media (max-width:940px){.cv-root .canvas-card{position:static}}
+  .cv-root .palco{position:relative;aspect-ratio:4/3.1;border-radius:9px;overflow:hidden;
+    background:radial-gradient(ellipse at 50% 35%,#fff 0,var(--palco) 60%,#F2EFE8 100%)}
+  @media (max-width:600px){.cv-root .palco{aspect-ratio:1/1}}
+  .cv-root #tela{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+  .cv-root #tela:active{cursor:grabbing}
+  .cv-root .palco.sobre-plano #tela{cursor:ns-resize}
+  .cv-root .rotulos{position:absolute;inset:0;pointer-events:none}
+  .cv-root .r3d{position:absolute;transform:translate(-50%,-50%);font-size:13px;font-weight:600;
+    background:rgba(255,255,255,.88);padding:1px 7px;border-radius:6px;white-space:nowrap;line-height:1.35;
+    font-variant-numeric:tabular-nums}
+  .cv-root .r3d.a{color:var(--cor-a)}
+  .cv-root .r3d.b{color:var(--cor-b)}
+  .cv-root .r3d.nome{font-family:var(--mat);font-style:italic;font-size:16px;background:none}
+  .cv-root .r3d.alca{color:var(--muted);font-weight:500;font-size:12px}
+  .cv-root .selo{position:absolute;left:12px;top:12px;font-family:var(--font-mono);font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+  .cv-root .sem-webgl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:30px;margin:0;color:var(--muted);font-size:14px}
+  .cv-root .sem-webgl[hidden]{display:none}
+
+  .cv-root .dobra{display:flex;align-items:center;gap:14px;padding:2px 4px}
+  .cv-root .regua{flex:1;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);
+    font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .cv-root .regua input{flex:1;accent-color:var(--accent);min-width:60px}
+  @media (max-width:520px){.cv-root .regua .ponta{display:none}}
+
+  .cv-root .painel{display:flex;flex-direction:column;gap:16px}
+  .cv-root .card{padding:18px}
+  .cv-root .card h2{font-family:var(--font-display);font-weight:600;font-size:21px;margin:0 0 6px;line-height:1.2}
+  .cv-root .card p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+  .cv-root .card p b{color:var(--ink);font-weight:600}
+  .cv-root .rotulo{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .cv-root .cab{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .cv-root .cab h2{margin:0}
+  .cv-root .alt{font-family:var(--mat);font-style:italic;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .cv-root .desliza{display:grid;gap:4px;font-size:13px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule)}
+  .cv-root .desliza b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  .cv-root .desliza input{accent-color:var(--cor-b);width:100%}
+  .cv-root .desliza[hidden]{display:none}
+
+  .cv-root .duas{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px}
+  .cv-root .duas figure{margin:0;text-align:center}
+  .cv-root .duas svg{display:block;width:100%;max-width:150px;margin:0 auto;aspect-ratio:1}
+  .cv-root .duas figcaption{font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:4px}
+  .cv-root .duas figcaption b{display:block;font-family:var(--mat);font-size:17px;color:var(--ink);font-weight:400;
+    font-variant-numeric:tabular-nums;margin-top:2px}
+  .cv-root .sinal{font-family:var(--mat);font-size:34px;color:var(--ok);width:32px;text-align:center}
+  .cv-root .sinal.nao{color:var(--nao)}
+  .cv-root .tag{display:inline-block;font-weight:700;font-size:11px;color:#fff;border-radius:4px;padding:0 5px;margin-right:2px}
+  .cv-root .tag-a{background:var(--cor-a)}
+  .cv-root .tag-b{background:var(--cor-b)}
+  .cv-root .veredito{margin-top:12px!important;font-size:14px!important;color:var(--ink)!important;min-height:3.2em}
+  .cv-root .veredito .ok{color:var(--ok);font-weight:600}
+  .cv-root .veredito .nao{color:var(--nao);font-weight:600}
+
+  .cv-root svg.grafico{display:block;width:100%;height:auto}
+  .cv-root .grafico .eixo{stroke:var(--muted);stroke-width:1}
+  .cv-root .grafico .grade{stroke:var(--rule);stroke-width:1}
+  .cv-root .grafico text{font-family:var(--font-body);font-size:10.5px;fill:var(--muted)}
+  .cv-root .grafico text.mat{font-family:var(--mat);font-style:italic;font-size:12.5px}
+  .cv-root .grafico .curva{fill:none;stroke-linejoin:round;stroke-linecap:round}
+  .cv-root .grafico .ca{stroke:var(--cor-a);stroke-width:4;opacity:.75}
+  .cv-root .grafico .cb{stroke:var(--cor-b);stroke-width:2;stroke-dasharray:6 4}
+  .cv-root .grafico .corte{stroke:var(--ink);stroke-width:1;stroke-dasharray:3 3}
+  .cv-root .legenda{font-size:12px!important;display:flex;align-items:center;gap:6px;margin-top:6px!important}
+  .cv-root .legenda .sw{display:inline-block;width:18px;height:4px;border-radius:2px}
+  .cv-root .legenda .sw-b{margin-left:8px;background:repeating-linear-gradient(90deg,var(--cor-b) 0 6px,transparent 6px 9px)}
+  .cv-root .legenda .sw-a{background:var(--cor-a)}
+
+  .cv-root .medidas{margin:6px 0 12px;display:grid;gap:6px}
+  .cv-root .medidas div{display:grid;grid-template-columns:1fr auto;gap:10px;font-size:13.5px;align-items:baseline}
+  .cv-root .medidas dt{color:var(--muted)}
+  .cv-root .medidas dd{margin:0;font-variant-numeric:tabular-nums;font-weight:500;text-align:right}
+  .cv-root .medidas .fat{border-top:1px solid var(--rule);padding-top:8px;margin-top:2px}
+
+  .cv-root .controles{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .cv-root .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);
+    border:1px solid var(--rule);background:var(--papel);border-radius:999px;padding:6px 12px;cursor:pointer;user-select:none}
+  .cv-root .toggle input{accent-color:var(--accent);margin:0}
+  .cv-root .toggle.on{color:var(--accent);border-color:var(--accent)}
+  .cv-root .fatias{display:inline-flex;align-items:center;gap:6px;font-size:12.5px}
+  .cv-root .fatias[hidden]{display:none}
+  .cv-root .fatias input{accent-color:var(--accent);width:110px}
+  .cv-root .fatias b{font-variant-numeric:tabular-nums;min-width:2ch;color:var(--accent)}
+  .cv-root .btn{appearance:none;border:1px solid var(--rule);background:var(--papel);
+    color:var(--accent);font:inherit;font-size:12.5px;border-radius:999px;padding:7px 14px;cursor:pointer}
+  .cv-root .btn:hover{border-color:var(--accent)}
+  .cv-root .btn-forte{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500;min-width:96px}
+  .cv-root .dica{font-size:12.5px;color:var(--muted);margin:0;text-align:center}
+
+  .cv-root .teoria{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
+  .cv-root .teoria h2{font-size:18px}
+</style>
+
+<script>
+// @ts-nocheck — JS vanilla da ferramenta; sem tipagem TS
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { CENARIOS, porId, solido, somaFatias, H, R } from '../../utils/cavalieri.js';
+
+const $ = (id) => document.getElementById(id);
+const fmt = (x, c = 2) => x.toFixed(c).replace('.', ',');
+const fmtPi = (a) => `${fmt(a / Math.PI)}π ≈ ${fmt(a)}`;
+
+/* ---------- estado ---------- */
+const est = {
+  id: 'moedas',
+  d: {},              // deformação escolhida em cada cenário
+  z: 0.8,
+  fatias: true,
+  n: 18,
+  cima: true,
+};
+CENARIOS.forEach((c) => { if (c.deforma) est.d[c.id] = c.deforma.padrao; });
+let C = porId(est.id);
+const dAtual = () => (C.deforma ? est.d[C.id] : 0);
+
+/* ================================================================
+   Cena 3D
+   ================================================================ */
+const palco = $('palco');
+const tela = $('tela');
+let renderer = null;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: tela, antialias: true, alpha: true });
+  renderer.localClippingEnabled = true;
+} catch (e) {
+  $('semWebgl').hidden = false;
+}
+
+const cena = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32, 4 / 3, 0.1, 200);
+camera.position.set(1, 4, 10);
+cena.add(camera);
+cena.add(new THREE.HemisphereLight(0xffffff, 0xcfc7b8, 1.9));
+const luz = new THREE.DirectionalLight(0xffffff, 1.4);
+luz.position.set(2.5, 4, 3);
+camera.add(luz);
+
+const chao = new THREE.GridHelper(16, 32, 0xd8d2c7, 0xe9e5dd);
+chao.material.transparent = true;
+chao.material.opacity = 0.7;
+chao.position.y = -0.002;
+cena.add(chao);
+
+let controles = null;
+if (renderer) {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  controles = new OrbitControls(camera, tela);
+  controles.enableDamping = true;
+  controles.dampingFactor = 0.08;
+  controles.minDistance = 3;
+  controles.maxDistance = 40;
+  controles.autoRotateSpeed = 0.8;
+  controles.maxPolarAngle = Math.PI * 0.62;
+  palco.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) return;
+    e.stopPropagation();
+  }, { capture: true });
+}
+
+/* o plano de corte: o que fica abaixo dele é o sólido; acima, só um fantasma */
+const abaixo = new THREE.Plane(new THREE.Vector3(0, -1, 0), est.z);
+const acima = new THREE.Plane(new THREE.Vector3(0, 1, 0), -est.z);
+
+const COR = {
+  A: { leve: 0x9cc5bd, forte: 0x1b4f4f },
+  B: { leve: 0xe8bfa6, forte: 0xa8442b },
+};
+function materiais(lado) {
+  const c = COR[lado];
+  const base = { color: c.leve, roughness: 0.8, metalness: 0, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 };
+  return {
+    cheio: new THREE.MeshStandardMaterial({ ...base, clippingPlanes: [abaixo] }),
+    fantasma: new THREE.MeshStandardMaterial({ ...base, clippingPlanes: [acima], transparent: true, opacity: 0.16, depthWrite: false }),
+    secao: new THREE.MeshBasicMaterial({ color: c.forte, side: THREE.DoubleSide, transparent: true, opacity: 0.88, depthWrite: false }),
+    aresta: new LineMaterial({ color: 0x1c1917, linewidth: 1.6, clippingPlanes: [abaixo] }),
+    arestaFantasma: new LineMaterial({ color: 0x1c1917, linewidth: 1, transparent: true, opacity: 0.22, clippingPlanes: [acima], depthWrite: false }),
+    contorno: new LineMaterial({ color: c.forte, linewidth: 3, depthTest: false }),
+  };
+}
+const MAT = { A: materiais('A'), B: materiais('B') };
+const matsLinha = [MAT.A.aresta, MAT.A.arestaFantasma, MAT.A.contorno, MAT.B.aresta, MAT.B.arestaFantasma, MAT.B.contorno];
+const matBorda = new LineMaterial({ color: 0x1b4f4f, linewidth: 1.4, transparent: true, opacity: 0.55 });
+matsLinha.push(matBorda);
+
+function linhas(pares, mat) {
+  const g = new LineSegmentsGeometry();
+  g.setPositions(pares.flat(2));
+  return new LineSegments2(g, mat);
+}
+function limpa(obj) {
+  if (!obj) return;
+  obj.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+  obj.parent?.remove(obj);
+}
+
+/* ---------- malha a partir das seções ----------
+   anéis = [{ z, s }] de baixo para cima, com s = { ext, int } de mesmo tamanho */
+const p3 = ([x, y], z, ox) => [x + ox, z, y];
+
+function grade(aneis, chave, ox, liso) {
+  const k = aneis[0].s[chave].length;
+  const pos = [], idx = [];
+  for (const { z, s } of aneis) for (const q of s[chave]) pos.push(...p3(q, z, ox));
+  for (let j = 0; j < aneis.length - 1; j++) {
+    for (let i = 0; i < k; i++) {
+      const a = j * k + i, b = j * k + ((i + 1) % k), c = a + k, d = b + k;
+      idx.push(a, b, d, a, d, c);
+    }
+  }
+  let g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  if (!liso) g = g.toNonIndexed();
+  g.computeVertexNormals();
+  return g;
+}
+/* a tampa: a faixa entre o contorno de fora e o de dentro (que, sem furo, é o centro) */
+function tampa(s, z, ox) {
+  const k = s.ext.length, pos = [], nor = [];
+  for (let i = 0; i < k; i++) {
+    const j = (i + 1) % k;
+    const e0 = p3(s.ext[i], z, ox), e1 = p3(s.ext[j], z, ox), n0 = p3(s.int[i], z, ox), n1 = p3(s.int[j], z, ox);
+    pos.push(...e0, ...e1, ...n1, ...e0, ...n1, ...n0);
+    for (let m = 0; m < 6; m++) nor.push(0, 1, 0);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  return g;
+}
+const anel = (p, z, ox) => p.map((q, i) => [p3(q, z, ox), p3(p[(i + 1) % p.length], z, ox)]);
+
+/* um "tubo": as superfícies de fora e de dentro, as tampas e as arestas */
+function tubo(aneis, sol, ox, grupo, mat) {
+  const geos = [grade(aneis, 'ext', ox, sol.liso), tampa(aneis[0].s, aneis[0].z, ox), tampa(aneis.at(-1).s, aneis.at(-1).z, ox)];
+  if (sol.oco) geos.push(grade(aneis, 'int', ox, true));
+  for (const g of geos) {
+    grupo.add(new THREE.Mesh(g, mat.cheio));
+    if (est.cima) grupo.add(new THREE.Mesh(g, mat.fantasma));
+  }
+  const pares = [...anel(aneis[0].s.ext, aneis[0].z, ox), ...anel(aneis.at(-1).s.ext, aneis.at(-1).z, ox)];
+  if (!sol.liso) {
+    // as arestas laterais: cada vértice do polígono seguido de baixo até em cima
+    const k = aneis[0].s.ext.length;
+    for (let i = 0; i < k; i++) {
+      for (let j = 0; j < aneis.length - 1; j++) pares.push([p3(aneis[j].s.ext[i], aneis[j].z, ox), p3(aneis[j + 1].s.ext[i], aneis[j + 1].z, ox)]);
+    }
+  }
+  grupo.add(linhas(pares, mat.aresta));
+  if (est.cima) grupo.add(linhas(pares, mat.arestaFantasma));
+}
+
+const OX = { A: -1.45, B: 1.45 };
+let grupos = { A: null, B: null };
+let secoes = { A: null, B: null };
+let plano = null;
+const rotulos = [];
+
+function passosZ(sol) {
+  return sol.torcido || sol === solido('moedas') ? 72 : sol.liso ? 48 : 1;
+}
+function constroiSolido(lado) {
+  limpa(grupos[lado]);
+  const chave = C[lado], sol = solido(chave), d = dAtual(), ox = OX[lado];
+  const g = new THREE.Group();
+  if (est.fatias) {
+    const dz = H / est.n;
+    for (let i = 0; i < est.n; i++) {
+      const s = sol.secao((i + 0.5) * dz, d);
+      tubo([{ z: i * dz, s }, { z: (i + 1) * dz, s }], sol, ox, g, MAT[lado]);
+    }
+  } else {
+    const m = passosZ(sol);
+    const aneis = Array.from({ length: m + 1 }, (_, j) => { const z = (j / m) * H; return { z, s: sol.secao(z, d) }; });
+    tubo(aneis, sol, ox, g, MAT[lado]);
+  }
+  cena.add(g);
+  grupos[lado] = g;
+}
+
+/* a seção que o plano corta (com fatias, a da fatia que ele atravessa) */
+function zDaSecao(z) {
+  if (!est.fatias) return z;
+  const dz = H / est.n;
+  return (Math.min(est.n - 1, Math.floor(z / dz)) + 0.5) * dz;
+}
+function constroiSecao(lado) {
+  limpa(secoes[lado]);
+  const sol = solido(C[lado]), ox = OX[lado];
+  const z = est.z, s = sol.secao(zDaSecao(z), dAtual());
+  const g = new THREE.Group();
+  const y = Math.min(H, z) + 0.002;
+  const m = new THREE.Mesh(tampa(s, y, ox), MAT[lado].secao);
+  m.renderOrder = 4;
+  g.add(m);
+  const pares = anel(s.ext, y, ox);
+  if (sol.oco) pares.push(...anel(s.int, y, ox));
+  const l = linhas(pares, MAT[lado].contorno);
+  l.renderOrder = 5;
+  g.add(l);
+  cena.add(g);
+  secoes[lado] = g;
+  return s;
+}
+
+/* a caixa que contém os dois sólidos com a deformação máxima — o plano e a câmera saem dela */
+let caixa = null;
+function medeCaixa() {
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const lado of ['A', 'B']) {
+    const sol = solido(C[lado]);
+    const ds = C.deforma ? [C.deforma.min, C.deforma.max, est.d[C.id]] : [0];
+    for (const d of ds) for (let j = 0; j <= 24; j++) {
+      for (const [x, y] of sol.secao((j / 24) * H, d).ext) {
+        x0 = Math.min(x0, x + OX[lado]); x1 = Math.max(x1, x + OX[lado]);
+        y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      }
+    }
+  }
+  caixa = { x0, x1, y0, y1 };
+}
+function constroiPlano() {
+  limpa(plano);
+  const m = 0.45, { x0, x1, y0, y1 } = caixa;
+  const w = x1 - x0 + 2 * m, p = y1 - y0 + 2 * m;
+  const geo = new THREE.PlaneGeometry(w, p);
+  geo.rotateX(-Math.PI / 2);
+  plano = new THREE.Group();
+  const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x1b4f4f, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false }));
+  mesh.renderOrder = 3;
+  plano.add(mesh);
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const a = [-w / 2, 0, -p / 2], b = [w / 2, 0, -p / 2], c = [w / 2, 0, p / 2], d = [-w / 2, 0, p / 2];
+  plano.add(linhas([[a, b], [b, c], [c, d], [d, a]], matBorda));
+  plano.position.set(cx, est.z, cy);
+  plano.userData = { mesh, w, p };
+  cena.add(plano);
+}
+
+/* ---------- rótulos HTML presos a pontos 3D ---------- */
+function rotulo(chave, classe) {
+  const el = document.createElement('span');
+  el.className = 'r3d ' + classe;
+  $('rotulos').appendChild(el);
+  const r = { el, p: new THREE.Vector3(), chave };
+  rotulos.push(r);
+  return r;
+}
+const rot = {
+  nomeA: rotulo('nomeA', 'nome a'), nomeB: rotulo('nomeB', 'nome b'),
+  areaA: rotulo('areaA', 'a'), areaB: rotulo('areaB', 'b'),
+  alca: rotulo('alca', 'alca'),
+};
+rot.nomeA.el.textContent = 'A';
+rot.nomeB.el.textContent = 'B';
+rot.alca.el.textContent = '↕ plano de corte';
+
+function posicionaRotulos() {
+  const w = palco.clientWidth, h = palco.clientHeight, v = new THREE.Vector3();
+  for (const r of rotulos) {
+    v.copy(r.p).project(camera);
+    r.el.style.left = ((v.x + 1) / 2) * w + 'px';
+    r.el.style.top = ((1 - v.y) / 2) * h + 'px';
+  }
+}
+function atualizaPontosRotulos() {
+  const { x0, x1, y0, y1 } = caixa;
+  rot.nomeA.p.set(OX.A, -0.28, y1 + 0.25);
+  rot.nomeB.p.set(OX.B, -0.28, y1 + 0.25);
+  const zs = Math.min(H, est.z);
+  rot.areaA.p.set(OX.A, zs, y1 + 0.45);
+  rot.areaB.p.set(OX.B + secoes.cxB, zs, y1 + 0.45);
+  rot.alca.p.set((x0 + x1) / 2, zs, y0 - 0.45);
+}
+
+/* ---------- câmera ---------- */
+function enquadra(instantaneo) {
+  if (!controles) return;
+  const { x0, x1, y0, y1 } = caixa;
+  const alvo = new THREE.Vector3((x0 + x1) / 2, H / 2, (y0 + y1) / 2);
+  // o que limitar: a largura dos dois sólidos ou a altura deles
+  const tg = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const dist = Math.max(((x1 - x0) / 2 + 0.5) / (tg * camera.aspect), (H * 0.8) / tg);
+  const dir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(68), THREE.MathUtils.degToRad(12));
+  const fim = { alvo, pos: alvo.clone().add(dir.multiplyScalar(dist)) };
+  if (instantaneo) {
+    controles.target.copy(fim.alvo);
+    camera.position.copy(fim.pos);
+    voo = null;
+  } else {
+    voo = { t0: performance.now(), dur: 750, deAlvo: controles.target.clone(), dePos: camera.position.clone(), fim };
+  }
+  pede();
+}
+const suave = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+let voo = null;
+function passoVoo(agora) {
+  if (!voo) return false;
+  const x = Math.min(1, (agora - voo.t0) / voo.dur), e = suave(x);
+  controles.target.lerpVectors(voo.deAlvo, voo.fim.alvo, e);
+  camera.position.lerpVectors(voo.dePos, voo.fim.pos, e);
+  if (x >= 1) voo = null;
+  return true;
+}
+
+/* ---------- varredura do plano ---------- */
+let varre = null;
+function alternaVarrer() {
+  if (varre) { varre = null; $('varrer').textContent = 'Varrer'; return; }
+  const de = est.z >= H - 1e-3 ? 0 : est.z;
+  varre = { t0: performance.now(), de, dur: 5200 * (1 - de / H) + 400 };
+  $('varrer').textContent = 'Parar';
+}
+function passoVarre(agora) {
+  if (!varre) return false;
+  const x = Math.min(1, (agora - varre.t0) / varre.dur);
+  mudaZ(varre.de + (H - varre.de) * x);
+  if (x >= 1) { varre = null; $('varrer').textContent = 'Varrer'; }
+  return true;
+}
+
+/* ---------- laço de desenho (só desenha quando algo mudou) ---------- */
+let sujo = true;
+const pede = () => { sujo = true; };
+function redimensiona() {
+  if (!renderer) return;
+  const w = palco.clientWidth, h = palco.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  matsLinha.forEach((m) => m.resolution.set(w, h));
+  pede();
+}
+new ResizeObserver(redimensiona).observe(palco);
+
+function laco(agora) {
+  requestAnimationFrame(laco);
+  if (!renderer || !caixa) return;
+  passoVarre(agora);
+  const voando = passoVoo(agora);
+  const mexeu = controles.update();
+  if (voando || mexeu || sujo) {
+    renderer.render(cena, camera);
+    posicionaRotulos();
+    sujo = false;
+  }
+}
+requestAnimationFrame(laco);
+
+/* ---------- arrastar o plano ---------- */
+const raio = new THREE.Raycaster();
+const ndc = (e) => {
+  const r = tela.getBoundingClientRect();
+  return new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+};
+function tocaPlano(e) {
+  if (!plano) return null;
+  raio.setFromCamera(ndc(e), camera);
+  return raio.intersectObject(plano.userData.mesh, false)[0] || null;
+}
+let arrasto = null;
+tela.addEventListener('pointerdown', (e) => {
+  paraDeGirar();
+  const hit = tocaPlano(e);
+  if (!hit) return;
+  // o ponteiro anda sobre um plano vertical de frente para a câmera
+  const n = camera.getWorldDirection(new THREE.Vector3()).setY(0);
+  if (n.lengthSq() < 1e-6) n.set(0, 0, -1);
+  n.normalize();
+  arrasto = { muro: new THREE.Plane().setFromNormalAndCoplanarPoint(n, hit.point), dz: est.z - hit.point.y };
+  controles.enabled = false;
+  tela.setPointerCapture(e.pointerId);
+  varre = null; $('varrer').textContent = 'Varrer';
+});
+tela.addEventListener('pointermove', (e) => {
+  if (!arrasto) {
+    if (e.buttons === 0) palco.classList.toggle('sobre-plano', !!tocaPlano(e));
+    return;
+  }
+  raio.setFromCamera(ndc(e), camera);
+  const p = raio.ray.intersectPlane(arrasto.muro, new THREE.Vector3());
+  if (p) mudaZ(p.y + arrasto.dz);
+});
+const solta = () => { if (arrasto) { arrasto = null; controles.enabled = true; } };
+tela.addEventListener('pointerup', solta);
+tela.addEventListener('pointercancel', solta);
+
+function paraDeGirar() {
+  if (!controles || !controles.autoRotate) return;
+  controles.autoRotate = false;
+  $('tGirar').checked = false;
+  $('tGirar').closest('.toggle').classList.remove('on');
+}
+
+/* ================================================================
+   Painel: seções vistas de cima, gráfico e volumes
+   ================================================================ */
+function desenhaSecao2D(svg, s, lado, sol) {
+  const pts = (p) => p.map(([x, y]) => `${(x - s.cx).toFixed(3)},${(-(y - s.cy)).toFixed(3)}`).join(' ');
+  const cor = lado === 'A' ? 'var(--cor-a)' : 'var(--cor-b)';
+  const leve = lado === 'A' ? 'var(--cor-a-leve)' : 'var(--cor-b-leve)';
+  let h = `<circle r="${R}" fill="none" stroke="var(--rule)" stroke-width=".02" stroke-dasharray=".06 .05"/>`;
+  if (sol.oco) {
+    h += `<path fill="${leve}" fill-rule="evenodd" stroke="${cor}" stroke-width=".035" d="M${pts(s.ext)}Z M${pts(s.int)}Z"/>`;
+  } else {
+    h += `<polygon fill="${leve}" stroke="${cor}" stroke-width=".035" stroke-linejoin="round" points="${pts(s.ext)}"/>`;
+  }
+  svg.innerHTML = h;
+}
+
+const G = { x0: 34, x1: 306, y0: 182, y1: 16 };   // área do gráfico em "pixels" do viewBox
+const gx = (a) => G.x0 + (a / (Math.PI * 1.08)) * (G.x1 - G.x0);
+const gy = (z) => G.y0 + (z / H) * (G.y1 - G.y0);
+function desenhaGrafico() {
+  const sA = solido(C.A), sB = solido(C.B), d = dAtual();
+  const curva = (sol) => {
+    let p = '';
+    for (let i = 0; i <= 80; i++) {
+      const z = (i / 80) * H;
+      const a = est.fatias ? sol.area(zDaSecao(Math.min(z, H - 1e-9)), d) : sol.area(z, d);
+      p += `${i ? 'L' : 'M'}${gx(a).toFixed(1)},${gy(z).toFixed(1)}`;
+    }
+    return p;
+  };
+  const z = Math.min(H, est.z), zs = zDaSecao(Math.min(z, H - 1e-9));
+  const aA = sA.area(est.fatias ? zs : z, d), aB = sB.area(est.fatias ? zs : z, d);
+  let h = '';
+  for (const k of [0.5, 1]) h += `<line class="grade" x1="${gx(Math.PI * k)}" y1="${G.y0}" x2="${gx(Math.PI * k)}" y2="${G.y1}"/>`;
+  h += `<line class="grade" x1="${G.x0}" y1="${gy(H / 2)}" x2="${G.x1}" y2="${gy(H / 2)}"/>`;
+  h += `<line class="eixo" x1="${G.x0}" y1="${G.y0}" x2="${G.x1}" y2="${G.y0}"/><line class="eixo" x1="${G.x0}" y1="${G.y0}" x2="${G.x0}" y2="${G.y1 - 6}"/>`;
+  h += `<text x="${gx(Math.PI / 2)}" y="${G.y0 + 14}" text-anchor="middle">π/2</text><text x="${gx(Math.PI)}" y="${G.y0 + 14}" text-anchor="middle">π</text>`;
+  h += `<text x="${G.x0 - 6}" y="${gy(0) + 4}" text-anchor="end">0</text><text x="${G.x0 - 6}" y="${gy(H) + 4}" text-anchor="end">h</text>`;
+  h += `<text x="${G.x1}" y="${G.y0 + 26}" text-anchor="end">área da seção →</text>`;
+  h += `<text class="mat" x="${G.x0 + 6}" y="${G.y1 - 4}">z</text>`;
+  h += `<path class="curva ca" d="${curva(sA)}"/><path class="curva cb" d="${curva(sB)}"/>`;
+  h += `<line class="corte" x1="${G.x0}" y1="${gy(z)}" x2="${G.x1}" y2="${gy(z)}"/>`;
+  h += `<circle cx="${gx(aA)}" cy="${gy(z)}" r="6" fill="var(--cor-a)" opacity=".8"/>`;
+  h += `<circle cx="${gx(aB)}" cy="${gy(z)}" r="3.5" fill="var(--cor-b)" stroke="#fff" stroke-width="1.2"/>`;
+  $('grafico').innerHTML = h;
+}
+
+function atualizaVolumes() {
+  const sA = solido(C.A), sB = solido(C.B);
+  const linhas = [
+    [`<span class="tag tag-a">A</span> ${sA.nome}`, `${sA.volume} ≈ ${fmt(sA.V)}`],
+    [`<span class="tag tag-b">B</span> ${sB.nome}`, `${sB.volume} ≈ ${fmt(sB.V)}`],
+  ];
+  let html = linhas.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('');
+  if (est.fatias) {
+    const vA = somaFatias(C.A, est.n), vB = somaFatias(C.B, est.n);
+    html += `<div class="fat"><dt>Soma das ${est.n} fatias de A</dt><dd>${fmt(vA, 3)}</dd></div>`;
+    html += `<div><dt>Soma das ${est.n} fatias de B</dt><dd>${fmt(vB, 3)}</dd></div>`;
+  }
+  $('volumes').innerHTML = html;
+  $('porque').innerHTML = C.porque;
+}
+
+/* tudo o que depende da altura do plano */
+function atualizaCorte() {
+  const z = Math.min(H, est.z), d = dAtual();
+  abaixo.constant = z + 1e-4;
+  acima.constant = -(z - 1e-4);
+  if (plano) plano.position.y = z;
+  const sA = solido(C.A), sB = solido(C.B);
+  const secA = constroiSecao('A'), secB = constroiSecao('B');
+  secoes.cxB = secB.cx;
+  const zs = est.fatias ? zDaSecao(Math.min(z, H - 1e-9)) : z;
+  const aA = sA.area(zs, d), aB = sB.area(zs, d);
+
+  desenhaSecao2D($('svgA'), secA, 'A', sA);
+  desenhaSecao2D($('svgB'), secB, 'B', sB);
+  $('areaA').textContent = fmtPi(aA);
+  $('areaB').textContent = fmtPi(aB);
+  rot.areaA.el.textContent = fmt(aA);
+  rot.areaB.el.textContent = fmt(aB);
+  const iguais = Math.abs(aA - aB) < 1e-9;
+  $('sinal').textContent = iguais ? '=' : '≠';
+  $('sinal').classList.toggle('nao', !iguais);
+  const pct = Math.round((z / H) * 100);
+  $('vZ').textContent = `z = ${fmt(z)} · ${pct}% da altura`;
+  $('z').value = z;
+
+  if (C.iguais) {
+    $('veredito').innerHTML = `<span class="ok">Áreas iguais nesta altura</span> — e em qualquer outra: suba e desça o plano.` +
+      (C.deforma && d ? ' A deformação muda a forma do sólido, nunca a área das seções.' : '');
+  } else if (iguais) {
+    $('veredito').innerHTML = 'No chão as duas seções são iguais (é a base). Suba o plano um pouco…';
+  } else {
+    $('veredito').innerHTML = `<span class="nao">Áreas diferentes</span>: a seção do cone tem ${fmt((aB / aA) * 100, 0)}% da do cilindro. Basta uma altura assim para o princípio não se aplicar.`;
+  }
+  desenhaGrafico();
+  atualizaPontosRotulos();
+  pede();
+}
+
+function mudaZ(z) {
+  est.z = Math.max(0, Math.min(H, z));
+  atualizaCorte();
+}
+
+/* ================================================================
+   Seleção e controles
+   ================================================================ */
+function desenhaChips() {
+  $('chips').innerHTML = CENARIOS.map((c) => `<button class="chip${c.iguais ? '' : ' contra'}" type="button" data-id="${c.id}" aria-pressed="${c.id === est.id}">${c.curto}</button>`).join('');
+}
+
+function atualizaDeforma() {
+  const df = C.deforma;
+  $('lDeforma').hidden = !df;
+  if (!df) return;
+  const i = $('deforma');
+  i.min = df.min; i.max = df.max; i.step = df.passo; i.value = est.d[C.id];
+  $('rDeforma').textContent = df.rotulo + ' (B)';
+  $('vDeforma').textContent = df.fmt(est.d[C.id]);
+}
+
+function refazSolidos() {
+  constroiSolido('A');
+  constroiSolido('B');
+  atualizaCorte();
+  atualizaVolumes();
+}
+
+function seleciona({ suave = true } = {}) {
+  C = porId(est.id);
+  const sA = solido(C.A), sB = solido(C.B);
+  $('nome').textContent = `${sA.nome} × ${sB.nome}`;
+  $('resumo').textContent = C.resumo;
+  $('selo').textContent = C.curto;
+  $('nomeA').textContent = sA.nome;
+  $('nomeB').textContent = sB.nome;
+  tela.setAttribute('aria-label', `${sA.nome} (A) e ${sB.nome} (B), de mesma altura, cortados por um plano horizontal`);
+  atualizaDeforma();
+  medeCaixa();
+  constroiPlano();
+  refazSolidos();
+  enquadra(!suave);
+  guardaUrl();
+}
+
+$('chips').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip');
+  if (!b || b.dataset.id === est.id) return;
+  est.id = b.dataset.id;
+  const c = porId(est.id);
+  if (est.fatias) { est.n = c.fatias; sincronizaFatias(); }
+  desenhaChips();
+  seleciona();
+});
+
+$('deforma').addEventListener('input', (e) => {
+  est.d[C.id] = Number(e.target.value);
+  $('vDeforma').textContent = C.deforma.fmt(est.d[C.id]);
+  refazSolidos();
+  guardaUrl();
+});
+
+$('z').addEventListener('input', (e) => {
+  varre = null; $('varrer').textContent = 'Varrer';
+  mudaZ(Number(e.target.value));
+});
+$('varrer').addEventListener('click', alternaVarrer);
+$('enquadrar').addEventListener('click', () => enquadra(false));
+
+function sincronizaFatias() {
+  $('tFatias').checked = est.fatias;
+  $('tFatias').closest('.toggle').classList.toggle('on', est.fatias);
+  $('lFatias').hidden = !est.fatias;
+  $('nFatias').value = est.n;
+  $('vFatias').textContent = est.n;
+}
+$('tFatias').addEventListener('change', (e) => {
+  est.fatias = e.target.checked;
+  if (est.fatias) est.n = Number($('nFatias').value) || C.fatias;
+  sincronizaFatias();
+  refazSolidos();
+  guardaUrl();
+});
+$('nFatias').addEventListener('input', (e) => {
+  est.n = Number(e.target.value);
+  $('vFatias').textContent = est.n;
+  refazSolidos();
+  guardaUrl();
+});
+$('tCima').addEventListener('change', (e) => {
+  est.cima = e.target.checked;
+  e.target.closest('.toggle').classList.toggle('on', est.cima);
+  refazSolidos();
+});
+$('tGirar').addEventListener('change', (e) => {
+  if (controles) controles.autoRotate = e.target.checked;
+  e.target.closest('.toggle').classList.toggle('on', e.target.checked);
+});
+
+/* ---------- endereço: o par, a deformação e as fatias vão para a URL ---------- */
+function guardaUrl() {
+  const u = new URL(location.href);
+  u.search = '';
+  u.searchParams.set('par', est.id);
+  if (C.deforma && est.d[C.id] !== C.deforma.padrao) u.searchParams.set('d', est.d[C.id]);
+  u.searchParams.set('fatias', est.fatias ? est.n : 0);
+  history.replaceState(null, '', u);
+}
+function leUrl() {
+  const q = new URLSearchParams(location.search);
+  const c = porId(q.get('par'));
+  if (!c) return;
+  est.id = c.id;
+  const d = Number(q.get('d'));
+  if (c.deforma && q.has('d') && d >= c.deforma.min && d <= c.deforma.max) est.d[c.id] = d;
+  const n = Number(q.get('fatias'));
+  if (q.has('fatias')) {
+    est.fatias = n >= 2 && n <= 40;
+    est.n = est.fatias ? Math.round(n) : c.fatias;
+  } else {
+    est.n = c.fatias;
+  }
+}
+
+leUrl();
+desenhaChips();
+sincronizaFatias();
+redimensiona();
+seleciona({ suave: false });
+</script>

@@ -14,7 +14,7 @@ pessoal mora em `/sobre`.
 - [Astro 6](https://astro.build) — site estático (+ MDX nos posts com componentes)
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
-- [three.js](https://threejs.org) — o 3D do Simulador de Poliedros (empacotado, sem CDN; só essa página o carrega)
+- [three.js](https://threejs.org) — o 3D do Simulador de Poliedros e do Princípio de Cavalieri (empacotado, sem CDN; só essas páginas o carregam)
 - Fontes auto-hospedadas em `public/fonts/` (variáveis, subset latino; `@font-face` em `src/styles/global.css`) — sem requisições ao Google Fonts
 - Busca própria: índice estático gerado no build (`/busca-index.json`) e filtrado no
   navegador — sem motor de busca de terceiros e sem mandar a consulta para lugar nenhum
@@ -60,6 +60,7 @@ src/
 │   ├── qr.js                     # o QR do permalink, desenhado em SVG para a folha
 │   ├── poliedros.js              # geometria do simulador de poliedros: sólidos, planificação, teste do segmento
 │   ├── poliedros-catalogo.js     # os sólidos do simulador: nomes, textos e parâmetros
+│   ├── cavalieri.js              # os pares do Princípio de Cavalieri, descritos pelas seções horizontais
 │   ├── planificacao.js           # a rede pronta para o papel: dobras, cortes e abas de colagem
 │   ├── folha-planificacao.js     # a folha A4 de uma planificação (cabeçalho, escala, abas numeradas)
 │   ├── pdf.js                    # PDF vetorial mínimo escrito à mão (e o SVG do mesmo desenho)
@@ -144,6 +145,12 @@ O `simulador-poliedros` também tira a lógica da página: a geometria fica em
 convexo acha as faces sozinho) ou uma construção (`prisma`, `piramide`, `tronco`, `poePontas`),
 mais nome, resumo e legenda. A planificação não é desenhada à mão — sai de uma árvore das
 faces escolhida entre várias candidatas por não ter sobreposição no plano.
+
+`principio-de-cavalieri` descreve cada sólido pelas **seções horizontais**, em
+`src/utils/cavalieri.js`: `secao(z, d)` devolve o contorno de fora e o de dentro (o furo da
+anticlepsidra) na altura `z`, com a deformação `d` do cenário, e `area(z, d)` a conta exata. A
+malha 3D, as fatias, o corte, as seções vistas de cima e o gráfico área × altura saem todos
+dessa mesma função — par novo é uma entrada em `CENARIOS`.
 
 `planificacoes-para-imprimir` usa o mesmo catálogo e a mesma rede (`planificacao.js`, que
 o simulador também importa). Cada folha é uma lista de itens em milímetros montada por

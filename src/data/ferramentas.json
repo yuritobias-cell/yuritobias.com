@@ -183,6 +183,16 @@
       ]
     },
     {
+      "slug": "principio-de-cavalieri",
+      "titulo": "Princípio de Cavalieri",
+      "assunto": "Geometria espacial",
+      "tipo": "simulacoes",
+      "descricao": "Suba um plano de corte por dois sólidos de mesma altura e compare as seções: pilha de moedas empurrada, prisma reto e oblíquo, cilindro e prisma torcido, cone e pirâmide, esfera e anticlepsidra. Fatie os sólidos para ver por que o volume é o mesmo — e o caso em que não é.",
+      "assuntos": [
+        "geometria"
+      ]
+    },
+    {
       "slug": "angulos-circunferencia",
       "titulo": "Ângulos na Circunferência",
       "assunto": "Geometria",
