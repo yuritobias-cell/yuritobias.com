@@ -28,5 +28,15 @@
     "assuntos": [
       "trigonometria"
     ]
+  },
+  {
+    "n": "4",
+    "data": "2026-10-18",
+    "titulo": "Avaliação Formativa — Roteiro de Revisão: Teodolito",
+    "descricao": "Roteiro individual (40 min) que retoma a atividade do teodolito: elementos do triângulo retângulo, escolha entre seno, cosseno e tangente, cálculo da altura de pontos inacessíveis (H = h_obs + d·tg θ), conferência da planilha da turma, análise de erros de medição e autoavaliação para a prova. Traz tabela de razões trigonométricas.",
+    "arquivo": "4-formativa-revisao-teodolito.pdf",
+    "assuntos": [
+      "trigonometria"
+    ]
   }
 ]
