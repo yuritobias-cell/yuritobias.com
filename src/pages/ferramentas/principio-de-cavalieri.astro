@@ -612,6 +612,26 @@ function redimensiona() {
 }
 new ResizeObserver(redimensiona).observe(palco);
 
+/* o navegador pode descartar o contexto WebGL (Mac que dormiu, troca de GPU,
+   aba esquecida em segundo plano). O three.js recria tudo quando ele volta,
+   mas o laço só desenha quando algo muda: é preciso pedir o redesenho. Se não
+   voltar, avisa em vez de deixar o palco em branco. */
+let esperaContexto = null;
+tela.addEventListener('webglcontextlost', () => {
+  clearTimeout(esperaContexto);
+  esperaContexto = setTimeout(() => {
+    $('semWebgl').textContent = 'O navegador interrompeu o desenho em 3D. Recarregue a página para trazê-lo de volta.';
+    $('semWebgl').hidden = false;
+    $('rotulos').hidden = true;
+  }, 2500);
+});
+tela.addEventListener('webglcontextrestored', () => {
+  clearTimeout(esperaContexto);
+  $('semWebgl').hidden = true;
+  $('rotulos').hidden = false;
+  redimensiona();
+});
+
 function laco(agora) {
   requestAnimationFrame(laco);
   if (!renderer || !caixa) return;
