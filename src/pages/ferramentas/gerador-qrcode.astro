@@ -51,8 +51,8 @@ import Layout from '../../layouts/Layout.astro';
         <div class="card">
           <h2>Conteúdo</h2>
           <p class="hint">O que o celular vai abrir ao ler o código.</p>
-          <label class="sr-only" for="conteudo">Link ou texto do QR code</label>
-          <textarea id="conteudo" rows="3" spellcheck="false"
+          <label class="sr-only" for="qr-conteudo">Link ou texto do QR code</label>
+          <textarea id="qr-conteudo" rows="3" spellcheck="false"
             placeholder="https://exemplo.com.br"></textarea>
           <p class="dica" id="dica-url" hidden>
             Isso parece um endereço sem <code>https://</code> — sem o prefixo, muitos leitores
@@ -541,7 +541,7 @@ const $ = (id) => document.getElementById(id);
 const elPreview   = $('preview');
 const elErro      = $('erro');
 const elCaption   = $('caption');
-const elConteudo  = $('conteudo');
+const elConteudo  = $('qr-conteudo');
 const elDicaUrl   = $('dica-url');
 const elBtnHttps  = $('btn-https');
 const elDropzone  = $('dropzone');
