@@ -7,7 +7,9 @@
    - /_astro/ (assets com hash no nome): cache primeiro — são imutáveis.
    - PDFs e o índice da busca: rede primeiro com fallback no cache (arquivo trocado
      com o mesmo nome propaga).
-   - Demais recursos locais (fontes, imagens): cache primeiro. */
+   - Demais recursos locais (fontes, imagens, dados das análises): cache na hora
+     e atualização em segundo plano — o arquivo trocado com o mesmo nome chega já
+     na visita seguinte, sem depender de a versão do cache mudar. */
 const VERSAO = '__VERSAO__';
 const CACHE_PAGINAS = 'paginas-' + VERSAO;
 const CACHE_ASSETS = 'assets-' + VERSAO;
@@ -40,6 +42,18 @@ function cacheFirst(req, cacheName) {
       caches.open(cacheName).then((c) => c.put(req, copia));
     }
     return res;
+  }));
+}
+
+function staleWhileRevalidate(req, cacheName) {
+  return caches.open(cacheName).then((c) => c.match(req).then((hit) => {
+    const rede = fetch(req).then((res) => {
+      if (res.ok) c.put(req, res.clone());
+      return res;
+    });
+    if (!hit) return rede;
+    rede.catch(() => {}); // offline: fica com o que já está no cache
+    return hit;
   }));
 }
 
@@ -82,7 +96,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
+  // Sem hash no nome, então nada garante que não mudou: serve o que tem e confere.
   if (url.origin === location.origin) {
-    e.respondWith(cacheFirst(req, CACHE_EXTRAS));
+    e.respondWith(staleWhileRevalidate(req, CACHE_EXTRAS));
   }
 });

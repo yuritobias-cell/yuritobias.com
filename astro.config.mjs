@@ -9,8 +9,8 @@ import mdx from '@astrojs/mdx';
 
 // Gera dist/sw.js a partir do template src/sw.js: o precache é derivado das
 // páginas reais de src/pages/ferramentas/ (impossível esquecer uma ferramenta
-// nova ou precachear uma removida) e a versão é um hash da própria lista
-// (invalida os caches quando a lista muda, e só quando muda).
+// nova ou precachear uma removida) e a versão é um hash da lista e do próprio
+// template (invalida os caches quando a lista ou as estratégias mudam, e só aí).
 function serviceWorker() {
   return {
     name: 'service-worker',
@@ -24,9 +24,9 @@ function serviceWorker() {
         // A busca também vai para o precache: o índice é um arquivo estático e
         // pequeno, e sem ele /busca abre offline sem conseguir buscar nada.
         const precache = ['/', '/ferramentas/', '/busca/', '/busca-index.json', ...ferramentas];
-        const versao = crypto.createHash('sha256').update(JSON.stringify(precache)).digest('hex').slice(0, 8);
-        const sw = fs
-          .readFileSync('./src/sw.js', 'utf-8')
+        const template = fs.readFileSync('./src/sw.js', 'utf-8');
+        const versao = crypto.createHash('sha256').update(JSON.stringify(precache)).update(template).digest('hex').slice(0, 8);
+        const sw = template
           .replaceAll('__VERSAO__', versao)
           .replaceAll('__PRECACHE__', JSON.stringify(precache, null, 2));
         fs.writeFileSync(path.join(fileURLToPath(dir), 'sw.js'), sw);
