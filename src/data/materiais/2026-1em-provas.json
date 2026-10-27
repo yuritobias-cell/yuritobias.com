@@ -38,5 +38,17 @@
     "assuntos": [
       "geometria"
     ]
+  },
+  {
+    "n": "5",
+    "data": "2026-10-26",
+    "titulo": "Prova Somativa — 3ª Etapa — Bloco 1",
+    "descricao": "Função quadrática (esboço do gráfico, discriminante e problemas de máximo), semelhança de triângulos e Teorema da Bissetriz Interna.",
+    "arquivo": "5-av3etapa.pdf",
+    "assuntos": [
+      "funcoes",
+      "geometria",
+      "proporcionalidade"
+    ]
   }
 ]
