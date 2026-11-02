@@ -268,6 +268,9 @@ achar "Produtos Notáveis", que não traz a palavra em lugar nenhum.
 
 - Tarefa de apostila (sem PDF): use `"apostila": { "ordem": "Atividades X, pág. Y", "data": "2026-06-15" }` — **data em formato ISO** (`AAAA-MM-DD`); tarefas futuras ganham destaque automático.
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
+  Todo material com o campo `video` ganha o endereço fixo `/video/<ano>/<serie>/<n>` (ex.:
+  `/video/2026/2em/r6`), que é o que vai no QR Code da lista: com `url` vazia ele mostra
+  "vídeo em breve"; quando a `url` é preenchida, o mesmo endereço redireciona para o vídeo.
 - `"assuntos"` põe o material em `/assuntos/<slug>` (um ou mais, de `src/data/assuntos.json`); sem o campo, ele fica fora do índice por assunto. Vale igual nos JSONs de provas e formativas.
 - Para dar ao material uma versão em HTML além do PDF, crie o `.mdx` correspondente em `src/content/listas/` — ver "Listas em HTML".
 

@@ -1,0 +1,102 @@
+---
+/* Endereço fixo do vídeo de uma lista — o que vai no QR Code impresso.
+   O QR é impresso antes de o vídeo existir, então o endereço não pode ser o do
+   YouTube: é /video/<ano>/<serie>/<n>, gerado para todo material com o campo
+   "video". Com a url vazia, a página avisa que o vídeo ainda não saiu; quando a
+   url é preenchida no JSON, o mesmo endereço passa a redirecionar para o vídeo.
+   O ano no caminho impede que a série de mesmo slug do ano seguinte tome o
+   endereço de um QR já impresso. */
+import Layout from '../../../../layouts/Layout.astro';
+import { series, urlSerie, type Material, type Serie } from '../../../../utils/materiais';
+
+export function getStaticPaths() {
+  return series.flatMap((serie) =>
+    serie.materiais
+      .filter((m) => m.video)
+      .map((material) => ({
+        params: { ano: String(serie.ano), serie: serie.slug, n: material.n.toLowerCase() },
+        props: { serie, material },
+      }))
+  );
+}
+
+interface Props { serie: Serie; material: Material }
+const { serie, material } = Astro.props;
+const destino = material.video!.url;
+const voltar = urlSerie(serie);
+
+// No build estático, o redirect vira uma página com meta refresh para o vídeo.
+if (destino) return Astro.redirect(destino);
+---
+
+<Layout title={`${material.titulo} — vídeo em breve`} noindex>
+  <main>
+    <p class="codigo">{serie.titulo} · {material.n}</p>
+    <h1>O vídeo ainda não está pronto</h1>
+    <p class="texto">
+      O vídeo de resolução da <b>{material.titulo}</b> ainda está sendo gravado.
+      Este mesmo QR Code vai abrir o vídeo assim que ele for publicado — volte aqui em breve.
+    </p>
+    <div class="links">
+      <a href={voltar}>Materiais de {serie.titulo}</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100dvh - 68px);
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    animation: fade-up 0.5s ease both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .codigo {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .texto {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .texto b { color: var(--ink); font-weight: 600; }
+
+  .links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
+
+  .links a {
+    text-decoration: none;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .links a:hover { text-decoration: underline; }
+</style>

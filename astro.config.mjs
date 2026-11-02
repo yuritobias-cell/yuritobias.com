@@ -56,8 +56,9 @@ export default defineConfig({
   },
   integrations: [
     mdx(),
-    // /exemplos fica fora da navegação e dos buscadores: acesso só pelo endereço direto
-    sitemap({ filter: (page) => !page.includes('/exemplos') }),
+    // /exemplos fica fora da navegação e dos buscadores: acesso só pelo endereço direto;
+    // /video/ são os endereços dos QR Codes, que só redirecionam para o YouTube
+    sitemap({ filter: (page) => !page.includes('/exemplos') && !page.includes('/video/') }),
     serviceWorker(),
   ],
   vite: {
