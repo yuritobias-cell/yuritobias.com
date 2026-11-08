@@ -1,0 +1,35 @@
+---
+titulo: "Trigonometria: Seno, Cosseno e Tangente"
+descricao: "Lista de exercícios do 9º ano sobre razões trigonométricas no triângulo retângulo: calcular seno, cosseno e tangente, encontrar catetos a partir de um ângulo e resolver problemas com rampa, escada e altura de uma torre."
+serie: "9ano"
+material: "19"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Observe o triângulo retângulo abaixo e determine o seno, o cosseno e a tangente do ângulo α. Escreva os resultados na forma de fração e na forma decimal.
+
+   <Figuras>
+     <Geo pontos={{ P: [0, 0], Q: [4, 0], R: [0, 3] }}
+          poligonos={[['P', 'Q', 'R']]}
+          medidas={[{ de: 'P', para: 'R', texto: '3 cm' }, { de: 'P', para: 'Q', texto: '4 cm' }, { de: 'R', para: 'Q', texto: '5 cm' }]}
+          retos={[['R', 'P', 'Q']]}
+          angulos={[{ v: 'Q', de: 'P', para: 'R', texto: 'α' }]}
+          tamanho={170}
+          descricao="Triângulo retângulo com catetos de 3 cm (vertical) e 4 cm (horizontal) e hipotenusa de 5 cm; o ângulo α fica no vértice oposto ao cateto de 3 cm, entre o cateto de 4 cm e a hipotenusa" />
+   </Figuras>
+
+1. Em um triângulo retângulo, a hipotenusa mede 13 cm e o cateto oposto ao ângulo β mede 5 cm. Calcule a medida do outro cateto e, em seguida, determine sen β, cos β e tg β.
+
+1. Um triângulo retângulo tem hipotenusa de 20 cm e um de seus ângulos agudos mede 30°. Calcule a medida do cateto oposto e a medida do cateto adjacente a esse ângulo. (Use sen 30° = 0,5 e cos 30° = 0,87.)
+
+1. Para dar acesso à entrada de um prédio, foi construída uma rampa de 12 m de comprimento, que forma um ângulo de 30° com o solo. Qual é a altura, em metros, alcançada por essa rampa? (Use sen 30° = 0,5.)
+
+1. Uma escada de 6 m de comprimento está apoiada em uma parede, formando um ângulo de 60° com o chão. (Use sen 60° = 0,87 e cos 60° = 0,5.) Determine:
+
+   1. a altura que a escada alcança na parede;
+   1. a distância do pé da escada até a parede.
+
+1. De um ponto do solo, situado a 40 m da base de uma torre, uma pessoa vê o topo dessa torre sob um ângulo de 30° com a horizontal. Qual é a altura da torre? (Use tg 30° = 0,58.)

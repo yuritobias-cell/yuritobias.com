@@ -31,9 +31,12 @@ const { titulo = 'Lembrete' } = Astro.props;
     margin-bottom: 0.4rem;
   }
   /* O MDX embrulha o conteúdo num <p>: o flex vale nele também, para as
-     fórmulas ficarem lado a lado e quebrarem uma embaixo da outra no celular. */
+     fórmulas ficarem lado a lado e quebrarem uma embaixo da outra no celular.
+     Só no <p> filho direto — um parágrafo de texto corrido mais fundo (dentro
+     de um <div>, num exemplo resolvido) não pode virar flex, senão cada <i> e
+     <sup> dele vira um bloco solto. */
   .lembrete-corpo,
-  .lembrete-corpo :global(p) {
+  .lembrete-corpo > :global(p) {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -42,4 +45,5 @@ const { titulo = 'Lembrete' } = Astro.props;
     line-height: 1.7;
   }
   .lembrete-corpo :global(p) { margin: 0; }
+  .lembrete-corpo > :global(div) { flex: 1 1 18rem; font-family: var(--font-body); line-height: 1.7; }
 </style>

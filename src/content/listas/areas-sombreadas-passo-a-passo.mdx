@@ -1,0 +1,158 @@
+---
+titulo: "Áreas Sombreadas Passo a Passo"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre áreas sombreadas em etapas, com exemplo resolvido e formulário: círculo, semicírculo e quarto de círculo, coroa circular, quadrados com arcos e semicírculos sobre um diâmetro."
+serie: "2em"
+material: "22"
+instrucoes: "Resolva sempre nesta ordem: identifique as figuras, calcule a área de cada uma e só depois some ou subtraia."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Geo from '../../components/mat/Geo.astro';
+import Lembrete from '../../components/mat/Lembrete.astro';
+
+<Lembrete titulo="Lembre-se">
+  <span>Use π ≈ 3,14.</span>
+  <span>Círculo: <i>A</i> = π<i>r</i><sup>2</sup></span>
+  <span>Semicírculo: <i>A</i> = <Frac n="π<i>r</i><sup>2</sup>" d="2" /></span>
+  <span>Quarto de círculo: <i>A</i> = <Frac n="π<i>r</i><sup>2</sup>" d="4" /></span>
+  <span>Quadrado: <i>A</i> = ℓ<sup>2</sup></span>
+  <span>Retângulo: <i>A</i> = <i>b</i> · <i>h</i></span>
+  <span>Triângulo: <i>A</i> = <Frac n="<i>b</i> · <i>h</i>" d="2" /></span>
+</Lembrete>
+
+<Lembrete titulo="Exemplo resolvido">
+  <div>
+    A figura mostra um quadrado de lado 10 cm com um círculo de raio 5 cm dentro dele. Qual é a área sombreada?<br />
+    **Estratégia:** área sombreada = área da figura maior − área da parte branca<br />
+    1º) área do quadrado: <i>A</i><sub>1</sub> = 10<sup>2</sup> = 100 cm<sup>2</sup><br />
+    2º) área do círculo: <i>A</i><sub>2</sub> = π · 5<sup>2</sup> = 25π ≈ 78,5 cm<sup>2</sup><br />
+    3º) área sombreada: <i>A</i> = <i>A</i><sub>1</sub> − <i>A</i><sub>2</sub> = 100 − 78,5 = 21,5 cm<sup>2</sup>
+  </div>
+  <Geo regioes={[{ d: [['M', [0, 0]], ['L', [10, 0]], ['L', [10, 10]], ['L', [0, 10]], ['Z'], ['O', [5, 5], 5]], pintado: true }]}
+       segmentos={[[[5, 5], [10, 5]]]} marcas={[[5, 5]]}
+       medidas={[{ de: [5, 5], para: [10, 5], texto: '5', lado: 1 }, { de: [0, 0], para: [10, 0], texto: '10 cm' }]}
+       tamanho={110}
+       descricao="Quadrado de lado 10 cm com um círculo de raio 5 cm inscrito; os quatro cantos entre o círculo e o quadrado estão pintados" />
+</Lembrete>
+
+1. Calcule a área de cada figura sombreada abaixo, sabendo que todas têm raio 6 cm. Dê a resposta em função de π e também com π ≈ 3,14.
+
+   <Figuras>
+     <Geo regioes={[{ d: [['O', [0, 0], 6]], pintado: true }]}
+          segmentos={[[[0, 0], [6, 0]]]} marcas={[[0, 0]]}
+          medidas={[{ de: [0, 0], para: [6, 0], texto: '6', lado: 1 }]}
+          tamanho={90} rotulo="a) círculo"
+          descricao="Círculo pintado de raio 6 cm" />
+     <Geo regioes={[{ d: [['M', [-6, 0]], ['A', [0, 0], [6, 0], 'h'], ['Z']], pintado: true }]}
+          marcas={[[0, 0]]} medidas={[{ de: [0, 0], para: [6, 0], texto: '6', lado: -1 }]}
+          tamanho={100} rotulo="b) semicírculo"
+          descricao="Semicírculo pintado de raio 6 cm" />
+     <Geo regioes={[{ d: [['M', [0, 0]], ['L', [6, 0]], ['A', [0, 0], [0, 6], 'ah'], ['Z']], pintado: true }]}
+          retos={[[[0, 6], [0, 0], [6, 0]]]} medidas={[{ de: [0, 0], para: [6, 0], texto: '6' }]}
+          tamanho={60} rotulo="c) quarto de círculo"
+          descricao="Quarto de círculo pintado de raio 6 cm" />
+   </Figuras>
+
+1. No quadrado <i>ABCD</i> de lado 4 cm foi traçado um arco de raio 4 cm com centro no vértice <i>A</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [4, 0], C: [4, 4], D: [0, 4] }}
+          regioes={[{ d: [['M', 'A'], ['L', 'B'], ['A', 'A', 'D', 'ah'], ['Z']], pintado: true }]}
+          poligonos={[['A', 'B', 'C', 'D']]} nomes={['A', 'B', 'C', 'D']}
+          retos={[['B', 'A', 'D']]} medidas={[{ de: 'A', para: 'B', texto: '4 cm' }]}
+          tamanho={120}
+          descricao="Quadrado ABCD de lado 4 cm com um arco de raio 4 cm centrado em A, de B até D; o quarto de círculo está pintado e o canto C fica em branco" />
+   </Figuras>
+
+   1. Calcule a área do quadrado.
+   1. Calcule a área do quarto de círculo (região sombreada).
+   1. Calcule a área da região branca.
+
+1. A figura é formada por dois círculos com o mesmo centro: o maior tem raio 10 cm e o menor, raio 6 cm.
+
+   <Figuras>
+     <Geo regioes={[{ d: [['O', [0, 0], 10], ['O', [0, 0], 6]], pintado: true }]}
+          segmentos={[[[0, 0], [0, 10]], [[0, 0], [6, 0]]]} marcas={[[0, 0]]}
+          medidas={[{ de: [0, 0], para: [0, 10], texto: '10', lado: 1 }, { de: [0, 0], para: [6, 0], texto: '6', lado: 1 }]}
+          tamanho={130}
+          descricao="Dois círculos concêntricos, de raios 10 cm e 6 cm; a coroa entre eles está pintada" />
+   </Figuras>
+
+   1. Calcule a área do círculo maior.
+   1. Calcule a área do círculo menor.
+   1. Calcule a área sombreada (a região entre os dois círculos).
+
+1. Na figura, <i>O</i> é o ponto médio de <i>AB</i> e <i>AB</i> = 20 cm. O semicírculo maior tem diâmetro <i>AB</i>, e os dois menores têm diâmetros <i>AO</i> e <i>OB</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], O: [10, 0], B: [20, 0] }}
+          regioes={[{ d: [['M', 'A'], ['A', 'O', 'B', 'h'], ['A', [15, 0], 'O', 'ah'], ['A', [5, 0], 'A', 'ah'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'B']]} nomes={['A', 'O', 'B']} marcas={['O']}
+          medidas={[{ de: 'A', para: 'O', texto: '10 cm', dist: 22 }, { de: 'O', para: 'B', texto: '10 cm', dist: 22 }]}
+          tamanho={150}
+          descricao="Semicírculo de diâmetro AB = 20 cm com dois semicírculos menores, de diâmetros AO e OB, recortados embaixo; a região entre o arco grande e os dois arcos pequenos está pintada" />
+   </Figuras>
+
+   1. Qual é o raio do semicírculo maior? E o raio de cada semicírculo menor?
+   1. Calcule a área do semicírculo maior e a área de *cada* semicírculo menor.
+   1. Calcule a área sombreada.
+
+1. No quadrado <i>ABCD</i> de lado 4 cm foram retirados dois quartos de círculo de raio 2 cm, com centros nos vértices <i>D</i> e <i>C</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [4, 0], C: [4, 4], D: [0, 4] }}
+          regioes={[{ d: [['M', 'A'], ['L', 'B'], ['L', 'C'], ['L', 'D'], ['Z'],
+                          ['M', 'D'], ['L', [2, 4]], ['A', 'D', [0, 2], 'h'], ['Z'],
+                          ['M', 'C'], ['L', [2, 4]], ['A', 'C', [4, 2], 'ah'], ['Z']], pintado: true }]}
+          nomes={['A', 'B', 'C', 'D']} medidas={[{ de: 'A', para: 'B', texto: '4 cm' }]}
+          tamanho={120}
+          descricao="Quadrado ABCD de lado 4 cm com dois quartos de círculo de raio 2 cm recortados nos cantos de cima, D e C; o resto do quadrado está pintado" />
+   </Figuras>
+
+   1. Calcule a área do quadrado.
+   1. Calcule a área dos dois quartos de círculo juntos.
+   1. Calcule a área sombreada.
+
+1. No quadrado <i>ABCD</i> de lado 6 cm, o arco tem centro em <i>A</i> e raio 6 cm, e <i>BD</i> é uma diagonal do quadrado.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [6, 0], C: [6, 6], D: [0, 6] }}
+          regioes={[{ d: [['M', 'B'], ['A', 'A', 'D', 'ah'], ['Z']], pintado: true }]}
+          poligonos={[['A', 'B', 'C', 'D']]} segmentos={[['B', 'D']]} nomes={['A', 'B', 'C', 'D']}
+          retos={[['B', 'A', 'D']]} medidas={[{ de: 'A', para: 'B', texto: '6 cm' }]}
+          tamanho={120}
+          descricao="Quadrado ABCD de lado 6 cm com a diagonal BD e um arco de raio 6 cm centrado em A, de B até D; a região entre a diagonal e o arco está pintada" />
+   </Figuras>
+
+   1. Calcule a área do quarto de círculo de centro <i>A</i>.
+   1. Calcule a área do triângulo <i>ABD</i>.
+   1. A região sombreada é a diferença entre essas duas áreas. Calcule-a.
+
+1. No quadrado <i>ABCD</i> de lado 6 cm foram traçados dois arcos de raio 6 cm: um com centro em <i>A</i> e outro com centro em <i>C</i>. A diagonal <i>BD</i> (tracejada) divide a região sombreada em duas partes iguais.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [6, 0], C: [6, 6], D: [0, 6] }}
+          regioes={[{ d: [['M', 'B'], ['A', 'A', 'D', 'ah'], ['A', 'C', 'B', 'ah'], ['Z']], pintado: true }]}
+          poligonos={[['A', 'B', 'C', 'D']]} tracejados={[['B', 'D']]} nomes={['A', 'B', 'C', 'D']}
+          medidas={[{ de: 'A', para: 'B', texto: '6 cm' }]}
+          tamanho={120}
+          descricao="Quadrado ABCD de lado 6 cm com dois arcos de raio 6 cm, centrados em A e em C, que vão de B a D formando uma lente pintada; a diagonal BD, tracejada, divide a lente ao meio" />
+   </Figuras>
+
+   1. Compare com a questão 5: qual é a área de *metade* da região sombreada?
+   1. Calcule a área total da região sombreada.
+
+1. **(Desafio)** Agora o semicírculo de diâmetro <i>AB</i> = 20 cm foi dividido em três semicírculos menores, de diâmetros <i>AC</i>, <i>CD</i> e <i>DB</i>, sendo <i>AC</i> = <i>CO</i> = <i>OD</i> = <i>DB</i> = 5 cm.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], C: [5, 0], O: [10, 0], D: [15, 0], B: [20, 0] }}
+          regioes={[{ d: [['M', 'A'], ['A', 'O', 'B', 'h'], ['A', [17.5, 0], 'D', 'ah'], ['A', 'O', 'C', 'ah'], ['A', [2.5, 0], 'A', 'ah'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'B']]} nomes={['A', 'C', 'O', 'D', 'B']} marcas={['O']}
+          tamanho={150}
+          descricao="Semicírculo de diâmetro AB = 20 cm com três semicírculos menores recortados embaixo, de diâmetros AC, CD e DB; a região entre o arco grande e os três arcos menores está pintada" />
+   </Figuras>
+
+   1. Escreva o raio de cada um dos três semicírculos menores.
+   1. Calcule a área de cada um deles.
+   1. Calcule a área sombreada.

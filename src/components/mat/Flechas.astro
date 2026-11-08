@@ -1,0 +1,81 @@
+---
+/* Diagrama de flechas de uma relação f : A → B — os dois conjuntos ovais, um
+   ao lado do outro, com setas ligando cada elemento de A à sua imagem em B.
+   É a figura de "classifique a função" das listas de funções.
+
+   <Flechas a={['1', '2', '3']} b={['a', 'b', 'c']}
+            setas={[['1', 'b'], ['2', 'a'], ['3', 'c']]} rotulo="(a)" />
+
+   As setas ligam elementos pelo nome. Letra vai em itálico (é variável ou
+   rótulo de conjunto, como no LaTeX); número vai reto. A descrição para o
+   leitor de tela é montada a partir das próprias setas. */
+interface Props {
+  a: string[];
+  b: string[];
+  /** Pares [elemento de A, elemento de B]. */
+  setas: [string, string][];
+  nomeA?: string;
+  nomeB?: string;
+  /** Legenda sob a figura — "(a)", "(b)". */
+  rotulo?: string;
+}
+const { a, b, setas, nomeA = 'A', nomeB = 'B', rotulo } = Astro.props;
+
+const PASSO = 27;               // distância vertical entre elementos
+const XA = 42, XB = 148;        // centros dos ovais
+const RX = 24;
+const n = Math.max(a.length, b.length);
+const RY = n * PASSO / 2 + 12;
+const CY = 26 + RY;
+const altura = CY + RY + 8;
+
+const ys = (k: number) => Array.from({ length: k }, (_, i) => CY + (i - (k - 1) / 2) * PASSO);
+const ya = ys(a.length);
+const yb = ys(b.length);
+const posA = new Map(a.map((e, i) => [e, ya[i]]));
+const posB = new Map(b.map((e, i) => [e, yb[i]]));
+
+for (const [de, para] of setas) {
+  if (!posA.has(de) || !posB.has(para)) {
+    throw new Error(`[Flechas] seta ${de} → ${para}: elemento fora dos conjuntos ${nomeA} = {${a}} e ${nomeB} = {${b}}`);
+  }
+}
+
+const ehLetra = (t: string) => /^[a-z]$/i.test(t);
+const descricao = `Diagrama de flechas de ${nomeA} = {${a.join(', ')}} para ${nomeB} = {${b.join(', ')}}: `
+  + setas.map(([de, para]) => `${de} associado a ${para}`).join('; ');
+
+// id do marcador tirado do conteúdo — determinístico e único por diagrama.
+let h = 0;
+for (const ch of JSON.stringify([a, b, setas, rotulo])) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+const id = `fl-${h.toString(36)}`;
+---
+<figure class="flechas">
+  <svg viewBox={`0 0 190 ${altura}`} width="190" role="img" aria-label={descricao}>
+    <defs>
+      <marker id={id} viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto">
+        <path d="M0,0 L8,4 L0,8 z" fill="currentColor" />
+      </marker>
+    </defs>
+    <ellipse cx={XA} cy={CY} rx={RX} ry={RY} />
+    <ellipse cx={XB} cy={CY} rx={RX} ry={RY} />
+    <text class="nome" x={XA} y="16" text-anchor="middle">{nomeA}</text>
+    <text class="nome" x={XB} y="16" text-anchor="middle">{nomeB}</text>
+    {a.map((e, i) => <text x={XA - 4} y={ya[i] + 4} text-anchor="middle" font-style={ehLetra(e) ? 'italic' : 'normal'}>{e}</text>)}
+    {b.map((e, i) => <text x={XB + 4} y={yb[i] + 4} text-anchor="middle" font-style={ehLetra(e) ? 'italic' : 'normal'}>{e}</text>)}
+    {setas.map(([de, para]) => (
+      <line x1={XA + 6} y1={posA.get(de)} x2={XB - 7} y2={posB.get(para)} marker-end={`url(#${id})`} />
+    ))}
+  </svg>
+  {rotulo && <figcaption>{rotulo}</figcaption>}
+</figure>
+
+<style>
+  .flechas { display: inline-block; margin: 0; text-align: center; }
+  .flechas svg { max-width: 100%; height: auto; color: var(--ink); }
+  ellipse { fill: none; stroke: currentColor; stroke-width: 1.2; }
+  line { stroke: currentColor; stroke-width: 1; }
+  text { font-family: var(--mat); font-size: 13px; fill: currentColor; }
+  .nome { font-style: italic; font-size: 14px; }
+  figcaption { font-size: 0.85rem; font-weight: 600; margin-top: 0.1rem; }
+</style>

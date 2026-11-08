@@ -1,0 +1,65 @@
+---
+titulo: "Área Total e Volume de Prismas"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre prismas: área total e volume do paralelepípedo, do cubo e dos prismas triangular e hexagonal regulares, capacidade em litros de aquário e piscina e o efeito de dobrar a aresta do cubo."
+serie: "2em"
+material: "25"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Lembrete from '../../components/mat/Lembrete.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+import Solido from '../../components/mat/Solido.astro';
+
+<Lembrete>
+  <span><i>A</i><sub>t</sub> = <i>A</i><sub>ℓ</sub> + 2<i>A</i><sub>b</sub></span>
+  <span><i>V</i> = <i>A</i><sub>b</sub> · <i>h</i></span>
+</Lembrete>
+
+1. Um paralelepípedo retângulo tem dimensões 5 cm, 3 cm e 4 cm. Calcule sua área total e seu volume.
+
+1. A área total de um cubo é 150 cm<sup>2</sup>. Determine a medida da aresta e o volume desse cubo.
+
+1. Um prisma triangular regular tem aresta da base medindo 4 cm e altura 10 cm. Calcule: *(Lembre-se: a área do triângulo equilátero de lado ℓ é <Frac><Fragment slot="n">ℓ<sup>2</sup><Raiz>3</Raiz></Fragment><Fragment slot="d">4</Fragment></Frac>.)*
+
+   1. a área da base;
+   1. a área lateral;
+   1. a área total;
+   1. o volume.
+
+1. A figura mostra um prisma hexagonal regular com aresta da base 2 cm e altura 5 cm. Calcule:
+
+   <Figuras>
+     <Solido tipo="prisma" base={[[2, 0], [1, 1.732], [-1, 1.732], [-2, 0], [-1, -1.732], [1, -1.732]]} altura={5}
+             medidas={[{ aresta: [4, 5], texto: '2 cm' }, { aresta: [0, 6], texto: '5 cm' }]}
+             descricao="Prisma hexagonal regular em pé, com aresta da base 2 cm e altura 5 cm" />
+   </Figuras>
+
+   1. a área da base *(dica: o hexágono regular é formado por 6 triângulos equiláteros)*;
+   1. a área lateral;
+   1. a área total;
+   1. o volume do prisma.
+
+1. Um aquário tem a forma de um paralelepípedo retângulo de 60 cm de comprimento, 30 cm de largura e 40 cm de altura. *(Lembre-se: 1 L = 1&nbsp;000 cm<sup>3</sup>.)*
+
+   1. Qual é a capacidade do aquário, em litros?
+   1. Quantos litros de água há no aquário quando a água atinge 30 cm de altura?
+
+1. Uma piscina tem a forma de um paralelepípedo retângulo com 8 m de comprimento, 4 m de largura e 1,5 m de profundidade.
+
+   1. Quantos litros de água são necessários para enchê-la completamente? (1 m<sup>3</sup> = 1&nbsp;000 L)
+   1. Quantos metros quadrados de azulejo são necessários para revestir o fundo e as paredes laterais?
+
+1. Em um prisma quadrangular regular, a altura é o dobro da aresta da base. Sabendo que sua área total é 160 cm<sup>2</sup>, determine as medidas da aresta da base e da altura e o volume desse prisma.
+
+1. Se a aresta de um cubo for dobrada, o seu volume ficará multiplicado por:
+
+   <Alt cols={5}>
+     <li>2</li>
+     <li>4</li>
+     <li>6</li>
+     <li>8</li>
+     <li>16</li>
+   </Alt>

@@ -30,6 +30,11 @@
     "descricao": "Polígonos e áreas, circunferência e círculo, semelhança, Teorema de Pitágoras e relações métricas no triângulo retângulo."
   },
   {
+    "slug": "geometria-espacial",
+    "nome": "Geometria espacial",
+    "descricao": "Poliedros e Relação de Euler, planificações, prismas, pirâmides, cilindros e cones — área total, volume e capacidade."
+  },
+  {
     "slug": "geometria-analitica",
     "nome": "Geometria analítica",
     "descricao": "Plano cartesiano, distância e ponto médio, vetores e transformações geométricas."

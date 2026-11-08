@@ -1,0 +1,58 @@
+---
+titulo: "Volumes de Prismas, Pirâmides, Cilindros e Cones"
+descricao: "Lista de exercícios do 9º ano sobre volume de prismas, pirâmides, cilindros e cones: capacidade em litros e tempo para encher uma piscina, copo cilíndrico e casquinha cônica, medidas desconhecidas a partir do volume, um silo de cilindro e cone, altura do cone pela geratriz e o volume de uma pedra no aquário."
+serie: "9ano"
+material: "24"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento. As figuras não estão em escala."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Solido from '../../components/mat/Solido.astro';
+
+1. Calcule o volume de cada sólido. Nos itens **c** e **d**, use π = 3,14.
+
+   <Figuras>
+     <Solido tipo="prisma" eixo="profundidade" base={[[0, 0], [8, 0], [0, 6]]} altura={10} destaque rotulo="a)"
+             medidas={[{ aresta: [0, 2], texto: '6 cm' }, { aresta: [0, 1], texto: '8 cm' }, { aresta: [1, 4], texto: '10 cm' }]}
+             descricao="Prisma deitado: a face da frente é um triângulo retângulo de catetos 6 cm (vertical) e 8 cm (horizontal), e o prisma tem 10 cm de comprimento para trás" />
+     <Solido tipo="piramide" base={[[0, 0], [6, 0], [6, 4], [0, 4]]} altura={9} rotuloAltura="h = 9 cm" rotulo="b)"
+             medidas={[{ aresta: [0, 1], texto: '6 cm' }, { aresta: [1, 2], texto: '4 cm' }]}
+             descricao="Pirâmide de base retangular com lados 6 cm e 4 cm e altura h = 9 cm" />
+     <Solido tipo="cilindro" r={5} h={8} destaque rotulos={{ r: '5 cm', h: '8 cm' }} rotulo="c)"
+             descricao="Cilindro com raio da base 5 cm e altura 8 cm" />
+     <Solido tipo="cone" r={6} h={10} destaque rotulos={{ r: '6 cm', h: '10 cm' }} rotulo="d)"
+             descricao="Cone com raio da base 6 cm e altura 10 cm" />
+   </Figuras>
+
+1. Uma piscina tem a forma de um paralelepípedo com 8 m de comprimento, 4 m de largura e 1,5 m de profundidade.
+
+   1. Quantos litros de água são necessários para enchê-la completamente? *(Lembre-se: 1 m<sup>3</sup> = 1&nbsp;000 L.)*
+   1. Uma mangueira despeja 2&nbsp;000 litros de água por hora. Em quantas horas a piscina, inicialmente vazia, ficará cheia?
+
+1. Um copo cilíndrico e uma casquinha de sorvete em forma de cone têm o mesmo raio da base, 3 cm, e a mesma altura, 12 cm. Usando π = 3:
+
+   1. calcule o volume do copo;
+   1. calcule o volume da casquinha;
+   1. quantas casquinhas cheias de suco são necessárias para encher o copo completamente?
+
+1. Uma barraca de acampamento tem a forma de uma pirâmide de base quadrada, com 3 m de lado, e altura de 2 m. Calcule o volume de ar no interior da barraca.
+
+1. Descubra a medida desconhecida em cada caso.
+
+   1. Um cilindro tem raio da base 5 cm e volume 471 cm<sup>3</sup>. Usando π = 3,14, qual é a sua altura?
+   1. Um cone tem raio da base 4 cm e volume 96 cm<sup>3</sup>. Usando π = 3, qual é a sua altura?
+   1. Um cubo tem volume de 125 cm<sup>3</sup>. Quanto mede a sua aresta?
+
+1. Um silo para armazenar grãos é formado por um cilindro com 2 m de raio da base e 6 m de altura, coberto por um cone de mesmo raio e 3 m de altura, como mostra a figura. Usando π = 3:
+
+   <Figuras>
+     <Solido tipo="silo" r={2} h={6} hCone={3} destaque rotulos={{ r: '2 m', h: '6 m', hCone: 'h = 3 m' }}
+             descricao="Silo: cilindro de raio 2 m e altura 6 m, coberto por um cone de mesmo raio e altura 3 m" />
+   </Figuras>
+
+   1. calcule o volume da parte cilíndrica e o volume da parte cônica;
+   1. calcule o volume total do silo, em m<sup>3</sup> e em litros.
+
+1. Um cone tem raio da base 6 cm e geratriz (segmento que liga o vértice a um ponto da circunferência da base) de 10 cm. Calcule a altura do cone e, em seguida, o seu volume, usando π = 3. *(Dica: a altura, o raio e a geratriz formam um triângulo retângulo.)*
+
+1. Um aquário com base retangular de 40 cm por 25 cm contém água. Ao mergulhar completamente uma pedra no aquário, o nível da água subiu 2 cm. Qual é o volume da pedra, em cm<sup>3</sup>? E em litros?

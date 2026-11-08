@@ -1,0 +1,49 @@
+---
+titulo: "Racionalização e Expressões com Radicais"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre radicais: simplificar raízes, racionalizar denominadores (inclusive com raiz cúbica e com conjugado) e calcular expressões com radicais e potências de expoente fracionário, em contextos do mundo do trabalho."
+serie: "1em"
+material: "05"
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Formula from '../../components/mat/Formula.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+
+1. Na construção de uma rampa de acesso para pessoas com mobilidade reduzida em uma fábrica parceira do SESI, o engenheiro calculou que o comprimento inclinado da rampa é de <Raiz>50</Raiz> metros e a base horizontal mede <Raiz>8</Raiz> metros. Para calcular a razão entre o comprimento inclinado e a base, ele obteve a expressão <Frac><Fragment slot="n"><Raiz>50</Raiz></Fragment><Fragment slot="d"><Raiz>8</Raiz></Fragment></Frac>.
+
+   1. Simplifique <Raiz>50</Raiz> e <Raiz>8</Raiz>, expressando cada um na forma <i>a</i><Raiz><i>b</i></Raiz>, com <i>b</i> o menor possível.
+   1. Calcule e simplifique a razão <Frac><Fragment slot="n"><Raiz>50</Raiz></Fragment><Fragment slot="d"><Raiz>8</Raiz></Fragment></Frac>.
+
+1. A racionalização do denominador é uma técnica que elimina radicais do denominador de uma fração, facilitando cálculos e comparações. Racionalize os denominadores das expressões abaixo.
+
+   <Alt cols={3}>
+     <li><Frac><Fragment slot="n">3</Fragment><Fragment slot="d"><Raiz>5</Raiz></Fragment></Frac></li>
+     <li><Frac><Fragment slot="n">10</Fragment><Fragment slot="d"><Raiz>2</Raiz></Fragment></Frac></li>
+     <li><Frac><Fragment slot="n">6</Fragment><Fragment slot="d"><Raiz>3</Raiz></Fragment></Frac></li>
+     <li><Frac><Fragment slot="n">5<Raiz>2</Raiz></Fragment><Fragment slot="d"><Raiz>7</Raiz></Fragment></Frac></li>
+     <li><Frac><Fragment slot="n">4</Fragment><Fragment slot="d"><Raiz i="3">2</Raiz></Fragment></Frac></li>
+   </Alt>
+
+1. Uma empresa industrial usa a fórmula <i>P</i> = <Frac><Fragment slot="n">120</Fragment><Fragment slot="d"><Raiz>3</Raiz> + 1</Fragment></Frac> para estimar, em reais, o custo unitário de produção de uma peça. Para facilitar os cálculos, o contador precisa racionalizar essa expressão.
+
+   1. Racionalize o denominador de <Frac><Fragment slot="n">120</Fragment><Fragment slot="d"><Raiz>3</Raiz> + 1</Fragment></Frac> e simplifique o resultado.
+   1. Qual o valor aproximado de <i>P</i>? Use <Raiz>3</Raiz> ≈ 1,73.
+
+1. Operações com radicais e potências aparecem em diversas situações do mundo do trabalho. Calcule o valor de cada expressão numérica abaixo, simplificando ao máximo.
+
+   <Alt cols={3}>
+     <li><Raiz>48</Raiz> − <Raiz>12</Raiz> + <Raiz>75</Raiz></li>
+     <li>(<Raiz>5</Raiz> + <Raiz>3</Raiz>)(<Raiz>5</Raiz> − <Raiz>3</Raiz>)</li>
+     <li>(2<sup>3</sup>)<sup>1/2</sup> · <Raiz>2</Raiz></li>
+     <li><Frac><Fragment slot="n"><Raiz i="3">54</Raiz></Fragment><Fragment slot="d"><Raiz i="3">2</Raiz></Fragment></Frac></li>
+     <li>3<sup>1/2</sup> · 3<sup>3/2</sup> − (<Raiz>3</Raiz>)<sup>2</sup></li>
+   </Alt>
+
+1. Em um projeto de automação industrial apresentado no programa *Tô Ligado na Indústria* do SESI, estudantes calcularam a eficiência de um circuito elétrico usando a expressão:
+
+   <Formula centro>
+     <i>E</i> = <Frac><Fragment slot="n"><Raiz>18</Raiz> + <Raiz>8</Raiz></Fragment><Fragment slot="d"><Raiz>2</Raiz></Fragment></Frac> · (3<sup>1/2</sup>)<sup>2</sup> − <Raiz>50</Raiz>
+   </Formula>
+
+   Calcule o valor exato de <i>E</i>, apresentando cada passo do desenvolvimento.

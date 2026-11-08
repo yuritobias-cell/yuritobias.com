@@ -1,0 +1,68 @@
+---
+titulo: "Semelhança, Bissetriz Interna e Baricentro"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre paralela a um lado do triângulo (Teorema de Tales), uma rampa sustentada por coluna, o Teorema da Bissetriz Interna e o baricentro, que divide as medianas na razão 2 : 1."
+serie: "1em"
+material: "25"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento. As figuras não estão em escala."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Em cada triângulo, o segmento <i>DE</i> é paralelo ao lado <i>BC</i>. Determine o valor de <i>x</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [2, 4], B: [0, 0], C: [4, 0], D: [1.2, 2.4], E: [2.8, 2.4] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['D', 'E']]} nomes={['A', 'B', 'C', 'D', 'E']}
+          medidas={[{ de: 'A', para: 'D', texto: '4' }, { de: 'D', para: 'B', texto: '6' }, { de: 'A', para: 'E', texto: '6' }, { de: 'E', para: 'C', texto: 'x' }]}
+          tamanho={110} rotulo="a)"
+          descricao="Triângulo ABC com DE paralelo a BC: AD = 4, DB = 6, AE = 6 e EC = x" />
+     <Geo pontos={{ A: [2, 4], B: [0, 0], C: [4, 0], D: [1.33, 2.67], E: [2.67, 2.67] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['D', 'E']]} nomes={['A', 'B', 'C', 'D', 'E']}
+          medidas={[{ de: 'A', para: 'D', texto: '5' }, { de: 'D', para: 'B', texto: '10' }, { de: 'D', para: 'E', texto: 'x', lado: -1 }, { de: 'B', para: 'C', texto: '18' }]}
+          tamanho={110} rotulo="b)"
+          descricao="Triângulo ABC com DE paralelo a BC: AD = 5, DB = 10, DE = x e BC = 18" />
+     <Geo pontos={{ A: [2, 4], B: [0, 0], C: [4, 0], D: [1.2, 2.4], E: [2.8, 2.4] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['D', 'E']]} nomes={['A', 'B', 'C', 'D', 'E']}
+          medidas={[{ de: 'A', para: 'D', texto: 'x' }, { de: 'D', para: 'B', texto: '6' }, { de: 'A', para: 'E', texto: '*x* + 2' }, { de: 'E', para: 'C', texto: '9' }]}
+          tamanho={110} rotulo="c)"
+          descricao="Triângulo ABC com DE paralelo a BC: AD = x, DB = 6, AE = x + 2 e EC = 9" />
+   </Figuras>
+
+1. Uma rampa reta tem 12 m de comprimento e, no seu ponto mais alto, está a 3 m do chão. A 4 m do início da rampa (medidos ao longo dela), uma coluna vertical a sustenta. Qual é a altura dessa coluna? *(Dica: a coluna é paralela à altura final da rampa.)*
+
+1. No triângulo <i>ABC</i>, <i>AD</i> é a bissetriz interna do ângulo <i>Â</i>, e as medidas estão em centímetros. Determine o valor de <i>x</i> e o perímetro do triângulo <i>ABC</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [2.1, 2.6], B: [0, 0], D: [2.2, 0], C: [5, 0] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['A', 'D']]} nomes={['A', 'B', 'C', 'D']}
+          medidas={[{ de: 'A', para: 'B', texto: '12' }, { de: 'A', para: 'C', texto: '15' }, { de: 'B', para: 'D', texto: 'x' }, { de: 'D', para: 'C', texto: '*x* + 2' }]}
+          angulos={[{ v: 'A', de: 'B', para: 'D', raio: 14 }, { v: 'A', de: 'D', para: 'C', raio: 18 }]}
+          tamanho={160}
+          descricao="Triângulo ABC com a bissetriz AD do ângulo A: AB = 12, AC = 15, BD = x e DC = x + 2" />
+   </Figuras>
+
+1. O ponto <i>G</i> é o **baricentro** do triângulo <i>ABC</i> (encontro das medianas). Lembre-se: <i>G</i> divide cada mediana na razão 2 : 1, a partir do vértice.
+
+   <Figuras>
+     <Geo pontos={{ A: [1.6, 4], B: [0, 0], C: [4, 0], M: [2, 0], N: [2.8, 2], P: [0.8, 2], G: [1.867, 1.333] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['A', 'M'], ['B', 'N'], ['C', 'P']]}
+          nomes={['A', 'B', 'C', 'M', 'N', 'P']} marcas={['G']}
+          textos={[{ em: [2.12, 1.12], texto: 'G' }, { em: [1.15, 0.42], texto: '3*x* − 2' }, { em: [2.55, 1.4], texto: '*x* + 1' }]}
+          tamanho={150}
+          descricao="Triângulo ABC com as três medianas AM, BN e CP, que se encontram no baricentro G. Na mediana BN, BG = 3x − 2 e GN = x + 1" />
+   </Figuras>
+
+   1. Se a mediana <i>AM</i> mede 18 cm, quanto medem <i>AG</i> e <i>GM</i>?
+   1. Na figura, <i>BG</i> = 3<i>x</i> − 2 e <i>GN</i> = <i>x</i> + 1. Determine <i>x</i> e a medida da mediana <i>BN</i>.
+
+1. Pelo baricentro <i>G</i> de um triângulo <i>ABC</i> traça-se uma reta paralela ao lado <i>BC</i>, que corta <i>AB</i> em <i>D</i> e <i>AC</i> em <i>E</i>. Se <i>BC</i> = 18 cm, a medida de <i>DE</i> é:
+
+   <Alt cols={5}>
+     <li>6 cm</li>
+     <li>9 cm</li>
+     <li>12 cm</li>
+     <li>13,5 cm</li>
+     <li>15 cm</li>
+   </Alt>

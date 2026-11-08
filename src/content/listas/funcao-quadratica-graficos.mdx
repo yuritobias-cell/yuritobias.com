@@ -1,0 +1,85 @@
+---
+titulo: "Função do 2º Grau — Gráficos, Raízes, Concavidade e Vértice"
+descricao: "Lista de exercícios do 9º ano sobre função quadrática: coeficientes e concavidade, discriminante e raízes, coordenadas do vértice, construção e leitura do gráfico da parábola e aplicações com lançamento de bola e lucro de uma loja."
+serie: "9ano"
+material: "14"
+instrucoes: "Resolva as questões diretamente no seu caderno, registrando todos os cálculos."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Formula from '../../components/mat/Formula.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Plano from '../../components/mat/Plano.astro';
+
+1. Para cada função do 2º grau <i>f</i>(<i>x</i>) = <i>ax</i><sup>2</sup> + <i>bx</i> + <i>c</i> abaixo, identifique os coeficientes <i>a</i>, <i>b</i> e <i>c</i>, indique a **concavidade** da parábola (para cima ou para baixo) e diga se ela possui ponto de **máximo** ou de **mínimo**.
+
+   <Alt cols={2}>
+     <li><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 4<i>x</i> + 3</li>
+     <li><i>f</i>(<i>x</i>) = −2<i>x</i><sup>2</sup> + 8<i>x</i> − 6</li>
+     <li><i>f</i>(<i>x</i>) = 3<i>x</i><sup>2</sup> − 12</li>
+     <li><i>f</i>(<i>x</i>) = −<i>x</i><sup>2</sup> + 5<i>x</i></li>
+   </Alt>
+
+1. Para cada equação do 2º grau, calcule o discriminante Δ = <i>b</i><sup>2</sup> − 4<i>ac</i>, indique o **número de raízes reais** e, quando existirem, determine essas raízes.
+
+   <Alt cols={2}>
+     <li><i>x</i><sup>2</sup> − 5<i>x</i> + 6 = 0</li>
+     <li><i>x</i><sup>2</sup> − 6<i>x</i> + 9 = 0</li>
+     <li><i>x</i><sup>2</sup> + <i>x</i> + 5 = 0</li>
+     <li>2<i>x</i><sup>2</sup> − 8 = 0</li>
+   </Alt>
+
+1. As coordenadas do vértice de uma parábola são dadas por:
+
+   <Formula centro>
+     <i>x</i><sub><i>v</i></sub> = −<Frac n="<i>b</i>" d="2<i>a</i>" />,&emsp;&emsp;<i>y</i><sub><i>v</i></sub> = −<Frac n="Δ" d="4<i>a</i>" />.
+   </Formula>
+
+   Para cada função, determine as coordenadas do vértice <i>V</i>(<i>x</i><sub><i>v</i></sub>, <i>y</i><sub><i>v</i></sub>) e classifique-o como ponto de **máximo** ou de **mínimo**.
+
+   <Alt cols={3}>
+     <li><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 6<i>x</i> + 5</li>
+     <li><i>f</i>(<i>x</i>) = −<i>x</i><sup>2</sup> + 4<i>x</i> − 3</li>
+     <li><i>f</i>(<i>x</i>) = 2<i>x</i><sup>2</sup> − 4<i>x</i></li>
+   </Alt>
+
+1. Considere a função <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 2<i>x</i> − 3. Vamos construir o seu gráfico passo a passo.
+
+   1. Determine a concavidade da parábola.
+   1. Calcule as raízes (zeros) da função.
+   1. Determine a intersecção com o eixo <i>y</i>.
+   1. Calcule as coordenadas do vértice.
+   1. Com base nas informações anteriores, esboce o gráfico da função.
+
+1. O gráfico abaixo representa uma função do 2º grau. Os pontos em destaque marcam as raízes e o vértice.
+
+   <div style="text-align: center">
+     <Plano x={[-2.5, 4.5]} y={[-2.5, 5.5]} curva={(x) => -x * x + 2 * x + 3} dominio={[-1.4, 3.4]}
+            pontos={[[-1, 0], [3, 0], [1, 4]]}
+            descricao="Parábola com concavidade para baixo, que corta o eixo x nos pontos marcados −1 e 3, corta o eixo y em 3 e tem o vértice marcado no ponto (1, 4)" />
+   </div>
+
+   Com base no gráfico, responda:
+
+   1. Qual é a concavidade da parábola? O que isso indica sobre o sinal do coeficiente <i>a</i>?
+   1. Quais são as raízes (zeros) da função?
+   1. Quais são as coordenadas do vértice? Trata-se de ponto de máximo ou de mínimo?
+   1. Em que ponto o gráfico intersecta o eixo <i>y</i>?
+   1. Qual é o valor máximo da função?
+
+1. Uma bola é lançada verticalmente para cima. Sua altura <i>h</i> (em metros), em função do tempo <i>t</i> (em segundos), é dada por:
+
+   <Formula centro><i>h</i>(<i>t</i>) = −5<i>t</i><sup>2</sup> + 20<i>t</i>.</Formula>
+
+   1. Qual é a concavidade da parábola? O que isso significa no contexto do lançamento?
+   1. Determine a altura máxima atingida pela bola e o instante em que isso ocorre.
+   1. Em que instante a bola retorna ao solo?
+   1. Qual é a altura da bola no instante <i>t</i> = 1 segundo?
+
+1. **(Desafio — estilo ENEM)** Uma loja de camisetas verificou que o lucro <i>L</i> (em reais) obtido em um dia depende do preço de venda <i>p</i> (em reais) de cada camiseta, segundo a função:
+
+   <Formula centro><i>L</i>(<i>p</i>) = −2<i>p</i><sup>2</sup> + 80<i>p</i> − 600.</Formula>
+
+   1. Para qual preço de venda o lucro é máximo? Qual é esse lucro máximo?
+   1. Para quais preços de venda o lucro é nulo (a loja não tem lucro nem prejuízo)?
+   1. Para preços de venda entre R$ 10,00 e R$ 30,00, o lucro da loja é positivo ou negativo? Justifique usando o gráfico da função.

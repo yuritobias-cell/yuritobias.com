@@ -1,0 +1,84 @@
+---
+titulo: "Funções Injetora, Sobrejetora, Bijetora e Paridade"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio: classificar funções em injetora, sobrejetora ou bijetora por diagramas de flechas e pela lei, restringir domínio, e estudar funções pares e ímpares algebricamente e pela simetria do gráfico, com questões adaptadas do ENEM e da Fuvest."
+serie: "1em"
+material: "10"
+instrucoes: "Resolva os exercícios diretamente no seu caderno."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Flechas from '../../components/mat/Flechas.astro';
+
+1. Os diagramas a seguir representam funções <i>f</i> : <i>A</i> → <i>B</i>. Classifique cada uma como **injetora**, **sobrejetora**, **bijetora** ou **nenhuma das anteriores**, justificando sua resposta.
+
+   <Figuras>
+     <Flechas a={['1', '2', '3']} b={['a', 'b', 'c']} setas={[['1', 'b'], ['2', 'a'], ['3', 'c']]} rotulo="(a)" />
+     <Flechas a={['1', '2', '3', '4']} b={['a', 'b', 'c']} setas={[['1', 'a'], ['2', 'b'], ['3', 'c'], ['4', 'b']]} rotulo="(b)" />
+     <Flechas a={['1', '2', '3']} b={['a', 'b', 'c', 'd']} setas={[['1', 'a'], ['2', 'c'], ['3', 'd']]} rotulo="(c)" />
+   </Figuras>
+
+1. **(ENEM – adaptado)** Seja <i>f</i> : ℝ → ℝ definida por <i>f</i>(<i>x</i>) = 3<i>x</i> − 5. Qual das afirmações abaixo é **verdadeira**?
+
+   1. <i>f</i> é sobrejetora, pois para todo <i>y</i> ∈ ℝ existe <i>x</i> ∈ ℝ tal que <i>f</i>(<i>x</i>) = <i>y</i>.
+   1. <i>f</i> é sobrejetora, mas não é injetora, pois <i>f</i>(1) = <i>f</i>(−1).
+   1. <i>f</i> é injetora, mas não é sobrejetora, pois o contradomínio é maior que a imagem.
+   1. <i>f</i> não é injetora, pois existem dois valores distintos de <i>x</i> que produzem o mesmo <i>f</i>(<i>x</i>).
+   1. <i>f</i> não é nem injetora nem sobrejetora.
+
+1. Considere a função <i>f</i> : ℝ → ℝ definida por <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup>.
+
+   1. Calcule <i>f</i>(2) e <i>f</i>(−2). O que você conclui sobre a injetividade de <i>f</i>?
+   1. A função <i>f</i> é sobrejetora? Justifique sua resposta indicando se existe <i>x</i> ∈ ℝ tal que <i>f</i>(<i>x</i>) = −4.
+   1. Restrinja o domínio para <i>f</i> : [0, +∞) → [0, +∞). Agora <i>f</i> é bijetora? Explique.
+
+1. Dada a função <i>f</i> : <i>A</i> → <i>B</i> com <i>A</i> = \{1, 2, 3, 4\}, <i>B</i> = \{2, 4, 6, 8\} e lei <i>f</i>(<i>x</i>) = 2<i>x</i>.
+
+   1. Liste todos os pares (<i>x</i>, <i>f</i>(<i>x</i>)) da função.
+   1. Verifique, pela definição, se <i>f</i> é injetora.
+   1. Verifique se <i>f</i> é sobrejetora comparando a imagem de <i>f</i> com o contradomínio <i>B</i>.
+   1. Conclua se <i>f</i> é bijetora.
+
+1. Uma função <i>f</i> : <i>A</i> → <i>B</i> é **bijetora** quando é, simultaneamente, injetora e sobrejetora. Assinale a alternativa que apresenta uma condição **necessária** para que uma função <i>f</i> : <i>A</i> → <i>B</i> seja bijetora.
+
+   1. <i>A</i> e <i>B</i> devem ser conjuntos infinitos.
+   1. Todo elemento de <i>B</i> deve ser imagem de *exatamente um* elemento de <i>A</i>.
+   1. Deve existir pelo menos um elemento de <i>B</i> que não é imagem de nenhum elemento de <i>A</i>.
+   1. A lei de formação deve ser polinomial.
+   1. Os conjuntos <i>A</i> e <i>B</i> devem ser iguais.
+
+1. Uma função <i>f</i> de domínio simétrico em relação à origem é chamada de:
+
+   - **par**, se <i>f</i>(−<i>x</i>) = <i>f</i>(<i>x</i>) para todo <i>x</i> do domínio;
+   - **ímpar**, se <i>f</i>(−<i>x</i>) = −<i>f</i>(<i>x</i>) para todo <i>x</i> do domínio.
+
+   Usando as definições acima, classifique cada função abaixo como **par**, **ímpar** ou **nem par nem ímpar**, justificando algebricamente.
+
+   <Alt cols={2}>
+     <li><i>f</i>(<i>x</i>) = <i>x</i><sup>4</sup> − 3<i>x</i><sup>2</sup> + 1</li>
+     <li><i>g</i>(<i>x</i>) = 5<i>x</i><sup>3</sup> − <i>x</i></li>
+     <li><i>h</i>(<i>x</i>) = <i>x</i><sup>2</sup> + 2<i>x</i></li>
+     <li><i>p</i>(<i>x</i>) = |<i>x</i>| + 3</li>
+   </Alt>
+
+1. Com base nas definições de função par e ímpar, responda:
+
+   1. Qual é a propriedade geométrica (simetria) característica do gráfico de uma função **par**?
+   1. Qual é a propriedade geométrica característica do gráfico de uma função **ímpar**?
+   1. A função <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 4 é par, ímpar ou nenhuma das anteriores? Verifique algebricamente e descreva a simetria de seu gráfico.
+
+1. **(Fuvest – adaptado)** Seja <i>f</i> uma função real de domínio ℝ tal que <i>f</i>(−<i>x</i>) = −<i>f</i>(<i>x</i>) para todo <i>x</i> ∈ ℝ. Qual deve ser, obrigatoriamente, o valor de <i>f</i>(0)?
+
+   <Alt cols={5}>
+     <li>−1</li>
+     <li>0</li>
+     <li>1</li>
+     <li>−<i>f</i>(1)</li>
+     <li>Indeterminado</li>
+   </Alt>
+
+1. Considere a função <i>f</i> : ℝ → ℝ definida por <i>f</i>(<i>x</i>) = <i>x</i><sup>3</sup> − <i>x</i>.
+
+   1. Mostre algebricamente que <i>f</i> é uma função **ímpar**.
+   1. Determine os valores de <i>x</i> para os quais <i>f</i>(<i>x</i>) = 0.
+   1. <i>f</i> é injetora? Analise se <i>f</i>(1) = <i>f</i>(−1) implica que não é injetora, ou verifique pelo critério algébrico.

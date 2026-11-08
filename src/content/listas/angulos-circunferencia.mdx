@@ -1,0 +1,157 @@
+---
+titulo: "Ângulos na Circunferência"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre ângulos na circunferência: ângulo inscrito, central e de segmento, ângulos excêntricos interior e exterior, arcos determinados por cordas, secantes e tangentes, e quadriláteros inscritos."
+serie: "1em"
+material: "14"
+instrucoes: "Resolva as questões diretamente no seu caderno, registrando todos os cálculos e justificativas."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+export const circ = { d: [['O', [0, 0], 1]] };
+
+1. Determine o valor do ângulo <i>x</i> em cada caso.
+
+   <Figuras>
+     <Geo pontos={{ V: [-0.174, 0.985], P1: [-0.087, -0.996], P2: [0.906, -0.423] }}
+          regioes={[circ]} segmentos={[['V', [-0.074, -1.293]], ['V', [1.176, -0.775]]]} marcas={[[0, 0]]}
+          angulos={[{ v: 'V', de: 'P1', para: 'P2', texto: 'x', raio: 18 }]}
+          textos={[{ em: [0.625, -1.083], texto: '70°' }]}
+          tamanho={110} rotulo="a)"
+          descricao="Ângulo inscrito x, com vértice no alto da circunferência, que enxerga um arco de 70° embaixo, à direita" />
+     <Geo pontos={{ A: [-0.643, 0.766], B: [0.906, 0.423], C: [0.259, 0.966], D: [0.174, -0.985], P: [0.242, 0.57] }}
+          regioes={[circ]} segmentos={[['A', 'B'], ['C', 'D']]}
+          angulos={[{ v: 'P', de: 'A', para: 'D', texto: 'x', raio: 14 }]}
+          textos={[{ em: [0.771, 0.919], texto: '50°' }, { em: [-1.133, -0.528], texto: '150°' }]}
+          tamanho={110} rotulo="b)"
+          descricao="Duas cordas que se cruzam dentro da circunferência formando o ângulo x; os arcos entre as pontas das cordas medem 50°, em cima à direita, e 150°, embaixo à esquerda" />
+     <Geo pontos={{ T: [0.342, -0.94], Q: [-0.985, 0.174] }}
+          regioes={[circ]} segmentos={[['T', [-1.383, 0.508]], [[-0.316, -1.179], [0.812, -0.769]]]} marcas={[[0, 0]]}
+          angulos={[{ v: 'T', de: [-0.316, -1.179], para: 'Q', texto: 'x', raio: 18 }]}
+          textos={[{ em: [-1.05, -0.85], texto: '120°' }]}
+          tamanho={110} rotulo="c)"
+          descricao="Ângulo de segmento x, formado por uma corda e pela reta tangente no ponto de baixo da circunferência; o arco entre eles mede 120°" />
+     <Geo pontos={{ P: [2.816, 0], F1: [-0.643, 0.766], N1: [0.906, 0.423], F2: [-0.643, -0.766], N2: [0.906, -0.423] }}
+          regioes={[circ]} segmentos={[['P', 'F1'], ['P', 'F2']]} marcas={[[0, 0]]}
+          angulos={[{ v: 'P', de: 'F1', para: 'F2', texto: 'x', raio: 22 }]}
+          textos={[{ em: [-1.25, 0], texto: '100°' }, { em: [0.82, 0], texto: '50°' }]}
+          tamanho={170} rotulo="d)"
+          descricao="Duas secantes saem de um ponto externo, à direita, formando o ângulo x; o arco distante mede 100° e o arco próximo mede 50°" />
+     <Geo pontos={{ P: [1.008, -1.008], F1: [-0.793, -0.609], F2: [0.609, 0.793], N1: [0.462, -0.887], N2: [0.887, -0.462] }}
+          regioes={[circ]} segmentos={[['P', 'F1'], ['P', 'F2']]} marcas={[[0, 0]]}
+          angulos={[{ v: 'P', de: 'F1', para: 'F2', raio: 18 }]}
+          textos={[{ em: [-0.884, 0.884], texto: '165°' }, { em: [0.6, -0.6], texto: 'x' }, { em: [1.3, -1.25], texto: '65°' }]}
+          tamanho={120} rotulo="e)"
+          descricao="Duas secantes saem de um ponto externo, embaixo à direita, formando 65°; o arco distante mede 165° e o arco próximo mede x" />
+     <Geo pontos={{ P: [2.924, 0], T: [0.342, 0.94], F: [-1, 0] }}
+          regioes={[circ]} segmentos={[['P', 'F'], ['P', 'T']]} marcas={[[0, 0]]}
+          angulos={[{ v: 'P', de: 'F', para: 'T', texto: 'x', raio: 26 }]}
+          textos={[{ em: [-0.717, 1.024], texto: '110°' }]}
+          tamanho={170} rotulo="f)"
+          descricao="De um ponto externo saem uma tangente, que toca a circunferência em cima, e uma secante que passa pelo centro, formando o ângulo x; o arco entre o ponto de tangência e a ponta mais distante da secante mede 110°" />
+   </Figuras>
+
+1. Determine a medida do arco <i>x</i> em cada caso.
+
+   <Figuras>
+     <Geo pontos={{ A: [-0.643, 0.766], B: [0.866, -0.5], C: [0.643, 0.766], D: [-0.866, -0.5], P: [0, 0.227] }}
+          regioes={[circ]} segmentos={[['A', 'B'], ['C', 'D']]} marcas={[[0, 0]]}
+          angulos={[{ v: 'P', de: 'C', para: 'A', texto: '100°', raio: 14 }]}
+          textos={[{ em: [0, 1.25], texto: 'x' }, { em: [0, -1.25], texto: '120°' }]}
+          tamanho={110} rotulo="a)"
+          descricao="Duas cordas que se cruzam formando 100°; o arco de cima mede x e o arco de baixo mede 120°" />
+     <Geo pontos={{ P: [2.434, 0], F1: [-0.819, 0.574], N1: [0.966, 0.259], F2: [-0.819, -0.574], N2: [0.966, -0.259] }}
+          regioes={[circ]} segmentos={[['P', 'F1'], ['P', 'F2']]}
+          angulos={[{ v: 'P', de: 'F1', para: 'F2', texto: '20°', raio: 26 }]}
+          textos={[{ em: [-1.25, 0], texto: '70°' }, { em: [0.82, 0], texto: 'x' }]}
+          tamanho={170} rotulo="b)"
+          descricao="Duas secantes saem de um ponto externo, à direita, formando 20°; o arco distante mede 70° e o arco próximo mede x" />
+     <Geo pontos={{ P: [-1.414, -1.414], T: [-0.966, 0.259], F: [0.707, 0.707] }}
+          regioes={[circ]} segmentos={[['P', [1.025, 1.025]], ['P', 'T']]} marcas={[[0, 0]]}
+          angulos={[{ v: 'P', de: 'F', para: 'T', texto: '30°', raio: 22 }]}
+          textos={[{ em: [-0.8, -0.2], texto: 'x' }]}
+          tamanho={130} rotulo="c)"
+          descricao="De um ponto externo, embaixo à esquerda, saem uma tangente e uma secante que passa pelo centro, formando 30°; x é o arco entre o ponto de tangência e a ponta mais próxima da secante" />
+   </Figuras>
+
+1. Nas figuras a seguir, calcule o valor de <i>x</i>.
+
+   <Figuras>
+     <Geo pontos={{ O: [0, 0], A: [-1, 0], C: [0.174, 0.985], B: [0.5, -0.866] }}
+          regioes={[circ]} segmentos={[['O', 'C'], ['O', 'B']]} tracejados={[['A', 'C'], ['A', 'B']]}
+          nomes={['A', 'B', 'C']} marcas={['O']}
+          angulos={[{ v: 'A', de: 'B', para: 'C', texto: '2*x*', raio: 14 }, { v: 'O', de: 'C', para: 'B', texto: '140°', raio: 12 }]}
+          tamanho={120} rotulo="a)"
+          descricao="Circunferência de centro O: o ângulo central COB mede 140° e o ângulo inscrito CAB, que enxerga o mesmo arco, mede 2x" />
+     <Geo pontos={{ D: [-0.906, 0.423], A: [0.906, 0.423], C: [-0.906, -0.423], B: [0.906, -0.423] }}
+          regioes={[circ]} segmentos={[['D', 'A'], ['D', 'B'], ['C', 'A'], ['C', 'B']]}
+          nomes={['A', 'B', 'C', 'D']}
+          angulos={[{ v: 'A', de: 'D', para: 'C', texto: '30°', raio: 22 }, { v: 'B', de: 'D', para: 'C', texto: '3*x*', raio: 22 }]}
+          tamanho={120} rotulo="b)"
+          descricao="Dois ângulos inscritos que enxergam o mesmo arco DC: o ângulo DAC mede 30° e o ângulo DBC mede 3x" />
+   </Figuras>
+
+1. Em cada figura, calcule a medida do arco <i>ABC</i>.
+
+   <Figuras>
+     <Geo pontos={{ P: [1, 0], A: [-0.423, 0.906], B: [-1, 0], C: [-0.423, -0.906] }}
+          regioes={[circ]} segmentos={[['P', 'A'], ['P', 'C']]}
+          nomes={['A', 'B', 'C', 'P']} marcas={['B']}
+          angulos={[{ v: 'P', de: 'A', para: 'C', texto: '65°', raio: 16 }]}
+          tamanho={110} rotulo="a)"
+          descricao="Ângulo inscrito APC de 65°, com vértice P à direita; o arco ABC fica do lado oposto, passando por B" />
+     <Geo pontos={{ P: [-1.861, 0], C: [-0.537, 0.843], A: [-0.537, -0.843], B: [1, 0], O: [0, 0] }}
+          regioes={[circ]} segmentos={[['P', 'C'], ['P', 'A']]} tracejados={[['O', 'C'], ['O', 'A']]}
+          retos={[['P', 'C', 'O'], ['P', 'A', 'O']]}
+          nomes={['A', 'B', 'C', 'P', 'O']} marcas={['O', 'B']}
+          angulos={[{ v: 'P', de: 'C', para: 'A', texto: '65°', raio: 16 }]}
+          tamanho={140} rotulo="b)"
+          descricao="De um ponto externo P saem duas tangentes, PC e PA, formando 65°; os raios OC e OA, tracejados, são perpendiculares às tangentes; o arco ABC passa por B, do lado oposto a P" />
+   </Figuras>
+
+1. Nas figuras a seguir, calcule <i>x</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [-0.643, 0.766], D: [0.643, 0.766], C: [0.985, -0.174], B: [-0.766, -0.643] }}
+          regioes={[circ]} poligonos={[['A', 'D', 'C', 'B']]} nomes={['A', 'B', 'C', 'D']}
+          angulos={[{ v: 'D', de: 'A', para: 'C', texto: '110°', raio: 14 }, { v: 'B', de: 'A', para: 'C', texto: 'x', raio: 14 }]}
+          tamanho={110} rotulo="a)"
+          descricao="Quadrilátero ABCD inscrito na circunferência: o ângulo interno em D mede 110° e o ângulo interno em B mede x" />
+     <Geo pontos={{ A: [0, 1], D: [0.985, 0.174], B: [-0.995, 0.105], C: [0, -1] }}
+          regioes={[circ]} poligonos={[['A', 'D', 'C', 'B']]} nomes={['A', 'B', 'C', 'D']}
+          angulos={[{ v: 'C', de: 'D', para: 'B', texto: '82°', raio: 14 }, { v: 'A', de: 'B', para: 'D', texto: 'x', raio: 14 }]}
+          tamanho={110} rotulo="b)"
+          descricao="Quadrilátero ABCD inscrito na circunferência: o ângulo interno em C mede 82° e o ângulo interno em A mede x" />
+     <Geo pontos={{ D: [0, 1], A: [-0.5, -0.866], B: [0, -1], C: [0.5, -0.866] }}
+          regioes={[circ]} segmentos={[['D', 'A'], ['D', 'C'], ['A', 'B'], ['B', 'C'], [[-0.7, 1], [0.7, 1]]]}
+          nomes={['A', 'B', 'C', 'D']}
+          angulos={[{ v: 'B', de: 'A', para: 'C', texto: '150°', raio: 10 }, { v: 'D', de: [0.7, 1], para: 'C', texto: 'x', raio: 16 }]}
+          tamanho={110} rotulo="c)"
+          descricao="Reta tangente à circunferência no ponto D, no alto. Do ponto D saem as cordas DA e DC; embaixo, o ângulo ABC mede 150°. O ângulo x fica entre a tangente e a corda DC" />
+   </Figuras>
+
+1. Calcule <i>x</i> em cada figura.
+
+   <Figuras>
+     <Geo pontos={{ A: [-0.342, 0.94], B: [-0.985, 0.174], C: [0.174, -0.985], D: [0.5, 0.866], P: [-0.231, 0.525], O: [0, 0] }}
+          regioes={[circ]} segmentos={[['A', 'C'], ['B', 'D']]}
+          nomes={['A', 'B', 'C', 'D', 'P', 'O']} marcas={['O']}
+          angulos={[{ v: 'P', de: 'A', para: 'B', texto: 'x', raio: 12 }]}
+          textos={[{ em: [-0.958, 0.803], texto: '60°' }, { em: [1.231, -0.217], texto: '140°' }]}
+          tamanho={110} rotulo="a)"
+          descricao="Circunferência de centro O com as cordas AC e BD cruzando-se em P; o arco AB mede 60° e o arco DC mede 140°; x é o ângulo APB" />
+     <Geo pontos={{ A: [-1, 0], B: [1, 0], C: [-0.5, 0.866], D: [0.5, 0.866], O: [0, 0] }}
+          regioes={[circ]} segmentos={[['A', 'B'], ['A', 'C'], ['C', 'B'], ['A', 'D'], ['D', 'B']]}
+          retos={[['A', 'C', 'B']]} nomes={['A', 'B', 'C', 'D', 'O']} marcas={['O']}
+          angulos={[{ v: 'D', de: 'A', para: 'B', texto: 'x', raio: 12 }]}
+          tamanho={120} rotulo="b)"
+          descricao="Circunferência de centro O com o diâmetro AB e os pontos C e D sobre ela; o triângulo ACB tem ângulo reto em C, e x é o ângulo ADB" />
+     <Geo pontos={{ P: [1.527, 0], B: [-0.375, 0.927], C: [-0.375, -0.927], A: [0.961, 0.276], D: [0.961, -0.276] }}
+          regioes={[circ]} segmentos={[['P', 'B'], ['P', 'C']]} marcas={[[0, 0]]}
+          nomes={['A', 'B', 'C', 'D', 'P']}
+          angulos={[{ v: 'P', de: 'B', para: 'C', raio: 12 }]}
+          textos={[{ em: [-1.25, 0], texto: '136°' }, { em: [0.62, 0], texto: '32°' }, { em: [1.3, 0], texto: 'x' }]}
+          tamanho={140} rotulo="c)"
+          descricao="Duas secantes saem do ponto externo P: a de cima corta a circunferência em A e B, a de baixo em D e C. O arco BC, distante, mede 136° e o arco AD, próximo, mede 32°; x é o ângulo em P" />
+   </Figuras>

@@ -1,0 +1,166 @@
+---
+/* Plano cartesiano desenhado no build — o `tikzpicture` com eixos das listas.
+   Serve aos dois usos das folhas:
+
+   - em branco, com quadriculado, para o aluno esboçar o gráfico:
+       <Plano x={[-3, 5]} y={[-3, 5]} grade rotulosX={[-2, 2, 4]} rotulosY={[-2, 2, 4]}
+              descricao="Plano cartesiano quadriculado em branco" />
+   - com a curva pronta e pontos marcados, para o aluno ler o gráfico:
+       <Plano x={[-2.5, 4.5]} y={[-2.5, 5.5]} curva={(x) => -x*x + 2*x + 3}
+              dominio={[-1.4, 3.4]} pontos={[[-1, 0], [3, 0], [1, 4]]} ... />
+
+   Eixos com escalas diferentes (0 a 10 horas × 0 a 800 litros) usam `ux`/`uy`
+   (pixels por unidade) e `passoX`/`passoY` (de quanto em quanto vão as marcas
+   e o quadriculado); `nomeX`/`nomeY` trocam o "x"/"y" das pontas dos eixos.
+
+   `curva` é uma função JavaScript comum (o MDX aceita expressão entre chaves);
+   é amostrada aqui no build e vira um <path> — nada roda no navegador.
+   `descricao` é obrigatória: é o que o leitor de tela diz no lugar da figura. */
+interface Props {
+  /** Intervalo visível do eixo x: [mín, máx]. */
+  x: [number, number];
+  /** Intervalo visível do eixo y: [mín, máx]. */
+  y: [number, number];
+  /** Quadriculado nas marcas de passoX/passoY (folha para esboçar). */
+  grade?: boolean;
+  /** Pixels por unidade em cada eixo; padrão 26. */
+  ux?: number;
+  uy?: number;
+  /** Distância entre marcas (e linhas do quadriculado); padrão 1. */
+  passoX?: number;
+  passoY?: number;
+  /** Números escritos nos eixos; padrão: toda marca ≠ 0. */
+  rotulosX?: number[];
+  rotulosY?: number[];
+  /** Nome na ponta de cada eixo; padrão "x" e "y" (em itálico). */
+  nomeX?: string;
+  nomeY?: string;
+  curva?: (x: number) => number;
+  /** Trecho de x em que a curva é desenhada; padrão: o intervalo todo. */
+  dominio?: [number, number];
+  /** Pontos destacados (raízes, vértice…). */
+  pontos?: [number, number][];
+  /** Legenda curta sob a figura — "a)", "b)"; aceita HTML (<i>x</i>), como o Frac. */
+  rotulo?: string;
+  descricao: string;
+}
+
+const {
+  x: [xmin, xmax],
+  y: [ymin, ymax],
+  grade = false,
+  ux = 26,
+  uy = 26,
+  passoX = 1,
+  passoY = 1,
+  rotulosX,
+  rotulosY,
+  nomeX = 'x',
+  nomeY = 'y',
+  curva,
+  dominio,
+  pontos = [],
+  rotulo,
+  descricao,
+} = Astro.props;
+
+const P = 16;                                   // folga para rótulos e setas
+const PD = 10 + Math.max(0, nomeX.length - 1) * 6; // folga à direita para o nome do eixo x
+const W = (xmax - xmin) * ux;
+const H = (ymax - ymin) * uy;
+const px = (x: number) => P + (x - xmin) * ux;
+const py = (y: number) => P + (ymax - y) * uy;
+
+/** Múltiplos de `passo` dentro de [a, b] (arredondados para não acumular erro). */
+const marcas = (a: number, b: number, passo: number) => {
+  const r: number[] = [];
+  for (let k = Math.ceil(a / passo); k * passo <= b + 1e-9; k++) r.push(+(k * passo).toFixed(6));
+  return r;
+};
+const mx = marcas(xmin, xmax, passoX);
+const my = marcas(ymin, ymax, passoY);
+const rx = (rotulosX ?? mx).filter((v) => v !== 0);
+const ry = (rotulosY ?? my).filter((v) => v !== 0);
+const num = (v: number) => String(v).replace('-', '−').replace('.', ',');
+// Nome de eixo de uma letra vai em itálico (variável); com unidade, "t (h)", só a letra.
+const [letraX, restoX] = [nomeX.slice(0, 1), nomeX.slice(1)];
+const [letraY, restoY] = [nomeY.slice(0, 1), nomeY.slice(1)];
+
+let caminho = '';
+if (curva) {
+  const [a, b] = dominio ?? [xmin, xmax];
+  const passos = 240;
+  const folga = (ymax - ymin) * 0.15;
+  let quebrou = true;
+  for (let i = 0; i <= passos; i++) {
+    const xv = a + (i / passos) * (b - a);
+    const yv = curva(xv);
+    // Fora da janela (com folga) a curva é interrompida, não esticada.
+    if (!Number.isFinite(yv) || yv < ymin - folga || yv > ymax + folga) { quebrou = true; continue; }
+    caminho += `${quebrou ? 'M' : 'L'}${px(xv).toFixed(1)} ${py(yv).toFixed(1)} `;
+    quebrou = false;
+  }
+}
+
+/* id da seta e do recorte: tirado das próprias props, para dois planos na mesma
+   página não colidirem e o mesmo plano sair igual a cada build (sem aleatório). */
+const assinatura = JSON.stringify([xmin, xmax, ymin, ymax, pontos, rotulo, descricao]);
+let h = 0;
+for (const ch of assinatura) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+const id = `pl-${h.toString(36)}`;
+
+// Eixos ficam na borda quando o 0 está fora da janela (gráfico só no 1º quadrante).
+const x0 = Math.min(Math.max(0, xmin), xmax);
+const y0 = Math.min(Math.max(0, ymin), ymax);
+const largura = W + P + PD + 8;
+---
+<figure class="plano">
+  <svg viewBox={`0 0 ${largura} ${H + 2 * P}`} width={largura} role="img" aria-label={descricao}>
+    <defs>
+      <marker id={`${id}-seta`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 z" fill="currentColor" />
+      </marker>
+      <clipPath id={`${id}-janela`}>
+        <rect x={P} y={P} width={W} height={H} />
+      </clipPath>
+    </defs>
+
+    {grade && (
+      <g class="grade">
+        {mx.map((v) => <line x1={px(v)} y1={P} x2={px(v)} y2={P + H} />)}
+        {my.map((v) => <line x1={P} y1={py(v)} x2={P + W} y2={py(v)} />)}
+      </g>
+    )}
+
+    <g class="eixos">
+      <line x1={P - 4} y1={py(y0)} x2={P + W + 8} y2={py(y0)} marker-end={`url(#${id}-seta)`} />
+      <line x1={px(x0)} y1={P + H + 4} x2={px(x0)} y2={P - 8} marker-end={`url(#${id}-seta)`} />
+      {!grade && mx.filter((v) => v !== x0).map((v) => <line x1={px(v)} y1={py(y0) - 3} x2={px(v)} y2={py(y0) + 3} />)}
+      {!grade && my.filter((v) => v !== y0).map((v) => <line x1={px(x0) - 3} y1={py(v)} x2={px(x0) + 3} y2={py(v)} />)}
+    </g>
+
+    <g class="rotulos">
+      {rx.map((v) => <text x={px(v)} y={py(y0) + 14} text-anchor="middle">{num(v)}</text>)}
+      {ry.map((v) => <text x={px(x0) - 6} y={py(v) + 4} text-anchor="end">{num(v)}</text>)}
+      <text class="var" x={P + W + 10} y={py(y0) + 4}><tspan class="letra">{letraX}</tspan>{restoX}</text>
+      <text class="var" x={px(x0) + 6} y={P - 4}><tspan class="letra">{letraY}</tspan>{restoY}</text>
+    </g>
+
+    {caminho && <path class="curva" d={caminho} clip-path={`url(#${id}-janela)`} />}
+    {pontos.map(([a, b]) => <circle class="ponto" cx={px(a)} cy={py(b)} r="3" />)}
+  </svg>
+  {rotulo && <figcaption set:html={rotulo} />}
+</figure>
+
+<style>
+  .plano { display: inline-block; margin: 0.6rem 0; text-align: center; }
+  .plano svg { max-width: 100%; height: auto; color: var(--ink); overflow: visible; }
+  .grade line { stroke: var(--rule); stroke-width: 1; }
+  .eixos line { stroke: currentColor; stroke-width: 1.2; }
+  .rotulos text { font-family: var(--mat); font-size: 11px; fill: currentColor; }
+  .rotulos .var { font-size: 13px; }
+  .rotulos .letra { font-style: italic; }
+  .curva { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+  .ponto { fill: var(--ink); }
+  figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
+</style>

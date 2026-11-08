@@ -1,0 +1,97 @@
+---
+titulo: "Retas Paralelas e Teorema da Bissetriz Interna"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio: ângulos em retas paralelas com linhas quebradas (teorema dos bicos), ângulos num triângulo entre paralelas e o Teorema da Bissetriz Interna aplicado a lados e perímetro do triângulo."
+serie: "1em"
+material: "24"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Sabendo que <i>r</i> // <i>s</i>, determine a medida do ângulo <i>x</i> indicado em cada figura.
+
+   <Figuras>
+     <Geo pontos={{ V: [0, 1], R: [1.428, 2], S: [2.145, 0] }}
+          segmentos={[[[-0.5, 2], [2.6, 2]], [[-0.5, 0], [2.6, 0]], ['V', [1.7, 2.19]], ['V', [2.4, -0.12]]]}
+          angulos={[
+            { v: 'R', de: [-0.5, 2], para: 'V', texto: '35°', raio: 20 },
+            { v: 'V', de: 'R', para: 'S', texto: 'x', raio: 14 },
+            { v: 'S', de: [-0.5, 0], para: 'V', texto: '25°', raio: 26 },
+          ]}
+          textos={[{ em: [2.75, 2], texto: 'r' }, { em: [2.75, 0], texto: 's' }]}
+          tamanho={150} rotulo="a)"
+          descricao="Retas paralelas r e s e uma linha quebrada com um bico para a esquerda: o segmento de cima forma 35° com r, o de baixo forma 25° com s, e o ângulo do bico é x" />
+     <Geo pontos={{ V: [0, 1], R: [1.192, 2], S: [0.7, 0] }}
+          segmentos={[[[-0.6, 2], [2, 2]], [[-0.6, 0], [2, 0]], ['V', [1.43, 2.2]], ['V', [0.84, -0.2]]]}
+          angulos={[
+            { v: 'R', de: [2, 2], para: 'V', texto: '140°', raio: 12 },
+            { v: 'V', de: 'R', para: 'S', texto: 'x', raio: 12 },
+            { v: 'S', de: [2, 0], para: 'V', texto: '125°', raio: 12 },
+          ]}
+          textos={[{ em: [2.15, 2], texto: 'r' }, { em: [2.15, 0], texto: 's' }]}
+          tamanho={130} rotulo="b)"
+          descricao="Retas paralelas r e s e uma linha quebrada com um bico para a esquerda: o segmento de cima forma 140° com r, medido pela direita; o de baixo forma 125° com s, também pela direita; o ângulo do bico é x" />
+     <Geo pontos={{ V: [1, 1], R: [0.423, 2], S: [-1.144, 0] }}
+          segmentos={[[[-1.6, 2], [1.8, 2]], [[-1.6, 0], [1.8, 0]], ['V', [0.25, 2.3]], ['V', [-1.4, -0.12]]]}
+          angulos={[
+            { v: 'R', de: [-1.6, 2], para: 'V', texto: '120°', raio: 12 },
+            { v: 'V', de: 'R', para: 'S', texto: 'x', raio: 12 },
+            { v: 'S', de: [1.8, 0], para: 'V', texto: '25°', raio: 26 },
+          ]}
+          textos={[{ em: [1.95, 2], texto: 'r' }, { em: [1.95, 0], texto: 's' }]}
+          tamanho={150} rotulo="c)"
+          descricao="Retas paralelas r e s e uma linha quebrada com um bico para a direita: o segmento de cima forma 120° com r, medido pela esquerda; o de baixo forma 25° com s; o ângulo do bico é x" />
+   </Figuras>
+
+1. Na figura, as retas <i>r</i> e <i>s</i> são paralelas. Determine as medidas dos ângulos <i>x</i>, <i>y</i> e <i>z</i>.
+
+   <Figuras>
+     <Geo pontos={{ L: [0, 0], Q: [3, 0], P: [1.095, 4.086], Rup: [-0.845, 1.813] }}
+          segmentos={[[[-1, 0], [4, 0]], ['L', 'P'], [[0.254, -0.544], 'Rup'], [[3.254, -0.544], [0.887, 4.53]]]}
+          angulos={[
+            { v: 'P', de: 'L', para: 'Q', texto: '40°', raio: 22 },
+            { v: 'Q', de: [4, 0], para: 'P', texto: '115°', raio: 14 },
+            { v: 'L', de: [-1, 0], para: 'Rup', texto: 'y', raio: 14 },
+            { v: 'L', de: 'Rup', para: 'P', texto: 'x', raio: 20 },
+            { v: 'L', de: 'P', para: 'Q', texto: 'z', raio: 14 },
+          ]}
+          textos={[{ em: [-0.95, 2.0], texto: 'r' }, { em: [0.75, 4.7], texto: 's' }, { em: [3.1, 4.2], texto: '*r* // *s*' }]}
+          tamanho={170}
+          descricao="Triângulo com o vértice de cima medindo 40°, apoiado numa reta horizontal. A reta s contém o lado direito do triângulo e forma 115° com a horizontal, do lado de fora. A reta r, paralela a s, passa pelo vértice de baixo à esquerda, onde ficam três ângulos acima da horizontal: y, entre a horizontal e r; x, entre r e o lado do triângulo; e z, o ângulo interno do triângulo" />
+   </Figuras>
+
+1. Os lados do triângulo <i>ABC</i> a seguir foram dados em centímetros, e <i>BD</i> é a bissetriz do ângulo <i>B̂</i>. Com base nessas informações, determine a soma das medidas dos segmentos <i>AB</i> e <i>BC</i> desse triângulo.
+
+   <Figuras>
+     <Geo pontos={{ B: [0, 0], A: [5, 0], C: [2.2, 2.2], D: [3.32, 1.32] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['B', 'D']]}
+          nomes={['A', 'B', 'C', 'D']} marcas={['D']}
+          medidas={[{ de: 'B', para: 'C', texto: '*x* + 4' }, { de: 'C', para: 'D', texto: '6 cm' }, { de: 'D', para: 'A', texto: '9 cm' }, { de: 'B', para: 'A', texto: '2*x* + 1' }]}
+          angulos={[{ v: 'B', de: 'A', para: 'D', raio: 16 }, { v: 'B', de: 'D', para: 'C', raio: 20 }]}
+          tamanho={170}
+          descricao="Triângulo ABC com a bissetriz BD do ângulo B, sendo D no lado CA: BC = x + 4, CD = 6 cm, DA = 9 cm e BA = 2x + 1" />
+   </Figuras>
+
+1. O perímetro do triângulo <i>ABC</i> vale 90 cm, e a bissetriz do ângulo <i>Â</i> divide o lado oposto em dois segmentos de 12 cm e 18 cm, conforme mostra a figura. A medida do maior lado desse triângulo, em centímetros, é de:
+
+   <Figuras>
+     <Geo pontos={{ A: [1.6, 2.6], B: [0, 0], E: [2, 0], C: [5, 0] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['A', 'E']]}
+          nomes={['A', 'B', 'C', 'E']} marcas={['E']}
+          medidas={[{ de: 'A', para: 'B', texto: 'c' }, { de: 'A', para: 'C', texto: 'b' }, { de: 'B', para: 'E', texto: '12 cm' }, { de: 'E', para: 'C', texto: '18 cm' }]}
+          angulos={[{ v: 'A', de: 'B', para: 'E', raio: 16 }, { v: 'A', de: 'E', para: 'C', raio: 20 }]}
+          tamanho={160}
+          descricao="Triângulo ABC com a bissetriz AE do ângulo A, que divide o lado BC em BE = 12 cm e EC = 18 cm; os lados AB e AC medem c e b" />
+   </Figuras>
+
+   <Alt cols={5}>
+     <li>24</li>
+     <li>30</li>
+     <li>32</li>
+     <li>36</li>
+     <li>40</li>
+   </Alt>
+
+1. Em um triângulo <i>ABC</i>, os lados medem <i>AB</i> = 10 cm, <i>AC</i> = 15 cm e <i>BC</i> = 20 cm. A bissetriz interna do ângulo <i>Â</i> intersecta o lado <i>BC</i> no ponto <i>D</i>. Determine as medidas de <i>BD</i> e <i>DC</i>.

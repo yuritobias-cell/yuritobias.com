@@ -1,0 +1,47 @@
+---
+titulo: "Funções e Inequações do 1º Grau"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio: tabela e gráfico da função afim, zero e crescimento, domínio de funções racionais, inequações do 1º grau na reta real e problemas de comparação de preços e de meta de salário."
+serie: "1em"
+material: "17"
+instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Plano from '../../components/mat/Plano.astro';
+
+1. Considere a função afim <i>f</i>(<i>x</i>) = −<i>x</i> + 3.
+
+   1. Complete a tabela e construa o gráfico de <i>f</i> no plano cartesiano.
+   1. Determine o zero da função e classifique-a em crescente ou decrescente.
+
+   <Figuras>
+     <table class="tabela">
+       <caption>Tabela de valores de <i>f</i> para completar</caption>
+       <tbody>
+         <tr><th scope="row"><i>x</i></th><td>−1</td><td>0</td><td>2</td><td>4</td></tr>
+         <tr><th scope="row"><i>f</i>(<i>x</i>)</th><td></td><td></td><td></td><td></td></tr>
+       </tbody>
+     </table>
+     <Plano x={[-3, 5]} y={[-3, 5]} grade rotulosX={[-2, 2, 4]} rotulosY={[-2, 2, 4]}
+            descricao="Plano cartesiano quadriculado em branco, com x e y de −3 a 5, para construir o gráfico de f" />
+   </Figuras>
+
+1. Determine o domínio e o zero de cada função:
+
+   <Alt cols={2}>
+     <li><i>f</i>(<i>x</i>) = <Frac n="3<i>x</i> − 9" d="<i>x</i> + 2" /></li>
+     <li><i>g</i>(<i>x</i>) = <Frac n="2<i>x</i> + 5" d="4 − <i>x</i>" /></li>
+   </Alt>
+
+1. Resolva as inequações em ℝ e represente a solução na reta real:
+
+   <Alt cols={2}>
+     <li>3<i>x</i> − 7 ≤ <i>x</i> + 5</li>
+     <li>−2<i>x</i> + 1 > 9</li>
+   </Alt>
+
+1. Duas empresas de transporte cobram por uma viagem de <i>x</i> quilômetros da seguinte forma: a **Empresa A** cobra taxa fixa de R$ 40,00 mais R$ 0,50 por quilômetro; a **Empresa B** cobra taxa fixa de R$ 25,00 mais R$ 0,80 por quilômetro. Escrevendo e resolvendo uma inequação, determine a partir de quantos quilômetros a Empresa A passa a ser mais barata que a Empresa B.
+
+1. Um vendedor recebe um salário fixo de R$ 1.200,00 por mês, mais R$ 45,00 por peça vendida. Ele pretende receber, no mínimo, R$ 3.000,00 no próximo mês. Escreva a inequação que representa a situação e determine o número mínimo de peças que ele precisa vender.

@@ -1,0 +1,62 @@
+---
+titulo: "Sistemas, Semelhança e Porcentagem"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio em estilo ENEM: sistema de equações com vale-transporte, semelhança de triângulos em um sistema de irrigação e aumento percentual da taxa de bagagem das companhias aéreas."
+serie: "2em"
+material: "17"
+instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento, e assinale a alternativa correta."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Olívia recebe R$&nbsp;135,00 de vale-transporte para seus 20 dias de trabalho mensais. Para se locomover de casa até seu trabalho e vice-versa, ela utiliza, em alguns dias, transporte público e, em outros, seu próprio veículo. O custo diário de utilizar transporte público para o trajeto é R$&nbsp;5,00, enquanto o custo diário de usar o próprio carro é R$&nbsp;7,50.
+
+   Considerando que o dinheiro recebido equivale exatamente ao seu gasto mensal com transporte, o número de dias, em um mês, que Olívia utiliza carro para ir trabalhar é
+
+   <Alt cols={5}>
+     <li>3</li>
+     <li>6</li>
+     <li>10</li>
+     <li>14</li>
+     <li>15</li>
+   </Alt>
+
+1. Durante a montagem de um sistema de irrigação em uma plantação em declive, um engenheiro posicionou um tubo de água entre os pontos <i>C</i> e <i>B</i>, como mostrado na figura, para facilitar o escoamento por gravidade. No trecho mais alto do terreno foi instalado um suporte vertical no ponto <i>A</i>, formando um ângulo reto com o solo, que vai até o ponto <i>C</i>.
+
+   Para fazer a manutenção do sistema sem interromper o fluxo de água, foi fixado um pequeno andaime no ponto <i>D</i>, localizado sobre o solo entre os pontos <i>A</i> e <i>B</i>. A barra de sustentação do andaime foi instalada de modo que formasse um ângulo reto com o tubo, unindo os pontos <i>D</i> e <i>E</i>, em que <i>E</i> é o ponto de interseção entre o tubo e a haste.
+
+   Ele mediu o comprimento do segmento <i>AB</i>, que corresponde a 12 metros, e o segmento <i>AC</i>, com 9 metros. O segmento <i>DB</i>, do andaime até o fim da tubulação, media 4 metros. Qual é a altura, em metros, da barra vertical, representada pelo segmento <i>DE</i>?
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [12, 0], C: [0, 9], D: [8, 0], E: [9.44, 1.92] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['D', 'E']]}
+          nomes={['A', 'B', 'C', 'D', 'E']} marcas={['A', 'B', 'C', 'D', 'E']}
+          retos={[['C', 'A', 'B'], ['D', 'E', 'B']]}
+          tamanho={220}
+          descricao="Triângulo retângulo ABC com ângulo reto em A: o suporte vertical AC, o solo AB e o tubo CB. Do ponto D, sobre o solo entre A e B, sai a barra DE perpendicular ao tubo, encontrando-o em E" />
+   </Figuras>
+
+   <Alt cols={5}>
+     <li>2,4 m</li>
+     <li>3,0 m</li>
+     <li>3,6 m</li>
+     <li>4,0 m</li>
+     <li>5,0 m</li>
+   </Alt>
+
+1. Leia a notícia abaixo.
+
+   > Única entre as quatro grandes companhias aéreas do Brasil que mantinha o mesmo preço para despachar mala desde que a cobrança começou a valer, há pouco mais de um ano, a Gol decidiu aumentar o valor da taxa nesta semana. \[…\] A Gol também aumentou o preço para bagagens acima do peso. \[…\] Antes, a cobrança era de R$&nbsp;12,00 para voos nacionais e de R$&nbsp;15,00 para internacionais, o que representa uma alta de 108,33% e de 66,67%, respectivamente.
+   >
+   > <cite>*Gol aumenta taxa para despachar bagagem em até 67% em voo nacional.* **UOL**, 29 jun. 2018. Acesso em: 9 ago. 2018.</cite>
+
+   Após o aumento mencionado na notícia, o preço aproximado para despachar bagagens acima do peso em voos nacionais e internacionais passou a ser, respectivamente,
+
+   <Alt cols={2}>
+     <li>R$&nbsp;20,00 e R$&nbsp;31,25.</li>
+     <li>R$&nbsp;25,00 e R$&nbsp;25,00.</li>
+     <li>R$&nbsp;13,00 e R$&nbsp;10,00.</li>
+     <li>R$&nbsp;10,00 e R$&nbsp;13,00.</li>
+     <li>R$&nbsp;8,00 e R$&nbsp;16,25.</li>
+   </Alt>

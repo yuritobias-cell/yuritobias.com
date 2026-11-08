@@ -1,0 +1,104 @@
+---
+titulo: "Teorema de Tales e Revisão de Bhaskara"
+descricao: "Lista de exercícios do 9º ano sobre o Teorema de Tales — feixes de paralelas cortados por transversais e paralela a um lado do triângulo —, o Teorema da Bissetriz Interna, sombras e escala, e revisão da fórmula de Bhaskara. Com gabarito."
+serie: "9ano"
+material: "09"
+instrucoes: "Resolva as questões diretamente no seu caderno."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Gabarito from '../../components/mat/Gabarito.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+export const feixe = {
+  A: [1, 2], B: [0.7, 1], C: [0.4, 0], Ap: [2.2, 2], Bp: [2.5, 1], Cp: [2.8, 0],
+};
+export const linhasFeixe = [
+  [[-0.3, 2], [3.5, 2]], [[-0.3, 1], [3.5, 1]], [[-0.3, 0], [3.5, 0]],
+  [[1.09, 2.3], [0.31, -0.3]], [[2.11, 2.3], [2.89, -0.3]],
+];
+export const nomesFeixe = [
+  { em: [1.2, 1.82], texto: 'A' }, { em: [2.0, 1.82], texto: 'A′' },
+  { em: [0.9, 0.82], texto: 'B' }, { em: [2.3, 0.82], texto: 'B′' },
+  { em: [0.6, 0.15], texto: 'C' }, { em: [2.6, 0.15], texto: 'C′' },
+  { em: [3.7, 2], texto: 'r' }, { em: [3.7, 1], texto: 's' }, { em: [3.7, 0], texto: 't' },
+];
+
+1. Nas figuras a seguir, <i>r</i> // <i>s</i> // <i>t</i>. Determine o valor de <i>x</i> em cada caso.
+
+   <Figuras>
+     <Geo pontos={feixe} segmentos={linhasFeixe} marcas={['A', 'B', 'C', 'Ap', 'Bp', 'Cp']} textos={nomesFeixe}
+          medidas={[{ de: 'A', para: 'B', texto: 'x' }, { de: 'B', para: 'C', texto: '8' }, { de: 'Ap', para: 'Bp', texto: '3' }, { de: 'Bp', para: 'Cp', texto: '4' }]}
+          tamanho={170} rotulo="b)"
+          descricao="Três retas paralelas r, s e t cortadas por duas transversais. Na da esquerda, AB = x e BC = 8; na da direita, A′B′ = 3 e B′C′ = 4" />
+     <Geo pontos={feixe} segmentos={linhasFeixe} marcas={['A', 'B', 'C', 'Ap', 'Bp', 'Cp']} textos={nomesFeixe}
+          medidas={[{ de: 'A', para: 'B', texto: '*x* + 2' }, { de: 'B', para: 'C', texto: '*x* − 1' }, { de: 'Ap', para: 'Bp', texto: '6' }, { de: 'Bp', para: 'Cp', texto: '4' }]}
+          tamanho={170} rotulo="c)"
+          descricao="Três retas paralelas r, s e t cortadas por duas transversais. Na da esquerda, AB = x + 2 e BC = x − 1; na da direita, A′B′ = 6 e B′C′ = 4" />
+     <Geo pontos={feixe} segmentos={linhasFeixe} marcas={['A', 'B', 'C', 'Ap', 'Bp', 'Cp']} textos={nomesFeixe}
+          medidas={[{ de: 'A', para: 'B', texto: '2*x* + 4' }, { de: 'B', para: 'C', texto: '3*x* − 3' }, { de: 'Ap', para: 'Bp', texto: '4' }, { de: 'Bp', para: 'Cp', texto: '3' }]}
+          tamanho={170} rotulo="d)"
+          descricao="Três retas paralelas r, s e t cortadas por duas transversais. Na da esquerda, AB = 2x + 4 e BC = 3x − 3; na da direita, A′B′ = 4 e B′C′ = 3" />
+   </Figuras>
+
+1. Nos triângulos abaixo, <i>DE</i> // <i>BC</i>. Determine o valor de <i>x</i> e as medidas indicadas.
+
+   <Figuras>
+     <Geo pontos={{ A: [2, 4], B: [0, 0], C: [4, 0], D: [1.333, 2.667], E: [2.667, 2.667] }}
+          poligonos={[['A', 'B', 'C']]} tracejados={[['D', 'E']]}
+          nomes={['A', 'B', 'C', 'D', 'E']} marcas={['A', 'B', 'C', 'D', 'E']}
+          medidas={[{ de: 'A', para: 'D', texto: '*x* − 1' }, { de: 'D', para: 'B', texto: '6' }, { de: 'A', para: 'E', texto: '4' }, { de: 'E', para: 'C', texto: '8' }]}
+          tamanho={130} rotulo="a) (determine <i>x</i> e <i>AD</i>)"
+          descricao="Triângulo ABC com o segmento DE paralelo à base BC, tracejado: AD = x − 1, DB = 6, AE = 4 e EC = 8" />
+     <Geo pontos={{ A: [2, 4], B: [0, 0], C: [4, 0], D: [0.8, 1.6], E: [3.2, 1.6] }}
+          poligonos={[['A', 'B', 'C']]} tracejados={[['D', 'E']]}
+          nomes={['A', 'B', 'C', 'D', 'E']} marcas={['A', 'B', 'C', 'D', 'E']}
+          medidas={[{ de: 'A', para: 'D', texto: '*x* + 1' }, { de: 'D', para: 'B', texto: '*x* − 1' }, { de: 'A', para: 'E', texto: '6' }, { de: 'E', para: 'C', texto: '4' }]}
+          tamanho={130} rotulo="b) (determine <i>x</i>, <i>AD</i> e <i>DB</i>)"
+          descricao="Triângulo ABC com o segmento DE paralelo à base BC, tracejado: AD = x + 1, DB = x − 1, AE = 6 e EC = 4" />
+   </Figuras>
+
+1. Em um triângulo <i>ABC</i>, <i>AD</i> é a bissetriz interna do ângulo <i>Â</i>, sendo <i>D</i> um ponto em <i>BC</i>. Pelo **Teorema da Bissetriz Interna**, determine o valor de <i>x</i> em cada figura.
+
+   <Figuras>
+     <Geo pontos={{ A: [1.9, 3], B: [0, 0], D: [2, 0], C: [5, 0] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['A', 'D']]}
+          nomes={['A', 'B', 'C', 'D']} marcas={['A', 'B', 'C', 'D']}
+          medidas={[{ de: 'A', para: 'B', texto: '8' }, { de: 'A', para: 'C', texto: '12' }, { de: 'B', para: 'D', texto: 'x' }, { de: 'D', para: 'C', texto: '9' }]}
+          tamanho={150} rotulo="a)"
+          descricao="Triângulo ABC com a bissetriz AD do ângulo A: AB = 8, AC = 12, BD = x e DC = 9" />
+     <Geo pontos={{ A: [1.9, 3], B: [0, 0], D: [2, 0], C: [5, 0] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['A', 'D']]}
+          nomes={['A', 'B', 'C', 'D']} marcas={['A', 'B', 'C', 'D']}
+          medidas={[{ de: 'A', para: 'B', texto: '6' }, { de: 'A', para: 'C', texto: '9' }, { de: 'B', para: 'D', texto: '*x* + 2' }, { de: 'D', para: 'C', texto: '2*x* − 1' }]}
+          tamanho={150} rotulo="b)"
+          descricao="Triângulo ABC com a bissetriz AD do ângulo A: AB = 6, AC = 9, BD = x + 2 e DC = 2x − 1" />
+   </Figuras>
+
+1. Um poste vertical de 5 m de altura projeta uma sombra de 3 m no chão. Ao mesmo tempo e no mesmo local, uma árvore projeta uma sombra de 7,2 m. Usando o Teorema de Tales (triângulos semelhantes formados pelos raios de luz), determine a altura da árvore.
+
+1. **(ENEM – adaptado)** Em uma maquete de uma cidade, a escala utilizada é de 1 : 200 (ou seja, 1 cm na maquete corresponde a 200 cm na realidade). Um prédio que mede 36 m de altura é representado na maquete com qual medida?
+
+   <Alt cols={5}>
+     <li>0,18 m</li>
+     <li>18 cm</li>
+     <li>18 m</li>
+     <li>7,2 m</li>
+     <li>3,6 cm</li>
+   </Alt>
+
+1. Utilize a Fórmula de Bhaskara para resolver as equações do 2º grau abaixo. Apresente o cálculo do discriminante Δ = <i>b</i><sup>2</sup> − 4<i>ac</i> e as raízes encontradas.
+
+   <Alt cols={2}>
+     <li><i>x</i><sup>2</sup> − 5<i>x</i> + 6 = 0</li>
+     <li>2<i>x</i><sup>2</sup> + 3<i>x</i> − 2 = 0</li>
+     <li><i>x</i><sup>2</sup> − 6<i>x</i> + 9 = 0</li>
+     <li><i>x</i><sup>2</sup> + <i>x</i> + 3 = 0</li>
+   </Alt>
+
+1. O produto de dois números inteiros consecutivos é 182. Escreva a equação do 2º grau que representa a situação e use Bhaskara para encontrar os dois pares de números consecutivos que satisfazem a condição.
+
+<Gabarito>
+  **1.** b) <i>x</i> = 6; c) <i>x</i> = 7; d) <i>x</i> = 4 · **2.** a) <i>x</i> = 4, <i>AD</i> = 3; b) <i>x</i> = 5, <i>AD</i> = 6, <i>DB</i> = 4 · **3.** a) <i>x</i> = 6; b) <i>x</i> = 8 · **4.** 12 m · **5.** alternativa b) · **6.** a) <i>x</i> = 2 e <i>x</i> = 3; b) <i>x</i> = ½ e <i>x</i> = −2; c) <i>x</i> = 3 (raiz dupla); d) sem raízes reais (Δ &lt; 0) · **7.** 13 × 14 = 182 ou (−14) × (−13) = 182
+</Gabarito>

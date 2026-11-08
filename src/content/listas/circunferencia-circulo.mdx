@@ -1,0 +1,100 @@
+---
+titulo: "Comprimento da Circunferência e Área do Círculo"
+descricao: "Lista de exercícios do 9º ano sobre comprimento da circunferência e área do círculo: roda de bicicleta, roda-gigante, semicírculo, círculo inscrito no quadrado, regiões sombreadas, coroa circular de um chafariz e uma pista de atletismo."
+serie: "9ano"
+material: "21"
+instrucoes: "Resolva as questões no caderno, mostrando todos os cálculos. Em cada questão, use o valor de π indicado no enunciado."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Use a aproximação π = 3,1 e responda:
+
+   1. Qual é o comprimento de uma circunferência de raio 3,5 cm?
+   1. Qual é o comprimento de uma circunferência de diâmetro 12 cm?
+   1. O comprimento de uma circunferência é 43,4 cm. Quanto medem o seu diâmetro e o seu raio?
+   1. Qual é a área de um círculo de raio 3,5 cm?
+   1. Um círculo tem área de 111,6 cm<sup>2</sup>. Qual é a medida do seu raio?
+
+1. A roda de uma bicicleta tem 66 cm de diâmetro. Usando π = 3,1:
+
+   1. quantos centímetros a bicicleta anda quando a roda dá uma volta completa?
+   1. quantos *metros* ela anda em 100 voltas completas?
+
+1. Uma roda-gigante tem 99,2 m de comprimento de circunferência. Usando π = 3,1:
+
+   1. quanto medem o diâmetro e o raio dessa roda-gigante?
+   1. que distância uma cadeirinha percorre em 5 voltas completas?
+
+1. A figura é um semicírculo de raio 6 m. Use π = 3,1 e calcule:
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [-6, 0]], ['A', [0, 0], [6, 0], 'h'], ['Z']], pintado: true }]}
+          marcas={[[0, 0]]} cotas={[{ de: [0, 0], para: [6, 0], texto: '6 m', dist: 14 }]}
+          tamanho={170}
+          descricao="Semicírculo pintado, com o diâmetro embaixo; o raio de 6 m vai do centro até a ponta direita" />
+   </Figuras>
+
+   1. o comprimento do arco (metade da circunferência);
+   1. o perímetro da figura (não se esqueça do diâmetro!);
+   1. a área do semicírculo.
+
+1. O círculo está inscrito no quadrado de lado 8 cm (ou seja, encosta nos quatro lados). Use π = 3 e calcule:
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [0, 0]], ['L', [8, 0]], ['L', [8, 8]], ['L', [0, 8]], ['Z'], ['O', [4, 4], 4]], pintado: true }]}
+          marcas={[[4, 4]]}
+          medidas={[{ de: [0, 0], para: [0, 8], texto: '8 cm' }, { de: [0, 0], para: [8, 0], texto: '8 cm' }]}
+          tamanho={130}
+          descricao="Quadrado de lado 8 cm com um círculo inscrito, que encosta nos quatro lados; as quatro pontas entre o círculo e os cantos do quadrado estão pintadas" />
+   </Figuras>
+
+   1. a área do quadrado;
+   1. o raio e a área do círculo;
+   1. a área total das quatro "pontas" sombreadas;
+   1. a área de uma única ponta.
+
+1. No retângulo de 6 cm por 3 cm foi desenhado um semicírculo, como mostra a figura. Use π = 3 e calcule:
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [0, 0]], ['L', [6, 0]], ['L', [6, 3]], ['L', [0, 3]], ['Z'], ['M', [0, 0]], ['A', [3, 0], [6, 0], 'h'], ['Z']], pintado: true }]}
+          marcas={[[3, 0]]}
+          medidas={[{ de: [0, 3], para: [6, 3], texto: '6 cm' }, { de: [0, 0], para: [0, 3], texto: '3 cm' }]}
+          tamanho={170}
+          descricao="Retângulo de 6 cm por 3 cm com um semicírculo apoiado no lado de baixo, de diâmetro 6 cm, que encosta no lado de cima; as duas pontas de cima, entre o semicírculo e os cantos, estão pintadas" />
+   </Figuras>
+
+   1. a área do retângulo;
+   1. o raio e a área do semicírculo;
+   1. a área sombreada (as duas pontas juntas);
+   1. a área de uma única ponta.
+
+1. Em uma praça, um chafariz circular de raio 2 m fica no centro de um piso circular de raio 5 m. A parte sombreada é a região do piso em que as pessoas podem caminhar. Use π = 3,1 e calcule:
+
+   <Figuras>
+     <Geo regioes={[{ d: [['O', [0, 0], 5], ['O', [0, 0], 2]], pintado: true }]}
+          segmentos={[[[0, 0], [-3.54, 3.54]], [[0, 0], [1.41, -1.41]]]}
+          medidas={[{ de: [0, 0], para: [-3.54, 3.54], texto: '5 m' }, { de: [0, 0], para: [1.41, -1.41], texto: '2 m' }]}
+          marcas={[[0, 0]]}
+          tamanho={150}
+          descricao="Coroa circular pintada: um círculo de raio 5 m com um círculo de raio 2 m no centro, o chafariz, que fica em branco" />
+   </Figuras>
+
+   1. a área do círculo maior;
+   1. a área ocupada pelo chafariz;
+   1. a área da região sombreada.
+
+1. **(Desafio)** A pista é formada por um retângulo de 40 m por 20 m e por dois semicírculos iguais nas extremidades. Use π = 3,1 e calcule:
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [0, 0]], ['L', [40, 0]], ['A', [40, 10], [40, 20], 'ah'], ['L', [0, 20]], ['A', [0, 10], [0, 0], 'ah'], ['Z']], pintado: true }]}
+          tracejados={[[[0, 0], [0, 20]], [[40, 0], [40, 20]]]}
+          cotas={[{ de: [0, 0], para: [40, 0], texto: '40 m', dist: 16 }, { de: [50, 0], para: [50, 20], texto: '20 m', dist: 10 }]}
+          tamanho={230}
+          descricao="Pista de atletismo: um retângulo de 40 m por 20 m com um semicírculo em cada ponta; os dois lados menores do retângulo estão tracejados porque não fazem parte do contorno" />
+   </Figuras>
+
+   1. o perímetro da pista (*atenção:* os lados tracejados não fazem parte do contorno);
+   1. a área total da pista;
+   1. quantos metros um atleta percorre ao dar 5 voltas completas.

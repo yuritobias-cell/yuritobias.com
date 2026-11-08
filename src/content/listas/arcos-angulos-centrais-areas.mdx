@@ -1,0 +1,101 @@
+---
+titulo: "Arcos, Ângulos Centrais e Áreas"
+descricao: "Lista de exercícios do 9º ano sobre arcos e ângulos centrais, ângulo entre os ponteiros do relógio, comprimento de arco, setores circulares (fatias de pizza) e áreas de regiões sombreadas, além de uma janela com semicírculo."
+serie: "9ano"
+material: "22"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento. Use o valor de π indicado em cada questão."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Em cada circunferência de centro <i>O</i>, determine o valor de <i>x</i>. *(Lembre-se: a medida de um arco, em graus, é igual à do ângulo central correspondente.)*
+
+   <Figuras>
+     <Geo pontos={{ O: [0, 0], A: [0.94, 0.342], B: [0, 1] }}
+          regioes={[{ d: [['O', 'O', 1]] }, { d: [['M', 'A'], ['A', 'O', 'B', 'ah']], contorno: 'realce' }]}
+          segmentos={[['O', 'A'], ['O', 'B']]} nomes={['O', 'A', 'B']} marcas={['O']}
+          medidas={[{ de: 'A', para: 'B', texto: '70°', dist: 22 }]}
+          angulos={[{ v: 'O', de: 'A', para: 'B', texto: '3*x* + 10°', raio: 22 }]}
+          tamanho={130} rotulo="a)"
+          descricao="Circunferência de centro O com os raios OA e OB; o arco AB, destacado, mede 70°, e o ângulo central AOB mede 3x + 10°" />
+     <Geo pontos={{ O: [0, 0], U: [0, 1], L: [-0.5, -0.866], R: [0.643, -0.766] }}
+          regioes={[{ d: [['O', 'O', 1]] }]}
+          segmentos={[['O', 'U'], ['O', 'L'], ['O', 'R']]} marcas={['O']}
+          angulos={[
+            { v: 'O', de: 'U', para: 'L', texto: '150°', raio: 12 },
+            { v: 'O', de: 'L', para: 'R', texto: '*x*', raio: 14 },
+            { v: 'O', de: 'R', para: 'U', texto: '2*x*', raio: 16 },
+          ]}
+          tamanho={130} rotulo="b)"
+          descricao="Circunferência de centro O dividida por três raios em três ângulos centrais: 150°, x e 2x" />
+     <Geo pontos={{ O: [0, 0], E: [-1, 0], D: [1, 0], P: [-0.259, 0.966] }}
+          regioes={[{ d: [['O', 'O', 1]] }]}
+          segmentos={[['E', 'D'], ['O', 'P']]} marcas={['O']}
+          angulos={[
+            { v: 'O', de: 'E', para: 'P', texto: '*x* + 20°', raio: 13 },
+            { v: 'O', de: 'P', para: 'D', texto: '2*x* − 5°', raio: 16 },
+          ]}
+          tamanho={130} rotulo="c)"
+          descricao="Circunferência de centro O com um diâmetro horizontal e um raio para cima, que dividem a metade de cima em dois ângulos centrais: x + 20° à esquerda e 2x − 5° à direita" />
+   </Figuras>
+
+1. O mostrador de um relógio é uma circunferência dividida em 12 arcos iguais. Qual é a medida do menor ângulo central formado pelos ponteiros às:
+
+   1. 4 h?
+   1. 10 h?
+
+1. Em uma circunferência de raio 10 cm, um arco corresponde a um ângulo central de 72°. Usando π = 3,14, calcule o comprimento desse arco.
+
+1. Uma pizza circular de raio 20 cm foi cortada em 8 fatias iguais. Usando π = 3, determine:
+
+   1. a medida do ângulo central de cada fatia;
+   1. a área de cada fatia;
+   1. o comprimento da borda curva de cada fatia.
+
+1. Uma pista circular tem 50 m de raio. Um atleta percorreu um arco de 100 m dessa pista. Usando π = 3, determine a medida do ângulo central correspondente ao arco percorrido.
+
+1. Usando π = 3, calcule a área da região sombreada em cada figura. No item **b**, calcule também o perímetro da região sombreada.
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [4, 0]], ['L', [4, 4]], ['L', [0, 4]], ['A', [0, 0], [4, 0], 'h'], ['Z']], pintado: true }]}
+          poligonos={[[[0, 0], [4, 0], [4, 4], [0, 4]]]} marcas={[[0, 0]]}
+          medidas={[{ de: [0, 0], para: [0, 4], texto: '4 cm' }, { de: [0, 0], para: [4, 0], texto: '4 cm' }]}
+          tamanho={120} rotulo="a)"
+          descricao="Quadrado de lado 4 cm com um quarto de círculo de raio 4 cm centrado no canto de baixo à esquerda; a região entre o arco e o canto de cima à direita está pintada" />
+     <Geo regioes={[{ d: [['M', [0, 0]], ['A', [6, 0], [12, 0], 'h'], ['A', [9, 0], [6, 0], 'ah'], ['A', [3, 0], [0, 0], 'ah'], ['Z']], pintado: true }]}
+          tracejados={[[[0, 0], [12, 0]]]}
+          medidas={[{ de: [0, 0], para: [12, 0], texto: '12 cm' }]}
+          tamanho={200} rotulo="b)"
+          descricao="Semicírculo grande de diâmetro 12 cm, com dois semicírculos menores de diâmetro 6 cm recortados lado a lado sobre o diâmetro; a região entre o arco grande e os dois arcos pequenos está pintada" />
+   </Figuras>
+
+1. Na figura, <i>O</i> é o centro de um setor circular de 90° e raio 6 cm. Usando π = 3, calcule:
+
+   <Figuras>
+     <Geo pontos={{ O: [0, 0], A: [6, 0], B: [0, 6] }}
+          regioes={[{ d: [['M', 'A'], ['A', 'O', 'B', 'ah'], ['Z']], pintado: true }]}
+          segmentos={[['O', 'A'], ['O', 'B']]} nomes={['O', 'A', 'B']} marcas={['O']}
+          retos={[['A', 'O', 'B']]}
+          medidas={[{ de: 'O', para: 'B', texto: '6 cm' }, { de: 'O', para: 'A', texto: '6 cm' }]}
+          tamanho={130}
+          descricao="Setor circular OAB de 90° e raio 6 cm, com o triângulo OAB desenhado dentro; a região entre o arco AB e a corda AB está pintada" />
+   </Figuras>
+
+   1. a área do setor circular <i>OAB</i>;
+   1. a área do triângulo <i>OAB</i>;
+   1. a área da região sombreada.
+
+1. Uma janela tem o formato de um retângulo de 2 m por 1,5 m com um semicírculo na parte de cima, como mostra a figura. Usando π = 3, calcule:
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [0, 0]], ['L', [2, 0]], ['L', [2, 1.5]], ['A', [1, 1.5], [0, 1.5], 'ah'], ['Z']], pintado: true }]}
+          tracejados={[[[0, 1.5], [2, 1.5]]]}
+          medidas={[{ de: [0, 0], para: [2, 0], texto: '2 m' }, { de: [2, 0], para: [2, 1.5], texto: '1,5 m' }]}
+          tamanho={110}
+          descricao="Janela: retângulo de 2 m de largura por 1,5 m de altura com um semicírculo de diâmetro 2 m em cima; a linha entre o retângulo e o semicírculo está tracejada" />
+   </Figuras>
+
+   1. a área de vidro necessária para cobrir toda a janela;
+   1. o comprimento do contorno da janela (a linha tracejada não faz parte do contorno);
+   1. o custo do vidro, sabendo que o metro quadrado custa R$&nbsp;80,00.

@@ -1,0 +1,65 @@
+---
+titulo: "Relações Métricas no Triângulo Retângulo"
+descricao: "Lista de exercícios do 9º ano sobre relações métricas no triângulo retângulo: hipotenusa, altura relativa à hipotenusa e projeções dos catetos, com problemas de telhado, terreno e peça metálica."
+serie: "9ano"
+material: "18"
+instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+import Lembrete from '../../components/mat/Lembrete.astro';
+
+<Lembrete titulo="Relações métricas">
+  <span><i>a</i><sup>2</sup> = <i>b</i><sup>2</sup> + <i>c</i><sup>2</sup></span>
+  <span><i>b</i><sup>2</sup> = <i>a</i> · <i>n</i></span>
+  <span><i>c</i><sup>2</sup> = <i>a</i> · <i>m</i></span>
+  <span><i>h</i><sup>2</sup> = <i>m</i> · <i>n</i></span>
+  <span><i>a</i> · <i>h</i> = <i>b</i> · <i>c</i></span>
+  <span><i>a</i> = <i>m</i> + <i>n</i></span>
+</Lembrete>
+
+1. O triângulo <i>ABC</i> é retângulo em <i>A</i> e <i>AH</i> é a altura relativa à hipotenusa. As medidas <i>m</i> e <i>n</i> são as projeções dos catetos <i>c</i> e <i>b</i> sobre a hipotenusa.
+
+   <Figuras>
+     <Geo pontos={{ A: [9, 12], B: [0, 0], C: [25, 0], H: [9, 0] }}
+          poligonos={[['A', 'B', 'C']]} segmentos={[['A', 'H']]}
+          nomes={['A', 'B', 'C', 'H']}
+          medidas={[
+            { de: 'B', para: 'A', texto: 'c' }, { de: 'A', para: 'C', texto: 'b' },
+            { de: 'A', para: 'H', texto: 'h', lado: -1 },
+            { de: 'B', para: 'H', texto: '9' }, { de: 'H', para: 'C', texto: '16' },
+          ]}
+          retos={[['B', 'A', 'C'], ['A', 'H', 'C']]}
+          cotas={[{ de: 'B', para: 'C', texto: 'a' }]}
+          tamanho={240}
+          descricao="Triângulo ABC retângulo em A, com a altura AH relativa à hipotenusa BC. Os catetos são c (lado AB) e b (lado AC), a altura é h, e a hipotenusa a fica dividida por H em BH = 9 e HC = 16" />
+   </Figuras>
+
+   Sendo <i>m</i> = 9 cm e <i>n</i> = 16 cm, determine, nesta ordem, as medidas de:
+
+   1. a hipotenusa <i>a</i> e a altura <i>h</i>;
+   1. os catetos <i>c</i> e <i>b</i>.
+
+1. Em um triângulo retângulo, os catetos medem 9 cm e 12 cm. Determine:
+
+   1. a medida da hipotenusa;
+   1. a altura relativa à hipotenusa;
+   1. as projeções dos catetos sobre a hipotenusa.
+
+1. A seção transversal de um telhado tem a forma de um triângulo retângulo: as duas águas medem 6 m e 8 m e formam um ângulo reto entre si, e a base mede 10 m. Uma viga de sustentação liga o ponto mais alto do telhado à base, sendo perpendicular a ela.
+
+   1. Qual é o comprimento dessa viga?
+   1. Em quais medidas a viga divide a base do telhado?
+
+1. Um terreno tem a forma de um triângulo retângulo cuja hipotenusa mede 25 m e um dos catetos mede 15 m. O proprietário quer construir um muro perpendicular à hipotenusa, partindo do vértice do ângulo reto.
+
+   1. Qual é a medida do outro cateto?
+   1. Em quais medidas esse muro divide a hipotenusa?
+   1. Quantos metros de muro serão necessários?
+
+1. Uma peça metálica tem o formato de um triângulo retângulo. Uma haste de reforço, perpendicular à hipotenusa e com uma extremidade no vértice do ângulo reto, divide a hipotenusa em duas partes que medem 4 cm e 9 cm.
+
+   1. Determine o comprimento da haste.
+   1. Determine a medida da hipotenusa.
+   1. Calcule a área da peça.

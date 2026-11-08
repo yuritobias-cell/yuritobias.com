@@ -1,0 +1,95 @@
+---
+titulo: "Funções de Várias Sentenças e Função Modular"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio: calcular valores e esboçar gráficos de funções definidas por várias sentenças, ler o gráfico de um reservatório, resolver equações modulares, esboçar gráficos de funções modulares e escrever o módulo como função por sentenças."
+serie: "1em"
+material: "27"
+instrucoes: "Resolva no caderno, com todo o desenvolvimento. Lembre-se: |x| = x, se x ⩾ 0, e |x| = −x, se x < 0. Em uma função de várias sentenças, primeiro descubra em qual sentença o valor de x se encaixa!"
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Formula from '../../components/mat/Formula.astro';
+import Plano from '../../components/mat/Plano.astro';
+import Sistema from '../../components/mat/Sistema.astro';
+
+1. Considere a função <i>f</i> : ℝ → ℝ definida por
+
+   <Formula centro>
+     <i>f</i>(<i>x</i>) = <Sistema n={2} cols={2}><span><i>x</i><sup>2</sup> − 1,</span><span>se <i>x</i> ⩽ 1</span><span>3<i>x</i> − 1,</span><span>se <i>x</i> > 1</span></Sistema>
+   </Formula>
+
+   O valor de <i>f</i>(−2) + <i>f</i>(3) é:
+
+   <Alt cols={5}>
+     <li>8</li>
+     <li>9</li>
+     <li>10</li>
+     <li>11</li>
+     <li>12</li>
+   </Alt>
+
+1. Um plano de internet móvel custa R$ 40,00 por mês para um consumo de até 10 GB. Acima disso, cobra-se R$ 5,00 por GB adicional. O valor <i>C</i> da conta, em reais, para um consumo de <i>x</i> GB, é
+
+   <Formula centro>
+     <i>C</i>(<i>x</i>) = <Sistema n={2} cols={2}><span>40,</span><span>se 0 ⩽ <i>x</i> ⩽ 10</span><span>40 + 5(<i>x</i> − 10),</span><span>se <i>x</i> > 10</span></Sistema>
+   </Formula>
+
+   1. Quanto paga um cliente que consumiu 7 GB no mês? E um que consumiu 14 GB?
+   1. A conta de um cliente veio R$ 75,00. Quantos GB ele consumiu?
+
+1. Considere a função <i>h</i> : ℝ → ℝ definida por
+
+   <Formula centro>
+     <i>h</i>(<i>x</i>) = <Sistema n={3} cols={2}><span><i>x</i> + 4,</span><span>se <i>x</i> < −2</span><span>2,</span><span>se −2 ⩽ <i>x</i> ⩽ 1</span><span>−2<i>x</i> + 4,</span><span>se <i>x</i> > 1</span></Sistema>
+   </Formula>
+
+   1. Calcule <i>h</i>(−5), <i>h</i>(0) e <i>h</i>(3).
+   1. Esboce o gráfico de <i>h</i> no plano cartesiano.
+   1. Para quais valores de <i>x</i> temos <i>h</i>(<i>x</i>) = 0?
+   1. Observando o gráfico, determine o conjunto imagem de <i>h</i>.
+
+   <Figuras>
+     <Plano x={[-7, 7]} y={[-7, 7]} ux={19} uy={19} grade rotulosX={[-6, -4, -2, 2, 4, 6]} rotulosY={[-6, -4, -2, 2, 4, 6]}
+            descricao="Plano cartesiano quadriculado em branco, com x e y de −7 a 7, para esboçar o gráfico de h" />
+   </Figuras>
+
+1. O gráfico abaixo mostra o volume <i>V</i> de água, em litros, de um reservatório ao longo de 10 horas: ele é enchido com vazão constante, fica parado por um tempo e depois é esvaziado, também com vazão constante.
+
+   <Figuras>
+     <Plano x={[0, 10.8]} y={[0, 920]} ux={28} uy={0.22} passoX={2} passoY={200} nomeX="t (h)" nomeY="V (L)"
+            curva={(t) => (t <= 4 ? 200 * t : t <= 6 ? 800 : 800 - 200 * (t - 6))} dominio={[0, 10]}
+            descricao="Gráfico do volume V, em litros, pelo tempo t, em horas: sobe em linha reta de 0 litros em t = 0 até 800 litros em t = 4, fica constante em 800 litros até t = 6 e desce em linha reta até 0 litros em t = 10" />
+   </Figuras>
+
+   1. Escreva a lei de <i>V</i>(<i>t</i>) como uma função de três sentenças.
+   1. Qual era o volume de água após 2 horas? E após 8 horas?
+   1. Em quais instantes o reservatório tinha 600 litros?
+
+1. Resolva, em ℝ, as equações modulares:
+
+   <Alt cols={3}>
+     <li>|<i>x</i> + 2| = 6</li>
+     <li>|3<i>x</i> − 5| = 4</li>
+     <li>|2<i>x</i> − 7| = −1</li>
+   </Alt>
+
+1. Esboce, nos planos abaixo, os gráficos de **a)** <i>f</i>(<i>x</i>) = |<i>x</i> + 3| e **b)** <i>g</i>(<i>x</i>) = |<i>x</i>| − 2. Em cada gráfico, destaque o **vértice** e os pontos em que ele corta os eixos, e determine o **conjunto imagem**. **c)** Escreva <i>f</i>(<i>x</i>) = |<i>x</i> + 3| como uma função de duas sentenças, sem usar o módulo.
+
+   <Figuras>
+     <Plano x={[-7, 7]} y={[-7, 7]} ux={16} uy={16} grade rotulosX={[-6, -4, -2, 2, 4, 6]} rotulosY={[-6, -4, -2, 2, 4, 6]} rotulo="a) <i>f</i>(<i>x</i>) = |<i>x</i> + 3|"
+            descricao="Plano cartesiano quadriculado em branco, com x e y de −7 a 7, para esboçar o gráfico de f(x) = |x + 3|" />
+     <Plano x={[-7, 7]} y={[-7, 7]} ux={16} uy={16} grade rotulosX={[-6, -4, -2, 2, 4, 6]} rotulosY={[-6, -4, -2, 2, 4, 6]} rotulo="b) <i>g</i>(<i>x</i>) = |<i>x</i>| − 2"
+            descricao="Plano cartesiano quadriculado em branco, com x e y de −7 a 7, para esboçar o gráfico de g(x) = |x| − 2" />
+   </Figuras>
+
+1. Uma vacina deve ser armazenada a uma temperatura <i>T</i> (em °C) que satisfaça |<i>T</i> − 5| ⩽ 3. Das leituras de temperatura abaixo, a única que indica um armazenamento **adequado** é:
+
+   <Alt cols={5}>
+     <li>1,5 °C</li>
+     <li>8,5 °C</li>
+     <li>9,0 °C</li>
+     <li>7,5 °C</li>
+     <li>−2,0 °C</li>
+   </Alt>
+
+1. **(Desafio)** Considere <i>f</i>(<i>x</i>) = |<i>x</i> − 2| + |<i>x</i> + 1|. Analisando o sinal de <i>x</i> − 2 e de <i>x</i> + 1 nos intervalos <i>x</i> < −1, −1 ⩽ <i>x</i> ⩽ 2 e <i>x</i> > 2, escreva <i>f</i> como uma função de três sentenças, sem usar o módulo. Depois, calcule <i>f</i>(−3), <i>f</i>(0) e <i>f</i>(4).

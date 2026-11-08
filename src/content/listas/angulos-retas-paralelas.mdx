@@ -1,0 +1,139 @@
+---
+titulo: "Ângulos e Retas Paralelas"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre ângulos complementares e suplementares, ângulos opostos pelo vértice, retas paralelas cortadas por uma transversal (correspondentes, alternos e colaterais) e o Teorema dos Bicos."
+serie: "1em"
+material: "23"
+instrucoes: "Resolva as questões no caderno, indicando em cada passagem qual propriedade você usou (correspondentes, alternos, colaterais, etc.)."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Para cada ângulo abaixo, determine o **complemento** e o **suplemento**.
+
+   <Alt cols={3}>
+     <li>35°</li>
+     <li>63°</li>
+     <li>78°</li>
+   </Alt>
+
+1. Escreva uma equação e resolva:
+
+   1. Um ângulo mede o *dobro* do seu complemento. Quanto mede esse ângulo?
+   1. Dois ângulos são suplementares e um deles mede 30° a mais que o outro. Quais são as medidas desses ângulos?
+   1. Qual é o suplemento do complemento de 40°?
+
+1. Em cada figura, determine o valor de <i>x</i> e, em seguida, a medida de cada ângulo indicado.
+
+   <Figuras>
+     <Geo pontos={{ O: [0, 0], H: [1.6, 0], V: [0, 1.4], R: [1.149, 0.964] }}
+          segmentos={[[[-0.3, 0], 'H'], [[0, -0.3], 'V'], ['O', 'R']]}
+          retos={[[[-0.3, 0], 'O', [0, -0.3]]]}
+          angulos={[{ v: 'O', de: 'R', para: 'V', raio: 22 }, { v: 'O', de: 'H', para: 'R', texto: '*x* + 20°', raio: 32 }]}
+          textos={[{ em: [-0.5, 0.55], texto: '3*x* − 10°' }]}
+          setas={[[[-0.22, 0.47], [0.12, 0.3]]]}
+          tamanho={130} rotulo="a)"
+          descricao="Ângulo reto dividido por uma semirreta em dois ângulos: 3x − 10°, junto ao lado vertical, e x + 20°, junto ao lado horizontal" />
+     <Geo pontos={{ O: [0, 0], P1: [1.229, 0.86], P2: [-1.229, 0.86], P3: [-1.229, -0.86], P4: [1.229, -0.86] }}
+          segmentos={[['P2', 'P4'], ['P3', 'P1']]}
+          angulos={[{ v: 'O', de: 'P1', para: 'P2', texto: '2*x* − 10°', raio: 18 }, { v: 'O', de: 'P3', para: 'P4', texto: '*x* + 50°', raio: 18 }]}
+          tamanho={150} rotulo="b)"
+          descricao="Duas retas que se cruzam formando ângulos opostos pelo vértice: o de cima mede 2x − 10° e o de baixo mede x + 50°" />
+   </Figuras>
+
+1. Na figura, as retas <i>r</i> e <i>s</i> são paralelas e <i>t</i> é uma transversal.
+
+   <Figuras>
+     <Geo pontos={{ S: [0, 0], R: [0.466, 1] }}
+          segmentos={[[[-1, 1], [1.8, 1]], [[-1, 0], [1.8, 0]], [[-0.211, -0.453], [0.677, 1.453]]]}
+          angulos={[
+            { v: 'S', de: [1.8, 0], para: 'R', texto: '65°', raio: 16 },
+            { v: 'S', de: [-1, 0], para: [-0.211, -0.453], texto: 'a', raio: 16 },
+            { v: 'R', de: [-1, 1], para: 'S', texto: 'b', raio: 16 },
+            { v: 'R', de: [1.8, 1], para: [0.677, 1.453], texto: 'c', raio: 16 },
+            { v: 'R', de: [1.8, 1], para: 'S', texto: 'd', raio: 12 },
+          ]}
+          textos={[{ em: [1.95, 1], texto: 'r' }, { em: [1.95, 0], texto: 's' }, { em: [0.74, 1.6], texto: 't' }]}
+          tamanho={170}
+          descricao="Retas paralelas r e s cortadas pela transversal t. Em s, o ângulo de 65° fica acima de s, à direita de t, e o ângulo a fica abaixo de s, à esquerda de t. Em r, b fica abaixo de r à esquerda de t, c fica acima de r à direita de t, e d fica abaixo de r à direita de t" />
+   </Figuras>
+
+   1. Determine as medidas de <i>a</i>, <i>b</i>, <i>c</i> e <i>d</i>.
+   1. Escreva qual é a relação de cada um desses ângulos com o ângulo de 65° (correspondentes, alternos internos, colaterais internos ou opostos pelo vértice).
+
+1. Na figura, <i>r</i> // <i>s</i>.
+
+   <Figuras>
+     <Geo pontos={{ S: [0, 0], R: [0.577, 1] }}
+          segmentos={[[[-1, 1], [1.8, 1]], [[-1, 0], [1.8, 0]], [[-0.25, -0.433], [0.827, 1.433]]]}
+          angulos={[
+            { v: 'R', de: [-1, 1], para: 'S', texto: '*x* − 2*y*', raio: 16 },
+            { v: 'S', de: [1.8, 0], para: 'R', texto: '3*y* + 30°', raio: 16 },
+            { v: 'S', de: [1.8, 0], para: [-0.25, -0.433], texto: '*x* + 40°', raio: 20 },
+          ]}
+          textos={[{ em: [1.95, 1], texto: 'r' }, { em: [1.95, 0], texto: 's' }]}
+          tamanho={170}
+          descricao="Retas paralelas r e s cortadas por uma transversal. Em r, abaixo e à esquerda da transversal, o ângulo x − 2y. Em s, acima e à direita, o ângulo 3y + 30°; logo abaixo dele, do outro lado da reta s, o ângulo x + 40°" />
+   </Figuras>
+
+   1. Escreva uma equação usando os ângulos *alternos internos* da figura.
+   1. Escreva outra equação usando os dois ângulos *adjacentes* sobre a reta <i>s</i>.
+   1. Resolva o sistema e determine <i>x</i> e <i>y</i>.
+   1. Calcule a medida de cada um dos três ângulos indicados.
+
+1. Determine as medidas dos ângulos <i>x</i>, <i>y</i> e <i>z</i> na figura, sabendo que <i>r</i> // <i>s</i>.
+
+   <Figuras>
+     <Geo pontos={{ S1: [0, 0], R1: [0.577, 1], R2: [1.6, 1], S2: [3.332, 0] }}
+          segmentos={[[[-0.5, 1], [4, 1]], [[-0.5, 0], [4, 0]], [[-0.115, -0.2], [0.808, 1.4]], [[1.254, 1.2], [3.592, -0.15]]]}
+          angulos={[
+            { v: 'S1', de: [1.5, 0], para: 'R1', texto: '60°', raio: 16 },
+            { v: 'R1', de: [-0.5, 1], para: [0.808, 1.4], texto: 'z', raio: 14 },
+            { v: 'R1', de: [0.808, 1.4], para: [1.5, 1], texto: 'x', raio: 18 },
+            { v: 'R2', de: [4, 1], para: [1.254, 1.2], texto: '150°', raio: 14 },
+            { v: 'S2', de: [2, 0], para: 'R2', texto: 'y', raio: 26 },
+          ]}
+          textos={[{ em: [4.15, 1], texto: 'r' }, { em: [4.15, 0], texto: 's' }]}
+          tamanho={230}
+          descricao="Retas paralelas r e s cortadas por duas transversais. A da esquerda forma 60° com s; em r, ela forma o ângulo z à esquerda e o ângulo x à direita, acima de r. A da direita forma 150° com r, acima dela, e o ângulo y com s, à esquerda" />
+   </Figuras>
+
+1. Na figura, <i>r</i> // <i>s</i>.
+
+   <Figuras>
+     <Geo pontos={{ V: [0, 1], R: [1.192, 2], S: [2.747, 0] }}
+          segmentos={[[[-0.5, 2], [3.5, 2]], [[-0.5, 0], [3.5, 0]], ['V', [1.55, 2.3]], ['V', [3.02, -0.1]]]}
+          angulos={[
+            { v: 'R', de: [-0.5, 2], para: 'V', texto: '40°', raio: 18 },
+            { v: 'V', de: 'R', para: 'S', texto: 'x', raio: 16 },
+            { v: 'S', de: [-0.5, 0], para: 'V', texto: '20°', raio: 34 },
+          ]}
+          textos={[{ em: [3.65, 2], texto: 'r' }, { em: [3.65, 0], texto: 's' }]}
+          tamanho={190}
+          descricao="Retas paralelas r e s e uma linha quebrada entre elas, com um bico apontando para a esquerda. O segmento de cima forma 40° com r; o de baixo forma 20° com s; o ângulo do bico é x" />
+   </Figuras>
+
+   1. Trace, pelo vértice do bico, uma reta paralela a <i>r</i> e a <i>s</i>.
+   1. Determine as medidas das duas partes em que essa reta divide o ângulo <i>x</i>, justificando.
+   1. Calcule <i>x</i>.
+
+1. **(Desafio)** Agora a linha quebrada tem *dois* bicos, <i>r</i> // <i>s</i> e todos os ângulos indicados estão em graus.
+
+   <Figuras>
+     <Geo pontos={{ R: [1.192, 3], V1: [0, 2], V2: [1.039, 1.4], S: [-1.963, 0] }}
+          segmentos={[[[-2.5, 3], [2.5, 3]], [[-2.5, 0], [2.5, 0]], ['V1', [1.43, 3.2]], ['V1', 'V2'], ['V2', [-2.3, -0.157]]]}
+          angulos={[
+            { v: 'R', de: [-2.5, 3], para: 'V1', texto: '*x* + 15°', raio: 16 },
+            { v: 'V1', de: 'R', para: 'V2', texto: '3*x* − 5°', raio: 14 },
+            { v: 'V2', de: 'V1', para: 'S', texto: '2*x* + 5°', raio: 14 },
+            { v: 'S', de: [2.5, 0], para: 'V2', texto: '*x*°', raio: 30 },
+          ]}
+          textos={[{ em: [2.65, 3], texto: 'r' }, { em: [2.65, 0], texto: 's' }]}
+          tamanho={190}
+          descricao="Retas paralelas r e s e uma linha quebrada entre elas com dois bicos, um apontando para a esquerda e outro para a direita. Os ângulos indicados são x + 15° junto a r, 3x − 5° no primeiro bico, 2x + 5° no segundo bico e x° junto a s" />
+   </Figuras>
+
+   1. Traçando uma paralela por cada bico, escreva a equação que relaciona os quatro ângulos indicados e determine <i>x</i>.
+   1. Calcule a medida de cada um dos quatro ângulos.
+   1. Qual é a medida do ângulo que o segmento do meio forma com as retas <i>r</i> e <i>s</i>?

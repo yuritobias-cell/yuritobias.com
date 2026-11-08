@@ -318,6 +318,7 @@ const schema = [
   .lista :global(table.tabela) {
     border-collapse: collapse;
     margin: 0.8rem auto;
+    align-self: center; /* ao lado de uma figura (<Figuras>), não estica junto */
     font-size: 0.95rem;
     font-variant-numeric: lining-nums tabular-nums;
   }
@@ -335,9 +336,27 @@ const schema = [
     text-align: center;
   }
   .lista :global(table.tabela th) { font-weight: 600; }
+  /* Célula em branco é para o aluno completar: precisa de corpo para escrever. */
+  .lista :global(table.tabela td:empty) { min-width: 2.8rem; height: 2rem; }
   .lista :global(table.tabela tbody th) { font-weight: 400; text-align: left; }
   .lista :global(table.tabela thead),
   .lista :global(table.tabela tfoot) { background: white; }
+
+  /* Texto-base citado (notícia, trecho de prova) — o `quote` do LaTeX. */
+  .lista :global(blockquote) {
+    margin: 0.6rem 0 0.8rem;
+    padding: 0.5rem 0 0.5rem 1rem;
+    border-left: 2px solid var(--rule);
+    font-size: 0.93rem;
+    color: var(--ink);
+  }
+  .lista :global(blockquote cite) {
+    display: block;
+    font-style: normal;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
 
   .lista :global(p) { margin: 0 0 0.5rem; }
   .lista :global(p:last-child) { margin-bottom: 0; }

@@ -1,0 +1,98 @@
+---
+titulo: "Potência de Ponto e Ângulo Inscrito"
+descricao: "Lista de exercícios do 9º ano sobre potência de ponto (cordas que se cruzam, secantes e tangente), ângulo inscrito e ângulo central, quadrilátero inscrito na circunferência e aplicações: o arco de uma ponte e o horizonte do Pequeno Príncipe."
+serie: "9ano"
+material: "23"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento. As figuras não estão em escala."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Em cada figura, determine o valor de <i>x</i>. *(No item **a**, o ponto <i>P</i> é interno à circunferência; nos itens **b** e **c**, <i>P</i> é externo e, no item **c**, <i>PT</i> é tangente.)*
+
+   <Figuras>
+     <Geo pontos={{ P: [0.08, -0.05], A: [-0.958, 0.287], B: [0.944, -0.331], C: [0.55, 0.835], D: [-0.384, -0.923] }}
+          regioes={[{ d: [['O', [0, 0], 1]] }]}
+          segmentos={[['A', 'B'], ['C', 'D']]} nomes={['P', 'A', 'B', 'C', 'D']} marcas={['P', 'A', 'B', 'C', 'D']}
+          medidas={[{ de: 'A', para: 'P', texto: '4' }, { de: 'P', para: 'B', texto: '6' }, { de: 'P', para: 'C', texto: '3' }, { de: 'D', para: 'P', texto: 'x' }]}
+          tamanho={130} rotulo="a)"
+          descricao="Circunferência com duas cordas, AB e CD, que se cruzam no ponto P, interno: PA = 4, PB = 6, PC = 3 e PD = x" />
+     <Geo pontos={{ P: [-2.4, 0.05], A: [-0.932, 0.362], B: [0.704, 0.71], C: [-0.959, -0.283], D: [0.738, -0.675] }}
+          regioes={[{ d: [['O', [0, 0], 1]] }]}
+          segmentos={[['P', 'B'], ['P', 'D']]} nomes={['P', 'A', 'B', 'C', 'D']} marcas={['P', 'A', 'B', 'C', 'D']}
+          medidas={[{ de: 'P', para: 'A', texto: '4' }, { de: 'A', para: 'B', texto: '5' }, { de: 'P', para: 'C', texto: '3' }, { de: 'C', para: 'D', texto: 'x' }]}
+          tamanho={170} rotulo="b)"
+          descricao="Do ponto P, externo, saem duas secantes à circunferência: a primeira corta em A e B, com PA = 4 e AB = 5; a segunda corta em C e D, com PC = 3 e CD = x" />
+     <Geo pontos={{ P: [-2.4, 0.05], T: [-0.398, 0.918], A: [-0.95, -0.311], B: [0.693, -0.721] }}
+          regioes={[{ d: [['O', [0, 0], 1]] }]}
+          segmentos={[['P', 'T'], ['P', 'B']]} nomes={['P', 'T', 'A', 'B']} marcas={['P', 'T', 'A', 'B']}
+          medidas={[{ de: 'P', para: 'T', texto: 'x' }, { de: 'P', para: 'A', texto: '4' }, { de: 'A', para: 'B', texto: '12' }]}
+          tamanho={170} rotulo="c)"
+          descricao="Do ponto P, externo, saem a tangente PT, de medida x, e uma secante que corta a circunferência em A e B, com PA = 4 e AB = 12" />
+   </Figuras>
+
+1. Duas cordas <i>AB</i> e <i>CD</i> de uma circunferência se cortam no ponto <i>P</i>. Sabendo que <i>PA</i> = <i>x</i>, <i>PB</i> = <i>x</i> + 5, <i>PC</i> = 4 e <i>PD</i> = 6 (em cm), determine o valor de <i>x</i> e o comprimento da corda <i>AB</i>.
+
+1. De um ponto <i>P</i>, externo a uma circunferência, traçam-se um segmento tangente <i>PT</i>, de 12 cm, e uma secante que **passa pelo centro** da circunferência, cuja parte externa mede 8 cm. Determine a medida do raio da circunferência.
+
+1. Em cada circunferência, determine o valor de <i>x</i>. *(Lembre-se: o ângulo inscrito mede a **metade** do ângulo central que enxerga o mesmo arco.)*
+
+   <Figuras>
+     <Geo pontos={{ O: [0, 0], V: [0, 1], L: [-0.766, -0.643], R: [0.766, -0.643] }}
+          regioes={[{ d: [['O', 'O', 1]] }]}
+          segmentos={[['V', 'L'], ['V', 'R'], ['O', 'L'], ['O', 'R']]} nomes={['O']} marcas={['O', 'V', 'L', 'R']}
+          angulos={[{ v: 'V', de: 'L', para: 'R', texto: '*x*', raio: 16 }, { v: 'O', de: 'L', para: 'R', texto: '100°', raio: 10 }]}
+          tamanho={110} rotulo="a)"
+          descricao="Circunferência de centro O: o ângulo inscrito x, com vértice no alto, e o ângulo central de 100° enxergam o mesmo arco, embaixo" />
+     <Geo pontos={{ O: [0, 0], V: [0, 1], L: [-0.574, -0.819], R: [0.574, -0.819] }}
+          regioes={[{ d: [['O', 'O', 1]] }]}
+          segmentos={[['V', 'L'], ['V', 'R'], ['O', 'L'], ['O', 'R']]} nomes={['O']} marcas={['O', 'V', 'L', 'R']}
+          angulos={[{ v: 'V', de: 'L', para: 'R', texto: '35°', raio: 18 }, { v: 'O', de: 'L', para: 'R', texto: '*x*', raio: 10 }]}
+          tamanho={110} rotulo="b)"
+          descricao="Circunferência de centro O: o ângulo inscrito de 35°, com vértice no alto, e o ângulo central x enxergam o mesmo arco, embaixo" />
+     <Geo pontos={{ O: [0, 0], A: [-1, 0], B: [1, 0], C: [0.5, 0.866] }}
+          regioes={[{ d: [['O', 'O', 1]] }]}
+          segmentos={[['A', 'B'], ['A', 'C'], ['C', 'B']]} nomes={['O', 'A', 'B', 'C']} marcas={['O', 'A', 'B', 'C']}
+          angulos={[{ v: 'A', de: 'B', para: 'C', texto: '*x*', raio: 18 }, { v: 'B', de: 'C', para: 'A', texto: '2*x*', raio: 14 }]}
+          tamanho={110} rotulo="c)"
+          descricao="Circunferência de centro O com o diâmetro AB e o ponto C sobre ela, formando o triângulo ABC; o ângulo em A mede x e o ângulo em B mede 2x" />
+     <Geo pontos={{ A: [-0.707, -0.707], B: [0.707, -0.707], E: [-0.866, 0.5], F: [0.5, 0.866] }}
+          regioes={[{ d: [['O', [0, 0], 1]] }]}
+          segmentos={[['E', 'A'], ['E', 'B'], ['F', 'A'], ['F', 'B']]} nomes={['A', 'B']} marcas={['A', 'B', 'E', 'F']}
+          angulos={[{ v: 'E', de: 'A', para: 'B', raio: 16 }, { v: 'F', de: 'A', para: 'B', texto: '50°', raio: 16 }]}
+          textos={[{ em: [-1.15, 0.9], texto: '2*x* + 10°' }]}
+          tamanho={110} rotulo="d)"
+          descricao="Circunferência com dois ângulos inscritos que enxergam o mesmo arco AB: um mede 2x + 10° e o outro, 50°" />
+   </Figuras>
+
+1. Em uma circunferência de centro <i>O</i>, o ângulo inscrito <i>AV̂B</i> mede 2<i>x</i> + 5° e o ângulo central <i>AÔB</i>, que enxerga o mesmo arco <i>AB</i>, mede 5<i>x</i> − 20°. Determine <i>x</i> e as medidas dos dois ângulos.
+
+1. Os vértices do quadrilátero <i>ABCD</i> estão sobre uma circunferência e dividem-na nos arcos indicados na figura.
+
+   <Figuras>
+     <Geo pontos={{ A: [-0.94, -0.342], B: [0.174, -0.985], C: [0.94, 0.342], D: [0, 1] }}
+          regioes={[{ d: [['O', [0, 0], 1]] }]}
+          poligonos={[['A', 'B', 'C', 'D']]} nomes={['A', 'B', 'C', 'D']} marcas={['A', 'B', 'C', 'D']}
+          textos={[{ em: [-0.65, -1.13], texto: '80°' }, { em: [1.13, -0.65], texto: '100°' }, { em: [0.75, 1.07], texto: '70°' }, { em: [-1.07, 0.75], texto: '110°' }]}
+          tamanho={120}
+          descricao="Quadrilátero ABCD inscrito na circunferência; os arcos entre os vértices medem AB = 80°, BC = 100°, CD = 70° e DA = 110°" />
+   </Figuras>
+
+   1. Calcule as medidas dos ângulos internos <i>Â</i>, <i>B̂</i>, <i>Ĉ</i> e <i>D̂</i> do quadrilátero. *(Dica: cada um deles é um ângulo inscrito; observe qual arco ele enxerga.)*
+   1. Calcule <i>Â</i> + <i>Ĉ</i> e <i>B̂</i> + <i>D̂</i>. O que você observa?
+
+1. O arco de uma ponte é parte de uma circunferência. O vão <i>AB</i> mede 16 m e a altura máxima do arco, <i>MN</i>, mede 4 m, sendo <i>M</i> o ponto médio de <i>AB</i>. Determine o raio da circunferência que contém esse arco. *(Dica: imagine a circunferência completa. O prolongamento de <i>NM</i> é uma corda que cruza a corda <i>AB</i> no ponto interno <i>M</i>.)*
+
+   <Figuras>
+     <Geo pontos={{ A: [-8, 0], M: [0, 0], B: [8, 0], N: [0, 4] }}
+          regioes={[{ d: [['M', 'A'], ['A', [0, -6], 'B', 'h'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'B']]} tracejados={[['M', 'N']]}
+          nomes={['A', 'M', 'B', 'N']} marcas={['A', 'M', 'B', 'N']}
+          retos={[['N', 'M', 'B']]}
+          medidas={[{ de: 'A', para: 'M', texto: '8 m', dist: 22 }, { de: 'M', para: 'B', texto: '8 m', dist: 22 }, { de: 'M', para: 'N', texto: '4 m', lado: -1 }]}
+          tamanho={200}
+          descricao="Arco de ponte pintado sobre o vão AB de 16 m; M é o ponto médio de AB, a 8 m de cada ponta, e N é o ponto mais alto do arco, 4 m acima de M" />
+   </Figuras>
+
+1. O Pequeno Príncipe mora em um asteroide esférico de raio 12 m. De pé, seus olhos ficam a 1 m do solo. Olhando para o horizonte, sua linha de visão é **tangente** ao asteroide. A que distância de seus olhos está o ponto do horizonte que ele avista? *(Dica: a reta que liga os olhos do Príncipe ao centro do asteroide é uma secante.)*

@@ -1,0 +1,53 @@
+---
+titulo: "Poliedros, Relação de Euler e Prisma"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio: arestas e vértices de poliedros convexos pela relação de Euler — tetraedro truncado, rombicuboctaedro — e área da base, área lateral, área total e volume de um prisma reto de base triangular."
+serie: "2em"
+material: "24"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento. Lembre-se: V − A + F = 2."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Solido from '../../components/mat/Solido.astro';
+
+1. Um poliedro convexo de 12 faces tem 6 faces triangulares, 4 faces quadrangulares e 2 faces pentagonais. Calcule o número de arestas e vértices desse poliedro.
+
+1. O tetraedro truncado é um poliedro convexo formado por 4 faces triangulares e 4 faces hexagonais. Calcule o número de arestas e vértices desse poliedro.
+
+1. Sabendo que um rombicuboctaedro é composto de 8 faces triangulares e 18 faces quadradas e que o número de arestas é o dobro do número de vértices, quantas arestas e vértices tem esse poliedro?
+
+1. Determine:
+
+   1. o número de arestas de um poliedro convexo com 12 faces e 10 vértices;
+   1. o número de vértices de um poliedro convexo com 8 faces e 18 arestas.
+
+1. Em um poliedro convexo:
+
+   1. o número de arestas excede o de vértices em 8 unidades. Quantas faces ele tem?
+   1. o número de arestas excede o de faces em 12 unidades. Quantos vértices ele tem?
+
+1. Um poliedro convexo de 30 arestas tem apenas 10 faces triangulares e <i>x</i> faces pentagonais. Determine o valor de <i>x</i> e o número de vértices desse poliedro.
+
+1. Um poliedro convexo de 20 arestas tem apenas 8 faces triangulares e <i>x</i> faces quadrangulares. Dessa forma, o valor de <i>x</i> é:
+
+   <Alt cols={5}>
+     <li>3</li>
+     <li>4</li>
+     <li>5</li>
+     <li>6</li>
+     <li>8</li>
+   </Alt>
+
+1. A figura mostra um prisma reto cuja base é um triângulo retângulo de catetos 6 cm e 8 cm. A altura do prisma é 10 cm. Calcule:
+
+   <Figuras>
+     <Solido tipo="prisma" base={[[0, 0], [6, 0], [6, 8]]} altura={10}
+             medidas={[{ aresta: [0, 1], texto: '6 cm' }, { aresta: [1, 2], texto: '8 cm' }, { aresta: [0, 3], texto: '10 cm' }]}
+             descricao="Prisma reto em pé, de altura 10 cm, cuja base no chão é um triângulo retângulo de catetos 6 cm e 8 cm" />
+   </Figuras>
+
+   1. a área de uma base;
+   1. a área lateral *(dica: encontre antes a hipotenusa da base)*;
+   1. a área total;
+   1. o volume do prisma;
+   1. os números de vértices, arestas e faces, verificando a relação de Euler.

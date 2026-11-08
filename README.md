@@ -335,16 +335,22 @@ de componentes que se importam no topo do arquivo:
 | `<Formula>…</Formula>`, `<Formula centro>` | fórmula na própria linha, sem quebrar no meio | `\mbox{$…$}`, `$$…$$` |
 | `<Alt cols={2}>` | alternativas lado a lado, em `n` colunas | `\begin{tasks}(2)` |
 | `<Sistema n={3}>` | sistema entre chaves, uma equação por `<span>` | `\begin{cases}` |
+| `<Sistema n={2} cols={2}>` | função por sentenças: `<span>` em pares (expressão, condição), condições alinhadas | `\begin{cases} … & \text{se } …` |
 | `<TriRet a="9" b="12" c="x" rotulo="a)" />` | triângulo retângulo com as três medidas | `\figTriRet{9}{12}{x}` |
 | `<Soma de="<i>k</i>=1" ate="5" /><i>k</i>` | somatório com os limites empilhados; o termo geral vem depois | `\sum_{k=1}^{5} k` |
 | `<Gabarito>…</Gabarito>` | gabarito ao final, fechado até o aluno abrir | o rodapé "Gabarito:" da folha |
 | `<Lembrete>…</Lembrete>`, `<Lembrete titulo="Relembrando">` | quadro de fórmulas antes das questões; cada fórmula num `<span>` | o `\fbox` "Lembrete:" |
+| `<Plano x={[-3, 5]} y={[-3, 5]} grade descricao="…" />` | plano cartesiano: quadriculado em branco (`grade`) ou com `curva={(x) => …}`, `dominio` e `pontos` destacados; escalas diferentes com `ux`/`uy` + `passoX`/`passoY`, eixos com unidade em `nomeX="t (h)"`, legenda em `rotulo`; `descricao` obrigatória (leitor de tela) | o `tikzpicture` com eixos |
+| `<Flechas a={['1','2']} b={['a','b']} setas={[['1','b'], ['2','a']]} rotulo="(a)" />` | diagrama de flechas de <i>f</i> : <i>A</i> → <i>B</i>; o build falha se uma seta citar elemento inexistente | os ovais com `\draw[->]` |
+| `<Solido tipo="prisma" base={[[0,0],[6,0],[6,8]]} altura={10} medidas={[{ aresta: [0, 1], texto: '6 cm' }]} descricao="…" />` | prisma/pirâmide a partir do polígono da base, em perspectiva oblíqua, com as arestas escondidas tracejadas **por cálculo**; `eixo="profundidade"` deita o prisma; vértices: base 0…n−1, outra base n…2n−1 (ou ápice n). `tipo="cilindro" \| "cone" \| "silo"` com `r`, `h`, `hCone` e `rotulos` | os sólidos em TikZ |
+| `<Geo pontos={{ A: [0,3], B: [0,0], C: [4,0] }} poligonos={[['A','B','C']]} medidas={[…]} retos={[['A','B','C']]} angulos={[…]} descricao="…" />` | figura de geometria plana como no TikZ: pontos com coordenadas (y para cima) e o que desenhar — `segmentos`, `tracejados`, `nomes`, `medidas` (fora da figura; `lado`/`dist` ajustam), `retos`, `angulos` (arco + texto), `cotas`, `solo` (chão hachurado), `setas`, `marcas` (o ponto do centro), `iguais` (tracinhos de congruência, `[p, q, n]`), `textos` (texto solto num ponto — a medida de um arco, fora da circunferência); `regioes` desenha e pinta curvas com um caminho em coordenadas da figura — `['M', p]`, `['L', p]`, `['A', centro, p, 'ah' \| 'h']`, `['O', centro, raio]`, `['Z']` —, com regra par-ímpar (círculo dentro de outro vira coroa) e `contorno: 'realce'` para o arco destacado; em texto, `*x*` põe só o *x* em itálico | o `tikzpicture` com `\draw`/`\fill`/`pic{angle}` |
 | `<Venn conjuntos={['A', 'B', 'C']} />` | diagrama de Venn em branco, 2 ou 3 conjuntos, com universo `U` (`universo=""` omite) | o `tikzpicture` dos círculos |
 
 O resto é HTML normal: `<i>x</i>` para a incógnita, `<sup>2</sup>` para a potência, o
 sinal de menos U+2212 (`−`) e não o hífen, e os símbolos direto em Unicode (`⊂`, `∈`,
 `∅`, `π`, `°`, `ℤ`). Expoente fracionário vai com barra (`<sup>1/3</sup>`): empilhado
-fica ilegível no tamanho de um expoente. Lacuna para completar é
+fica ilegível no tamanho de um expoente. Entre `R$` e o valor, e entre os grupos de milhar (`15 000`), vai espaço não
+separável (U+00A0) — senão a linha pode quebrar no meio do número. Lacuna para completar é
 `<span class="lacuna"></span>`; tabela de dados é um `<table class="tabela">` em HTML, com
 `<caption>` (para o leitor de tela), `<th scope="col">` no cabeçalho e `<th scope="row">`
 na primeira coluna — ver `probabilidade.mdx`. Figura nova pede um componente novo em

@@ -2,21 +2,30 @@
 /* Sistema de equações entre chaves — o `\begin{cases}` do LaTeX. Cada linha é
    um <span>; a chave cresce com a quantidade de equações.
 
+   Com `cols={2}` vira função definida por várias sentenças: os <span> vêm em
+   pares (expressão, condição) e as condições ficam alinhadas numa coluna,
+   como o `&` do cases:
+     <Sistema n={2} cols={2}><span>x² − 1,</span><span>se x ⩽ 1</span>…</Sistema>
+
    Mesma marcação do gerador de sistemas (`.sist` / `.chave` / `.eqs`), para que
    a lista na tela e a folha gerada mostrem o sistema do mesmo jeito. */
 interface Props {
-  /** Quantas equações — dimensiona a chave. */
+  /** Quantas equações (linhas) — dimensiona a chave. */
   n: number;
+  /** 2 para expressão + condição alinhadas (função por sentenças). */
+  cols?: 1 | 2;
 }
-const { n } = Astro.props;
+const { n, cols = 1 } = Astro.props;
 ---
-<span class="sist" data-n={n}><span class="chave">&#123;</span><span class="eqs"><slot /></span></span>
+<span class="sist" data-n={n}><span class="chave">&#123;</span><span class:list={['eqs', { sentencas: cols === 2 }]}><slot /></span></span>
 
 <style>
-  .sist { display: inline-flex; align-items: center; gap: 0.35em; font-family: var(--mat); }
+  .sist { display: inline-flex; align-items: center; gap: 0.35em; font-family: var(--mat); vertical-align: middle; }
   .chave { line-height: 0.86; font-weight: 400; }
   .sist[data-n="2"] .chave { font-size: 3.4em; }
   .sist[data-n="3"] .chave { font-size: 5.15em; }
   .sist[data-n="4"] .chave { font-size: 6.9em; }
   .eqs { display: flex; flex-direction: column; gap: 0.12em; }
+  .eqs.sentencas { display: grid; grid-template-columns: auto auto; column-gap: 1.2em; text-align: left; }
+  .eqs.sentencas > :global(span) { white-space: nowrap; }
 </style>

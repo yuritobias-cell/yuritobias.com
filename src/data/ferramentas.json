@@ -85,7 +85,7 @@
       "tipo": "suporte",
       "descricao": "Planificações de 34 poliedros em folhas A4 para recortar e montar — Platão, prismas e pirâmides retos ou oblíquos, arquimedianos e côncavos. Abas de colagem numeradas, aresta em centímetros, impressão direta e download em PDF ou SVG.",
       "assuntos": [
-        "geometria",
+        "geometria-espacial",
         "sala-de-aula"
       ]
     },
@@ -179,7 +179,7 @@
       "tipo": "simulacoes",
       "descricao": "Gire e planifique poliedros em 3D: os cinco de Platão, prismas e pirâmides retos e oblíquos, arquimedianos e côncavos. A rede abre face a face, a Relação de Euler se confere sozinha e o teste do segmento separa convexos de côncavos.",
       "assuntos": [
-        "geometria"
+        "geometria-espacial"
       ]
     },
     {
@@ -189,7 +189,7 @@
       "tipo": "simulacoes",
       "descricao": "Suba um plano de corte por dois sólidos de mesma altura e compare as seções: pilha de moedas empurrada, prisma reto e oblíquo, cilindro e prisma torcido, cone e pirâmide, esfera e anticlepsidra. Fatie os sólidos para ver por que o volume é o mesmo — e o caso em que não é.",
       "assuntos": [
-        "geometria"
+        "geometria-espacial"
       ]
     },
     {

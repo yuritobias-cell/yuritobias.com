@@ -1,0 +1,118 @@
+---
+titulo: "Áreas Sombreadas"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre áreas de regiões sombreadas formadas por quadrados, retângulos, círculos, semicírculos e quartos de círculo: pétalas, lentes, a estrela entre quatro arcos e figuras com semicircunferências sobre um diâmetro."
+serie: "2em"
+material: "21"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento. Use π ≈ 3,14 quando for pedido o valor aproximado."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. Calcule, em função de <i>a</i>, a área da superfície sombreada em cada figura.
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [0, 4]], ['A', [0, 0], [4, 0], 'h'], ['Z']], pintado: true }]}
+          poligonos={[[[0, 0], [4, 0], [4, 4], [0, 4]]]} segmentos={[[[0, 4], [4, 0]]]}
+          retos={[[[0, 4], [0, 0], [4, 0]]]} medidas={[{ de: [0, 0], para: [0, 4], texto: 'a' }]}
+          tamanho={110} rotulo="a) quadrado"
+          descricao="Quadrado de lado a com uma diagonal e um quarto de circunferência centrado no canto de baixo à esquerda; a região entre a diagonal e o arco está pintada" />
+     <Geo regioes={[{ d: [['M', [0, 0]], ['L', [8, 0]], ['A', [8, 4], [4, 4], 'h'], ['A', [0, 4], [0, 0], 'h'], ['Z']], pintado: true }]}
+          poligonos={[[[0, 0], [8, 0], [8, 4], [0, 4]]]}
+          retos={[[[0, 0], [0, 4], [8, 4]]]}
+          medidas={[{ de: [0, 0], para: [0, 4], texto: 'a' }, { de: [0, 0], para: [8, 0], texto: '2*a*' }]}
+          tamanho={170} rotulo="b) retângulo"
+          descricao="Retângulo de lados 2a e a com dois quartos de circunferência de raio a, centrados nos cantos de cima; a região entre os dois arcos e o lado de baixo está pintada" />
+     <Geo regioes={[
+            { d: [['M', [0, 0]], ['A', [2, 0], [2, 2], 'h'], ['A', [0, 2], [0, 0], 'h'], ['Z']], pintado: true },
+            { d: [['M', [4, 0]], ['A', [2, 0], [2, 2], 'ah'], ['A', [4, 2], [4, 0], 'ah'], ['Z']], pintado: true },
+            { d: [['M', [4, 4]], ['A', [2, 4], [2, 2], 'h'], ['A', [4, 2], [4, 4], 'h'], ['Z']], pintado: true },
+            { d: [['M', [0, 4]], ['A', [2, 4], [2, 2], 'ah'], ['A', [0, 2], [0, 4], 'ah'], ['Z']], pintado: true },
+          ]}
+          poligonos={[[[0, 0], [4, 0], [4, 4], [0, 4]]]}
+          retos={[[[0, 4], [0, 0], [4, 0]]]} medidas={[{ de: [0, 0], para: [0, 4], texto: 'a' }]}
+          tamanho={110} rotulo="c) quadrado"
+          descricao="Quadrado de lado a com quatro pétalas pintadas, uma em cada canto, formadas por semicircunferências traçadas sobre os lados e que se encontram no centro do quadrado" />
+   </Figuras>
+
+1. <i>ABCD</i> é um quadrado de perímetro 16 cm. Os dois arcos têm raio igual ao lado do quadrado e centros nos vértices <i>B</i> e <i>D</i>. Determine a área total das regiões sombreadas.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [4, 0], C: [4, 4], D: [0, 4] }}
+          regioes={[{ d: [['M', 'A'], ['L', 'B'], ['L', 'C'], ['L', 'D'], ['Z'], ['M', 'A'], ['A', 'B', 'C', 'h'], ['A', 'D', 'A', 'h'], ['Z']], pintado: true }]}
+          nomes={['A', 'B', 'C', 'D']}
+          tamanho={130}
+          descricao="Quadrado ABCD com dois arcos de raio igual ao lado, centrados em B e em D, que se cruzam em A e em C formando uma lente branca no meio; os dois cantos de fora da lente estão pintados" />
+   </Figuras>
+
+1. Determine a área sombreada em cada figura, sabendo que os três quadrados <i>ABCD</i> têm lado medindo 2 cm. Em (a) e (c), os arcos têm raio 1 cm; em (b), raio 2 cm.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], B: [2, 0], C: [2, 2], D: [0, 2] }}
+          regioes={[{ d: [['M', 'A'], ['L', 'B'], ['L', 'C'], ['L', 'D'], ['Z'],
+                          ['M', 'D'], ['L', [1, 2]], ['A', 'D', [0, 1], 'h'], ['Z'],
+                          ['M', 'C'], ['L', [1, 2]], ['A', 'C', [2, 1], 'ah'], ['Z']], pintado: true }]}
+          nomes={['A', 'B', 'C', 'D']}
+          iguais={[['D', [1, 2]], [[1, 2], 'C'], ['D', [0, 1]], [[0, 1], 'A'], ['C', [2, 1]], [[2, 1], 'B']]}
+          tamanho={100} rotulo="a)"
+          descricao="Quadrado ABCD com dois quartos de círculo de raio 1 cm recortados nos cantos de cima, D e C; o resto do quadrado está pintado" />
+     <Geo pontos={{ A: [0, 0], B: [2, 0], C: [2, 2], D: [0, 2] }}
+          regioes={[{ d: [['M', 'D'], ['A', 'A', 'B', 'h'], ['A', 'C', 'D', 'h'], ['Z']], pintado: true }]}
+          poligonos={[['A', 'B', 'C', 'D']]} nomes={['A', 'B', 'C', 'D']}
+          tamanho={100} rotulo="b)"
+          descricao="Quadrado ABCD com dois arcos de raio 2 cm, centrados em A e em C, que vão de B a D; a lente entre os dois arcos está pintada" />
+     <Geo pontos={{ A: [0, 0], B: [2, 0], C: [2, 2], D: [0, 2] }}
+          regioes={[{ d: [['M', 'A'], ['L', 'B'], ['L', 'C'], ['L', 'D'], ['Z'],
+                          ['M', 'A'], ['L', [1, 0]], ['A', 'A', [0, 1], 'ah'], ['Z'],
+                          ['M', 'B'], ['L', [2, 1]], ['A', 'B', [1, 0], 'ah'], ['Z'],
+                          ['M', 'C'], ['L', [1, 2]], ['A', 'C', [2, 1], 'ah'], ['Z'],
+                          ['M', 'D'], ['L', [0, 1]], ['A', 'D', [1, 2], 'ah'], ['Z']], pintado: true }]}
+          nomes={['A', 'B', 'C', 'D']}
+          iguais={[['A', [1, 0]], [[1, 0], 'B'], ['B', [2, 1]], [[2, 1], 'C'], ['C', [1, 2]], [[1, 2], 'D'], ['D', [0, 1]], [[0, 1], 'A']]}
+          tamanho={100} rotulo="c)"
+          descricao="Quadrado ABCD com quatro quartos de círculo de raio 1 cm recortados nos quatro cantos; a estrela de lados curvos que sobra no centro está pintada" />
+   </Figuras>
+
+1. Nas figuras abaixo, <i>C</i> é um ponto do segmento <i>AB</i>, com <i>AC</i> igual ao triplo de <i>CB</i> e <i>AB</i> = 32 cm. Determine a área sombreada em cada caso.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], C: [24, 0], B: [32, 0] }}
+          regioes={[{ d: [['M', 'A'], ['A', [16, 0], 'B', 'h'], ['A', [28, 0], 'C', 'h'], ['A', [12, 0], 'A', 'ah'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'C']]} nomes={['A', 'C', 'B']} marcas={[[16, 0], 'C']}
+          tamanho={170} rotulo="a)"
+          descricao="Faixa curva pintada: por cima, a semicircunferência de diâmetro AB; por dentro, a semicircunferência de diâmetro AC; e, embaixo da reta, a pequena semicircunferência de diâmetro CB, que fecha a figura entre C e B" />
+     <Geo pontos={{ A: [0, 0], C: [24, 0], B: [32, 0] }}
+          regioes={[{ d: [['O', [16, 0], 16]] }, { d: [['M', 'A'], ['A', [12, 0], 'C', 'h'], ['A', [28, 0], 'B', 'ah'], ['A', [16, 0], 'A', 'h'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'B']]} nomes={['A', 'C', 'B']} marcas={[[16, 0], 'C']}
+          tamanho={170} rotulo="b)"
+          descricao="Circunferência de diâmetro AB. A região pintada é limitada pela semicircunferência de diâmetro AC (em cima), pela pequena semicircunferência de diâmetro CB (embaixo da reta) e pela metade de baixo da circunferência grande" />
+   </Figuras>
+
+1. Na figura, o semicírculo tem raio 10 cm e o círculo inscrito nele tem raio 5 cm. Calcule a área da parte sombreada.
+
+   <Figuras>
+     <Geo regioes={[{ d: [['M', [-10, 0]], ['A', [0, 0], [10, 0], 'h'], ['Z'], ['O', [0, 5], 5]], pintado: true }]}
+          segmentos={[[[-12, 0], [12, 0]], [[0, 5], [0, 10]], [[0, 0], [7.07, 7.07]]]}
+          tracejados={[[[-5, 5], [5, 5]], [[0, 0], [0, 5]]]}
+          medidas={[{ de: [0, 5], para: [0, 10], texto: '5', lado: -1 }, { de: [0, 0], para: [7.07, 7.07], texto: '10', lado: 1 }]}
+          marcas={[[0, 5], [0, 0]]}
+          tamanho={180}
+          descricao="Semicírculo de raio 10 com um círculo de raio 5 inscrito, que encosta no diâmetro e no arco; a parte do semicírculo fora do círculo está pintada" />
+   </Figuras>
+
+1. Nas figuras abaixo, determine a área sombreada sabendo que <i>AB</i> = 20 cm. Em (a), <i>AO</i> ≡ <i>OB</i>; em (b), <i>AC</i> ≡ <i>CO</i> ≡ <i>OD</i> ≡ <i>DB</i>.
+
+   <Figuras>
+     <Geo pontos={{ A: [0, 0], O: [10, 0], B: [20, 0] }}
+          regioes={[{ d: [['M', 'A'], ['A', 'O', 'B', 'h'], ['A', [15, 0], 'O', 'ah'], ['A', [5, 0], 'A', 'ah'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'B']]} nomes={['A', 'O', 'B']} marcas={['O']}
+          iguais={[['A', 'O'], ['O', 'B']]}
+          tamanho={150} rotulo="a)"
+          descricao="Semicírculo de diâmetro AB com dois semicírculos menores, de diâmetros AO e OB, recortados embaixo; a região entre o arco grande e os dois arcos pequenos está pintada" />
+     <Geo pontos={{ A: [0, 0], C: [5, 0], O: [10, 0], D: [15, 0], B: [20, 0] }}
+          regioes={[{ d: [['M', 'A'], ['A', 'O', 'B', 'h'], ['A', [17.5, 0], 'D', 'ah'], ['A', 'O', 'C', 'ah'], ['A', [2.5, 0], 'A', 'ah'], ['Z']], pintado: true }]}
+          segmentos={[['A', 'B']]} nomes={['A', 'C', 'O', 'D', 'B']} marcas={['O']}
+          iguais={[['A', 'C'], ['C', 'O'], ['O', 'D'], ['D', 'B']]}
+          tamanho={150} rotulo="b)"
+          descricao="Semicírculo de diâmetro AB com três semicírculos menores recortados embaixo, de diâmetros AC, CD e DB; a região entre o arco grande e os três arcos menores está pintada" />
+   </Figuras>

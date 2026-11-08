@@ -1,0 +1,67 @@
+---
+titulo: "Conjuntos — Diagrama de Venn"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre diagrama de Venn: problemas de contagem com dois e três conjuntos — audiência de programas de TV, aprovação em disciplinas, uso de notebooks e tablets —, com questões da Fuvest e da Fatec."
+serie: "1em"
+material: "03"
+instrucoes: "Os exercícios a seguir podem ser resolvidos diretamente no caderno ou na apostila (páginas 159 e 160)."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+
+1. O quadro a seguir mostra o resultado de uma pesquisa realizada com 1 700 pessoas entrevistadas a respeito da audiência de três tipos de programa de televisão: esportivo (E), humorístico (H) e jornalístico (J).
+
+   <table class="tabela">
+     <caption>Audiência dos programas entre os 1 700 entrevistados</caption>
+     <thead>
+       <tr><th scope="col">Programas</th><th scope="col">Número de entrevistados que assistem aos programas</th></tr>
+     </thead>
+     <tbody>
+       <tr><th scope="row">E</th><td>600</td></tr>
+       <tr><th scope="row">H</th><td>750</td></tr>
+       <tr><th scope="row">J</th><td>800</td></tr>
+       <tr><th scope="row">E e H</th><td>210</td></tr>
+       <tr><th scope="row">E e J</th><td>300</td></tr>
+       <tr><th scope="row">H e J</th><td>190</td></tr>
+       <tr><th scope="row">E, H e J</th><td>80</td></tr>
+     </tbody>
+   </table>
+
+   De acordo com os dados apresentados, calcule o número de pessoas entrevistadas que não assistem a nenhum dos programas.
+
+1. **(Fuvest-SP)** Dentre os candidatos que fizeram provas de Matemática, Português e Inglês num concurso, 20 obtiveram nota mínima para aprovação nas três disciplinas. Além disso, sabe-se que:
+
+   - 14 não obtiveram nota mínima em Matemática;
+   - 16 não obtiveram nota mínima em Português;
+   - 12 não obtiveram nota mínima em Inglês;
+   - 5 não obtiveram nota mínima em Matemática e em Português;
+   - 3 não obtiveram nota mínima em Matemática e em Inglês;
+   - 7 não obtiveram nota mínima em Português e em Inglês e
+   - 2 não obtiveram nota mínima em Português, Matemática e Inglês.
+
+   A quantidade de candidatos que participaram do concurso foi
+
+   <Alt cols={5}>
+     <li>44.</li>
+     <li>46.</li>
+     <li>47.</li>
+     <li>48.</li>
+     <li>49.</li>
+   </Alt>
+
+1. **(Fatec-SP)** Em uma pesquisa de mercado sobre o uso de *notebooks* e *tablets* foram obtidos, entre os indivíduos pesquisados, os seguintes resultados:
+
+   - 55 usam *notebook*;
+   - 45 usam *tablet*; e
+   - 27 usam apenas *notebook*.
+
+   Sabendo que todos os pesquisados utilizam pelo menos um desses dois equipamentos, então, dentre os pesquisados, o número dos que usam apenas *tablet* é:
+
+   <Alt cols={5}>
+     <li>8.</li>
+     <li>17.</li>
+     <li>27.</li>
+     <li>36.</li>
+     <li>45.</li>
+   </Alt>
+
+1. Uma entrevista foi realizada com os 900 inscritos em um clube de motociclistas. Desses inscritos, 480 relatam ter carro e 315 declaram ter carro e moto. Considere que todos os inscritos têm um dos dois veículos. Com base nesses casos, quantos são os que têm apenas moto nesse momento da entrevista?

@@ -1,0 +1,250 @@
+---
+/* Sólidos geométricos desenhados no build — os prismas, pirâmides, cilindros e
+   cones das listas de geometria espacial. Duas famílias:
+
+   POLIEDROS (tipo "prisma" | "piramide"): a base é um polígono dado em
+   coordenadas (u, v), e o sólido é montado em 3D e projetado em perspectiva
+   oblíqua (a profundidade sobe para a direita, encurtada — como o TikZ das
+   folhas). As arestas escondidas saem tracejadas POR CÁLCULO: uma aresta é
+   escondida quando todas as faces que a contêm estão de costas para quem olha.
+   Nada de escolher à mão qual tracejar.
+
+     eixo="vertical"     a base fica no chão e o sólido sobe (prisma "em pé")
+     eixo="profundidade" a base fica de frente e o prisma vai para trás
+                          (o prisma "deitado", com a face triangular à vista)
+
+   Os vértices são numerados assim, para as `medidas`:
+     prisma:   0…n−1 = a base dada;  n…2n−1 = a outra base (mesma ordem)
+     pirâmide: 0…n−1 = a base;       n = o vértice (ápice)
+
+     <Solido tipo="prisma" eixo="profundidade" base={[[0,0],[8,0],[0,6]]} altura={10}
+             medidas={[{ aresta: [0, 2], texto: '6 cm' }, …]} destaque descricao="…" />
+
+   REDONDOS (tipo "cilindro" | "cone" | "silo"): raio `r` e altura `h` (o silo
+   é cilindro + cone por cima, com `hCone`); os rótulos vão em `rotulos`.
+
+     <Solido tipo="cone" r={6} h={10} rotulos={{ r: '6 cm', h: '10 cm' }} descricao="…" />
+
+   As figuras não estão em escala exata (como avisam as folhas), mas guardam a
+   proporção das medidas dadas. `descricao` é obrigatória (leitor de tela). */
+interface Medida {
+  /** Índices dos dois vértices da aresta. */
+  aresta: [number, number];
+  texto: string;
+}
+interface Props {
+  tipo: 'prisma' | 'piramide' | 'cilindro' | 'cone' | 'silo';
+  /** Poliedros: polígono da base em (u, v). */
+  base?: [number, number][];
+  /** Prisma: altura (ou comprimento, se eixo="profundidade"); pirâmide: altura. */
+  altura?: number;
+  eixo?: 'vertical' | 'profundidade';
+  medidas?: Medida[];
+  /** Pirâmide: rótulo da altura, desenhada tracejada do ápice ao centro da base. */
+  rotuloAltura?: string;
+  /** Pinta a base dada (a face de frente, no prisma deitado). */
+  destaque?: boolean;
+  /** Redondos. */
+  r?: number;
+  h?: number;
+  hCone?: number;
+  rotulos?: { r?: string; h?: string; hCone?: string };
+  /** Legenda curta sob a figura — "a)", "b)". */
+  rotulo?: string;
+  descricao: string;
+}
+
+const p = Astro.props;
+const ALVO = 150;   // maior dimensão do desenho, em px
+const M = 34;       // margem para os rótulos
+
+type V3 = [number, number, number];
+type P2 = [number, number];
+const sub = (a: V3, b: V3): V3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const cruz = (a: V3, b: V3): V3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const esc = (a: V3, b: V3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const media = (pts: V3[]): V3 => pts.reduce((s, q) => [s[0] + q[0] / pts.length, s[1] + q[1] / pts.length, s[2] + q[2] / pts.length], [0, 0, 0] as V3);
+
+// Perspectiva oblíqua: profundidade z encurtada pela metade, a 30° para cima-direita.
+const KA = 0.45 * Math.cos(Math.PI / 6);
+const KB = 0.45 * Math.sin(Math.PI / 6);
+const proj = ([x, y, z]: V3): P2 => [x + KA * z, -(y + KB * z)];
+// Quem olha, olha nesta direção (pontos ao longo dela caem no mesmo lugar da tela).
+const OLHAR: V3 = [-KA, -KB, 1];
+
+let largura = 0, alturaSvg = 0, minX = 0, minY = 0;
+let escondidas: [P2, P2][] = [];
+let visiveis: [P2, P2][] = [];
+let faceDestaque: P2[] | null = null;
+let rotulosTxt: { x: number; y: number; t: string; anchor: string }[] = [];
+let linhaAltura: [P2, P2] | null = null;
+let redondo = '';   // marcação SVG pronta dos sólidos redondos
+
+if (p.tipo === 'prisma' || p.tipo === 'piramide') {
+  const base = p.base ?? [];
+  const n = base.length;
+  const H = p.altura ?? 1;
+  const vertical = p.tipo === 'piramide' || p.eixo !== 'profundidade';
+
+  // 1. Vértices e faces em 3D.
+  const vs: V3[] = [];
+  const faces: number[][] = [];
+  if (p.tipo === 'prisma') {
+    for (const [u, v] of base) vs.push(vertical ? [u, 0, v] : [u, v, 0]);
+    for (const [u, v] of base) vs.push(vertical ? [u, H, v] : [u, v, H]);
+    faces.push([...Array(n).keys()]);
+    faces.push([...Array(n).keys()].map((i) => i + n));
+    for (let i = 0; i < n; i++) faces.push([i, (i + 1) % n, ((i + 1) % n) + n, i + n]);
+  } else {
+    for (const [u, v] of base) vs.push([u, 0, v]);
+    const c = media(vs);
+    vs.push([c[0], H, c[2]]);
+    faces.push([...Array(n).keys()]);
+    for (let i = 0; i < n; i++) faces.push([i, (i + 1) % n, n]);
+  }
+
+  // 2. Face visível = normal para fora apontando contra a direção do olhar.
+  const centro = media(vs);
+  const visivel = faces.map((f) => {
+    let nrm = cruz(sub(vs[f[1]], vs[f[0]]), sub(vs[f[2]], vs[f[0]]));
+    if (esc(nrm, sub(media(f.map((i) => vs[i])), centro)) < 0) nrm = [-nrm[0], -nrm[1], -nrm[2]];
+    return esc(nrm, OLHAR) < 0;
+  });
+
+  // 3. Aresta escondida = todas as faces dela estão de costas.
+  const arestas = new Map<string, { a: number; b: number; vista: boolean }>();
+  faces.forEach((f, k) => f.forEach((a, i) => {
+    const b = f[(i + 1) % f.length];
+    const chave = a < b ? `${a}-${b}` : `${b}-${a}`;
+    const e = arestas.get(chave) ?? { a: Math.min(a, b), b: Math.max(a, b), vista: false };
+    e.vista ||= visivel[k];
+    arestas.set(chave, e);
+  }));
+
+  // 4. Escala para caber em ALVO px e passa tudo para a tela.
+  const crus = vs.map(proj);
+  const xs = crus.map((q) => q[0]), ys = crus.map((q) => q[1]);
+  const s = ALVO / Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+  const tela = crus.map(([x, y]) => [x * s, y * s] as P2);
+  minX = Math.min(...tela.map((q) => q[0])) - M;
+  minY = Math.min(...tela.map((q) => q[1])) - M;
+  largura = Math.max(...tela.map((q) => q[0])) - minX + M;
+  alturaSvg = Math.max(...tela.map((q) => q[1])) - minY + M;
+
+  for (const { a, b, vista } of arestas.values()) (vista ? visiveis : escondidas).push([tela[a], tela[b]]);
+  if (p.destaque) faceDestaque = faces[0].map((i) => tela[i]);
+
+  // 5. Rótulos: no meio da aresta, empurrados para fora da figura.
+  const cx = tela.reduce((acc, q) => acc + q[0], 0) / tela.length;
+  const cy = tela.reduce((acc, q) => acc + q[1], 0) / tela.length;
+  const rotular = (m: P2, t: string, dist = 13) => {
+    let dx = m[0] - cx, dy = m[1] - cy;
+    const L = Math.hypot(dx, dy) || 1;
+    dx /= L; dy /= L;
+    rotulosTxt.push({
+      x: m[0] + dx * dist,
+      y: m[1] + dy * dist + 4,
+      t,
+      anchor: dx > 0.35 ? 'start' : dx < -0.35 ? 'end' : 'middle',
+    });
+  };
+  for (const { aresta: [a, b], texto } of p.medidas ?? []) {
+    if (!tela[a] || !tela[b]) throw new Error(`[Solido] aresta [${a}, ${b}] fora dos ${tela.length} vértices`);
+    rotular([(tela[a][0] + tela[b][0]) / 2, (tela[a][1] + tela[b][1]) / 2], texto);
+  }
+  if (p.tipo === 'piramide') {
+    const ap = tela[n];
+    const cb = proj(media(vs.slice(0, n)));
+    const pe: P2 = [cb[0] * s, cb[1] * s];
+    linhaAltura = [ap, pe];
+    if (p.rotuloAltura) {
+      rotulosTxt.push({ x: (ap[0] + pe[0]) / 2 + 6, y: (ap[1] + pe[1]) / 2 + 4, t: p.rotuloAltura, anchor: 'start' });
+    }
+  }
+} else {
+  // Sólidos redondos: elipse achatada para as bases.
+  const r = p.r ?? 1, h = p.h ?? 1, hc = p.tipo === 'silo' ? p.hCone ?? 1 : 0;
+  const s = ALVO / Math.max(2 * r, h + hc);
+  const R = r * s, E = R * 0.3, Hs = h * s, Hc = hc * s;
+  const rot = p.rotulos ?? {};
+  const cx = 0, yb = 0, yt = -Hs;
+  const frente = (y: number) => `M${cx - R},${y} A${R},${E} 0 0 0 ${cx + R},${y}`;  // metade de baixo (vista)
+  const tras = (y: number) => `M${cx - R},${y} A${R},${E} 0 0 1 ${cx + R},${y}`;    // metade de cima (atrás)
+  const t = (x: number, y: number, txt: string, anchor = 'start') =>
+    `<text x="${x}" y="${y}" text-anchor="${anchor}" class="rot">${txt}</text>`;
+  const partes: string[] = [];
+
+  if (p.tipo === 'cilindro' || p.tipo === 'silo') {
+    if (p.destaque) partes.push(`<path class="pinta" d="M${cx - R},${yb} L${cx - R},${yt} ${tras(yt).slice(tras(yt).indexOf('A'))} L${cx + R},${yb} A${R},${E} 0 0 1 ${cx - R},${yb} Z" />`);
+    partes.push(`<path d="${frente(yb)}" />`, `<path class="esc" d="${tras(yb)}" />`);
+    partes.push(`<line x1="${cx - R}" y1="${yb}" x2="${cx - R}" y2="${yt}" />`, `<line x1="${cx + R}" y1="${yb}" x2="${cx + R}" y2="${yt}" />`);
+    if (p.tipo === 'cilindro') {
+      partes.push(`<ellipse cx="${cx}" cy="${yt}" rx="${R}" ry="${E}" />`);
+      partes.push(`<line class="esc" x1="${cx}" y1="${yt}" x2="${cx}" y2="${yb}" />`);
+      partes.push(`<line class="med" x1="${cx}" y1="${yt}" x2="${cx + R}" y2="${yt}" />`);
+      if (rot.r) partes.push(t(cx + R / 2, yt - E - 5, rot.r, 'middle'));
+      if (rot.h) partes.push(t(cx + R + 6, (yt + yb) / 2 + 4, rot.h));
+    } else {
+      // Silo: a tampa do cilindro fica por baixo do cone — metade de trás escondida.
+      partes.push(`<path d="${frente(yt)}" />`, `<path class="esc" d="${tras(yt)}" />`);
+      const ap = yt - Hc;
+      partes.push(`<line x1="${cx - R}" y1="${yt}" x2="${cx}" y2="${ap}" />`, `<line x1="${cx}" y1="${ap}" x2="${cx + R}" y2="${yt}" />`);
+      partes.push(`<line class="esc" x1="${cx}" y1="${ap}" x2="${cx}" y2="${yb}" />`);
+      partes.push(`<line class="med" x1="${cx}" y1="${yb}" x2="${cx + R}" y2="${yb}" />`);
+      if (rot.r) partes.push(t(cx + R / 2, yb + E + 14, rot.r, 'middle'));
+      if (rot.h) partes.push(t(cx + R + 6, (yt + yb) / 2 + 4, rot.h));
+      if (rot.hCone) partes.push(t(cx + R * 0.55, ap + Hc * 0.45, rot.hCone));
+    }
+    minY = yt - Hc - E - M;
+  } else {
+    // Cone.
+    const ap = yb - Hs;
+    if (p.destaque) partes.push(`<path class="pinta" d="M${cx},${ap} L${cx + R},${yb} A${R},${E} 0 0 1 ${cx - R},${yb} Z" />`);
+    partes.push(`<path d="${frente(yb)}" />`, `<path class="esc" d="${tras(yb)}" />`);
+    partes.push(`<line x1="${cx - R}" y1="${yb}" x2="${cx}" y2="${ap}" />`, `<line x1="${cx}" y1="${ap}" x2="${cx + R}" y2="${yb}" />`);
+    partes.push(`<line class="esc" x1="${cx}" y1="${ap}" x2="${cx}" y2="${yb}" />`);
+    partes.push(`<line class="med" x1="${cx}" y1="${yb}" x2="${cx + R}" y2="${yb}" />`);
+    partes.push(`<polyline class="fino" points="${cx},${yb - 7} ${cx + 7},${yb - 7} ${cx + 7},${yb}" />`);
+    if (rot.h) partes.push(t(cx - 6, (ap + yb) / 2 + 4, rot.h, 'end'));
+    if (rot.r) partes.push(t(cx + R / 2, yb + E + 14, rot.r, 'middle'));
+    minY = ap - M;
+  }
+  redondo = partes.join('');
+  minX = cx - R - M - 24;
+  largura = 2 * R + 2 * M + 48;
+  alturaSvg = yb + E + 22 - minY;
+}
+
+const pts = (q: P2[]) => q.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+---
+<figure class="solido">
+  <svg viewBox={`${minX.toFixed(1)} ${minY.toFixed(1)} ${largura.toFixed(1)} ${alturaSvg.toFixed(1)}`}
+       width={Math.round(largura)} role="img" aria-label={p.descricao}>
+    {faceDestaque && <polygon class="pinta" points={pts(faceDestaque)} />}
+    {escondidas.map(([a, b]) => <line class="esc" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />)}
+    {visiveis.map(([a, b]) => <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />)}
+    {linhaAltura && <line class="esc med" x1={linhaAltura[0][0]} y1={linhaAltura[0][1]} x2={linhaAltura[1][0]} y2={linhaAltura[1][1]} />}
+    {redondo && <Fragment set:html={redondo} />}
+    {rotulosTxt.map((r) => <text class="rot" x={r.x} y={r.y} text-anchor={r.anchor}>{r.t}</text>)}
+  </svg>
+  {p.rotulo && <figcaption set:html={p.rotulo} />}
+</figure>
+
+<style>
+  .solido { display: inline-block; margin: 0.4rem 0; text-align: center; vertical-align: top; }
+  .solido svg { max-width: 100%; height: auto; color: var(--ink); overflow: visible; }
+  .solido :global(line), .solido :global(path), .solido :global(ellipse), .solido :global(polyline) {
+    fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linejoin: round;
+  }
+  .solido :global(.esc) { stroke-dasharray: 4 3; stroke-width: 1; }
+  .solido :global(.med) { stroke: var(--accent); }
+  .solido :global(.fino) { stroke-width: 0.9; }
+  .solido :global(.pinta) { fill: color-mix(in srgb, var(--accent) 12%, transparent); stroke: none; }
+  /* Contorno da cor do fundo: o rótulo continua legível quando cruza uma aresta
+     (o `fill=white` dos nós do TikZ). */
+  .solido :global(.rot) {
+    font-family: var(--mat); font-size: 12px; fill: currentColor;
+    paint-order: stroke; stroke: var(--bg); stroke-width: 3.5px; stroke-linejoin: round;
+  }
+  figcaption { font-size: 0.85rem; font-weight: 600; margin-top: 0.1rem; }
+</style>

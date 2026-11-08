@@ -1,0 +1,60 @@
+---
+titulo: "Função Quadrática: Raízes, Vértice e Estudo do Sinal"
+descricao: "Lista de exercícios do 1º ano do Ensino Médio sobre função quadrática: discriminante e raízes, vértice e conjunto imagem, esboço do gráfico, estudo do sinal e aplicações com lançamento de bola e lucro de uma fábrica."
+serie: "1em"
+material: "18"
+instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Figuras from '../../components/mat/Figuras.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Lembrete from '../../components/mat/Lembrete.astro';
+import Plano from '../../components/mat/Plano.astro';
+import Raiz from '../../components/mat/Raiz.astro';
+
+<Lembrete titulo="Fórmulas">
+  <span>Δ = <i>b</i><sup>2</sup> − 4<i>ac</i></span>
+  <span><i>x</i> = <Frac><Fragment slot="n">−<i>b</i> ± <Raiz>Δ</Raiz></Fragment><Fragment slot="d">2<i>a</i></Fragment></Frac></span>
+  <span><i>x</i><sub><i>V</i></sub> = <Frac n="−<i>b</i>" d="2<i>a</i>" /></span>
+  <span><i>y</i><sub><i>V</i></sub> = <Frac n="−Δ" d="4<i>a</i>" /></span>
+</Lembrete>
+
+1. Para cada função quadrática, calcule o discriminante Δ e determine as raízes reais, quando existirem:
+
+   <Alt cols={3}>
+     <li><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 7<i>x</i> + 10</li>
+     <li><i>g</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 6<i>x</i> + 9</li>
+     <li><i>h</i>(<i>x</i>) = <i>x</i><sup>2</sup> + 2<i>x</i> + 5</li>
+   </Alt>
+
+1. Considere a função quadrática <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − 4<i>x</i> + 3.
+
+   1. Determine as raízes e o ponto em que a parábola corta o eixo <i>y</i>.
+   1. Calcule as coordenadas do vértice <i>V</i> e diga se ele é ponto de máximo ou de mínimo.
+   1. Esboce o gráfico de <i>f</i> na malha.
+   1. A partir do vértice, determine o conjunto imagem de <i>f</i>.
+
+   <Figuras>
+     <Plano x={[-2, 5]} y={[-3, 5]} grade rotulosX={[-1, 1, 3]} rotulosY={[-2, 2, 4]}
+            descricao="Malha quadriculada em branco, com x de −2 a 5 e y de −3 a 5, para esboçar o gráfico de f" />
+   </Figuras>
+
+1. Faça o estudo dos sinais de cada função, indicando para quais valores de <i>x</i> ela é positiva, negativa ou nula:
+
+   <Alt cols={2}>
+     <li><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − <i>x</i> − 6</li>
+     <li><i>g</i>(<i>x</i>) = −<i>x</i><sup>2</sup> + 4<i>x</i></li>
+   </Alt>
+
+1. Uma bola é lançada verticalmente para cima e sua altura, em metros, <i>t</i> segundos após o lançamento, é dada por <span style="white-space: nowrap"><i>h</i>(<i>t</i>) = −5<i>t</i><sup>2</sup> + 20<i>t</i></span>.
+
+   1. Em que instante a bola retorna ao solo?
+   1. Qual é a altura máxima atingida e em que instante isso ocorre?
+   1. Estudando o sinal de <i>h</i>(<i>t</i>) − 15, determine durante quanto tempo a bola permanece acima de 15 m de altura.
+
+1. O lucro mensal de uma fábrica, em reais, ao produzir e vender <i>x</i> peças, é dado por <span style="white-space: nowrap"><i>L</i>(<i>x</i>) = −<i>x</i><sup>2</sup> + 60<i>x</i> − 500</span>.
+
+   1. Quantas peças devem ser vendidas para que o lucro seja nulo?
+   1. Determine o número de peças que gera o lucro máximo e o valor desse lucro.
+   1. Para quais quantidades de peças a fábrica tem prejuízo, ou seja, <i>L</i>(<i>x</i>) < 0?

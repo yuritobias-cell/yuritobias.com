@@ -1,0 +1,59 @@
+---
+titulo: "Trigonometria Aplicada"
+descricao: "Lista de exercícios do 9º ano com seno, cosseno e tangente em situações reais — rampa de skate, poste estaiado e sombra de um prédio — e uma análise de erro conferida pelo Teorema de Pitágoras."
+serie: "9ano"
+material: "20"
+instrucoes: "Resolva as questões no caderno, apresentando todo o desenvolvimento."
+---
+
+import Figuras from '../../components/mat/Figuras.astro';
+import Geo from '../../components/mat/Geo.astro';
+
+1. A rampa de uma pista de skate tem 8 m de comprimento e forma um ângulo de 30° com o solo. (Use sen 30° = 0,5 e cos 30° = 0,87.)
+
+   <Figuras>
+     <Geo pontos={{ P: [0, 0], Q: [6.93, 0], R: [6.93, 4] }}
+          poligonos={[['P', 'Q', 'R']]} solo={['P', 'Q']}
+          medidas={[{ de: 'P', para: 'R', texto: '8 m' }, { de: 'Q', para: 'R', texto: 'x' }, { de: 'P', para: 'Q', texto: 'y', dist: 22 }]}
+          retos={[['P', 'Q', 'R']]}
+          angulos={[{ v: 'P', de: 'Q', para: 'R', texto: '30°', raio: 24 }]}
+          tamanho={170}
+          descricao="Rampa de skate: triângulo retângulo sobre o chão, com a rampa de 8 m formando 30° com o solo; x é a altura (vertical) e y o afastamento no chão" />
+   </Figuras>
+
+   1. Calcule a altura <i>x</i> alcançada pela rampa.
+   1. Calcule o afastamento <i>y</i>, isto é, a distância horizontal ocupada pela rampa no chão.
+
+1. Um cabo de aço prende o topo de um poste de 9 m de altura a um ponto do solo, formando um ângulo de 60° com o chão. (Use sen 60° = 0,87 e tg 60° = 1,73.)
+
+   <Figuras>
+     <Geo pontos={{ P: [0, 0], B: [5.2, 0], T: [5.2, 9] }}
+          poligonos={[['P', 'B', 'T']]} solo={['P', 'B']}
+          medidas={[{ de: 'P', para: 'T', texto: 'cabo' }, { de: 'B', para: 'T', texto: '9 m' }, { de: 'P', para: 'B', texto: 'd', dist: 22 }]}
+          retos={[['P', 'B', 'T']]}
+          angulos={[{ v: 'P', de: 'B', para: 'T', texto: '60°', raio: 16 }]}
+          tamanho={130}
+          descricao="Poste vertical de 9 m preso por um cabo que forma 60° com o chão; d é a distância do ponto de fixação até a base do poste" />
+   </Figuras>
+
+   1. Usando o seno de 60°, calcule o comprimento do cabo.
+   1. Usando a tangente de 60°, calcule a distância <i>d</i> do ponto de fixação até a base do poste.
+   1. Confira os resultados usando o Teorema de Pitágoras.
+
+1. Em certo horário, um prédio projeta uma sombra de 25 m no chão, e os raios solares formam um ângulo de 30° com o solo. (Use tg 30° = 0,58 e tg 45° = 1.)
+
+   <Figuras>
+     <Geo pontos={{ B: [0, 0], T: [0, 14.43], S: [25, 0] }}
+          poligonos={[['B', 'T', 'S']]} solo={['B', 'S']}
+          medidas={[{ de: 'B', para: 'T', texto: 'h' }, { de: 'B', para: 'S', texto: '25 m (sombra)', dist: 22 }]}
+          retos={[['T', 'B', 'S']]}
+          angulos={[{ v: 'S', de: 'B', para: 'T', texto: '30°', raio: 30 }]}
+          setas={[[[6, 21], [11.2, 18]], [[10, 20.5], [15.2, 17.5]]]}
+          tamanho={210}
+          descricao="Prédio vertical de altura h e sua sombra de 25 m no chão; o raio de sol que passa pelo topo do prédio chega à ponta da sombra formando 30° com o solo" />
+   </Figuras>
+
+   1. Calcule a altura <i>h</i> do prédio.
+   1. Mais tarde, os raios solares passam a formar 45° com o solo. Qual passa a ser o comprimento da sombra?
+
+1. Um aluno afirmou que, em um triângulo retângulo de hipotenusa 20 cm, um dos ângulos agudos α satisfaz sen α = 0,8 e cos α = 0,5. Obtenha as medidas dos catetos, verifique com o Teorema de Pitágoras se esse triângulo pode existir e escreva sua justificativa. Se houver erro, corrija o valor incorreto.
