@@ -1,0 +1,54 @@
+---
+titulo: "Probabilidade"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre probabilidade: espaço amostral, probabilidade da união, probabilidade condicional a partir de uma tabela de dupla entrada e retiradas sucessivas sem reposição."
+serie: "2em"
+material: "15"
+instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Frac from '../../components/mat/Frac.astro';
+
+1. Uma caixa contém 7 bolas numeradas de 1 a 7. Retira-se uma bola ao acaso. A probabilidade de o número sorteado ser **par** é:
+
+   <Alt cols={5}>
+     <li><Frac n="1" d="7" /></li>
+     <li><Frac n="2" d="7" /></li>
+     <li><Frac n="3" d="7" /></li>
+     <li><Frac n="4" d="7" /></li>
+     <li><Frac n="5" d="7" /></li>
+   </Alt>
+
+1. Sejam <i>A</i> e <i>B</i> eventos com <i>P</i>(<i>A</i>) = 0,45, <i>P</i>(<i>B</i>) = 0,35 e <i>P</i>(<i>A</i> ∩ <i>B</i>) = 0,15. Então <i>P</i>(<i>A</i> ∪ <i>B</i>) é:
+
+   <Alt cols={5}>
+     <li>0,65</li>
+     <li>0,80</li>
+     <li>0,50</li>
+     <li>0,95</li>
+     <li>0,20</li>
+   </Alt>
+
+1. Uma pesquisa (com *dados fictícios*) com 120 estudantes de Poços de Caldas os classificou quanto ao turno e ao gosto por leitura:
+
+   <table class="tabela">
+     <caption>Estudantes por turno e gosto por leitura</caption>
+     <thead>
+       <tr><th scope="col">Turno</th><th scope="col">Gosta</th><th scope="col">Não gosta</th><th scope="col">Total</th></tr>
+     </thead>
+     <tbody>
+       <tr><th scope="row">Manhã</th><td>35</td><td>25</td><td>60</td></tr>
+       <tr><th scope="row">Tarde</th><td>40</td><td>20</td><td>60</td></tr>
+     </tbody>
+     <tfoot>
+       <tr><th scope="row">Total</th><td>75</td><td>45</td><td>120</td></tr>
+     </tfoot>
+   </table>
+
+   1. Qual a probabilidade de um estudante escolhido ao acaso gostar de leitura?
+   1. Sabendo que o estudante é do turno da tarde, qual a probabilidade de ele gostar de leitura?
+
+1. Uma urna contém 7 fichas premiadas e 5 não premiadas. Dois estudantes retiram, cada um, uma ficha, sucessivamente e **sem reposição**. Calcule a probabilidade de:
+
+   1. os dois retirarem ficha premiada;
+   1. exatamente um dos dois retirar ficha premiada.

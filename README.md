@@ -336,13 +336,28 @@ de componentes que se importam no topo do arquivo:
 | `<Alt cols={2}>` | alternativas lado a lado, em `n` colunas | `\begin{tasks}(2)` |
 | `<Sistema n={3}>` | sistema entre chaves, uma equação por `<span>` | `\begin{cases}` |
 | `<TriRet a="9" b="12" c="x" rotulo="a)" />` | triângulo retângulo com as três medidas | `\figTriRet{9}{12}{x}` |
+| `<Soma de="<i>k</i>=1" ate="5" /><i>k</i>` | somatório com os limites empilhados; o termo geral vem depois | `\sum_{k=1}^{5} k` |
+| `<Gabarito>…</Gabarito>` | gabarito ao final, fechado até o aluno abrir | o rodapé "Gabarito:" da folha |
+| `<Lembrete>…</Lembrete>`, `<Lembrete titulo="Relembrando">` | quadro de fórmulas antes das questões; cada fórmula num `<span>` | o `\fbox` "Lembrete:" |
+| `<Venn conjuntos={['A', 'B', 'C']} />` | diagrama de Venn em branco, 2 ou 3 conjuntos, com universo `U` (`universo=""` omite) | o `tikzpicture` dos círculos |
 
 O resto é HTML normal: `<i>x</i>` para a incógnita, `<sup>2</sup>` para a potência, o
 sinal de menos U+2212 (`−`) e não o hífen, e os símbolos direto em Unicode (`⊂`, `∈`,
 `∅`, `π`, `°`, `ℤ`). Expoente fracionário vai com barra (`<sup>1/3</sup>`): empilhado
-fica ilegível no tamanho de um expoente. Figura nova pede um componente novo em
+fica ilegível no tamanho de um expoente. Lacuna para completar é
+`<span class="lacuna"></span>`; tabela de dados é um `<table class="tabela">` em HTML, com
+`<caption>` (para o leitor de tela), `<th scope="col">` no cabeçalho e `<th scope="row">`
+na primeira coluna — ver `probabilidade.mdx`. Figura nova pede um componente novo em
 `src/components/mat/` — mantenha a mesma geometria do macro TikZ correspondente, para
 que a folha e a tela contem a mesma história.
+
+Cada questão ganha uma âncora no build — `id="q1"`, `"q2"`… — e o número dela vira um
+link para si mesma (plugin `src/utils/rehype-questoes.mjs`, ligado no `mdx()` do
+`astro.config.mjs` e restrito a `src/content/listas/`). Então
+`/materiais/2em/fatorial-somatorio#q8` abre direto na questão 8, marcada; clicar no número
+copia esse endereço. A contagem segue a ordem dos `1.` do arquivo — a mesma numeração da
+folha —, então **não reordene questões de uma lista já publicada**: o link que foi mandado
+para a turma passaria a apontar para outra questão.
 
 Três armadilhas do MDX que valem o aviso, porque o erro não é óbvio:
 

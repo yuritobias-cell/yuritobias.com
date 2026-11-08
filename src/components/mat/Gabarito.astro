@@ -1,0 +1,32 @@
+---
+/* Gabarito ao final da lista, fechado por padrão — no PDF ele vem no rodapé
+   da folha; na tela o aluno abre quando quiser conferir, sem ver as respostas
+   antes de resolver. É um <details>, então funciona sem JavaScript. */
+---
+<details class="gabarito">
+  <summary>Ver gabarito</summary>
+  <div class="gabarito-corpo"><slot /></div>
+</details>
+
+<style>
+  .gabarito {
+    margin-top: 2.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    font-size: 0.92rem;
+  }
+  summary {
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: var(--accent);
+  }
+  summary:hover { text-decoration: underline; }
+  .gabarito-corpo { padding: 0 1rem 0.9rem; line-height: 1.7; }
+  .gabarito-corpo :global(p) { margin: 0; }
+  @media print {
+    .gabarito { border: none; background: none; margin-top: 1.5rem; }
+  }
+</style>

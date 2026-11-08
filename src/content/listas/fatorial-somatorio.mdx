@@ -1,0 +1,64 @@
+---
+titulo: "Princípio Fundamental da Contagem, Fatorial e Somatórios"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre contagem, fatorial e somatório: princípio multiplicativo, simplificação de expressões e equações com fatorial, cálculo de somatórios e a soma dos n primeiros naturais."
+serie: "2em"
+material: "10"
+instrucoes: "Resolva os exercícios diretamente no seu caderno."
+---
+
+import Frac from '../../components/mat/Frac.astro';
+import Soma from '../../components/mat/Soma.astro';
+
+1. Em uma lanchonete, um combo é formado pela escolha de **1 sanduíche**, **1 bebida** e **1 sobremesa**. O cardápio oferece 4 opções de sanduíche, 3 opções de bebida e 2 opções de sobremesa. De quantas maneiras diferentes um cliente pode montar o seu combo?
+
+1. Uma roupa de gala é composta por uma camisa, uma gravata e um sapato. Se Armando possui 5 camisas, 4 gravatas e 3 pares de sapatos, de quantas maneiras diferentes ele pode se vestir?
+
+1. Uma senha de acesso a um sistema é formada por **2 letras distintas** do nosso alfabeto (26 letras) seguidas de **3 dígitos distintos** (de 0 a 9). Quantas senhas diferentes podem ser criadas?
+
+1. Quantos números de **3 algarismos** podem ser formados com os dígitos \{1, 2, 3, 4, 5\}, sendo que:
+
+   1. a repetição de algarismos é permitida?
+   1. a repetição de algarismos não é permitida?
+   1. o número deve ser **par** e a repetição não é permitida?
+
+1. Calcule o valor de cada expressão:
+
+   1. 5!
+   1. <Frac n="7!" d="5!" />
+   1. <Frac n="4! + 3!" d="3!" />
+   1. <Frac n="10!" d="8! · 2!" />
+
+1. Simplifique as expressões fatoriais abaixo, deixando a resposta em função de <i>n</i>:
+
+   1. <Frac n="(<i>n</i> + 1)!" d="<i>n</i>!" />
+   1. <Frac n="(<i>n</i> + 2)!" d="<i>n</i>!" />
+   1. <Frac n="<i>n</i>!" d="(<i>n</i> − 1)!" />
+
+1. Determine o valor do natural <i>n</i> em cada equação:
+
+   1. <Frac n="<i>n</i>!" d="(<i>n</i> − 2)!" /> = 42
+   1. <Frac n="(<i>n</i> + 1)!" d="(<i>n</i> − 1)!" /> = 30
+
+1. Calcule os somatórios abaixo:
+
+   1. <Soma de="<i>k</i>=1" ate="5" /><i>k</i>
+   1. <Soma de="<i>k</i>=1" ate="4" /><i>k</i><sup>2</sup>
+   1. <Soma de="<i>k</i>=1" ate="6" />(2<i>k</i> − 1)
+   1. <Soma de="<i>k</i>=3" ate="7" />(<i>k</i> + 2)
+
+1. Escreva cada soma abaixo utilizando a notação de somatório:
+
+   1. 1 + 2 + 3 + ⋯ + 20
+   1. 1 + 4 + 9 + 16 + 25
+   1. 2 + 4 + 6 + 8 + 10 + 12
+
+1. Usando a fórmula <Soma de="<i>k</i>=1" ate="<i>n</i>" /><i>k</i> = <Frac n="<i>n</i>(<i>n</i> + 1)" d="2" />, calcule:
+
+   1. 1 + 2 + 3 + ⋯ + 100
+   1. 1 + 2 + 3 + ⋯ + 50
+   1. 51 + 52 + 53 + ⋯ + 100 &nbsp;<em>(dica: use os dois resultados anteriores)</em>
+
+1. Um estudante registrou suas notas semanais em cinco atividades ao longo do bimestre. As notas obtidas foram: 6,0; 7,0; 8,0; 9,0 e 10,0.
+
+   1. Represente a soma total das notas usando notação de somatório, identificando o termo geral.
+   1. Calcule essa soma e determine a média aritmética das notas.

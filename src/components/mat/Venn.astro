@@ -1,0 +1,55 @@
+---
+/* Diagrama de Venn em branco, para o aluno pensar (ou copiar e preencher) —
+   o `\begin{tikzpicture}` com o retângulo do universo e dois ou três círculos
+   que se cruzam. Os rótulos vão em itálico, como conjuntos no texto.
+
+   <Venn conjuntos={['A', 'B', 'C']} />   — três conjuntos
+   <Venn conjuntos={['A', 'B']} universo="U" />  — dois */
+interface Props {
+  /** Nomes dos conjuntos: 2 ou 3. */
+  conjuntos: string[];
+  /** Rótulo do conjunto universo; vazio para omitir o retângulo. */
+  universo?: string;
+}
+const { conjuntos, universo = 'U' } = Astro.props;
+const tres = conjuntos.length >= 3;
+
+// Mesma proporção da figura TikZ: raio ~ 1,1 da distância entre os centros.
+const r = 44;
+const circulos = tres
+  ? [
+      { cx: 78, cy: 70, lx: 34, ly: 30, anchor: 'end' },
+      { cx: 128, cy: 70, lx: 172, ly: 30, anchor: 'start' },
+      { cx: 103, cy: 113, lx: 103, ly: 174, anchor: 'middle' },
+    ]
+  : [
+      { cx: 80, cy: 85, lx: 40, ly: 38, anchor: 'end' },
+      { cx: 126, cy: 85, lx: 166, ly: 38, anchor: 'start' },
+    ];
+const altura = tres ? 186 : 160;
+const descricao = `Diagrama de Venn com os conjuntos ${conjuntos.join(', ')}`
+  + (universo ? ` dentro do universo ${universo}` : '');
+---
+<figure class="venn">
+  <svg viewBox={`0 0 206 ${altura}`} role="img" aria-label={descricao}>
+    {universo && (
+      <>
+        <rect x="3" y="3" width="200" height={altura - 6} rx="8" fill="none" stroke="currentColor" stroke-width="1.2" />
+        {/* no canto de baixo: em cima ele disputa espaço com o rótulo de B */}
+        <text x="192" y={altura - 13} text-anchor="end">{universo}</text>
+      </>
+    )}
+    {circulos.map((c, i) => (
+      <>
+        <circle cx={c.cx} cy={c.cy} r={r} fill="none" stroke="currentColor" stroke-width="1.3" />
+        <text x={c.lx} y={c.ly} text-anchor={c.anchor}>{conjuntos[i]}</text>
+      </>
+    ))}
+  </svg>
+</figure>
+
+<style>
+  .venn { margin: 0.9rem auto 0.6rem; text-align: center; }
+  .venn svg { width: 220px; max-width: 100%; height: auto; color: var(--ink); }
+  .venn text { font-family: var(--mat); font-style: italic; font-size: 14px; fill: currentColor; }
+</style>

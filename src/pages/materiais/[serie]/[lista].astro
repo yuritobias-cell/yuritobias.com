@@ -98,6 +98,21 @@ const schema = [
 
 <script>
   document.getElementById('imprimir')?.addEventListener('click', () => window.print());
+
+  /* Clicar no número da questão segue o link (#q3) normalmente e, de bônus,
+     copia o endereço completo — pronto para colar no grupo da turma. Sem
+     clipboard (http, navegador antigo), fica só a navegação. */
+  document.querySelectorAll<HTMLAnchorElement>('.lista a.q-num').forEach((a) => {
+    a.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(a.href);
+      } catch {
+        return;
+      }
+      a.classList.add('copiado');
+      setTimeout(() => a.classList.remove('copiado'), 1600);
+    });
+  });
 </script>
 
 <style>
@@ -188,15 +203,16 @@ const schema = [
   .lista :global(ol) { list-style: none; counter-reset: q; display: grid; gap: 1.6rem; }
 
   .lista :global(> ol > li) {
-    counter-increment: q;
     position: relative;
     padding-left: 2.1rem;
     font-size: 1rem;
     line-height: 1.65;
+    scroll-margin-top: 1.5rem;
   }
 
-  .lista :global(> ol > li::before) {
-    content: counter(q) ".";
+  /* O número da questão é um link para ela mesma (#q3) — vem pronto do build,
+     pelo plugin src/utils/rehype-questoes.mjs. Clicar copia o endereço. */
+  .lista :global(a.q-num) {
     position: absolute;
     left: 0;
     top: 0;
@@ -204,7 +220,37 @@ const schema = [
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--accent);
+    text-decoration: none;
     padding-top: 0.2em;
+  }
+  .lista :global(a.q-num:hover) { text-decoration: underline; }
+  .lista :global(a.q-num:hover::after),
+  .lista :global(a.q-num:focus-visible::after) {
+    content: "#";
+    margin-left: 0.15em;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .lista :global(a.q-num.copiado::after) {
+    content: "link copiado";
+    position: absolute;
+    left: 0;
+    top: -1.3em;
+    white-space: nowrap;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--accent);
+    border-radius: 3px;
+    padding: 0.05rem 0.4rem;
+  }
+
+  /* Quem chega por um link direto vê a questão marcada. */
+  .lista :global(> ol > li:target) {
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+    box-shadow: -0.6rem 0 0 color-mix(in srgb, var(--accent) 7%, transparent),
+                0.6rem 0 0 color-mix(in srgb, var(--accent) 7%, transparent);
+    border-radius: 2px;
   }
 
   /* Subitens a), b), c) */
@@ -266,6 +312,32 @@ const schema = [
     border-bottom: 1px solid var(--muted);
     margin: 0 0.2rem;
   }
+
+  /* Tabela de dados da questão — o `tabular` com \hline do LaTeX. A legenda
+     existe para o leitor de tela; na tela ela fica discreta, sob a tabela. */
+  .lista :global(table.tabela) {
+    border-collapse: collapse;
+    margin: 0.8rem auto;
+    font-size: 0.95rem;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .lista :global(table.tabela caption) {
+    caption-side: bottom;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding-top: 0.35rem;
+  }
+  .lista :global(table.tabela th),
+  .lista :global(table.tabela td) {
+    border: 1px solid var(--rule);
+    padding: 0.3rem 0.9rem;
+    text-align: center;
+  }
+  .lista :global(table.tabela th) { font-weight: 600; }
+  .lista :global(table.tabela tbody th) { font-weight: 400; text-align: left; }
+  .lista :global(table.tabela thead),
+  .lista :global(table.tabela tfoot) { background: white; }
 
   .lista :global(p) { margin: 0 0 0.5rem; }
   .lista :global(p:last-child) { margin-bottom: 0; }

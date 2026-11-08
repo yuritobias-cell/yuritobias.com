@@ -6,6 +6,8 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
+import { unified } from '@astrojs/markdown-remark';
+import rehypeQuestoes from './src/utils/rehype-questoes.mjs';
 
 // Gera dist/sw.js a partir do template src/sw.js: o precache é derivado das
 // páginas reais de src/pages/ferramentas/ (impossível esquecer uma ferramenta
@@ -53,6 +55,13 @@ export default defineConfig({
     // URL antiga da ferramenta, publicada antes do rename
     '/ferramentas/cifrador-emojis': '/ferramentas/cifrador-silabico',
     ...redirectsArquivo,
+  },
+  markdown: {
+    // O processador padrão do Astro, mais um plugin: rehypeQuestoes dá id e link
+    // a cada questão — e só age nos arquivos de src/content/listas/. O MDX herda.
+    // (`@astrojs/markdown-remark` fixado na mesma versão que o Astro usa, para
+    // não haver duas cópias do pipeline.)
+    processor: unified({ rehypePlugins: [rehypeQuestoes] }),
   },
   integrations: [
     mdx(),

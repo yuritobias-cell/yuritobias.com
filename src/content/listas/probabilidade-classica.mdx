@@ -1,0 +1,89 @@
+---
+titulo: "Probabilidade: Casos Favoráveis e União de Eventos"
+descricao: "Lista de exercícios do 2º ano do Ensino Médio sobre probabilidade: baralho, sorteio de números, urnas e dois dados, eventos complementares e probabilidade da união, com um problema de três conjuntos e diagrama de Venn."
+serie: "2em"
+material: "14"
+instrucoes: "Resolva as questões diretamente no seu caderno, registrando todos os cálculos."
+---
+
+import Alt from '../../components/mat/Alt.astro';
+import Frac from '../../components/mat/Frac.astro';
+import Lembrete from '../../components/mat/Lembrete.astro';
+import Venn from '../../components/mat/Venn.astro';
+
+<Lembrete>
+  <span><i>P</i>(<i>E</i>) = <Frac n="nº de casos favoráveis" d="nº de casos possíveis" /></span>
+  <span><i>P</i>(<i>A</i> ∪ <i>B</i>) = <i>P</i>(<i>A</i>) + <i>P</i>(<i>B</i>) − <i>P</i>(<i>A</i> ∩ <i>B</i>)</span>
+</Lembrete>
+
+1. De um baralho de 52 cartas, uma é extraída ao acaso. Qual a probabilidade de cada um dos eventos abaixo?
+
+   <Alt cols={2}>
+     <li>Ocorrer dama de copas.</li>
+     <li>Ocorrer dama.</li>
+     <li>Ocorrer carta de naipe paus.</li>
+     <li>Ocorrer dama ou rei ou valete.</li>
+     <li>Ocorrer uma carta que não é um rei.</li>
+   </Alt>
+
+1. Um número é escolhido ao acaso entre os 20 inteiros, de 1 a 20. Qual a probabilidade de o número escolhido:
+
+   <Alt cols={2}>
+     <li>ser par?</li>
+     <li>ser ímpar?</li>
+     <li>ser primo?</li>
+     <li>ser quadrado perfeito?</li>
+   </Alt>
+
+1. Uma urna contém 6 bolas pretas, 2 bolas brancas e 10 amarelas. Uma bola é escolhida ao acaso. Qual a probabilidade de:
+
+   1. a bola não ser amarela?
+   1. a bola ser branca ou preta?
+   1. a bola não ser branca nem amarela?
+
+1. Um número é escolhido ao acaso entre os 100 inteiros, de 1 a 100. Qual a probabilidade de o número:
+
+   <Alt cols={2}>
+     <li>ser múltiplo de 9?</li>
+     <li>ser múltiplo de 3 e de 4?</li>
+     <li>ser múltiplo de 3 ou de 4?</li>
+   </Alt>
+
+1. Uma urna contém 20 bolas numeradas de 1 a 20. Seja o experimento a retirada de uma bola, e considere os eventos:
+
+   <i>A</i> = \{a bola retirada possui um número múltiplo de 2\}<br />
+   <i>B</i> = \{a bola retirada possui um número múltiplo de 5\}
+
+   Determine a probabilidade do evento <i>A</i> ∪ <i>B</i>.
+
+1. Dois dados, um verde e um vermelho, são lançados e observados os números das faces de cima.
+
+   1. Qual a probabilidade de ocorrerem números iguais?
+   1. Qual a probabilidade de ocorrerem números diferentes?
+   1. Qual a probabilidade de a soma dos números ser 7?
+   1. Qual a probabilidade de a soma dos números ser 12?
+   1. Qual a probabilidade de a soma dos números ser menor ou igual a 12?
+   1. Qual a probabilidade de aparecer número 3 em ao menos um dado?
+
+1. De um grupo de 200 pessoas, 160 têm fator Rh positivo, 100 têm sangue tipo O e 80 têm fator Rh positivo e sangue tipo O. Se uma dessas pessoas for selecionada ao acaso, qual a probabilidade de:
+
+   1. seu sangue ter fator Rh positivo?
+   1. seu sangue não ser tipo O?
+   1. seu sangue ter fator Rh positivo ou ser tipo O?
+
+1. Uma cidade tem 50 000 habitantes e 3 jornais, <i>A</i>, <i>B</i> e <i>C</i>. Sabe-se que:
+
+   - 15 000 leem o jornal <i>A</i>
+   - 10 000 leem o jornal <i>B</i>
+   - 8 000 leem o jornal <i>C</i>
+   - 6 000 leem os jornais <i>A</i> e <i>B</i>
+   - 4 000 leem os jornais <i>A</i> e <i>C</i>
+   - 3 000 leem os jornais <i>B</i> e <i>C</i>
+   - 1 000 leem os três jornais.
+
+   <Venn conjuntos={['A', 'B', 'C']} />
+
+   Uma pessoa é selecionada ao acaso. Qual a probabilidade de que:
+
+   1. ela leia pelo menos um jornal?
+   1. ela leia só um jornal?

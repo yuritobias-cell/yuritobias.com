@@ -1,0 +1,45 @@
+---
+/* Quadro de lembrete com as fórmulas que a lista usa — o `\fbox` com
+   "Lembrete:" no topo das folhas, e os quadros "Relembrando" das revisões.
+   Fica antes das questões (ou entre elas); renderiza <div>, nunca <p>, porque
+   embrulha bloco multilinha (ver README, armadilhas do MDX). */
+interface Props {
+  titulo?: string;
+}
+const { titulo = 'Lembrete' } = Astro.props;
+---
+<aside class="lembrete" aria-label={titulo}>
+  <div class="lembrete-titulo">{titulo}</div>
+  <div class="lembrete-corpo"><slot /></div>
+</aside>
+
+<style>
+  .lembrete {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    padding: 0.7rem 1rem 0.8rem;
+    margin: 0 0 2rem;
+  }
+  .lembrete-titulo {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  /* O MDX embrulha o conteúdo num <p>: o flex vale nele também, para as
+     fórmulas ficarem lado a lado e quebrarem uma embaixo da outra no celular. */
+  .lembrete-corpo,
+  .lembrete-corpo :global(p) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 2.5rem;
+    font-family: var(--mat);
+    line-height: 1.7;
+  }
+  .lembrete-corpo :global(p) { margin: 0; }
+</style>

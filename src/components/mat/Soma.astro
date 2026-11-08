@@ -1,0 +1,30 @@
+---
+/* Somatório com os limites empilhados acima e abaixo do sinal — o
+   `\displaystyle\sum_{k=1}^{n}` das listas. O termo geral vem logo depois do
+   componente, como texto normal: `<Soma de="<i>k</i> = 1" ate="5" /><i>k</i>`. */
+interface Props {
+  /** Limite inferior, com a variável: "<i>k</i> = 1". */
+  de: string;
+  /** Limite superior. */
+  ate: string;
+}
+const { de, ate } = Astro.props;
+---
+<span class="soma"
+  ><span class="soma-lim"><Fragment set:html={ate} /></span
+  ><span class="soma-sig" aria-hidden="true">∑</span
+  ><span class="soma-lim"><Fragment set:html={de} /></span
+></span>
+
+<style>
+  .soma {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 .15em 0 .05em;
+    line-height: 1;
+  }
+  .soma-sig { font-size: 1.6em; line-height: 0.95; }
+  .soma-lim { font-size: 0.68em; white-space: nowrap; }
+</style>
