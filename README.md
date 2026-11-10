@@ -11,7 +11,7 @@ pessoal mora em `/sobre`.
 
 ## Stack
 
-- [Astro 6](https://astro.build) — site estático (+ MDX nos posts com componentes)
+- [Astro 7](https://astro.build) — site estático (+ MDX nos posts com componentes)
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
 - [three.js](https://threejs.org) — o 3D do Simulador de Poliedros e do Princípio de Cavalieri (empacotado, sem CDN; só essas páginas o carregam)

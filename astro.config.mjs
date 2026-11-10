@@ -126,6 +126,9 @@ const redirectsArquivo = Object.fromEntries(
 
 export default defineConfig({
   site: 'https://yuritobias.com',
+  // O padrão do Astro 7 ('jsx') também remove o espaço entre uma expressão e o
+  // texto vizinho ("— {n} itens" virava "—164 itens"); `true` mantém a regra de HTML.
+  compressHTML: true,
   redirects: {
     // URL antiga da ferramenta, publicada antes do rename
     '/ferramentas/cifrador-emojis': '/ferramentas/cifrador-silabico/',
@@ -134,8 +137,9 @@ export default defineConfig({
   markdown: {
     // O processador padrão do Astro, mais um plugin: rehypeQuestoes dá id e link
     // a cada questão — e só age nos arquivos de src/content/listas/. O MDX herda.
-    // (`@astrojs/markdown-remark` fixado na mesma versão que o Astro usa, para
-    // não haver duas cópias do pipeline.)
+    // (No Astro 7 o padrão é o Sätteri, que não roda plugins rehype; o pipeline
+    // unified continua disponível em `@astrojs/markdown-remark`, que agora é
+    // dependência opcional do Astro — só existe a cópia instalada por este projeto.)
     processor: unified({ rehypePlugins: [rehypeQuestoes] }),
   },
   integrations: [
