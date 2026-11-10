@@ -38,5 +38,15 @@
     "assuntos": [
       "trigonometria"
     ]
+  },
+  {
+    "n": "5",
+    "data": "2026-11-10",
+    "titulo": "Avaliação Formativa — 3ª Etapa — Volumes de Sólidos",
+    "descricao": "Roteiro de investigação em grupo: volume de prisma, cilindro, pirâmide e cone (contagem de cubinhos, experimento do 1/3) e aplicações em embalagens.",
+    "arquivo": "5-formativa3etapa-volumes.pdf",
+    "assuntos": [
+      "geometria-espacial"
+    ]
   }
 ]

@@ -18,5 +18,16 @@
     "assuntos": [
       "combinatoria"
     ]
+  },
+  {
+    "n": "3",
+    "data": "2026-11-10",
+    "titulo": "Avaliação Formativa — 3ª Etapa",
+    "descricao": "Atividade em grupo de otimização: lata cilíndrica de 350 mL com menor área total, usando área total e volume do cilindro, tabela de raios e a função A(r) no Desmos.",
+    "arquivo": "3-formativa3etapa.pdf",
+    "assuntos": [
+      "geometria-espacial",
+      "funcoes"
+    ]
   }
 ]
