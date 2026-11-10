@@ -7,13 +7,8 @@ import Layout from '../../layouts/Layout.astro';
   description="Gere folhas A4 de malha quadriculada, pontilhada ou isométrica: escolha o passo em centímetros, a espessura do traço, o cabeçalho da escola e o espaço para o nome do aluno — e imprima ou salve em PDF."
 >
 
-  <!-- IBM Plex Mono carregado só nesta página (rótulos técnicos e medidas usam mono).
-       Playfair Display + IBM Plex Sans já vêm do Layout. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <div class="mal-root">
+  <div class="mal-root" role="main">
 
     <header class="masthead">
       <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Geometria</p>

@@ -95,7 +95,7 @@ const ano = new Date().getFullYear();
     <script is:inline>
       // Service worker: ferramentas e páginas visitadas funcionam offline.
       // Fora do localhost para não servir módulos velhos durante o desenvolvimento.
-      if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
+      if ('serviceWorker' in navigator && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
         window.addEventListener('load', function () {
           navigator.serviceWorker.register('/sw.js');
         });

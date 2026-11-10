@@ -74,7 +74,8 @@ const total = (await montarIndice()).length;
         }));
       })
       .catch(() => {
-        elEstado.textContent = 'Não foi possível carregar o índice da busca. Recarregue a página.';
+        // Esquece a tentativa: a próxima tecla tenta de novo (a rede pode ter voltado).
+        carregando = null;
       }));
 
   /* Pontuação: o que casa no título vale mais que no resto, e quanto mais perto
@@ -170,7 +171,7 @@ const total = (await montarIndice()).length;
   function guardaUrl(consulta: string) {
     clearTimeout(adiado);
     adiado = setTimeout(() => {
-      const url = consulta ? `/busca?q=${encodeURIComponent(consulta)}` : '/busca';
+      const url = consulta ? `/busca/?q=${encodeURIComponent(consulta)}` : '/busca/';
       history.replaceState(null, '', url);
     }, 400);
   }
@@ -180,7 +181,14 @@ const total = (await montarIndice()).length;
     guardaUrl(consulta);
     if (!consulta) { pintar(''); return; }
     if (!itens.length) { elEstado.textContent = 'Carregando o índice…'; await carregar(); }
-    pintar(consulta);
+    // Sem índice não há o que pintar — e "nada encontrado" seria mentira.
+    if (!itens.length) {
+      elRes.innerHTML = '';
+      elEstado.textContent = 'Não foi possível carregar o índice da busca. Verifique a conexão e tente de novo.';
+      return;
+    }
+    // Enquanto o índice chegava, o campo pode ter mudado: vale o que está nele agora.
+    pintar(elQ.value.trim());
   }
 
   elQ.addEventListener('input', buscar);

@@ -15,12 +15,16 @@ pessoal mora em `/sobre`.
 - [Tailwind CSS 4](https://tailwindcss.com) — tema central em `src/styles/global.css` (bloco `@theme`)
 - [Chart.js](https://www.chartjs.org) e [Observable Plot](https://observablehq.com/plot/) — gráficos (empacotados, sem CDN)
 - [three.js](https://threejs.org) — o 3D do Simulador de Poliedros e do Princípio de Cavalieri (empacotado, sem CDN; só essas páginas o carregam)
-- Fontes auto-hospedadas em `public/fonts/` (variáveis, subset latino; `@font-face` em `src/styles/global.css`) — sem requisições ao Google Fonts
+- Fontes auto-hospedadas em `public/fonts/` (subset latino; `@font-face` em `src/styles/global.css`): IBM Plex Sans e Playfair Display variáveis, IBM Plex Mono em três pesos para as ferramentas — sem requisições ao Google Fonts
 - Busca própria: índice estático gerado no build (`/busca-index.json`) e filtrado no
   navegador — sem motor de busca de terceiros e sem mandar a consulta para lugar nenhum
 - Service worker (offline) gerado no build: template em `src/sw.js`, precache derivado
   das páginas de `src/pages/ferramentas/` pela integração em `astro.config.mjs`
-  (mais a busca e o índice dela)
+  (mais a busca e o índice dela) — junto com o CSS e o JS que essas páginas carregam,
+  seguidos pelos `import`, e as fontes: ferramenta nunca visitada também abre offline
+- Links internos com barra final (`/sobre/`) postos no build pela integração
+  `barrasFinais` de `astro.config.mjs`: o código pode escrever `/sobre`, e o HTML
+  publicado sai sem o redirecionamento 301 que o GitHub Pages faria a cada clique
 - Deploy automático no GitHub Pages via Actions (push na `main`)
 - Analytics: GoatCounter (pageviews + eventos de download de PDF)
 

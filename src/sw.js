@@ -1,6 +1,7 @@
 /* Service worker — páginas e ferramentas funcionam offline após a primeira visita.
    TEMPLATE: os marcadores de versão e de precache abaixo são preenchidos no
-   build pela integração em astro.config.mjs, com a lista real de ferramentas.
+   build pela integração em astro.config.mjs, com a lista real de ferramentas
+   e dos arquivos (CSS, JS, fontes) de que elas precisam para funcionar.
    Estratégias:
    - Navegação (HTML): rede primeiro, cache como fallback (atualizações chegam rápido,
      offline continua funcionando).
@@ -17,11 +18,35 @@ const CACHE_EXTRAS = 'extras-' + VERSAO;
 
 const PRECACHE = __PRECACHE__;
 
+// O CSS e o JS que as páginas do precache carregam (e o que esses importam):
+// sem eles a ferramenta abriria offline sem estilo e sem funcionar.
+const ASSETS = __ASSETS__;
+
+// As fontes do site.
+const FONTES = __FONTES__;
+
+/* No cache, o endereço decide tudo: cada URL daqui tem uma resposta só. Sem
+   isto, um `Vary` do servidor (Origin, por exemplo) faz o pedido de um
+   <script type="module"> ou de uma fonte não casar com a cópia guardada pelo
+   precache — e o arquivo "some" offline mesmo estando no cache. */
+const SEM_VARY = { ignoreVary: true };
+
+/* Busca só o que ainda não está no cache. Os assets têm hash no nome (o mesmo
+   nome é sempre o mesmo arquivo), então a cada versão nova do site só desce o
+   que de fato mudou — e não o three.js inteiro de novo. */
+function completar(cacheName, urls) {
+  return caches.open(cacheName).then((c) => Promise.all(
+    urls.map((u) => c.match(u, SEM_VARY).then((hit) => hit || c.add(u)))
+  ));
+}
+
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_PAGINAS)
-      .then((c) => c.addAll(PRECACHE))
-      .then(() => self.skipWaiting())
+    Promise.all([
+      caches.open(CACHE_PAGINAS).then((c) => c.addAll(PRECACHE)),
+      completar(CACHE_ASSETS, ASSETS),
+      completar(CACHE_EXTRAS, FONTES),
+    ]).then(() => self.skipWaiting())
   );
 });
 
@@ -36,7 +61,7 @@ self.addEventListener('activate', (e) => {
 });
 
 function cacheFirst(req, cacheName) {
-  return caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+  return caches.match(req, SEM_VARY).then((hit) => hit || fetch(req).then((res) => {
     if (res.ok) {
       const copia = res.clone();
       caches.open(cacheName).then((c) => c.put(req, copia));
@@ -46,7 +71,7 @@ function cacheFirst(req, cacheName) {
 }
 
 function staleWhileRevalidate(req, cacheName) {
-  return caches.open(cacheName).then((c) => c.match(req).then((hit) => {
+  return caches.open(cacheName).then((c) => c.match(req, SEM_VARY).then((hit) => {
     const rede = fetch(req).then((res) => {
       if (res.ok) c.put(req, res.clone());
       return res;
@@ -64,7 +89,7 @@ function networkFirst(req, cacheName) {
       caches.open(cacheName).then((c) => c.put(req, copia));
     }
     return res;
-  }).catch(() => caches.match(req, { ignoreSearch: true }));
+  }).catch(() => caches.match(req, { ignoreSearch: true, ignoreVary: true }));
 }
 
 self.addEventListener('fetch', (e) => {
@@ -76,8 +101,14 @@ self.addEventListener('fetch', (e) => {
   if (url.hostname === 'gc.zgo.at' || url.hostname.endsWith('goatcounter.com')) return;
 
   if (req.mode === 'navigate') {
+    // As páginas ficam no cache com a barra final (/ferramentas/x/), que é como
+    // o servidor as entrega. Endereço digitado ou guardado sem a barra tem de
+    // achar a mesma página offline — senão cairia na home, com a URL errada.
+    const comBarra = url.pathname.endsWith('/') ? null : url.pathname + '/';
     e.respondWith(
-      networkFirst(req, CACHE_PAGINAS).then((r) => r || caches.match('/'))
+      networkFirst(req, CACHE_PAGINAS)
+        .then((r) => r || (comBarra && caches.match(comBarra, SEM_VARY)))
+        .then((r) => r || caches.match('/', SEM_VARY))
     );
     return;
   }

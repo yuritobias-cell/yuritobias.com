@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 /* Fontes auto-hospedadas (variáveis, subset latino — cobre todo o português).
-   Arquivos em public/fonts/, baixados do Google Fonts (licenças: OFL). */
+   Arquivos em public/fonts/, baixados do Google Fonts (licenças: OFL).
+   O intervalo de `font-weight` tem de cobrir o eixo inteiro do arquivo: com
+   menos (era 300–500), todo `600`/`700` do site ficava preso no 500 e o
+   navegador engrossava a letra por conta própria (negrito sintético). */
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
-  font-weight: 300 500;
+  font-weight: 100 700;
   font-display: swap;
   src: url('/fonts/ibm-plex-sans-latin.woff2') format('woff2');
 }
@@ -22,6 +25,32 @@
   font-weight: 400;
   font-display: swap;
   src: url('/fonts/playfair-display-latin-italic.woff2') format('woff2');
+}
+
+/* IBM Plex Mono — números, rótulos técnicos e fórmulas de dez ferramentas.
+   Não é variável: um arquivo por peso (~10 KB cada), e o navegador só baixa o
+   peso que a página de fato usa. Antes vinha do Google Fonts, direto nessas
+   páginas — uma requisição a terceiros e uma fonte que sumia offline. */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-600.woff2') format('woff2');
 }
 
 @theme {

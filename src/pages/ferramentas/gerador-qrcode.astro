@@ -7,13 +7,8 @@ import Layout from '../../layouts/Layout.astro';
   description="Gere QR codes personalizados a partir de um link ou texto: cores, formato dos módulos, margem e uma imagem no centro. Baixe em PNG ou SVG. Tudo acontece no seu navegador — nenhuma imagem é enviada para lugar nenhum."
 >
 
-  <!-- IBM Plex Mono carregado só nesta página (rótulos técnicos e medidas usam mono).
-       Playfair Display + IBM Plex Sans já vêm do Layout. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <div class="qr-root">
+  <div class="qr-root" role="main">
 
     <header class="masthead">
       <p class="eyebrow"><a href="/ferramentas">Ferramentas</a> · <a href="/ferramentas?tipo=suporte">Suporte</a> · Utilidades</p>
@@ -67,7 +62,7 @@ import Layout from '../../layouts/Layout.astro';
 
           <div class="dropzone" id="dropzone" tabindex="0" role="button"
             aria-label="Escolher imagem para o centro do código">
-            <input type="file" id="logo-input" accept="image/*" class="sr-only" />
+            <input type="file" id="logo-input" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true" />
             <div class="dz-vazio" id="dz-vazio">
               <span class="dz-icone" aria-hidden="true">+</span>
               <span class="dz-txt">Clique ou arraste uma imagem</span>

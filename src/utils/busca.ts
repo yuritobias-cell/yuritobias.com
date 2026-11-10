@@ -152,5 +152,8 @@ export async function montarIndice(): Promise<ItemBusca[]> {
     });
   }
 
-  return itens;
+  /* Os endereços saem com a barra final, que é como o servidor entrega cada
+     página — sem ela, todo clique num resultado custaria um redirecionamento.
+     (Os links do HTML ganham a barra no build; estes são montados no navegador.) */
+  return itens.map((i) => (i.u.endsWith('/') ? i : { ...i, u: `${i.u}/` }));
 }

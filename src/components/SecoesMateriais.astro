@@ -101,9 +101,11 @@ const disponiveis = (n: number, singular: string, plural: string) =>
           {lista(m) && (
             <a href={urlLista(lista(m)!)} class="btn btn-html">Ler online</a>
           )}
-          <a href={`${basePdf}/${m.arquivo}`} download class="btn">
-            Baixar PDF
-          </a>
+          {m.arquivo && (
+            <a href={`${basePdf}/${m.arquivo}`} download class="btn">
+              Baixar PDF
+            </a>
+          )}
           {m.video?.url && (
             <a href={m.video.url} target="_blank" rel="noopener noreferrer" class="btn btn-video">
               ▶ Vídeo
