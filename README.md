@@ -272,6 +272,7 @@ achar "Produtos Notáveis", que não traz a palavra em lugar nenhum.
 
 - Tarefa de apostila (sem PDF): use `"apostila": { "ordem": "Atividades X, pág. Y", "data": "2026-06-15" }` — **data em formato ISO** (`AAAA-MM-DD`); tarefas futuras ganham destaque automático.
 - Lista de revisão com vídeo: use `"video": { "url": "https://youtu.be/...", "topicos": [] }` — com `url` vazia o botão de vídeo não aparece.
+- Lista com gabarito em PDF: use `"gabarito": "arquivo-gabarito.pdf"` (na mesma pasta do `arquivo`) — aparece o botão "Gabarito", e o QR `/video/...` da lista leva ao gabarito enquanto não houver `url` de vídeo.
   Todo material com o campo `video` ganha o endereço fixo `/video/<ano>/<serie>/<n>` (ex.:
   `/video/2026/2em/r6`), que é o que vai no QR Code da lista: com `url` vazia ele mostra
   "vídeo em breve"; quando a `url` é preenchida, o mesmo endereço redireciona para o vídeo.

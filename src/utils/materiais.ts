@@ -15,6 +15,8 @@ export interface Material {
   descricao: string;
   arquivo?: string;
   video?: { url: string; topicos: string[] };
+  /** PDF do gabarito, na mesma pasta do `arquivo` — o QR da lista cai nele quando não há vídeo. */
+  gabarito?: string;
   apostila?: { ordem: string; data: string };
   /** Slugs de src/data/assuntos.json — dirigem o índice por assunto. */
   assuntos?: string[];
@@ -73,7 +75,7 @@ function validarPdfs(serie: Serie) {
   }
   const emDisco = new Set(fs.readdirSync(dir));
   const faltando = [...serie.materiais, ...serie.provas, ...serie.formativas]
-    .map((m) => m.arquivo)
+    .flatMap((m) => [m.arquivo, 'gabarito' in m ? m.gabarito : undefined])
     .filter((a) => a && !emDisco.has(a));
   if (faltando.length > 0) {
     throw new Error(

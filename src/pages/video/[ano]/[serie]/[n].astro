@@ -4,6 +4,7 @@
    YouTube: é /video/<ano>/<serie>/<n>, gerado para todo material com o campo
    "video". Com a url vazia, a página avisa que o vídeo ainda não saiu; quando a
    url é preenchida no JSON, o mesmo endereço passa a redirecionar para o vídeo.
+   Lista que não vai ter vídeo pode ter "gabarito": sem vídeo, o QR cai no PDF dele.
    O ano no caminho impede que a série de mesmo slug do ano seguinte tome o
    endereço de um QR já impresso. */
 import Layout from '../../../../layouts/Layout.astro';
@@ -12,7 +13,7 @@ import { series, urlSerie, type Material, type Serie } from '../../../../utils/m
 export function getStaticPaths() {
   return series.flatMap((serie) =>
     serie.materiais
-      .filter((m) => m.video)
+      .filter((m) => m.video || m.gabarito)
       .map((material) => ({
         params: { ano: String(serie.ano), serie: serie.slug, n: material.n.toLowerCase() },
         props: { serie, material },
@@ -22,10 +23,11 @@ export function getStaticPaths() {
 
 interface Props { serie: Serie; material: Material }
 const { serie, material } = Astro.props;
-const destino = material.video!.url;
+const destino = material.video?.url
+  || (material.gabarito ? `/materiais/${serie.pastaPdf}/${material.gabarito}` : '');
 const voltar = urlSerie(serie);
 
-// No build estático, o redirect vira uma página com meta refresh para o vídeo.
+// No build estático, o redirect vira uma página com meta refresh para o vídeo (ou o gabarito).
 if (destino) return Astro.redirect(destino);
 ---
 
