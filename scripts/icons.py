@@ -3,6 +3,8 @@
 Pré-requisitos: os mesmos de og-image.py (fontes em /tmp/ogfonts, venv com Pillow).
 Execução: /tmp/ogvenv/bin/python scripts/icons.py
 """
+import os
+
 from PIL import Image, ImageDraw, ImageFont
 
 ACCENT = "#1B4F4F"
@@ -20,7 +22,7 @@ def gerar(tamanho, destino):
     img.save(destino, optimize=True)
     print(destino, img.size)
 
-base = "/Users/yuricorrearamos/Projetos/yuritobias.com/public"
+base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "public")
 gerar(192, f"{base}/icon-192.png")
 gerar(512, f"{base}/icon-512.png")
 gerar(180, f"{base}/apple-touch-icon.png")
