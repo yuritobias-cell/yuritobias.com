@@ -50,5 +50,15 @@
       "geometria",
       "geometria-espacial"
     ]
+  },
+  {
+    "n": "6",
+    "data": "2026-11-24",
+    "titulo": "Prova Somativa — 3ª Etapa — Bloco 2",
+    "descricao": "Geometria espacial: área total e volume do cubo e do paralelepípedo, capacidade em litros, prisma triangular (rampa), pirâmide quadrangular regular (apótema, área lateral, área total e volume) e relação entre os volumes de pirâmide e prisma.",
+    "arquivo": "6-av3etapa.pdf",
+    "assuntos": [
+      "geometria-espacial"
+    ]
   }
 ]

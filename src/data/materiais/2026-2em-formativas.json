@@ -29,5 +29,15 @@
       "geometria-espacial",
       "funcoes"
     ]
+  },
+  {
+    "n": "4",
+    "data": "2026-11-24",
+    "titulo": "Avaliação Formativa — 3ª Etapa — Lista",
+    "descricao": "Lista em grupo (40 min, sem calculadora): desenho em perspectiva de pirâmide e prisma, relação de Euler, criação de um exercício de área lateral e total, e o problema da pintura do corredor do Ensino Médio (área lateral, latas de tinta e custo).",
+    "arquivo": "4-formativa3etapa-lista.pdf",
+    "assuntos": [
+      "geometria-espacial"
+    ]
   }
 ]
