@@ -1,0 +1,19 @@
+---
+/* Listas em HTML das séries arquivadas: /materiais/arquivo/<ano>/<slug>/<id>.
+   Só gera páginas quando existe série arquivada — até lá, a rota fica dormente. */
+import PaginaLista from '../../../../../components/PaginaLista.astro';
+import { listasPublicadas, serieDaLista, type Lista } from '../../../../../utils/listas';
+
+export async function getStaticPaths() {
+  const arquivadas = (await listasPublicadas()).filter((l) => serieDaLista(l).arquivada);
+  return arquivadas.map((lista) => ({
+    params: { ano: String(lista.data.ano), serie: lista.data.serie, lista: lista.id },
+    props: { lista },
+  }));
+}
+
+interface Props { lista: Lista }
+const { lista } = Astro.props;
+---
+
+<PaginaLista lista={lista} />

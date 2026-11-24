@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { seriesAtivas, seriesArquivadas, ultimaAtualizacao } from '../../utils/materiais';
+import { seriesAtivas, seriesArquivadas, ultimaAtualizacao, ultimoAnoLetivo, proximoAnoLetivo } from '../../utils/materiais';
 
 // Séries arquivadas agrupadas por ano, do mais recente para o mais antigo.
 const anosArquivo = [...new Set(seriesArquivadas.map((s) => s.ano))].sort((a, b) => b - a);
@@ -25,6 +25,17 @@ const atualizado = (iso?: string) =>
     </header>
 
     <div class="grid">
+      {seriesAtivas.length === 0 && (
+        <div class="card em-breve">
+          <div class="card-top">
+            <span class="serie">Em breve</span>
+            <span class="count">{proximoAnoLetivo}</span>
+          </div>
+          <p class="descricao">Os materiais das turmas de {proximoAnoLetivo} entram aqui assim que
+            o ano letivo começar. Os de {ultimoAnoLetivo} continuam disponíveis
+            no <a href="#arquivo">arquivo</a>, logo abaixo.</p>
+        </div>
+      )}
       {seriesAtivas.map((s) => (
         <a href={`/materiais/${s.slug}`} class="card">
           <div class="card-top">
@@ -43,7 +54,7 @@ const atualizado = (iso?: string) =>
     </div>
 
     {anosArquivo.length > 0 && (
-      <section class="arquivo">
+      <section class="arquivo" id="arquivo">
         <h2>Arquivo</h2>
         <p class="subtitle">Materiais de anos letivos encerrados.</p>
         {anosArquivo.map((ano) => (
@@ -102,6 +113,10 @@ const atualizado = (iso?: string) =>
     background: white;
     transition: border-color 0.2s ease, transform 0.2s ease;
   }
+
+  .em-breve { border-style: dashed; background: transparent; }
+  .em-breve .descricao { margin-bottom: 0; }
+  .em-breve a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
   .card:hover {
     border-color: var(--accent);

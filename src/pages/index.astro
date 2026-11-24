@@ -5,7 +5,7 @@
    Nada nesta página é catalogado à mão: tudo sai dos mesmos manifestos que
    dirigem /materiais, /ferramentas e /analises. */
 import Layout from '../layouts/Layout.astro';
-import { materiaisRecentes, urlSerie, series } from '../utils/materiais';
+import { materiaisRecentes, urlSerie, series, ultimoAnoLetivo, proximoAnoLetivo } from '../utils/materiais';
 import { mapaDeListas, listaDe, urlLista } from '../utils/listas';
 import { destaques, ferramentas } from '../utils/ferramentas';
 import { analisesPublicadas, dataPorExtenso } from '../utils/analises';
@@ -110,8 +110,14 @@ const website = {
     <section class="bloco">
       <div class="bloco-topo">
         <h2>Publicados recentemente</h2>
-        <a href="/materiais" class="mais">Todos os {totalMateriais} materiais →</a>
+        {totalMateriais > 0
+          ? <a href="/materiais" class="mais">Todos os {totalMateriais} materiais →</a>
+          : <a href="/materiais#arquivo" class="mais">Arquivo de {ultimoAnoLetivo} →</a>}
       </div>
+      {recentes.length === 0 && (
+        <p class="em-breve">Em breve, os materiais das turmas de {proximoAnoLetivo}. Os de
+          {' '}{ultimoAnoLetivo} continuam no <a href="/materiais#arquivo">arquivo</a>.</p>
+      )}
       <ul class="recentes">
         {recentes.map((r) => (
           <li>
@@ -263,6 +269,9 @@ const website = {
   .mais:hover { text-decoration: underline; text-underline-offset: 3px; }
 
   /* --- publicados recentemente --- */
+  .em-breve { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+  .em-breve a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+
   .recentes { list-style: none; }
 
   .recentes li + li { border-top: 1px solid var(--rule); }

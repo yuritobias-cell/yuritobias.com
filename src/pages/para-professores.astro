@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { porTipo } from '../utils/ferramentas';
-import { seriesAtivas, series } from '../utils/materiais';
+import { seriesAtivas, series, ultimoAnoLetivo } from '../utils/materiais';
 import { analisesPublicadas } from '../utils/analises';
 
 /* Os números vêm dos manifestos: a página não envelhece sozinha quando entra
@@ -12,6 +12,10 @@ const nPdfs = series.reduce(
   (t, s) => t + [...s.materiais, ...s.provas, ...s.formativas].filter((m) => m.arquivo).length, 0);
 /* Quantos dos geradores de suporte são geradores de lista — os que compartilham
    o motor de sorteio e saem em folha A4. */
+/* As turmas citadas: as ativas; entre um ano letivo e outro, as do último ano. */
+const turmas = seriesAtivas.length > 0
+  ? seriesAtivas.map((s) => s.titulo).join(', ')
+  : `${series.filter((s) => s.ano === ultimoAnoLetivo).map((s) => s.titulo).join(', ')} em ${ultimoAnoLetivo}`;
 const nListas = porTipo('suporte').filter((f) => f.slug.startsWith('gerador-')
   && f.slug !== 'gerador-qrcode').length;
 
@@ -70,9 +74,7 @@ const schema = {
         <a class="card" href="/materiais">
           <span class="n">{nPdfs}</span>
           <span class="titulo">materiais em PDF</span>
-          <p>Listas, revisões e avaliações aplicadas nas turmas de {
-            seriesAtivas.map((s) => s.titulo).join(', ')
-          } — com as provas e formativas de anos anteriores.</p>
+          <p>Listas, revisões e avaliações aplicadas nas turmas de {turmas} — com as provas e formativas de anos anteriores.</p>
           <span class="cta">Ver materiais →</span>
         </a>
         <a class="card" href="/analises">

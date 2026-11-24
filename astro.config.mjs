@@ -113,6 +113,13 @@ function barrasFinais() {
   };
 }
 
+// Página gerada com <meta name="robots" content="noindex…"> não vai para o sitemap.
+// O filtro do sitemap roda no fim do build, com o HTML já em dist/.
+function temNoindex(pagina) {
+  const arquivo = path.join('./dist', decodeURIComponent(new URL(pagina).pathname), 'index.html');
+  return fs.existsSync(arquivo) && /<meta name="robots" content="noindex/.test(fs.readFileSync(arquivo, 'utf-8'));
+}
+
 // Séries arquivadas cujo slug não foi reaproveitado por uma série ativa:
 // a URL antiga (/materiais/<slug>) redireciona para a página no arquivo.
 const series = JSON.parse(fs.readFileSync('./src/data/series.json', 'utf-8'));
@@ -146,7 +153,8 @@ export default defineConfig({
     mdx(),
     // /exemplos fica fora da navegação e dos buscadores: acesso só pelo endereço direto;
     // /video/ são os endereços dos QR Codes, que só redirecionam para o YouTube
-    sitemap({ filter: (page) => !page.includes('/exemplos') && !page.includes('/video/') }),
+    // e as páginas marcadas noindex (os desvios das listas arquivadas, por exemplo)
+    sitemap({ filter: (page) => !page.includes('/exemplos') && !page.includes('/video/') && !temNoindex(page) }),
     serviceWorker(),
     barrasFinais(),
   ],

@@ -19,7 +19,7 @@ const blog = defineCollection({
 });
 
 /* Listas de exercícios em HTML — a versão navegável do PDF. Cada arquivo
-   aponta para a entrada que já existe no JSON da série (`serie` + `material`),
+   aponta para a entrada que já existe no JSON da série (`serie` + `ano` + `material`),
    e é essa ligação que faz o botão "Ler online" aparecer na capa da série.
    Ver README, "Listas em HTML". */
 const listas = defineCollection({
@@ -31,6 +31,8 @@ const listas = defineCollection({
     descricao: z.string(),
     /** Slug da série em src/data/series.json. */
     serie: z.string(),
+    /** Ano letivo da série — o slug se repete de um ano para o outro, o par não. */
+    ano: z.number().int(),
     /** Campo `n` da entrada correspondente no JSON da série. */
     material: z.string(),
     /** A linha de instruções da folha, quando houver. */

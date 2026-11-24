@@ -4,7 +4,7 @@
     "titulo": "9º ano",
     "tituloLongo": "9º ano",
     "ano": 2026,
-    "arquivada": false,
+    "arquivada": true,
     "descricao": "Álgebra, geometria e preparação para o Ensino Médio.",
     "descricaoMeta": "Materiais didáticos de matemática para o 9º ano do Ensino Fundamental.",
     "pastaPdf": "9ano"
@@ -14,7 +14,7 @@
     "titulo": "1º EM",
     "tituloLongo": "1º ano — Ensino Médio",
     "ano": 2026,
-    "arquivada": false,
+    "arquivada": true,
     "descricao": "Conjuntos, números reais, funções e geometria plana.",
     "descricaoMeta": "Materiais didáticos de matemática para o 1º ano do Ensino Médio.",
     "pastaPdf": "1em"
@@ -24,7 +24,7 @@
     "titulo": "2º EM",
     "tituloLongo": "2º ano — Ensino Médio",
     "ano": 2026,
-    "arquivada": false,
+    "arquivada": true,
     "descricao": "Trigonometria, funções trigonométricas e sistemas lineares.",
     "descricaoMeta": "Materiais didáticos de matemática para o 2º ano do Ensino Médio.",
     "pastaPdf": "2em"

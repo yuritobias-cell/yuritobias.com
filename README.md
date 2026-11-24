@@ -290,10 +290,20 @@ Tudo é dirigido por `src/data/series.json` — nenhuma página precisa ser edit
    `/materiais/arquivo/<ano>/<slug>`, com aviso de conteúdo encerrado. A URL antiga
    (`/materiais/<slug>`) redireciona sozinha para o arquivo — a menos que uma série
    nova reutilize o slug, caso em que ele passa a apontar para a série nova.
+   As listas em HTML da série vão junto, sem editar nenhum `.mdx`: passam para
+   `/materiais/arquivo/<ano>/<slug>/<arquivo>`, e o endereço antigo
+   (`/materiais/<slug>/<arquivo>`, que pode estar num QR Code ou no grupo da turma)
+   vira um desvio para lá, levando junto o `#q3` da questão. Esquecer o
+   `arquivada: true` numa série cujo slug se repete faz o build falhar ("mais de uma
+   série ativa").
 2. **Criar as séries novas**: adicione uma entrada por série no manifesto (com o `ano`
    novo e sem `pastaPdf` — a pasta padrão é `public/materiais/<ano>/<slug>/`) e crie:
    - `src/data/materiais/<ano>-<slug>.json` com os materiais (pode começar `[]`);
    - a pasta `public/materiais/<ano>/<slug>/` para os PDFs;
+   - as listas em HTML do ano novo, cada uma num `.mdx` **novo** com o `ano` novo. Para
+     reaproveitar o texto de uma lista do ano anterior, copie o arquivo com outro nome
+     (`teorema-pitagoras-2027.mdx`) — nunca mude o `ano` do antigo: ele continua sendo a
+     página do arquivo e o destino do desvio;
    - `src/data/materiais/<ano>-<slug>-provas.json` e `<ano>-<slug>-formativas.json` são
      opcionais (sem eles, a série começa sem somativas/formativas anteriores).
 3. Confira com `npm run dev` e faça push. O build valida pastas e PDFs e falha cedo se algo faltar.
@@ -316,17 +326,22 @@ Cada lista é um `.mdx` em `src/content/listas/`, transcrito do `.tex` que gerou
 titulo: "Teorema de Pitágoras"
 descricao: "Resumo — vai para as meta tags, o índice por assunto e a busca."
 serie: "9ano"        # slug em src/data/series.json
+ano: 2026            # ano letivo da série — o slug se repete entre anos, o par não
 material: "17"       # o `n` da entrada no JSON da série
 instrucoes: "Resolva as questões no caderno, apresentando o desenvolvimento."
 draft: false
 ---
 ```
 
-O par `serie` + `material` é a ligação com o conteúdo que já existe: é ele que faz o
+O trio `serie` + `ano` + `material` é a ligação com o conteúdo que já existe: é ele que faz o
 botão aparecer na capa da série e que leva a busca e o índice por assunto a apontarem
-para a página em HTML em vez da capa. O build **falha** se a série não existir, se o
+para a página em HTML em vez da capa. O build **falha** se a série daquele ano não existir, se o
 `material` não casar com nenhum `n` daquela série, ou se duas listas disputarem o mesmo
-material. Os assuntos **não** se repetem aqui: saem do próprio material no JSON da série.
+material.
+
+A lista mora sob o endereço da série: `/materiais/<slug>/<arquivo>` enquanto a série está
+ativa, `/materiais/arquivo/<ano>/<slug>/<arquivo>` depois de arquivada (ver "Virada do ano
+letivo"). Os assuntos **não** se repetem aqui: saem do próprio material no JSON da série.
 
 O corpo é uma lista numerada em Markdown; as subalíneas a), b) são uma lista aninhada.
 Não há KaTeX nem MathJax — a matemática usa as mesmas classes das ferramentas, por meio

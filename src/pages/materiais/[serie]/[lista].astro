@@ -1,396 +1,46 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import '../../../styles/matematica.css';
-import { listasPublicadas, materialDaLista, type Lista } from '../../../utils/listas';
-import { assuntos as todosAssuntos } from '../../../utils/assuntos';
-import { render } from 'astro:content';
+/* Listas em HTML das séries ativas: /materiais/<slug>/<id>.
+   Depois da virada, as listas da série arquivada passam a viver em
+   /materiais/arquivo/<ano>/<slug>/<id>, e o endereço antigo — que pode estar
+   num QR Code ou no grupo da turma, com o #q3 da questão — vira um desvio para
+   lá, a menos que uma lista do ano novo tenha ocupado o mesmo endereço. */
+import PaginaLista from '../../../components/PaginaLista.astro';
+import { listasPublicadas, listasDesviadas, serieDaLista, type Lista } from '../../../utils/listas';
 
 export async function getStaticPaths() {
-  const listas = await listasPublicadas();
-  return listas.map((lista) => ({
-    params: { serie: lista.data.serie, lista: lista.id },
-    props: { lista },
-  }));
+  const ativas = (await listasPublicadas()).filter((l) => !serieDaLista(l).arquivada);
+  const desvios = await listasDesviadas();
+  return [
+    ...ativas.map((lista) => ({
+      params: { serie: lista.data.serie, lista: lista.id },
+      props: { lista, destino: undefined },
+    })),
+    ...desvios.map((d) => ({
+      params: { serie: d.slug, lista: d.id },
+      props: { lista: undefined, destino: d.destino },
+    })),
+  ];
 }
 
-interface Props { lista: Lista }
-const { lista } = Astro.props;
-const { Content } = await render(lista);
-const { material, serie, urlSerie, pdf } = materialDaLista(lista);
-
-// Os assuntos são os do material no JSON da série — uma fonte só.
-const marcados = new Set(material.assuntos ?? []);
-const assuntos = todosAssuntos.filter((a) => marcados.has(a.slug));
-
-/* Declarar a lista como material didático é o que faz um buscador entender que
-   a página é um exercício de matemática de uma série, e não um texto qualquer. */
-const schema = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    name: lista.data.titulo,
-    description: lista.data.descricao,
-    url: new URL(Astro.url.pathname, Astro.site).toString(),
-    learningResourceType: 'Lista de exercícios',
-    educationalLevel: serie.tituloLongo,
-    inLanguage: 'pt-BR',
-    isAccessibleForFree: true,
-    about: assuntos.map((a) => a.nome),
-    license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-    author: { '@id': 'https://yuritobias.com/#eu' },
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Materiais', item: new URL('/materiais/', Astro.site).toString() },
-      { '@type': 'ListItem', position: 2, name: serie.titulo, item: new URL(urlSerie, Astro.site).toString() },
-      { '@type': 'ListItem', position: 3, name: lista.data.titulo },
-    ],
-  },
-];
+type Props = { lista: Lista; destino: undefined } | { lista: undefined; destino: string };
+const { lista, destino } = Astro.props;
+const destinoAbsoluto = destino && new URL(`${destino}/`, Astro.site).toString();
 ---
 
-<Layout title={lista.data.titulo} description={lista.data.descricao} schema={schema}>
-  <main>
-    <nav class="breadcrumb">
-      <a href="/materiais">Materiais</a>
-      <span>›</span>
-      <a href={urlSerie}>{serie.titulo}</a>
-      <span>›</span>
-      <span>Lista</span>
-    </nav>
-
-    <header>
-      <h1>{lista.data.titulo}</h1>
-      <p class="subtitle">{lista.data.descricao}</p>
-
-      <div class="acoes">
-        {pdf && <a class="btn" href={pdf} download>Baixar PDF</a>}
-        <button class="btn sec" type="button" id="imprimir">Imprimir</button>
-      </div>
-
-      {assuntos.length > 0 && (
-        <p class="assuntos">
-          {assuntos.map((a) => <a href={`/assuntos/${a.slug}`}>{a.nome}</a>)}
-        </p>
-      )}
-    </header>
-
-    {lista.data.instrucoes && (
-      <p class="instrucoes"><b>Instruções:</b> {lista.data.instrucoes}</p>
-    )}
-
-    <article class="lista mat">
-      <Content />
-    </article>
-
-    <footer class="rodape">
-      <p>
-        {serie.tituloLongo} · Prof. Yuri Tobias · Escola SESI Poços de Caldas.
-        Esta lista está sob <a href="/para-professores">CC BY-NC-SA 4.0</a> —
-        use e adapte em sala de aula, com atribuição.
-      </p>
-      <p><a href={urlSerie}>← Todos os materiais de {serie.titulo}</a></p>
-    </footer>
-  </main>
-</Layout>
-
-<script>
-  document.getElementById('imprimir')?.addEventListener('click', () => window.print());
-
-  /* Clicar no número da questão segue o link (#q3) normalmente e, de bônus,
-     copia o endereço completo — pronto para colar no grupo da turma. Sem
-     clipboard (http, navegador antigo), fica só a navegação. */
-  document.querySelectorAll<HTMLAnchorElement>('.lista a.q-num').forEach((a) => {
-    a.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(a.href);
-      } catch {
-        return;
-      }
-      a.classList.add('copiado');
-      setTimeout(() => a.classList.remove('copiado'), 1600);
-    });
-  });
-</script>
-
-<style>
-  main {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 5rem;
-    animation: fade-up 0.5s ease both;
-  }
-
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 2rem;
-  }
-
-  .breadcrumb a { color: var(--accent); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
-
-  header { margin-bottom: 2rem; }
-
-  h1 {
-    font-family: var(--font-display);
-    font-size: clamp(1.8rem, 4.5vw, 2.5rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle { font-size: 0.95rem; color: var(--muted); font-weight: 300; line-height: 1.65; }
-
-  .acoes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.2rem; }
-
-  .btn {
-    display: inline-block;
-    background: var(--accent);
-    color: var(--bg);
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    padding: 0.45rem 0.9rem;
-    font: inherit;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .btn.sec { background: white; color: var(--accent); border-color: var(--rule); }
-  .btn.sec:hover { border-color: var(--accent); }
-
-  .assuntos { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
-
-  .assuntos a {
-    font-size: 0.75rem;
-    color: var(--accent);
-    text-decoration: none;
-    border: 1px solid var(--rule);
-    border-radius: 99px;
-    padding: 0.15rem 0.7rem;
-    background: white;
-  }
-
-  .assuntos a:hover { border-color: var(--accent); }
-
-  .instrucoes {
-    font-size: 0.88rem;
-    color: var(--ink);
-    line-height: 1.6;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--rule);
-    border-left: 3px solid var(--accent);
-    border-radius: 4px;
-    background: white;
-    margin-bottom: 2rem;
-  }
-
-  /* ---------- o corpo da lista ---------- */
-  .lista :global(ol) { list-style: none; counter-reset: q; display: grid; gap: 1.6rem; }
-
-  .lista :global(> ol > li) {
-    position: relative;
-    padding-left: 2.1rem;
-    font-size: 1rem;
-    line-height: 1.65;
-    scroll-margin-top: 1.5rem;
-  }
-
-  /* O número da questão é um link para ela mesma (#q3) — vem pronto do build,
-     pelo plugin src/utils/rehype-questoes.mjs. Clicar copia o endereço. */
-  .lista :global(a.q-num) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent);
-    text-decoration: none;
-    padding-top: 0.2em;
-  }
-  .lista :global(a.q-num:hover) { text-decoration: underline; }
-  .lista :global(a.q-num:hover::after),
-  .lista :global(a.q-num:focus-visible::after) {
-    content: "#";
-    margin-left: 0.15em;
-    color: var(--muted);
-    font-weight: 400;
-  }
-  .lista :global(a.q-num.copiado::after) {
-    content: "link copiado";
-    position: absolute;
-    left: 0;
-    top: -1.3em;
-    white-space: nowrap;
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: var(--bg);
-    background: var(--accent);
-    border-radius: 3px;
-    padding: 0.05rem 0.4rem;
-  }
-
-  /* Quem chega por um link direto vê a questão marcada. */
-  .lista :global(> ol > li:target) {
-    background: color-mix(in srgb, var(--accent) 7%, transparent);
-    box-shadow: -0.6rem 0 0 color-mix(in srgb, var(--accent) 7%, transparent),
-                0.6rem 0 0 color-mix(in srgb, var(--accent) 7%, transparent);
-    border-radius: 2px;
-  }
-
-  /* Subitens a), b), c) */
-  .lista :global(> ol > li ol) {
-    counter-reset: sub;
-    gap: 0.4rem;
-    margin-top: 0.7rem;
-  }
-
-  .lista :global(> ol > li ol > li) {
-    counter-increment: sub;
-    position: relative;
-    padding-left: 1.7rem;
-    font-size: 0.95rem;
-  }
-
-  .lista :global(> ol > li ol > li::before) {
-    content: counter(sub, lower-alpha) ")";
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    color: var(--muted);
-  }
-
-  /* Alternativas em grade — o `tasks` do LaTeX, com as colunas que a questão pede */
-  .lista :global(ol.alt) { grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); }
-  @media (max-width: 560px) {
-    .lista :global(ol.alt) { grid-template-columns: 1fr; }
-  }
-
-  /* Listas sem numeração — o `itemize` do LaTeX */
-  .lista :global(ul) {
-    list-style: none;
-    display: grid;
-    gap: 0.3rem;
-    margin: 0.6rem 0 0.2rem;
-  }
-
-  .lista :global(ul > li) {
-    position: relative;
-    padding-left: 1.1rem;
-    font-size: 0.95rem;
-  }
-
-  .lista :global(ul > li::before) {
-    content: "·";
-    position: absolute;
-    left: 0.25rem;
-    color: var(--accent);
-    font-weight: 700;
-  }
-
-  /* Lacuna para o aluno preencher — o `\underline{\hspace{1cm}}` */
-  .lista :global(.lacuna) {
-    display: inline-block;
-    min-width: 3.5rem;
-    border-bottom: 1px solid var(--muted);
-    margin: 0 0.2rem;
-  }
-
-  /* Tabela de dados da questão — o `tabular` com \hline do LaTeX. A legenda
-     existe para o leitor de tela; na tela ela fica discreta, sob a tabela. */
-  .lista :global(table.tabela) {
-    border-collapse: collapse;
-    margin: 0.8rem auto;
-    align-self: center; /* ao lado de uma figura (<Figuras>), não estica junto */
-    font-size: 0.95rem;
-    font-variant-numeric: lining-nums tabular-nums;
-  }
-  .lista :global(table.tabela caption) {
-    caption-side: bottom;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    color: var(--muted);
-    padding-top: 0.35rem;
-  }
-  .lista :global(table.tabela th),
-  .lista :global(table.tabela td) {
-    border: 1px solid var(--rule);
-    padding: 0.3rem 0.9rem;
-    text-align: center;
-  }
-  .lista :global(table.tabela th) { font-weight: 600; }
-  /* Célula em branco é para o aluno completar: precisa de corpo para escrever. */
-  .lista :global(table.tabela td:empty) { min-width: 2.8rem; height: 2rem; }
-  .lista :global(table.tabela tbody th) { font-weight: 400; text-align: left; }
-  .lista :global(table.tabela thead),
-  .lista :global(table.tabela tfoot) { background: white; }
-
-  /* Texto-base citado (notícia, trecho de prova) — o `quote` do LaTeX. */
-  .lista :global(blockquote) {
-    margin: 0.6rem 0 0.8rem;
-    padding: 0.5rem 0 0.5rem 1rem;
-    border-left: 2px solid var(--rule);
-    font-size: 0.93rem;
-    color: var(--ink);
-  }
-  .lista :global(blockquote cite) {
-    display: block;
-    font-style: normal;
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-top: 0.3rem;
-  }
-
-  .lista :global(p) { margin: 0 0 0.5rem; }
-  .lista :global(p:last-child) { margin-bottom: 0; }
-  .lista :global(b), .lista :global(strong) { font-weight: 600; color: var(--ink); }
-  .lista :global(em) { font-style: italic; }
-  .lista :global(sup) { font-size: 0.7em; vertical-align: 0.45em; }
-  .lista :global(sub) { font-size: 0.7em; vertical-align: -0.25em; }
-  .lista :global(i) { font-style: italic; }
-
-  .rodape {
-    margin-top: 3.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--rule);
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-weight: 300;
-    line-height: 1.7;
-  }
-
-  .rodape a { color: var(--accent); text-decoration: none; }
-  .rodape a:hover { text-decoration: underline; }
-  .rodape p + p { margin-top: 0.6rem; }
-
-  @media (max-width: 640px) {
-    main { padding: 2rem 1.25rem 3.5rem; }
-  }
-
-  /* ---------- impressão: só a lista vai ao papel ---------- */
-  @media print {
-    @page { size: A4; margin: 15mm; }
-    :global(body > nav), :global(body > footer) { display: none !important; }
-    main { max-width: none; padding: 0; animation: none; }
-    .breadcrumb, .acoes, .assuntos { display: none !important; }
-    .lista :global(> ol > li) { break-inside: avoid; }
-    .rodape { margin-top: 1.5rem; }
-  }
-</style>
+{lista && <PaginaLista lista={lista} />}
+{destinoAbsoluto && (
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <title>Lista arquivada</title>
+      <meta name="robots" content="noindex" />
+      <link rel="canonical" href={destinoAbsoluto} />
+      {/* O script leva junto o #q3; o meta refresh é a rede para quem está sem JS. */}
+      <script is:inline define:vars={{ destino: `${destino}/` }}>location.replace(destino + location.hash);</script>
+      <meta http-equiv="refresh" content={`0;url=${destino}/`} />
+    </head>
+    <body>
+      <p>Esta lista foi arquivada: <a href={`${destino}/`}>{destinoAbsoluto}</a></p>
+    </body>
+  </html>
+)}

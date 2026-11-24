@@ -105,12 +105,36 @@ function montar(entrada: EntradaManifesto): Serie {
 /** Todas as séries do manifesto, com dados carregados e PDFs validados (o build falha cedo). */
 export const series: Serie[] = (manifesto as EntradaManifesto[]).map(montar);
 
+/* O slug pode se repetir entre anos (o 9º ano de 2026 e o de 2027), mas não
+   dentro do mesmo ano, nem entre duas séries ativas — as duas disputariam
+   /materiais/<slug>. Esquecer o `arquivada: true` na virada cai aqui. */
+function validarSlugs() {
+  const repetidos = (chaves: string[]) => [...new Set(chaves.filter((k, i, a) => a.indexOf(k) !== i))];
+  const mesmoAno = repetidos(series.map((s) => `${s.ano}/${s.slug}`));
+  if (mesmoAno.length > 0) {
+    throw new Error(`[series.json] série repetida no mesmo ano: ${mesmoAno.join(', ')}`);
+  }
+  const ativas = repetidos(series.filter((s) => !s.arquivada).map((s) => s.slug));
+  if (ativas.length > 0) {
+    throw new Error(
+      `[series.json] mais de uma série ativa com o slug ${ativas.join(', ')} — `
+      + 'na virada do ano, marque "arquivada": true nas séries do ano encerrado'
+    );
+  }
+}
+validarSlugs();
+
 /** Endereço público de uma série — as arquivadas vivem sob /materiais/arquivo/. */
 export const urlSerie = (s: Serie) =>
   s.arquivada ? `/materiais/arquivo/${s.ano}/${s.slug}` : `/materiais/${s.slug}`;
 
 export const seriesAtivas = series.filter((s) => !s.arquivada);
 export const seriesArquivadas = series.filter((s) => s.arquivada);
+
+/* Entre o arquivamento de um ano e o cadastro das turmas do seguinte, não há
+   série ativa: as páginas mostram "Em breve" no lugar dos cartões. */
+export const ultimoAnoLetivo = Math.max(...series.map((s) => s.ano));
+export const proximoAnoLetivo = ultimoAnoLetivo + 1;
 
 /** Um material com a série de onde veio — o que "Publicados recentemente" mostra. */
 export interface Recente {
